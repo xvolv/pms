@@ -1,0 +1,640 @@
+{
+  "Version": 1,
+  "Hash": "MZZ7mFMuG4diN3XHNEOhnVkQXm4Rmd0vZxTOaDNMRSQ=",
+  "Source": "ERP.V7.WebPMS",
+  "BasePath": "_content/ERP.V7.WebPMS",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "ERP.V7.WebPMS\\wwwroot",
+      "Source": "ERP.V7.WebPMS",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\bundle\\ERP.V7.WebPMS.styles.css",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "ERP.V7.WebPMS#[.{fingerprint}]?.styles.css",
+      "AssetKind": "All",
+      "AssetMode": "CurrentProject",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "ScopedCss",
+      "AssetTraitValue": "ApplicationBundle",
+      "Fingerprint": "vupo32cyym",
+      "Integrity": "5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\bundle\\ERP.V7.WebPMS.styles.css"
+    },
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ERP.V7.WebPMS.bundle.scp.css",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "ERP.V7.WebPMS#[.{fingerprint}]!.bundle.scp.css",
+      "AssetKind": "All",
+      "AssetMode": "Reference",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "ScopedCss",
+      "AssetTraitValue": "ProjectBundle",
+      "Fingerprint": "vupo32cyym",
+      "Integrity": "5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ERP.V7.WebPMS.bundle.scp.css"
+    },
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\app.css",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "app#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "h3v7k14dg9",
+      "Integrity": "0671kKBdwwSZ2MgwXFnE7rQlg+RjTqoFvxg48AXic98=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\app.css"
+    },
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "bootstrap/bootstrap.min#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "bpk8xqwxhs",
+      "Integrity": "z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "bootstrap/bootstrap.min.css#[.{fingerprint}]?.map",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "8inm30yfxf",
+      "Integrity": "gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Identity": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\favicon.png",
+      "SourceId": "ERP.V7.WebPMS",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\",
+      "BasePath": "_content/ERP.V7.WebPMS",
+      "RelativePath": "favicon#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "ifv42okdf2",
+      "Integrity": "4mWsDy3aHl36ZbGt8zByK7Pvd4kRUoNgTYzRnwmPHwg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\favicon.png"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "app.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\app.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "19200"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0671kKBdwwSZ2MgwXFnE7rQlg+RjTqoFvxg48AXic98=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 08:59:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-0671kKBdwwSZ2MgwXFnE7rQlg+RjTqoFvxg48AXic98="
+        }
+      ]
+    },
+    {
+      "Route": "app.h3v7k14dg9.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\app.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "19200"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0671kKBdwwSZ2MgwXFnE7rQlg+RjTqoFvxg48AXic98=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 08:59:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "h3v7k14dg9"
+        },
+        {
+          "Name": "label",
+          "Value": "app.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-0671kKBdwwSZ2MgwXFnE7rQlg+RjTqoFvxg48AXic98="
+        }
+      ]
+    },
+    {
+      "Route": "bootstrap/bootstrap.min.bpk8xqwxhs.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "162720"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bpk8xqwxhs"
+        },
+        {
+          "Name": "label",
+          "Value": "bootstrap/bootstrap.min.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg="
+        }
+      ]
+    },
+    {
+      "Route": "bootstrap/bootstrap.min.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "162720"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg="
+        }
+      ]
+    },
+    {
+      "Route": "bootstrap/bootstrap.min.css.8inm30yfxf.map",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "449111"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8inm30yfxf"
+        },
+        {
+          "Name": "label",
+          "Value": "bootstrap/bootstrap.min.css.map"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ="
+        }
+      ]
+    },
+    {
+      "Route": "bootstrap/bootstrap.min.css.map",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "449111"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/plain"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ="
+        }
+      ]
+    },
+    {
+      "Route": "ERP.V7.WebPMS.bundle.scp.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ERP.V7.WebPMS.bundle.scp.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3449"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 09:06:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ="
+        }
+      ]
+    },
+    {
+      "Route": "ERP.V7.WebPMS.styles.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\bundle\\ERP.V7.WebPMS.styles.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3449"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 09:06:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ="
+        }
+      ]
+    },
+    {
+      "Route": "ERP.V7.WebPMS.vupo32cyym.bundle.scp.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ERP.V7.WebPMS.bundle.scp.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3449"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 09:06:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vupo32cyym"
+        },
+        {
+          "Name": "label",
+          "Value": "ERP.V7.WebPMS.bundle.scp.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ="
+        }
+      ]
+    },
+    {
+      "Route": "ERP.V7.WebPMS.vupo32cyym.styles.css",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\bundle\\ERP.V7.WebPMS.styles.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3449"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 09:06:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vupo32cyym"
+        },
+        {
+          "Name": "label",
+          "Value": "ERP.V7.WebPMS.styles.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5wMniXa8IKl3OPQ04q/8ccXPfME0kbBVyUYZueWMBYQ="
+        }
+      ]
+    },
+    {
+      "Route": "favicon.ifv42okdf2.png",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\favicon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1148"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"4mWsDy3aHl36ZbGt8zByK7Pvd4kRUoNgTYzRnwmPHwg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ifv42okdf2"
+        },
+        {
+          "Name": "label",
+          "Value": "favicon.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-4mWsDy3aHl36ZbGt8zByK7Pvd4kRUoNgTYzRnwmPHwg="
+        }
+      ]
+    },
+    {
+      "Route": "favicon.png",
+      "AssetFile": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\favicon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1148"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"4mWsDy3aHl36ZbGt8zByK7Pvd4kRUoNgTYzRnwmPHwg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 27 Jul 2026 07:48:17 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-4mWsDy3aHl36ZbGt8zByK7Pvd4kRUoNgTYzRnwmPHwg="
+        }
+      ]
+    }
+  ]
+}

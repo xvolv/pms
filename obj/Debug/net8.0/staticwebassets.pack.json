@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\ERP.V7.WebPMS.bundle.scp.css",
+      "PackagePath": "staticwebassets\\ERP.V7.WebPMS.vupo32cyym.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\RND01\\source\\repos\\ERP.V7.WebPMS\\ERP.V7.WebPMS\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.ERP.V7.WebPMS.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.ERP.V7.WebPMS.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.ERP.V7.WebPMS.props",
+      "PackagePath": "build\\ERP.V7.WebPMS.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.ERP.V7.WebPMS.props",
+      "PackagePath": "buildMultiTargeting\\ERP.V7.WebPMS.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.ERP.V7.WebPMS.props",
+      "PackagePath": "buildTransitive\\ERP.V7.WebPMS.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

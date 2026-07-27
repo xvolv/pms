@@ -1,0 +1,214 @@
+<div class="main-menu-container">
+    <div class="menu-header">
+        <span class="menu-title">Main Menu</span>
+        <button class="expand-all-btn" @onclick="ToggleExpandAll">
+            <span>@(allExpanded ? "Collapse All" : "Expand All")</span>
+            <i class="bi @(allExpanded ? "bi-chevron-up" : "bi-chevron-down") ms-1"></i>
+        </button>
+    </div>
+
+    <div class="menu-scrollable">
+        <!-- Main Page Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleMainPage">
+                <i class="bi bi-chevron-right chevron-icon @(isMainPageExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-house-door-fill group-icon" style="color: #0d6efd;"></i>
+                <span class="group-title">Main Page</span>
+            </div>
+            @if (isMainPageExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="dashboard" Match="NavLinkMatch.All">
+                        <i class="bi bi-folder-fill item-icon" style="color: #ffc107;"></i>
+                        <span>Document Browser</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="registration-document">
+                        <i class="bi bi-file-earmark-text-fill item-icon" style="color: #198754;"></i>
+                        <span>Registration Document</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="density-chart">
+                        <i class="bi bi-bar-chart-steps item-icon" style="color: #0dcaf0;"></i>
+                        <span>Density Chart</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="room-status">
+                        <i class="bi bi-grid-3x3-gap-fill item-icon" style="color: #20c997;"></i>
+                        <span>Room Status</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="room-inventory">
+                        <i class="bi bi-key-fill item-icon" style="color: #fd7e14;"></i>
+                        <span>Room Inventory</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="package-audit">
+                        <i class="bi bi-file-earmark-check-fill item-icon" style="color: #6f42c1;"></i>
+                        <span>Package Audit</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
+        <!-- Registration Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleRegistration">
+                <i class="bi bi-chevron-right chevron-icon @(isRegistrationExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-journal-text group-icon" style="color: #dc3545;"></i>
+                <span class="group-title">Registration</span>
+            </div>
+            @if (isRegistrationExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="reservation">
+                        <i class="bi bi-calendar-event-fill item-icon" style="color: #e83e8c;"></i>
+                        <span>Reservation</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="counter">
+                        <i class="bi bi-plus-square-fill item-icon" style="color: #0d6efd;"></i>
+                        <span>Counter (Check In)</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="group-registration">
+                        <i class="bi bi-people-fill item-icon" style="color: #6610f2;"></i>
+                        <span>Group Registration</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
+        <!-- Profile Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleProfile">
+                <i class="bi bi-chevron-right chevron-icon @(isProfileExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-person-fill group-icon" style="color: #6c757d;"></i>
+                <span class="group-title">Profile</span>
+            </div>
+            @if (isProfileExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="guest">
+                        <i class="bi bi-person item-icon" style="color: #6c757d;"></i>
+                        <span>Guest</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="contact">
+                        <i class="bi bi-telephone-fill item-icon" style="color: #198754;"></i>
+                        <span>Contact</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="company">
+                        <i class="bi bi-building item-icon" style="color: #0d6efd;"></i>
+                        <span>Company</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="travel-agent">
+                        <i class="bi bi-airplane-fill item-icon" style="color: #0dcaf0;"></i>
+                        <span>Travel Agent</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="source">
+                        <i class="bi bi-share-fill item-icon" style="color: #fd7e14;"></i>
+                        <span>Source</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="group">
+                        <i class="bi bi-people item-icon" style="color: #20c997;"></i>
+                        <span>Group</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
+        <!-- Night Audit Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleNightAudit">
+                <i class="bi bi-chevron-right chevron-icon @(isNightAuditExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-moon-stars-fill group-icon" style="color: #6f42c1;"></i>
+                <span class="group-title">Night Audit</span>
+            </div>
+            @if (isNightAuditExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="end-of-day">
+                        <i class="bi bi-brightness-alt-high-fill item-icon" style="color: #fd7e14;"></i>
+                        <span>End of Day</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="end-of-month">
+                        <i class="bi bi-calendar-check-fill item-icon" style="color: #198754;"></i>
+                        <span>End of Month</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="weather">
+                        <i class="bi bi-file-earmark-bar-graph-fill item-icon" style="color: #0d6efd;"></i>
+                        <span>Weather (Reports)</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
+        <!-- Settings Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleSettings">
+                <i class="bi bi-chevron-right chevron-icon @(isSettingsExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-gear-fill group-icon" style="color: #495057;"></i>
+                <span class="group-title">Setting And Miscellaneous</span>
+            </div>
+            @if (isSettingsExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="property">
+                        <i class="bi bi-house-fill item-icon" style="color: #198754;"></i>
+                        <span>Property</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="package">
+                        <i class="bi bi-box-seam-fill item-icon" style="color: #fd7e14;"></i>
+                        <span>Package</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="revenue">
+                        <i class="bi bi-cash-coin item-icon" style="color: #20c997;"></i>
+                        <span>Revenue Management</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="calendar">
+                        <i class="bi bi-calendar3 item-icon" style="color: #0dcaf0;"></i>
+                        <span>Calendar</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="budget">
+                        <i class="bi bi-wallet2 item-icon" style="color: #ffc107;"></i>
+                        <span>Budget</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="license">
+                        <i class="bi bi-key-fill item-icon" style="color: #6f42c1;"></i>
+                        <span>License</span>
+                    </NavLink>
+                    <NavLink class="menu-item" href="update">
+                        <i class="bi bi-arrow-clockwise item-icon" style="color: #0d6efd;"></i>
+                        <span>ERP Update</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="menu-footer">
+        <NavLink class="logout-link" href="">
+            <i class="bi bi-box-arrow-left logout-icon"></i>
+            <span>Log Out</span>
+        </NavLink>
+    </div>
+</div>
+
+@code {
+    private bool isMainPageExpanded = true;
+    private bool isRegistrationExpanded = true;
+    private bool isProfileExpanded = true;
+    private bool isNightAuditExpanded = true;
+    private bool isSettingsExpanded = true;
+
+    private bool allExpanded = true;
+
+    private void ToggleMainPage() => isMainPageExpanded = !isMainPageExpanded;
+    private void ToggleRegistration() => isRegistrationExpanded = !isRegistrationExpanded;
+    private void ToggleProfile() => isProfileExpanded = !isProfileExpanded;
+    private void ToggleNightAudit() => isNightAuditExpanded = !isNightAuditExpanded;
+    private void ToggleSettings() => isSettingsExpanded = !isSettingsExpanded;
+
+    private void ToggleExpandAll()
+    {
+        allExpanded = !allExpanded;
+        isMainPageExpanded = allExpanded;
+        isRegistrationExpanded = allExpanded;
+        isProfileExpanded = allExpanded;
+        isNightAuditExpanded = allExpanded;
+        isSettingsExpanded = allExpanded;
+    }
+}

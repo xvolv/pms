@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\ERP.V7.WebPMS.props" />
+</Project>

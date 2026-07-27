@@ -1,0 +1,234 @@
+@page "/"
+@layout ERP.V7.WebPMS.Components.Layout.LoginLayout
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Services
+@using CNET_V7_Domain.Misc
+@inject IApiService ApiService
+@inject NavigationManager Navigation
+
+<PageTitle>Login - PMS ERP V7</PageTitle>
+
+<div class="login-container">
+    <div class="login-header">
+       @*  <span class="brand-cnet">RED Cloud</span> *@ <span class="brand-erp">PMS ERP V7</span>
+    </div>
+
+    <div class="login-card">
+        @if (currentStep == 1)
+        {
+            <div class="card-subtitle">
+                Please verify your identification no. to continue
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+                </div>
+            }
+
+            <form @onsubmit="HandleVerify">
+                <div class="input-group-custom">
+                    <input type="text" 
+                           class="form-control-custom" 
+                           placeholder="Identification No." 
+                           @bind="tin" 
+                           required 
+                           disabled="@isLoading" />
+                    <span class="input-icon">
+                        <i class="bi bi-cloud-fill"></i>
+                    </span>
+                </div>
+
+                <div class="login-actions-row">
+                    <label class="checkbox-container">
+                        <input type="checkbox" @bind="remember" disabled="@isLoading" />
+                        <span class="checkmark"></span>
+                        Remember
+                    </label>
+                    <button type="submit" class="btn-orange" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>Verifying...</span>
+                        }
+                        else
+                        {
+                            <span>Verify</span>
+                        }
+                    </button>
+                </div>
+            </form>
+        }
+        else if (currentStep == 2)
+        {
+            <div class="card-subtitle">
+                Login to start your session
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+                </div>
+            }
+            
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>@successMessage
+                </div>
+            }
+
+            <form @onsubmit="HandleLogin">
+                <div class="input-group-custom">
+                    <input type="text" 
+                           class="form-control-custom" 
+                           placeholder="Username" 
+                           @bind="username" 
+                           required 
+                           disabled="@isLoading" />
+                    <span class="input-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                </div>
+
+                <div class="input-group-custom">
+                    <input type="password" 
+                           class="form-control-custom" 
+                           placeholder="Password" 
+                           @bind="password" 
+                           required 
+                           disabled="@isLoading" />
+                    <span class="input-icon">
+                        <i class="bi bi-lock-fill"></i>
+                    </span>
+                </div>
+
+                <div class="input-group-custom">
+                    <select class="form-control-custom select-custom" @bind="selectedBranchId" required disabled="@isLoading">
+                        <option value="" disabled selected>Select Branch ...</option>
+                        @if (systemInitData?.branches != null)
+                        {
+                            @foreach (var branch in systemInitData.branches)
+                            {
+                                <option value="@branch.Id">@branch.Name</option>
+                            }
+                        }
+                    </select>
+                    <span class="input-icon">
+                        <i class="bi bi-chevron-down"></i>
+                    </span>
+                </div>
+
+                <div class="login-actions-row">
+                    <label class="checkbox-container">
+                        <input type="checkbox" @bind="isRememberMe" disabled="@isLoading" />
+                        <span class="checkmark"></span>
+                        Remember Me
+                    </label>
+                    <a href="javascript:void(0)" class="forgot-password-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-orange btn-block mt-4 w-100" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Logging in...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                    }
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (currentStep == 2 && systemInitData?.company != null)
+    {
+        <div class="company-footer">
+            @systemInitData.company.FirstName
+        </div>
+    }
+    
+</div>
+
+@code {
+    private string tin = "";
+    private bool remember = false;
+    private string username = "";
+    private string password = "";
+    private string selectedBranchId = "";
+    private bool isRememberMe = false;
+
+    private int currentStep = 1;
+    private bool isLoading = false;
+    private string? errorMessage;
+    private string? successMessage;
+    private SystemInitDTO? systemInitData;
+
+    private async Task HandleVerify()
+    {
+        if (string.IsNullOrWhiteSpace(tin))
+        {
+            errorMessage = "Please enter an identification number.";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+        successMessage = null;
+
+        ResponseModel<SystemInitDTO>? result = await ApiService.InitializeSystemAsync(tin);
+
+        if (result != null && result.Success && result.Data != null)
+        {
+            systemInitData = result.Data;
+            currentStep = 2;
+            if (result.Message != null && result.Message.Contains("Offline"))
+            {
+                successMessage = result.Message;
+            }
+        }
+        else
+        {
+            errorMessage = result?.Message ?? "Unable to verify the identification number. Please try again.";
+        }
+
+        isLoading = false;
+    }
+
+    private async Task HandleLogin()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Please enter both username and password.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(selectedBranchId))
+        {
+            errorMessage = "Please select a branch.";
+            return;
+        }
+
+        isLoading = true;
+
+        var result = await ApiService.AuthenticateAsync(username, password, tin, selectedBranchId);
+
+        if (result != null && result.Success)
+        {
+            // Successful login
+            Navigation.NavigateTo("/dashboard");
+        }
+        else
+        {
+            errorMessage = result?.Message ?? "Invalid username or password.";
+        }
+
+        isLoading = false;
+    }
+}
