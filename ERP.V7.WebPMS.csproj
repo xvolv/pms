@@ -15,13 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CNET_V7_Domain">
-      <HintPath>..\..\..\..\..\..\CNET_V7_Domain\CNET_V7_Domain.dll</HintPath>
-    </Reference>
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Reference Include="CNET_V7_Domain">
+      <HintPath>..\..\..\..\..\DLL\CNET_V7_Domain.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
