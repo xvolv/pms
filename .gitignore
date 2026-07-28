@@ -1,6 +1,7 @@
 bin/
 obj/
 .vs/
+
 *.user
 appsettings.json
 ERP.V7.WebPMS.slnx
