@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DevExpress.Blazor" Version="21.2.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="CNET_V7_Domain">
       <HintPath>..\..\..\..\..\DLL\CNET_V7_Domain.dll</HintPath>
     </Reference>
