@@ -1,0 +1,323 @@
+@page "/property"
+@rendermode InteractiveServer
+
+<PageTitle>Property - Room Type</PageTitle>
+
+<div class="dashboard-wrapper">
+    <!-- Top Tabs -->
+    <div class="top-tab-header">
+        <NavLink class="tab-item" href="dashboard" Match="NavLinkMatch.All">HOME</NavLink>
+   
+        <div class="tab-item active">
+            Property <i class="bi bi-x ms-2"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content" @onclick="ClearSelection">
+        <!-- Sub Tabs -->
+        <div class="sub-tabs-bar">
+            <div class="sub-tab-item @(activeSubTab == "roomtype" ? "active" : "")" @onclick='() => activeSubTab = "roomtype"'>
+                Room Type
+            </div>
+            <div class="sub-tab-item @(activeSubTab == "rooms" ? "active" : "")" @onclick='() => activeSubTab = "rooms"'>
+                Rooms
+            </div>
+        </div>
+
+        @if (activeSubTab == "roomtype")
+        {
+            <!-- Toolbar -->
+            <div class="rt-toolbar" @onclick:stopPropagation="true">
+                <button class="rt-toolbar-btn" @onclick="AddRoomType">
+                    <span class="rt-toolbar-emoji">📄</span>
+                    <span>Add</span>
+                </button>
+                <button class="rt-toolbar-btn" disabled="@(selectedRoomType == null)" @onclick="DeleteRoomType">
+                    <span class="rt-toolbar-emoji">❌</span>
+                    <span>Delete</span>
+                </button>
+                <button class="rt-toolbar-btn" @onclick="SaveRoomTypes">
+                    <i class="bi bi-floppy-fill text-secondary"></i>
+                    <span>Save</span>
+                </button>
+                <button class="rt-toolbar-btn" disabled="@(selectedRoomType == null)" @onclick="EditRoomType">
+                    <span class="rt-toolbar-emoji">📝</span>
+                    <span>Edit</span>
+                </button>
+
+                @if (!string.IsNullOrEmpty(statusMessage))
+                {
+                    <span class="rt-status-message"><i class="bi bi-check-circle-fill me-1"></i>@statusMessage</span>
+                }
+            </div>
+
+            <!-- Grid -->
+            <div class="rt-grid-area" @onclick:stopPropagation="true">
+                <DxGrid Data="@roomTypes"
+                        KeyFieldName="Id"
+                        CssClass="rt-grid">
+                    <Columns>
+                        <DxGridDataColumn FieldName="Sn" Caption="SN" Width="60px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    @(((RoomTypeRow)context.DataItem).Sn)
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="110px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    @(((RoomTypeRow)context.DataItem).Code)
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Description" Caption="Description" Width="220px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    @(((RoomTypeRow)context.DataItem).Description)
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="NoOfRooms" Caption="No. Of Rooms" Width="130px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    @(((RoomTypeRow)context.DataItem).NoOfRooms)
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="Status" Caption="Status" Width="90px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).Status)" disabled />
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="IsHouseKeeping" Caption="Is House Keeping?" Width="150px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).IsHouseKeeping)" disabled />
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="IsPseudoRoom" Caption="Is Pseudo Room?" Width="140px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).IsPseudoRoom)" disabled />
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="CanBeMeetingRoom" Caption="Can Be Meeting Room?" Width="170px">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).CanBeMeetingRoom)" disabled />
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName="AutoRoomAssign" Caption="Auto Room Assign">
+                            <CellDisplayTemplate>
+                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
+                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).AutoRoomAssign)" disabled />
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+
+                <div class="rt-footer">
+                    Total Number of Rooms = @roomTypes.Sum(r => r.NoOfRooms)
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="rt-placeholder">Rooms management coming soon.</div>
+        }
+    </div>
+</div>
+
+<RoomTypeEditModal Visible="isModalOpen"
+                    EditingItem="editingItem"
+                    RoomTypes="roomTypes"
+                    RoomClasses="roomClasses"
+                    OnNew="NewRoomTypeInModal"
+                    OnSave="SaveModalRoomType"
+                    OnClose="CloseModal" />
+
+@code {
+    private string activeSubTab = "roomtype";
+    private string? statusMessage;
+
+    private RoomTypeRow? selectedRoomType;
+
+    private void SelectRow(RoomTypeRow row)
+    {
+        selectedRoomType = selectedRoomType?.Id == row.Id ? null : row;
+    }
+
+    private void ClearSelection()
+    {
+        selectedRoomType = null;
+    }
+
+    private string RowCellClass(RoomTypeRow row, bool center = false)
+    {
+        var classes = "rt-grid-cell";
+        if (center)
+            classes += " rt-grid-cell-center";
+        if (selectedRoomType?.Id == row.Id)
+            classes += " rt-row-selected";
+        return classes;
+    }
+
+    private bool isModalOpen;
+    private bool isNewEntry;
+    private RoomTypeRow? editingItem;
+
+    private List<string> roomClasses = new() { "Non-VIP", "VIP", "Suite" };
+
+    private List<RoomTypeRow> roomTypes = new()
+    {
+        new RoomTypeRow { Id = 1, Sn = 1, Code = "ROT001", Description = "Standard Room", NoOfRooms = 15, Status = true, RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
+        new RoomTypeRow { Id = 2, Sn = 2, Code = "ROT002", Description = "Excutive", NoOfRooms = 13, Status = true, RoomClass = "VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
+        new RoomTypeRow { Id = 3, Sn = 3, Code = "ROT003", Description = "Pseudo Rooms", NoOfRooms = 5, Status = true, RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = true, CanBeMeetingRoom = false, AutoRoomAssign = false },
+    };
+
+    private void AddRoomType()
+    {
+        statusMessage = null;
+        editingItem = CreateBlankRoomType();
+        isNewEntry = true;
+        isModalOpen = true;
+    }
+
+    private void EditRoomType()
+    {
+        if (selectedRoomType == null)
+            return;
+
+        statusMessage = null;
+        editingItem = CloneRoomType(selectedRoomType);
+        isNewEntry = false;
+        isModalOpen = true;
+    }
+
+    private void NewRoomTypeInModal()
+    {
+        editingItem = CreateBlankRoomType();
+        isNewEntry = true;
+    }
+
+    private void SaveModalRoomType()
+    {
+        if (editingItem == null)
+            return;
+
+        if (isNewEntry)
+        {
+            editingItem.Id = roomTypes.Count == 0 ? 1 : roomTypes.Max(r => r.Id) + 1;
+            roomTypes.Add(editingItem);
+            RenumberRoomTypes();
+        }
+        else
+        {
+            var target = roomTypes.FirstOrDefault(r => r.Id == editingItem.Id);
+            if (target != null)
+            {
+                target.Code = editingItem.Code;
+                target.Description = editingItem.Description;
+                target.NoOfRooms = editingItem.NoOfRooms;
+                target.Status = editingItem.Status;
+                target.ActivationDate = editingItem.ActivationDate;
+                target.ComponentRoom = editingItem.ComponentRoom;
+                target.RoomClass = editingItem.RoomClass;
+                target.DefaultOccupancy = editingItem.DefaultOccupancy;
+                target.MaximumOccupancy = editingItem.MaximumOccupancy;
+                target.MaximumAdult = editingItem.MaximumAdult;
+                target.MaximumChilds = editingItem.MaximumChilds;
+                target.IsHouseKeeping = editingItem.IsHouseKeeping;
+                target.IsPseudoRoom = editingItem.IsPseudoRoom;
+                target.CanBeMeetingRoom = editingItem.CanBeMeetingRoom;
+                target.AutoRoomAssign = editingItem.AutoRoomAssign;
+            }
+        }
+
+        statusMessage = "Changes saved.";
+        isModalOpen = false;
+        editingItem = null;
+    }
+
+    private void CloseModal()
+    {
+        isModalOpen = false;
+        editingItem = null;
+    }
+
+    private RoomTypeRow CreateBlankRoomType()
+    {
+        return new RoomTypeRow
+        {
+            Code = GenerateNextCode(),
+            Status = true,
+            ActivationDate = DateTime.Today,
+            RoomClass = roomClasses.First(),
+        };
+    }
+
+    private RoomTypeRow CloneRoomType(RoomTypeRow source)
+    {
+        return new RoomTypeRow
+        {
+            Id = source.Id,
+            Sn = source.Sn,
+            Code = source.Code,
+            Description = source.Description,
+            NoOfRooms = source.NoOfRooms,
+            Status = source.Status,
+            ActivationDate = source.ActivationDate,
+            ComponentRoom = source.ComponentRoom,
+            RoomClass = source.RoomClass,
+            DefaultOccupancy = source.DefaultOccupancy,
+            MaximumOccupancy = source.MaximumOccupancy,
+            MaximumAdult = source.MaximumAdult,
+            MaximumChilds = source.MaximumChilds,
+            IsHouseKeeping = source.IsHouseKeeping,
+            IsPseudoRoom = source.IsPseudoRoom,
+            CanBeMeetingRoom = source.CanBeMeetingRoom,
+            AutoRoomAssign = source.AutoRoomAssign,
+        };
+    }
+
+    private string GenerateNextCode()
+    {
+        int maxNum = 0;
+        foreach (var rt in roomTypes)
+        {
+            if (rt.Code.StartsWith("ROT") && int.TryParse(rt.Code.Substring(3), out var n))
+                maxNum = Math.Max(maxNum, n);
+        }
+        return $"ROT{(maxNum + 1):D3}";
+    }
+
+    private void DeleteRoomType()
+    {
+        if (selectedRoomType != null)
+        {
+            roomTypes.Remove(selectedRoomType);
+            selectedRoomType = null;
+            statusMessage = null;
+            RenumberRoomTypes();
+        }
+    }
+
+    private void RenumberRoomTypes()
+    {
+        for (int i = 0; i < roomTypes.Count; i++)
+            roomTypes[i].Sn = i + 1;
+    }
+
+    private void SaveRoomTypes()
+    {
+        // TODO: persist via ApiService once the Room Type API endpoint is available.
+        statusMessage = "Changes saved.";
+    }
+}
