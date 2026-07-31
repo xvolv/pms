@@ -1,125 +1,72 @@
 @page "/property"
 @rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Room.shared
 
 <PageTitle>Property - Room Type</PageTitle>
 
 <div class="dashboard-wrapper">
     <!-- Top Tabs -->
     <div class="top-tab-header">
-        <NavLink class="tab-item" href="dashboard" Match="NavLinkMatch.All">HOME</NavLink>
-   
         <div class="tab-item active">
             Property <i class="bi bi-x ms-2"></i>
         </div>
     </div>
 
     <div class="dashboard-content" @onclick="ClearSelection">
-        <!-- Sub Tabs -->
-        <div class="sub-tabs-bar">
-            <div class="sub-tab-item @(activeSubTab == "roomtype" ? "active" : "")" @onclick='() => activeSubTab = "roomtype"'>
-                Room Type
-            </div>
-            <div class="sub-tab-item @(activeSubTab == "rooms" ? "active" : "")" @onclick='() => activeSubTab = "rooms"'>
-                Rooms
-            </div>
-        </div>
+        <DxTabs @bind-ActiveTabIndex="activeTabIndex" CssClass="property-tabs">
+            <DxTabPage Text="Room Type" />
 
-        @if (activeSubTab == "roomtype")
+            <DxTabPage Text="Rooms" />
+        </DxTabs>
+
+
+
+
+        @if (activeTabIndex == 0)
         {
             <!-- Toolbar -->
-            <div class="rt-toolbar" @onclick:stopPropagation="true">
-                <button class="rt-toolbar-btn" @onclick="AddRoomType">
-                    <span class="rt-toolbar-emoji">📄</span>
-                    <span>Add</span>
-                </button>
-                <button class="rt-toolbar-btn" disabled="@(selectedRoomType == null)" @onclick="DeleteRoomType">
-                    <span class="rt-toolbar-emoji">❌</span>
-                    <span>Delete</span>
-                </button>
-                <button class="rt-toolbar-btn" @onclick="SaveRoomTypes">
-                    <i class="bi bi-floppy-fill text-secondary"></i>
-                    <span>Save</span>
-                </button>
-                <button class="rt-toolbar-btn" disabled="@(selectedRoomType == null)" @onclick="EditRoomType">
-                    <span class="rt-toolbar-emoji">📝</span>
-                    <span>Edit</span>
-                </button>
-
-                @if (!string.IsNullOrEmpty(statusMessage))
-                {
-                    <span class="rt-status-message"><i class="bi bi-check-circle-fill me-1"></i>@statusMessage</span>
-                }
-            </div>
-
+            <Toolbar Items="roomTypeToolbarItems" StatusMessage="@statusMessage" />
             <!-- Grid -->
             <div class="rt-grid-area" @onclick:stopPropagation="true">
-                <DxGrid Data="@roomTypes"
-                        KeyFieldName="Id"
-                        CssClass="rt-grid">
+
+                <DxGrid @ref="roomTypeGrid" width="100%" Data="@roomTypes" KeyFieldName="Id" CssClass="rt-grid"
+                        RowClick="@OnRoomTypeRowClick" CustomizeElement="@OnRoomTypeCustomizeElement">
                     <Columns>
-                        <DxGridDataColumn FieldName="Sn" Caption="SN" Width="60px">
+                        <DxGridDataColumn FieldName="Sn" Caption="SN" Width="5%" />
+                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="10%" />
+                        <DxGridDataColumn FieldName="Description" Caption="Description" Width="25%" />
+                        <DxGridDataColumn FieldName="NoOfRooms" Caption="No. Of Rooms" Width="8%" />
+                        <DxGridDataColumn FieldName="Status" Caption="Status" Width="7%">
                             <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    @(((RoomTypeRow)context.DataItem).Sn)
-                                </div>
+                                <input type="checkbox" class="rt-grid-checkbox"
+                                       checked="@(((RoomTypeRow)context.DataItem).Status)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="110px">
+                        <DxGridDataColumn FieldName="IsHouseKeeping" Caption="Is House Keeping?" Width="10%">
                             <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    @(((RoomTypeRow)context.DataItem).Code)
-                                </div>
+                                <input type="checkbox" class="rt-grid-checkbox"
+                                       checked="@(((RoomTypeRow)context.DataItem).IsHouseKeeping)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="Description" Caption="Description" Width="220px">
+                        <DxGridDataColumn FieldName="IsPseudoRoom" Caption="Is Pseudo Room?" Width="10%">
                             <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    @(((RoomTypeRow)context.DataItem).Description)
-                                </div>
+                                <input type="checkbox" class="rt-grid-checkbox"
+                                       checked="@(((RoomTypeRow)context.DataItem).IsPseudoRoom)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="NoOfRooms" Caption="No. Of Rooms" Width="130px">
+                        <DxGridDataColumn FieldName="AutoRoomAssign" Caption="Auto Room Assign" width="15%">
                             <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    @(((RoomTypeRow)context.DataItem).NoOfRooms)
-                                </div>
+                                <input type="checkbox" class="rt-grid-checkbox"
+                                       checked="@(((RoomTypeRow)context.DataItem).AutoRoomAssign)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="Status" Caption="Status" Width="90px">
+                        <DxGridDataColumn FieldName="CanBeMeetingRoom" Caption="Meeting Room?" Width="10%">
                             <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).Status)" disabled />
-                                </div>
+                                <input type="checkbox" class="rt-grid-checkbox"
+                                       checked="@(((RoomTypeRow)context.DataItem).CanBeMeetingRoom)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="IsHouseKeeping" Caption="Is House Keeping?" Width="150px">
-                            <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).IsHouseKeeping)" disabled />
-                                </div>
-                            </CellDisplayTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="IsPseudoRoom" Caption="Is Pseudo Room?" Width="140px">
-                            <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).IsPseudoRoom)" disabled />
-                                </div>
-                            </CellDisplayTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="CanBeMeetingRoom" Caption="Can Be Meeting Room?" Width="170px">
-                            <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).CanBeMeetingRoom)" disabled />
-                                </div>
-                            </CellDisplayTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn FieldName="AutoRoomAssign" Caption="Auto Room Assign">
-                            <CellDisplayTemplate>
-                                <div class="@RowCellClass((RoomTypeRow)context.DataItem, true)" @onclick="() => SelectRow((RoomTypeRow)context.DataItem)">
-                                    <input type="checkbox" class="rt-grid-checkbox" checked="@(((RoomTypeRow)context.DataItem).AutoRoomAssign)" disabled />
-                                </div>
-                            </CellDisplayTemplate>
-                        </DxGridDataColumn>
+
                     </Columns>
                 </DxGrid>
 
@@ -130,28 +77,516 @@
         }
         else
         {
-            <div class="rt-placeholder">Rooms management coming soon.</div>
+            <Toolbar Items="blocksToolbarItems" StatusMessage="@blocksStatusMessage" />
+
+            <div class="rooms-tab" @onclick:stopPropagation="true">
+                <!-- Building / Floor Tree -->
+                <div class="rooms-tree-panel">
+                    <div class="rooms-tree-header">Building Name</div>
+                    <div class="rooms-tree-body">
+                        @foreach (var block in blocks)
+                        {
+                            <div class="block-header" @onclick="() => ToggleBlock(block.Id)">
+                                <i class="bi @(block.IsExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
+                                <span>@block.Name</span>
+                            </div>
+                            @if (block.IsExpanded)
+                            {
+                                @foreach (var floor in block.Floors)
+                                {
+                                    <div class="floor-row @(currentFloorId == floor.Id ? "active" : "")"
+                                         @onclick="() => SelectFloor(floor.Id)">
+                                        Floor - @floor.Number@(floor.Rooms.Count > 0 ? $" ( {floor.Rooms.Count} Rooms )" : "")
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+
+                <!-- Rooms / Floor Layout -->
+                <div class="rooms-main-panel">
+                    <DxTabs @bind-ActiveTabIndex="roomsSubTabIndex" CssClass="rooms-tabs">
+                        <DxTabPage Text="Rooms">
+                            <!-- Toolbar goes HERE -->
+                            <div class="rooms-toolbar">
+                                <button class="rt-toolbar-btn" @onclick="AddRoomTile">
+                                    <i class="bi bi bi-file-earmark-plus text-secondary"></i>
+                                    <span>Add</span>
+                                </button>
+                                <button class="rt-toolbar-btn" "
+                                        @onclick=" DeleteRoomTiles">
+                                    <i class="bi bi-trash3 text-secondary"></i>
+                                    <span>Delete</span>
+                                </button>
+                                <button class="rt-toolbar-btn" disabled="@(selectedTileIds.Count != 1)"
+                                        @onclick="EditRoomTile">
+                                    <i class="bi bi-pencil-square text-secondary"></i>
+                                    <span>Edit</span>
+                                </button>
+                                <button class="rt-toolbar-btn" @onclick="ApplyRoomType">
+                                    <i class="bi bi-check-circle-fill text-secondary"></i>
+                                    <span>Apply</span>
+                                </button>
+                                <div class="rooms-toolbar-field">
+                                    <label>Room Type</label>
+                                    <DxComboBox Data="@roomTypes" @bind-Value="@applyRoomTypeCode"
+                                                TextFieldName="@nameof(RoomTypeRow.Description)"
+                                                ValueFieldName="@nameof(RoomTypeRow.Code)" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Width="200px" />
+                                </div>
+                                <div class="rooms-toolbar-field">
+                                    <label>Filter Rooms By</label>
+                                    <select class="rt-form-select" @bind="statusFilter">
+                                        <option value="">All</option>
+                                        <option value="Clean">Clean</option>
+                                        <option value="Dirty">Dirty</option>
+                                        <option value="Occupied">Occupied</option>
+                                        <option value="OOS">Out of Service</option>
+                                    </select>
+                                </div>
+
+                                <div class="rooms-toolbar-selection">
+                                    <span>Selection (@selectedTileIds.Count)</span>
+                                    <select class="rt-form-select" @onchange="HandleSelectionAction">
+                                        <option value="">-</option>
+                                        <option value="all">Select All</option>
+                                        <option value="none">Clear</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            @if (currentFloor == null)
+                            {
+                                <div class="rt-placeholder">Select a floor to view its rooms.</div>
+                            }
+                            else
+                            {
+                                <div class="rooms-floor-title">Floor - @currentFloor.Number</div>
+                                <div class="room-tiles-grid">
+                                    @foreach (var room in FilteredRooms())
+                                    {
+                                        <div class="room-tile @(selectedTileIds.Contains(room.Id) ? "selected" : "")"
+                                             @onclick="() => ToggleTile(room.Id)">
+                                            <div class="room-tile-number">@room.Number</div>
+                                            <div class="room-tile-type">@room.TypeDescription</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </DxTabPage>
+
+                        <DxTabPage Text="Floor Layout">
+                            <div class="rt-placeholder">Floor layout designer coming soon.</div>
+                        </DxTabPage>
+                    </DxTabs>
+                </div>
+            </div>
         }
     </div>
 </div>
 
-<RoomTypeEditModal Visible="isModalOpen"
-                    EditingItem="editingItem"
-                    RoomTypes="roomTypes"
-                    RoomClasses="roomClasses"
-                    OnNew="NewRoomTypeInModal"
-                    OnSave="SaveModalRoomType"
-                    OnClose="CloseModal" />
+<RoomTypeEditModal Visible="isModalOpen" EditingItem="editingItem" RoomTypes="roomTypes" RoomClasses="roomClasses"
+                   OnNew="NewRoomTypeInModal" OnSave="SaveModalRoomType" OnClose="CloseModal" />
+
+<RoomEditModal Visible="isRoomModalOpen" IsNew="isRoomNewEntry" EditingItem="editingRoomTile" RoomTypes="roomTypes"
+               OnSave="SaveRoomTile" OnClose="CloseRoomModal" />
+
+<BlockEditModal Visible="isBlockModalOpen" EditingItem="editingBlockDraft" OnSave="SaveNewBlock"
+                OnClose="CloseBlockModal" />
 
 @code {
+    private int activeTabIndex = 0;
     private string activeSubTab = "roomtype";
+
+    // --- Rooms tab (Block / Floor management) ---
+    private string roomsSubTab = "rooms";
+    private List<BlockRow> blocks = CreateSampleBlocks();
+    private int? currentFloorId;
+    private HashSet<int> selectedTileIds = new();
+    private string applyRoomTypeCode = "";
+    private string statusFilter = "";
+
+    private bool isRoomModalOpen;
+    private bool isRoomNewEntry;
+    private RoomTileRow? editingRoomTile;
+
+    private bool isBlockModalOpen;
+    private BlockDraft? editingBlockDraft;
+    private string? blocksStatusMessage;
+
+    private FloorRow? currentFloor => blocks.SelectMany(b => b.Floors).FirstOrDefault(f => f.Id == currentFloorId);
+
+    private List<Toolbar.ToolbarItem> roomTypeToolbarItems = new();
+    private List<Toolbar.ToolbarItem> blocksToolbarItems = new();
+
+    protected override void OnInitialized()
+    {
+        roomTypeToolbarItems = new()
+        {
+            new() { Label = "Add", Icon = "bi-file-earmark-plus", OnClick = EventCallback.Factory.Create(this, AddRoomType) },
+            new() { Label = "Delete", Icon = "bi-trash3", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+DeleteRoomType) },
+            new() { Label = "Save", Icon = "bi-floppy", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+SaveRoomTypes) },
+            new() { Label = "Edit", Icon = "bi-pencil-square", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+EditRoomType) },
+        };
+
+        blocksToolbarItems = new()
+        {
+            new() { Label = "Add", Icon = "bi-file-earmark-plus", OnClick = EventCallback.Factory.Create(this, OpenAddBlockModal) },
+            new() { Label = "Save", Icon = "bi-floppy", BeginGroup = true, OnClick = EventCallback.Factory.Create(this, SaveBlocks)
+},
+            new() { Label = "Refresh", Icon = "bi-arrow-clockwise", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+RefreshBlocks) },
+        };
+
+        var firstBlock = blocks.FirstOrDefault();
+        if (firstBlock != null)
+        {
+            firstBlock.IsExpanded = true;
+            currentFloorId = firstBlock.Floors.FirstOrDefault()?.Id;
+        }
+    }
+
+    private void ToggleBlock(int blockId)
+    {
+        var block = blocks.FirstOrDefault(b => b.Id == blockId);
+        if (block != null)
+            block.IsExpanded = !block.IsExpanded;
+    }
+
+    private void SelectFloor(int floorId)
+    {
+        currentFloorId = floorId;
+        selectedTileIds.Clear();
+    }
+
+    private IEnumerable<RoomTileRow> FilteredRooms()
+    {
+        if (currentFloor == null)
+            yield break;
+
+        foreach (var room in currentFloor.Rooms)
+        {
+            if (string.IsNullOrEmpty(statusFilter) || room.Status == statusFilter)
+                yield return room;
+        }
+    }
+
+    private void ToggleTile(int roomId)
+    {
+        if (!selectedTileIds.Add(roomId))
+            selectedTileIds.Remove(roomId);
+    }
+
+    private void HandleSelectionAction(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (value == "all")
+            selectedTileIds = FilteredRooms().Select(r => r.Id).ToHashSet();
+        else if (value == "none")
+            selectedTileIds.Clear();
+    }
+
+    private void AddRoomTile()
+    {
+        if (currentFloor == null)
+            return;
+
+        editingRoomTile = new RoomTileRow
+        {
+            Number = "",
+            TypeCode = roomTypes.FirstOrDefault()?.Code ?? "",
+            TypeDescription = roomTypes.FirstOrDefault()?.Description ?? "",
+            Status = "Clean",
+        };
+        isRoomNewEntry = true;
+        isRoomModalOpen = true;
+    }
+
+    private void EditRoomTile()
+    {
+        if (currentFloor == null || selectedTileIds.Count != 1)
+            return;
+
+        var source = currentFloor.Rooms.FirstOrDefault(r => r.Id == selectedTileIds.First());
+        if (source == null)
+            return;
+
+        editingRoomTile = new RoomTileRow
+        {
+            Id = source.Id,
+            Number = source.Number,
+            TypeCode = source.TypeCode,
+            TypeDescription = source.TypeDescription,
+            Status = source.Status,
+        };
+        isRoomNewEntry = false;
+        isRoomModalOpen = true;
+    }
+
+    private void SaveRoomTile()
+    {
+        if (editingRoomTile == null || currentFloor == null)
+            return;
+
+        var selectedType = roomTypes.FirstOrDefault(rt => rt.Code == editingRoomTile.TypeCode);
+        if (selectedType != null)
+            editingRoomTile.TypeDescription = selectedType.Description;
+
+        if (isRoomNewEntry)
+        {
+            var allTiles = blocks.SelectMany(b => b.Floors).SelectMany(f => f.Rooms);
+            editingRoomTile.Id = allTiles.Any() ? allTiles.Max(r => r.Id) + 1 : 1;
+            currentFloor.Rooms.Add(editingRoomTile);
+        }
+        else
+        {
+            var target = currentFloor.Rooms.FirstOrDefault(r => r.Id == editingRoomTile.Id);
+            if (target != null)
+            {
+                target.Number = editingRoomTile.Number;
+                target.TypeCode = editingRoomTile.TypeCode;
+                target.TypeDescription = editingRoomTile.TypeDescription;
+                target.Status = editingRoomTile.Status;
+            }
+        }
+
+        isRoomModalOpen = false;
+        editingRoomTile = null;
+    }
+
+    private void CloseRoomModal()
+    {
+        isRoomModalOpen = false;
+        editingRoomTile = null;
+    }
+
+    private void DeleteRoomTiles()
+    {
+        if (currentFloor == null)
+            return;
+
+        currentFloor.Rooms.RemoveAll(r => selectedTileIds.Contains(r.Id));
+        selectedTileIds.Clear();
+    }
+
+    private void ApplyRoomType()
+    {
+        if (currentFloor == null || string.IsNullOrEmpty(applyRoomTypeCode))
+            return;
+
+        var type = roomTypes.FirstOrDefault(rt => rt.Code == applyRoomTypeCode);
+        if (type == null)
+            return;
+
+        foreach (var room in currentFloor.Rooms.Where(r => selectedTileIds.Contains(r.Id)))
+        {
+            room.TypeCode = type.Code;
+            room.TypeDescription = type.Description;
+        }
+    }
+
+    private void OpenAddBlockModal()
+    {
+        blocksStatusMessage = null;
+        editingBlockDraft = new BlockDraft
+        {
+            Code = GenerateNextBlockCode(),
+            NoOfFloors = 1,
+            FloorStartsFrom = 1,
+            RoomNoDigit = 3,
+            RoomNoStartsFrom = 1,
+            RoomsPerFloor = 10,
+        };
+        isBlockModalOpen = true;
+    }
+
+
+    private string GenerateNextBlockCode()
+    {
+        int maxNum = 0;
+        foreach (var b in blocks)
+        {
+            var digits = new string(b.Code.Where(char.IsDigit).ToArray());
+            if (int.TryParse(digits, out var n))
+                maxNum = Math.Max(maxNum, n);
+        }
+        return $"BLK{(maxNum + 1):D3}";
+    }
+
+    private void CloseBlockModal()
+    {
+        isBlockModalOpen = false;
+        editingBlockDraft = null;
+    }
+
+    private void SaveNewBlock()
+    {
+        if (editingBlockDraft == null
+            || string.IsNullOrWhiteSpace(editingBlockDraft.Code)
+            || string.IsNullOrWhiteSpace(editingBlockDraft.Name)
+            || editingBlockDraft.NoOfFloors <= 0)
+            return;
+
+        var allFloors = blocks.SelectMany(b => b.Floors).ToList();
+        var allTiles = allFloors.SelectMany(f => f.Rooms).ToList();
+        int nextFloorId = allFloors.Any() ? allFloors.Max(f => f.Id) + 1 : 1;
+        int nextRoomId = allTiles.Any() ? allTiles.Max(r => r.Id) + 1 : 1;
+        var defaultType = roomTypes.FirstOrDefault();
+
+        var newBlock = new BlockRow
+        {
+            Id = blocks.Count == 0 ? 1 : blocks.Max(b => b.Id) + 1,
+            Code = editingBlockDraft.Code.Trim(),
+            Name = editingBlockDraft.Name.Trim(),
+            IsExpanded = true,
+        };
+
+        for (int f = 0; f < editingBlockDraft.NoOfFloors; f++)
+        {
+            int floorNumber = editingBlockDraft.FloorStartsFrom + f;
+            var floorRow = new FloorRow { Id = nextFloorId++, Number = floorNumber };
+
+            for (int r = 0; r < editingBlockDraft.RoomsPerFloor; r++)
+            {
+                int sequence = editingBlockDraft.RoomNoStartsFrom + r;
+                floorRow.Rooms.Add(new RoomTileRow
+                {
+                    Id = nextRoomId++,
+                    Number = RoomNumbering.Generate(floorNumber, editingBlockDraft.RoomNoDigit, sequence),
+                    TypeCode = defaultType?.Code ?? "",
+                    TypeDescription = defaultType?.Description ?? "",
+                    Status = "Clean",
+                });
+            }
+
+            newBlock.Floors.Add(floorRow);
+        }
+
+        blocks.Add(newBlock);
+        currentFloorId = newBlock.Floors.FirstOrDefault()?.Id ?? currentFloorId;
+        isBlockModalOpen = false;
+        editingBlockDraft = null;
+        blocksStatusMessage = "Block added.";
+    }
+
+    private void SaveBlocks()
+    {
+        // TODO: persist blocks/floors via ApiService once the Property API endpoint is available.
+        blocksStatusMessage = "Changes saved.";
+    }
+
+    private void RefreshBlocks()
+    {
+        blocks = CreateSampleBlocks();
+        selectedTileIds.Clear();
+        blocksStatusMessage = null;
+
+        var firstBlock = blocks.FirstOrDefault();
+        if (firstBlock != null)
+        {
+            firstBlock.IsExpanded = true;
+            currentFloorId = firstBlock.Floors.FirstOrDefault()?.Id;
+        }
+    }
+
+    private static List<BlockRow> CreateSampleBlocks()
+    {
+        int id = 0;
+        string[] statusCycle = { "Clean", "Clean", "Occupied", "Dirty" };
+        RoomTileRow Room(string number) => new()
+        {
+            Id = ++id,
+            Number = number,
+            TypeCode = "ROT001",
+            TypeDescription = "Standard Room",
+            Status = statusCycle[(id - 1) % statusCycle.Length],
+        };
+
+        return new List<BlockRow>
+        {
+            new BlockRow
+            {
+                Id = 1,
+                Code = "BLK001",
+                Name = "Block 1",
+                Floors = new List<FloorRow>
+                {
+                    new FloorRow
+                    {
+                        Id = 1,
+                        Number = 1,
+                        Rooms = new List<RoomTileRow>
+                        {
+                            Room("164A"), Room("102"), Room("103"), Room("104"), Room("105"),
+                            Room("106"), Room("107"), Room("108"), Room("109"), Room("110"),
+                        },
+                    },
+                    new FloorRow
+                    {
+                        Id = 2,
+                        Number = 2,
+                        Rooms = Enumerable.Range(201, 13).Select(n => Room(n.ToString())).ToList(),
+                    },
+                    new FloorRow
+                    {
+                        Id = 3,
+                        Number = 3,
+                        Rooms = Enumerable.Range(301, 5).Select(n => Room(n.ToString())).ToList(),
+                    },
+                    new FloorRow
+                    {
+                        Id = 4,
+                        Number = 4,
+                        Rooms = Enumerable.Range(401, 1).Select(n => Room(n.ToString())).ToList(),
+                    },
+                    new FloorRow
+                    {
+                        Id = 5,
+                        Number = 5,
+                        Rooms = new List<RoomTileRow>(),
+                    },
+                },
+            },
+            new BlockRow
+            {
+                Id = 2,
+                Code = "BLK002",
+                Name = "Saba Bldg",
+                Floors = new List<FloorRow>
+                {
+                    new FloorRow
+                    {
+                        Id = 6,
+                        Number = 1,
+                        Rooms = new List<RoomTileRow> { Room("S101"), Room("S102"), Room("S103") },
+                    },
+                },
+            },
+        };
+    }
     private string? statusMessage;
 
     private RoomTypeRow? selectedRoomType;
+    private IGrid? roomTypeGrid;
 
-    private void SelectRow(RoomTypeRow row)
+    private void OnRoomTypeRowClick(GridRowClickEventArgs e)
     {
+        var row = (RoomTypeRow)roomTypeGrid!.GetDataItem(e.VisibleIndex);
         selectedRoomType = selectedRoomType?.Id == row.Id ? null : row;
+    }
+
+    private void OnRoomTypeCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow)
+            return;
+
+        var row = (RoomTypeRow)roomTypeGrid!.GetDataItem(e.VisibleIndex);
+        if (selectedRoomType?.Id == row.Id)
+            e.CssClass = "rt-row-selected";
     }
 
     private void ClearSelection()
@@ -159,27 +594,20 @@
         selectedRoomType = null;
     }
 
-    private string RowCellClass(RoomTypeRow row, bool center = false)
-    {
-        var classes = "rt-grid-cell";
-        if (center)
-            classes += " rt-grid-cell-center";
-        if (selectedRoomType?.Id == row.Id)
-            classes += " rt-row-selected";
-        return classes;
-    }
-
     private bool isModalOpen;
     private bool isNewEntry;
     private RoomTypeRow? editingItem;
 
-    private List<string> roomClasses = new() { "Non-VIP", "VIP", "Suite" };
+    private List<string> roomClasses = new() { "Non-VIP", "VIP", "VIIP" };
 
     private List<RoomTypeRow> roomTypes = new()
     {
-        new RoomTypeRow { Id = 1, Sn = 1, Code = "ROT001", Description = "Standard Room", NoOfRooms = 15, Status = true, RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
-        new RoomTypeRow { Id = 2, Sn = 2, Code = "ROT002", Description = "Excutive", NoOfRooms = 13, Status = true, RoomClass = "VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
-        new RoomTypeRow { Id = 3, Sn = 3, Code = "ROT003", Description = "Pseudo Rooms", NoOfRooms = 5, Status = true, RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = true, CanBeMeetingRoom = false, AutoRoomAssign = false },
+        new RoomTypeRow { Id = 1, Sn = 1, Code = "ROT001", Description = "Standard Room", NoOfRooms = 15, Status = true,
+RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
+        new RoomTypeRow { Id = 2, Sn = 2, Code = "ROT002", Description = "Excutive", NoOfRooms = 13, Status = true, RoomClass =
+"VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeetingRoom = false, AutoRoomAssign = false },
+        new RoomTypeRow { Id = 3, Sn = 3, Code = "ROT003", Description = "Pseudo Rooms", NoOfRooms = 5, Status = true, RoomClass
+= "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = true, CanBeMeetingRoom = false, AutoRoomAssign = false },
     };
 
     private void AddRoomType()
@@ -320,4 +748,5 @@
         // TODO: persist via ApiService once the Room Type API endpoint is available.
         statusMessage = "Changes saved.";
     }
+    private int roomsSubTabIndex = 0;
 }

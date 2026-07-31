@@ -1,0 +1,479 @@
+﻿/* Room Type Page */
+.rt-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    /* padding: 2px 1px; */
+     margin-bottom: 4px; 
+     padding-top: 2px;
+     margin-top :4px;
+}
+
+/* .rt-toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 6px 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4f5d73;
+    cursor: pointer;
+} */
+.rt-toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 70px;
+    padding: 4px 7px;
+
+    border: none;
+    border-radius: 0;
+
+    background: transparent;
+}
+.toolbar-separator {
+    width: 1px;
+    align-self: stretch;
+    background: #cfcfcf;
+}
+
+    .rt-toolbar-btn i {
+        font-size: 1.7rem;
+    }
+
+.rt-toolbar-emoji {
+    font-size: 1.7rem;
+    line-height: 1;
+    font-style: normal;
+}
+
+/* .rt-toolbar-btn:hover:not(:disabled) {
+    background-color: #f1f3f4;
+  
+} */
+
+.rt-toolbar-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.rt-status-message {
+    margin-left: 12px;
+    font-size: 0.85rem;
+    color: #61bd92;
+    font-weight: 600;
+}
+
+.rt-grid-area {
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.rt-footer {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5f6368;
+}
+
+.rt-grid-checkbox {
+    display: block;
+    margin: 0 auto;
+    width: 16px;
+    height: 16px;
+    cursor: not-allowed;
+    opacity: 1;
+    filter: none;
+    accent-color: #4f5d73;
+}
+
+/* .rt-grid-cell {
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 6px 8px;
+    margin: -6px -8px;
+ 
+} */
+
+.rt-grid-cell {
+    display: flex;
+    align-items: center;
+
+    min-height: 24px;
+    padding: 3px 8px;
+    margin: -3px -8px;
+       cursor: pointer;
+    box-sizing: content-box;
+    user-select: none;
+}
+.rt-grid-cell-center {
+    justify-content: center;
+}
+
+.rt-row-selected {
+    background-color: #0390fc;
+    color: #ffffff
+}
+
+.rt-grid tbody > tr:hover:not(.rt-row-selected) {
+    background-color: #e9e9e9;
+    cursor: pointer;
+}
+
+.rt-placeholder {
+    background-color: #ffffff;
+    border: 1px dashed #d3d3d3;
+    border-radius: 4px;
+    padding: 40px;
+    text-align: center;
+    color: #8c8c8c;
+    font-size: 0.9rem;
+}
+
+/* Room Type Add/Edit Modal */
+.rt-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.rt-modal {
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 720px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.rt-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.rt-modal-header-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #202124;
+    display: flex;
+    align-items: center;
+}
+
+.rt-modal-close-btn {
+    background: none;
+    border: none;
+    color: #5f6368;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+    .rt-modal-close-btn:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+    }
+
+.rt-modal .rt-toolbar {
+    margin: 12px 16px 0;
+}
+
+.rt-modal-tabs {
+    margin: 12px 16px 0;
+}
+
+.rt-modal-body {
+    padding: 16px;
+}
+
+.rt-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.rt-form-row-groups {
+    align-items: flex-start;
+}
+
+.rt-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 180px;
+}
+/* .rt.form-field-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1673e6;
+} */
+
+.rt-form-field-wide {
+    flex: 1 1 100%;
+}
+
+.rt-form-field-inline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding-top: 18px;
+}
+
+.rt-form-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5f6368;
+}
+
+.rt-form-input {
+    width: 100%;
+}
+
+.rt-form-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #202124;
+    background-color: #ffffff;
+}
+
+.rt-form-fieldset {
+    flex: 1 1 300px;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rt-occupancy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+}
+
+.rt-form-fieldset legend {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #5f6368;
+    padding: 0 6px;
+    width: auto;
+}
+
+/* Room modal (add/edit single room) */
+.room-modal {
+    width: 420px;
+}
+
+.room-modal-toolbar {
+    margin: 0 16px 16px;
+}
+
+/* Rooms Tab - Block / Floor management */
+.rooms-tab {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.rooms-tree-panel {
+    width: 240px;
+    min-width: 240px;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rooms-tree-header {
+    background-color: #eef1f4;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #4f5d73;
+    padding: 8px 10px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.rooms-tree-body {
+    max-height: 620px;
+    overflow-y: auto;
+}
+
+.block-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #1f8a7a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.block-header:hover {
+    background-color: #1b7669;
+}
+
+.floor-row {
+    padding: 6px 10px 6px 26px;
+    font-size: 0.82rem;
+    color: #202124;
+    cursor: pointer;
+    user-select: none;
+}
+
+.floor-row:hover {
+    background-color: #f1f3f4;
+}
+
+.floor-row.active {
+    font-weight: 700;
+    background-color: #eaf3ff;
+}
+
+.rooms-main-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.rooms-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin: 8px 0;
+}
+
+.rooms-toolbar-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #4f5d73;
+    font-weight: 600;
+}
+
+.rooms-toolbar-field select {
+    width: auto;
+    min-width: 140px;
+}
+
+.rooms-toolbar-selection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4f5d73;
+    margin-left: auto;
+}
+
+.rooms-toolbar-selection select {
+    width: auto;
+    min-width: 70px;
+}
+
+.rooms-floor-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #202124;
+    margin: 4px 2px 10px;
+}
+
+.room-tiles-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 10px;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 12px;
+    min-height: 140px;
+}
+
+.room-tile {
+    width: 96px;
+    height: 78px;
+    background-color: #6cb9dd;
+    border-radius: 4px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.08);
+}
+
+.room-tile:hover {
+    background-color: #5aa9cf;
+}
+
+.room-tile.selected {
+    outline: 3px solid #f4a623;
+    outline-offset: -3px;
+}
+
+.room-tile-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.room-tile-type {
+    font-size: 0.68rem;
+    margin-top: 4px;
+    text-align: center;
+    padding: 0 4px;
+}
+
+/* Add Block modal */
+.block-generate-summary {
+    background-color: #eef1f4;
+    border: 1px dashed #c7ccd1;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: #4f5d73;
+    margin-top: 4px;
+}
+
+.property-tabs .nav-link:not(.active),
+.rooms-tabs .nav-link:not(.active) {
+    color: #6c757d !important;
+}
