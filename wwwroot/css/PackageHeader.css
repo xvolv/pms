@@ -162,7 +162,7 @@
 
     .erp-combobox .dxbl-text-edit-input {
         background-color: white !important;
-        cursor: pointer;
+        cursor: pointer !important;
     }
 
 .dxbl-text-edit,

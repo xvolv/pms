@@ -1,3 +1,11 @@
+:root {
+    /* Global Color Variables */
+    --primary-color: #1d73d4;
+    --primary-color-hover: #0d6efd;
+    --primary-color-light: rgba(29, 115, 212, 0.1);
+    --primary-color-lighter: rgba(29, 115, 212, 0.05);
+}
+
 html,
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
