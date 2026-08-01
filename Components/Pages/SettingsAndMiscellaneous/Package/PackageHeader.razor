@@ -1,0 +1,213 @@
+@* PackageHeader.razor - child component rendered inside Package.razor's content tab *@
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
+
+<div class="grid-container">
+
+    <DxGrid @ref="Grid"
+            Data="@Packages"
+            KeyFieldName="Code"
+            CssClass="erp-grid"
+            Width="100%"
+            ShowGroupPanel="false"
+            ShowFilterRow="false"
+            RowClick="@OnRowClick"
+            CustomizeElement="@OnCustomizeElement">
+
+        <Columns>
+
+            <DxGridDataColumn FieldName="Code" Caption="Code" />
+            <DxGridDataColumn FieldName="Description" Caption="Description" />
+            <DxGridDataColumn FieldName="Group" Caption="Group" />
+            <DxGridDataColumn FieldName="Type" Caption="Type" />
+            <DxGridDataColumn FieldName="Currency" Caption="Currency" />
+            <DxGridDataColumn FieldName="Article" Caption="Article" />
+            <DxGridDataColumn FieldName="PostingRhythm" Caption="Posting-Rhythm" />
+
+        </Columns>
+
+    </DxGrid>
+
+</div>
+
+
+<!-- ===================== PACKAGE HEADER POPUP (Add / Edit) ===================== -->
+
+<PackageHeaderPopup Visible="@ShowDialog"
+                     VisibleChanged="@((value) => ShowDialog = value)"
+                     Model="@Current"
+                     Title="@popupTitle"
+                     OnSave="HandleSave"
+                     OnNew="HandlePopupNew"
+                     OnClose="HandlePopupClose" />
+
+
+<!-- ===================== DELETE CONFIRMATION POPUP ===================== -->
+
+<DxPopup @bind-Visible="@ShowDeleteConfirm"
+         Width="360px"
+         ShowFooter="false"
+         ShowCloseButton="true"
+         CloseOnOutsideClick="false">
+
+    <HeaderTemplate>
+        <div class="popup-header confirm-header">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+                <path fill="#c0392b" d="M12 2 1 21h22L12 2zm0 5.5a1.3 1.3 0 0 1 1.3 1.4l-.4 6.1a.9.9 0 0 1-1.8 0l-.4-6.1A1.3 1.3 0 0 1 12 7.5zm0 10.6a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8z" />
+            </svg>
+            <span class="popup-header-title confirm-title">Confirm Delete</span>
+        </div>
+    </HeaderTemplate>
+
+    <BodyContentTemplate>
+
+        <div class="confirm-body">
+
+            <p>
+                Are you sure you want to delete package
+                <strong>@(PendingDelete?.Code) - @(PendingDelete?.Description)</strong>?
+            </p>
+            <p class="confirm-subtext">This action cannot be undone.</p>
+
+        </div>
+
+        <div class="confirm-footer">
+            <button type="button" class="confirm-btn confirm-btn-cancel" @onclick="CancelDelete">Cancel</button>
+            <button type="button" class="confirm-btn confirm-btn-delete" @onclick="ConfirmDelete">Delete</button>
+        </div>
+
+    </BodyContentTemplate>
+
+</DxPopup>
+
+
+
+@code {
+    [Inject]
+    private PackageHeaderService Service { get; set; } = default!;
+
+    private List<PackageHeaderModel> Packages = new();
+    private DxGrid? Grid;
+    private object? SelectedItemObj;
+    private PackageHeaderModel? SelectedItem => SelectedItemObj as PackageHeaderModel;
+
+    private bool ShowDialog;
+    private string popupTitle = "Create Package Header";
+    private PackageHeaderModel Current = new();
+    private bool isEditMode;
+
+    private bool ShowDeleteConfirm;
+    private PackageHeaderModel? PendingDelete;
+
+    protected override void OnInitialized()
+    {
+        Packages = Service.GetPackages();
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var clickedItem = Grid?.GetDataItem(e.VisibleIndex) as PackageHeaderModel;
+        SelectedItemObj = (clickedItem is not null && clickedItem == SelectedItem) ? null : clickedItem;
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && Grid is not null)
+        {
+            var rowItem = Grid.GetDataItem(e.VisibleIndex) as PackageHeaderModel;
+            if (rowItem is not null && rowItem == SelectedItem)
+            {
+                e.CssClass = "row-manually-selected";
+            }
+        }
+    }
+
+    public void New()
+    {
+        Current = Service.CreateDefaultModel();
+        isEditMode = false;
+        popupTitle = "Create Package Header";
+        ShowDialog = true;
+        StateHasChanged();
+    }
+
+    public void Edit()
+    {
+        if (SelectedItem is null) return;
+        Current = SelectedItem;
+        isEditMode = true;
+        popupTitle = "Update Package Header";
+        ShowDialog = true;
+        StateHasChanged();
+    }
+
+    public void Delete()
+    {
+        if (SelectedItem is null) return;
+        PendingDelete = SelectedItem;
+        ShowDeleteConfirm = true;
+        StateHasChanged();
+    }
+
+    void ConfirmDelete()
+    {
+        if (PendingDelete is not null)
+        {
+            Service.DeletePackage(PendingDelete);
+            Packages = Service.GetPackages();
+            SelectedItemObj = null;
+        }
+        PendingDelete = null;
+        ShowDeleteConfirm = false;
+    }
+
+    void CancelDelete()
+    {
+        PendingDelete = null;
+        ShowDeleteConfirm = false;
+    }
+
+    private async Task HandleSave(PackageHeaderModel model)
+    {
+        Current = model;
+
+        try
+        {
+            if (isEditMode)
+            {
+                Service.UpdatePackage(Current);
+            }
+            else
+            {
+                Service.AddPackage(Current);
+            }
+
+            Packages = Service.GetPackages();
+            ShowDialog = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving package: {ex.Message}");
+        }
+    }
+
+    private void HandlePopupNew()
+    {
+        Current = Service.CreateDefaultModel();
+        isEditMode = false;
+        popupTitle = "Create Package Header";
+        StateHasChanged();
+    }
+
+    private void HandlePopupClose()
+    {
+        ShowDialog = false;
+        StateHasChanged();
+    }
+
+    public void Print()
+    {
+        // Print implementation
+    }
+}

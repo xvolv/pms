@@ -1,0 +1,433 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
+
+<DxPopup @bind-Visible="@Visible"
+         Width="740px"
+         ShowFooter="false"
+         ShowCloseButton="true"
+         CloseOnOutsideClick="false">
+
+    <HeaderTemplate>
+        <div class="popup-header">
+            <svg class="popup-header-icon" viewBox="0 0 24 24" width="25" height="25">
+                <path fill="#c0392b" d="M12 2l1.9 6.3L20 10l-6.1 1.7L12 18l-1.9-6.3L4 10l6.1-1.7z" />
+            </svg>
+            <span class="popup-header-title">@Title</span>
+        </div>
+    </HeaderTemplate>
+
+    <BodyContentTemplate Context="popupContext">
+        <PackageToolbar OnNew="HandleNew"
+                        OnSave="HandleToolbarSave"
+                        OnClose="HandleClose" />
+
+        <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" @ref="editForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-wrapper">
+                <DxGridLayout CssClass="erp-form">
+
+                    <Rows>
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="80px" />
+                    </Rows>
+
+                    <Columns>
+                        <DxGridLayoutColumn Width="20%" />
+                        <DxGridLayoutColumn Width="28%" />
+                        <DxGridLayoutColumn Width="4%" />
+                        <DxGridLayoutColumn Width="19%" />
+                        <DxGridLayoutColumn Width="29%" />
+                    </Columns>
+
+                    <Items>
+                        <!-- Code -->
+                        <DxGridLayoutItem Row="0" Column="0">
+                            <Template>
+                                <div class="label">Code</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="0" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxTextBox @bind-Text="@Model.Code"
+                                           ReadOnly="true"
+                                           Width="100%" />
+                                <ValidationMessage For="@(() => Model.Code)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Description -->
+                        <DxGridLayoutItem Row="1" Column="0">
+                            <Template>
+                                <div class="label">Description</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="1" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxTextBox @bind-Text="@Model.Description" Width="100%" />
+                                <ValidationMessage For="@(() => Model.Description)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Article -->
+                        <DxGridLayoutItem Row="2" Column="0">
+                            <Template>
+                                <div class="label">Article</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="2" Column="1">
+                            <Template>
+                                <div class="lookup-field">
+                                    <DxTextBox @bind-Text="@Model.Article"
+                                               ReadOnly="true"
+                                               Width="100%"
+                                               CssClass="erp-combobox lookup-input"
+                                               Click="@(() => ToggleArticleLookup())" />
+                                    <button type="button" class="lookup-toggle-btn" @onclick="@(() => ToggleArticleLookup())">▾</button>
+
+                                    @if (isArticleLookupOpen)
+                                    {
+                                        <div class="article-lookup-panel">
+                                            <button type="button" class="lookup-close-btn" @onclick="@(() => isArticleLookupOpen = false)">×</button>
+                                            <div class="lookup-search-row">
+                                                <DxTextBox @bind-Text="@articleSearchText"
+                                                           Width="100%"
+                                                           CssClass="lookup-search-input" />
+                                                <button type="button" class="lookup-find-btn">Find</button>
+                                            </div>
+                                            <div class="lookup-grid-wrap">
+                                                <table class="lookup-grid">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>code</th>
+                                                            <th>name</th>
+                                                            <th>preference</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var item in FilteredArticleLookupItems)
+                                                        {
+                                                            <tr @onclick="@(() => SelectArticleRow(item))">
+                                                                <td>@item.Code</td>
+                                                                <td>@item.Name</td>
+                                                                <td>@item.Preference</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="lookup-footer">
+                                                <button type="button" class="lookup-clear-btn" @onclick="ClearArticleSelection">Clear</button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <ValidationMessage For="@(() => Model.Article)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Currency -->
+                        <DxGridLayoutItem Row="2" Column="3">
+                            <Template>
+                                <div class="label">Currency</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="2" Column="4">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@currencyItems"
+                                            @bind-Value="@Model.Currency"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                                <ValidationMessage For="@(() => Model.Currency)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Group -->
+                        <DxGridLayoutItem Row="3" Column="0">
+                            <Template>
+                                <div class="label">Group</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="3" Column="1">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@groupItems"
+                                            @bind-Value="@Model.Group"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                                <ValidationMessage For="@(() => Model.Group)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Type -->
+                        <DxGridLayoutItem Row="3" Column="3">
+                            <Template>
+                                <div class="label">Type</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="3" Column="4">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@typeItems"
+                                            @bind-Value="@Model.Type"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                                <ValidationMessage For="@(() => Model.Type)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Rate Appearance -->
+                        <DxGridLayoutItem Row="4" Column="0">
+                            <Template>
+                                <div class="label">Rate Appearance</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="4" Column="1">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@rateAppearanceItems"
+                                            @bind-Value="@Model.RateAppearance"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Sale Separate -->
+                        <DxGridLayoutItem Row="4" Column="3">
+                            <Template>
+                                <div class="label">Sale Separate</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="4" Column="4">
+                            <Template>
+                                <div class="checkbox-center">
+                                    <DxCheckBox @bind-Checked="@Model.SaleSeparate" />
+                                </div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Posting Rhythm -->
+                        <DxGridLayoutItem Row="5" Column="0">
+                            <Template>
+                                <div class="label">Posting Rhythm</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="5" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@postingRhythmItems"
+                                            @bind-Value="@Model.PostingRhythm"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                                <ValidationMessage For="@(() => Model.PostingRhythm)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Calculate Rule -->
+                        <DxGridLayoutItem Row="6" Column="0">
+                            <Template>
+                                <div class="label">Calculate Rule</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="6" Column="1">
+                            <Template>
+                                <DxComboBox TData="string"
+                                            TValue="string"
+                                            Data="@calculateRuleItems"
+                                            @bind-Value="@Model.CalculateRule"
+                                            Width="100%"
+                                            CssClass="erp-combobox" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Formula -->
+                        <DxGridLayoutItem Row="7" Column="0">
+                            <Template>
+                                <div class="label">Formula</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="7" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxTextBox @bind-Text="@Model.Formula" Width="100%" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Remark -->
+                        <DxGridLayoutItem Row="8" Column="0">
+                            <Template>
+                                <div class="label">Remark</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="8" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxMemo @bind-Text="@Model.Remark" Rows="3" Width="100%" />
+                            </Template>
+                        </DxGridLayoutItem>
+                    </Items>
+                </DxGridLayout>
+            </div>
+        </EditForm>
+    </BodyContentTemplate>
+
+</DxPopup>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public PackageHeaderModel Model { get; set; } = new();
+
+    [Parameter]
+    public string Title { get; set; } = "Create Package Header";
+
+    [Parameter]
+    public EventCallback<PackageHeaderModel> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnNew { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback OnReset { get; set; }
+
+    private EditForm? editForm;
+
+    // Combo box data
+    private List<string> currencyItems = new()
+    {
+        "ETB - Ethiopian Birr",
+        "USD - US Dollar",
+        "EUR - Euro"
+    };
+
+    private List<string> groupItems = new()
+    {
+        "Raw Materials",
+        "Finished Goods",
+        "Spare Parts"
+    };
+
+    private List<string> typeItems = new()
+    {
+        "Purchase",
+        "Sales",
+        "Internal"
+    };
+
+    private List<string> rateAppearanceItems = new()
+    {
+        "Percentage",
+        "Fixed Amount",
+        "Formula Based"
+    };
+
+    private List<string> postingRhythmItems = new()
+    {
+        "Daily",
+        "Weekly",
+        "Monthly",
+        "Quarterly"
+    };
+
+    private List<string> calculateRuleItems = new()
+    {
+        "Standard Markup",
+        "Cost Plus",
+        "Market Based"
+    };
+
+    // Article lookup
+    private List<ArticleLookupItem> articleLookupItems = new()
+    {
+        new ArticleLookupItem { Code = "SFP-00009", Name = "LUNCH", Preference = "Package" },
+        new ArticleLookupItem { Code = "SFP-00010", Name = "DINNER", Preference = "Package" },
+        new ArticleLookupItem { Code = "SFP-00011", Name = "BREAKFAST", Preference = "Package" },
+        new ArticleLookupItem { Code = "ART-1001", Name = "Steel Bracket", Preference = "Purchase" },
+        new ArticleLookupItem { Code = "ART-1002", Name = "Aluminum Frame", Preference = "Purchase" },
+        new ArticleLookupItem { Code = "ART-1003", Name = "Rubber Gasket", Preference = "Purchase" }
+    };
+
+    private bool isArticleLookupOpen = false;
+    private string articleSearchText = "";
+
+    private IEnumerable<ArticleLookupItem> FilteredArticleLookupItems =>
+        string.IsNullOrWhiteSpace(articleSearchText)
+            ? articleLookupItems
+            : articleLookupItems.Where(a =>
+                a.Code.Contains(articleSearchText, StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains(articleSearchText, StringComparison.OrdinalIgnoreCase));
+
+    private void ToggleArticleLookup()
+    {
+        isArticleLookupOpen = !isArticleLookupOpen;
+    }
+
+    private void SelectArticleRow(ArticleLookupItem item)
+    {
+        Model.Article = $"{item.Code} - {item.Name}";
+        isArticleLookupOpen = false;
+    }
+
+    private void ClearArticleSelection()
+    {
+        Model.Article = "";
+        articleSearchText = "";
+        isArticleLookupOpen = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await OnSave.InvokeAsync(Model);
+    }
+
+    private void HandleNew()
+    {
+        OnNew.InvokeAsync();
+    }
+
+    private void HandleToolbarSave()
+    {
+        if (editForm?.EditContext?.Validate() == true)
+        {
+            OnSave.InvokeAsync(Model);
+        }
+    }
+
+    private void HandleClose()
+    {
+        OnClose.InvokeAsync();
+    }
+}

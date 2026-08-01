@@ -1,0 +1,224 @@
+/* Package Detail Component Styles */
+
+.page-shell {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+}
+
+/* ---------- master-detail ---------- */
+
+.master-detail {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    width: 99%;
+    margin: 0 auto;
+}
+
+.detail-list-panel {
+    width: 160px;
+    min-width: 160px;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    min-height: 320px;
+    box-sizing: border-box;
+}
+
+.detail-list-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+    .detail-list-item:hover {
+        background: #eaf2fb;
+    }
+
+    .detail-list-item.selected {
+        background: #2f6fb3;
+        color: #fff;
+    }
+
+.detail-list-icon {
+    font-size: 14px;
+}
+
+.detail-grid-panel {
+    flex: 1;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    min-height: 320px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+    .detail-table th {
+        text-align: left;
+        font-weight: 700;
+        padding: 6px 8px;
+        background: #e0e0e0;
+        border: 1px solid #cfcfcf;
+    }
+
+    .detail-table td {
+        padding: 6px 8px;
+        border: 1px solid #e5e5e5;
+    }
+
+        .detail-table td.num {
+            text-align: right;
+        }
+
+    .detail-table tr {
+        cursor: pointer;
+    }
+
+        .detail-table tr:hover {
+            background: #3399FF;
+        }
+
+        .detail-table tr.selected {
+            background: #2f6fb3;
+            color: #fff;
+        }
+
+.detail-grid-footer {
+    padding: 6px 8px;
+    border-top: 1px solid #eee;
+    margin-top: auto;
+}
+
+.link-btn {
+    border: none;
+    background: none;
+    color: #2f6fb3;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+}
+
+    .link-btn:hover {
+        text-decoration: underline;
+    }
+
+/* ---------- popup header + toolbar ---------- */
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.popup-header-icon {
+    flex-shrink: 0;
+}
+
+.popup-header-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.modal-toolbar {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #d9d9d9;
+    background: #fafafa;
+    margin: -1px -1px 0 -1px;
+}
+
+.toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 52px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #333;
+    font-family: inherit;
+}
+
+    .toolbar-btn:hover {
+        background: #eaf2fb;
+        border: 1px solid #a9c9ec;
+    }
+
+    .toolbar-btn:active {
+        background: #d6e6fa;
+    }
+
+/* ---------- create package detail popup body ---------- */
+
+.detail-form {
+    padding: 14px 16px;
+    background: #f2f2f2;
+}
+
+    .detail-form .dxbl-text-edit,
+    .detail-form .dxbl-date-edit,
+    .detail-form .dxbl-memo {
+        background-color: #fff !important;
+        border: 1px solid #4a4a4a !important;
+        border-radius: 2px;
+    }
+
+.detail-form-row {
+    margin-bottom: 10px;
+}
+
+    .detail-form-row.two-col {
+        display: flex;
+        gap: 16px;
+    }
+
+        .detail-form-row.two-col .col {
+            flex: 1;
+        }
+
+.detail-form-label {
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+    .detail-form-label.center {
+        text-align: center;
+    }
+
+.weekdays-row .weekdays {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+    .weekdays-row .weekdays label {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+.code-box {
+    background: #eee !important;
+}

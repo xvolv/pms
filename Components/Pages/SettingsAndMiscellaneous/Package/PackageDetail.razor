@@ -1,0 +1,298 @@
+@page "/package-detail"
+@rendermode InteractiveServer
+
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
+@using DevExpress.Blazor
+
+<div class="page-shell">
+
+    <!-- ===================== PACKAGE DETAIL (master-detail) ===================== -->
+
+    <div class="master-detail">
+
+        <div class="detail-list-panel">
+
+            @foreach (var group in packageGroups)
+            {
+                <div class="detail-list-item @(selectedGroup == group ? "selected" : "")"
+                     @onclick="@(() => SelectGroup(group))">
+                    <span class="detail-list-icon">🍱</span>
+                    <span>@group.Name</span>
+                </div>
+            }
+
+        </div>
+
+        <div class="detail-grid-panel">
+
+            <div class="grid-container">
+                <DxGrid @ref="Grid"
+                        Data="@(selectedGroup?.Details ?? new List<PackageDetailRow>())"
+                        KeyFieldName="StartDate"
+                        CssClass="erp-grid"
+                        Width="100%"
+                        ShowGroupPanel="false"
+                        ShowFilterRow="false"
+                        RowClick="@OnRowClick"
+                        CustomizeElement="@OnCustomizeElement">
+
+                    <Columns>
+                        <DxGridDataColumn FieldName="StartDate" Caption="Start Date" />
+                        <DxGridDataColumn FieldName="EndDate" Caption="End Date" />
+                        <DxGridDataColumn FieldName="Price" Caption="Price" />
+                        <DxGridDataColumn FieldName="Allowance" Caption="Allowance" />
+                    </Columns>
+
+                </DxGrid>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================== PACKAGE DETAIL POPUP ===================== -->
+
+<PackageDetailPopup Visible="@isCreatePopupVisible"
+                   VisibleChanged="@((value) => isCreatePopupVisible = value)"
+                   Model="@holidayModel"
+                   Title="@popupTitle"
+                   OnSave="HandleSave"
+                   OnNew="HandlePopupNew"
+                   OnClose="HandlePopupClose"
+                   OnReset="HandleReset" />
+
+
+@code {
+    [Inject]
+    private PackageDetailService Service { get; set; } = default!;
+
+    private DxGrid? Grid;
+    private object? SelectedItemObj;
+    private PackageDetailRow? SelectedItem => SelectedItemObj as PackageDetailRow;
+
+    private List<PackageGroup> packageGroups = new();
+    private PackageGroup? selectedGroup;
+    private HolidayModel holidayModel = new();
+    private bool isCreatePopupVisible = false;
+    private PackageDetailRow? editingRow = null;
+    private string popupTitle = "Create Package Detail";
+
+    private bool ShowDeleteConfirm = false;
+    private PackageDetailRow? PendingDelete = null;
+
+    protected override void OnInitialized()
+    {
+        packageGroups = Service.GetPackageGroups();
+        selectedGroup = Service.GetFirstGroup();
+        ResetForm();
+    }
+
+    private void SelectGroup(PackageGroup group)
+    {
+        selectedGroup = group;
+        SelectedItemObj = null;
+    }
+
+    public void New()
+    {
+        if (selectedGroup is null) return;
+        editingRow = null;
+        popupTitle = "Create Package Detail";
+        ResetForm();
+        isCreatePopupVisible = true;
+        StateHasChanged();
+    }
+
+    public void Edit()
+    {
+        if (selectedGroup is null || SelectedItem is null) return;
+        editingRow = SelectedItem;
+        popupTitle = "Edit Package Detail";
+        holidayModel = Service.CreateModelFromRow(editingRow);
+        isCreatePopupVisible = true;
+        StateHasChanged();
+    }
+
+    public void Delete()
+    {
+        if (selectedGroup is null || SelectedItem is null) return;
+        PendingDelete = SelectedItem;
+        ShowDeleteConfirm = true;
+        StateHasChanged();
+    }
+
+    void ConfirmDelete()
+    {
+        if (PendingDelete is not null && selectedGroup is not null)
+        {
+            selectedGroup.Details.Remove(PendingDelete);
+            SelectedItemObj = null;
+        }
+        PendingDelete = null;
+        ShowDeleteConfirm = false;
+    }
+
+    void CancelDelete()
+    {
+        PendingDelete = null;
+        ShowDeleteConfirm = false;
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var clickedItem = Grid?.GetDataItem(e.VisibleIndex) as PackageDetailRow;
+        SelectedItemObj = (clickedItem is not null && clickedItem == SelectedItem) ? null : clickedItem;
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && Grid is not null)
+        {
+            var rowItem = Grid.GetDataItem(e.VisibleIndex) as PackageDetailRow;
+            if (rowItem is not null && rowItem == SelectedItem)
+            {
+                e.CssClass = "row-manually-selected";
+            }
+        }
+    }
+
+    private void ResetForm()
+    {
+        holidayModel = Service.CreateDefaultModel();
+    }
+
+    private void HandleReset(HolidayModel model)
+    {
+        holidayModel = model;
+    }
+
+    private async Task HandleSave(HolidayModel model)
+    {
+        holidayModel = model;
+
+        if (selectedGroup is null) return;
+
+        try
+        {
+            if (editingRow is not null)
+            {
+                Service.UpdateDetail(editingRow, holidayModel);
+            }
+            else
+            {
+                Service.AddDetail(selectedGroup, holidayModel);
+            }
+
+            isCreatePopupVisible = false;
+            editingRow = null;
+            StateHasChanged();
+        }
+        catch (ArgumentException ex)
+        {
+            // Handle validation errors
+            Console.WriteLine($"Validation error: {ex.Message}");
+        }
+    }
+
+    private void HandlePopupNew()
+    {
+        if (selectedGroup is null) return;
+        editingRow = null;
+        popupTitle = "Create Package Detail";
+        ResetForm();
+        StateHasChanged();
+    }
+
+    private void HandlePopupClose()
+    {
+        isCreatePopupVisible = false;
+        StateHasChanged();
+    }
+
+    public void Print()
+    {
+        // Print implementation
+    }
+}
+
+
+<!-- ===================== DELETE CONFIRMATION POPUP ===================== -->
+
+<DxPopup @bind-Visible="@ShowDeleteConfirm"
+         Width="360px"
+         ShowFooter="false"
+         ShowCloseButton="true"
+         CloseOnOutsideClick="false">
+
+    <HeaderTemplate>
+        <div class="popup-header">
+            <svg class="popup-header-icon" viewBox="0 0 24 24" width="25" height="25">
+                <path fill="#c0392b" d="M12 2l1.9 6.3L20 10l-6.1 1.7L12 18l-1.9-6.3L4 10l6.1-1.7z" />
+            </svg>
+            <span class="popup-header-title">Confirm Delete</span>
+        </div>
+    </HeaderTemplate>
+
+    <BodyContentTemplate>
+        <div class="delete-confirm-content">
+            <p>Are you sure you want to delete this package detail?</p>
+            <div class="delete-confirm-buttons">
+                <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+
+</DxPopup>
+
+
+<style>
+    .delete-confirm-content {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .delete-confirm-content p {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .delete-confirm-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>
+

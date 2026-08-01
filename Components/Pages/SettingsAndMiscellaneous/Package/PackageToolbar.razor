@@ -1,0 +1,129 @@
+@rendermode InteractiveServer
+
+<div class="erp-toolbar">
+
+    @if (OnNew.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnNew">
+            <div class="toolbar-icon">
+                <i class="bi bi-file-earmark-plus"></i>
+            </div>
+            <div class="toolbar-text">New</div>
+        </button>
+    }
+
+    @if (OnEdit.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnEdit">
+            <div class="toolbar-icon">
+                <i class="bi bi-pencil-square"></i>
+            </div>
+            <div class="toolbar-text">Edit</div>
+        </button>
+    }
+
+    @if (OnSave.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnSave">
+            <div class="toolbar-icon">
+                <i class="bi bi-floppy"></i>
+            </div>
+            <div class="toolbar-text">Save</div>
+        </button>
+    }
+
+    @if (OnDelete.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnDelete">
+            <div class="toolbar-icon">
+                <i class="bi bi-trash3"></i>
+            </div>
+            <div class="toolbar-text">Delete</div>
+        </button>
+    }
+
+    @if (OnPrint.HasDelegate)
+    {
+        <button class="toolbar-btn toolbar-print" @onclick="OnPrint">
+            <div class="toolbar-icon">
+                <i class="bi bi-printer"></i>
+            </div>
+            <div class="toolbar-text">Print</div>
+        </button>
+    }
+
+    @if (OnClose.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnClose">
+            <div class="toolbar-icon">
+                <i class="bi bi-x-circle"></i>
+            </div>
+            <div class="toolbar-text">Close</div>
+        </button>
+    }
+
+</div>
+
+@code {
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnEdit { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+}
+
+<style>
+    .erp-toolbar {
+        display: flex;
+        align-items: stretch;
+        height: 74px;
+        background: white;
+        border: 1px solid #d6d6d6;
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .toolbar-btn {
+        background: transparent !important;
+        border: none !important;
+    }
+
+        .toolbar-btn:hover {
+            background: transparent !important;
+            border: none !important;
+        }
+
+
+        /* Only the Print button has left and right borders */
+        .toolbar-btn.toolbar-print {
+            border-left: 2px solid #d6d6d6;
+            border-right: 2px solid #d6d6d6;
+        }
+
+    .toolbar-icon {
+        font-size: 28px;
+        line-height: 28px;
+        color: #555;
+    }
+
+        .toolbar-icon i {
+            font-size: 28px;
+        }
+
+    .toolbar-btn:hover .toolbar-icon i {
+        color: #0d6efd;
+    }
+
+    .toolbar-text {
+        margin-top: 4px;
+        font-size: 11px;
+        color: #444;
+        font-weight: 500;
+    }
+
+    .toolbar-btn:hover .toolbar-text {
+        color: #0d6efd;
+    }
+</style>

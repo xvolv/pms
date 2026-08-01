@@ -1,0 +1,167 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
+
+<DxPopup @bind-Visible="@Visible"
+         Width="480px"
+         ShowFooter="false"
+         ShowCloseButton="true"
+         CloseOnOutsideClick="false">
+
+    <HeaderTemplate>
+        <div class="popup-header">
+            <svg class="popup-header-icon" viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#c0392b" d="M12 2l1.9 6.3L20 10l-6.1 1.7L12 18l-1.9-6.3L4 10l6.1-1.7z" />
+            </svg>
+            <span class="popup-header-title">@Title</span>
+        </div>
+    </HeaderTemplate>
+
+    <BodyContentTemplate Context="popupContext">
+        <PackageToolbar OnNew="HandleNew"
+                        OnSave="HandleToolbarSave"
+                        OnClose="HandleClose" />
+
+        <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" @ref="editForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="detail-form">
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Code</div>
+                    <DxTextBox @bind-Text="@Model.Code" ReadOnly="true" CssClass="code-box" Width="100%" />
+                    <ValidationMessage For="@(() => Model.Code)" />
+                </div>
+
+                <div class="detail-form-row two-col">
+                    <div class="col">
+                        <div class="detail-form-label">Start Date</div>
+                        <DxDateEdit @bind-Date="@Model.StartDate" Width="100%" />
+                        <ValidationMessage For="@(() => Model.StartDate)" />
+                    </div>
+                    <div class="col">
+                        <div class="detail-form-label">End Date</div>
+                        <DxDateEdit @bind-Date="@Model.EndDate" Width="100%" />
+                        <ValidationMessage For="@(() => Model.EndDate)" />
+                    </div>
+                </div>
+
+                <div class="detail-form-row weekdays-row">
+                    <div class="detail-form-label center">Weekdays</div>
+                    <div class="weekdays">
+                        <label><DxCheckBox @bind-Checked="@Model.Sun" /> Sun</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Mon" /> Mon</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Tue" /> Tue</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Wed" /> Wed</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Thu" /> Thu</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Fri" /> Fri</label>
+                        <label><DxCheckBox @bind-Checked="@Model.Sat" /> Sat</label>
+                    </div>
+                    <ValidationMessage For="@(() => Model.Sun)" />
+                </div>
+
+                <div class="detail-form-row two-col">
+                    <div class="col">
+                        <div class="detail-form-label">Price</div>
+                        <DxTextBox @bind-Text="@Model.Price" Width="100%" />
+                        <ValidationMessage For="@(() => Model.Price)" />
+                    </div>
+                    <div class="col">
+                        <div class="detail-form-label">Allowance</div>
+                        <DxTextBox @bind-Text="@Model.Allowance" Width="100%" />
+                        <ValidationMessage For="@(() => Model.Allowance)" />
+                    </div>
+                </div>
+
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Remark</div>
+                    <DxMemo @bind-Text="@Model.Remark" Rows="4" Width="100%" />
+                </div>
+            </div>
+        </EditForm>
+    </BodyContentTemplate>
+
+</DxPopup>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public HolidayModel Model { get; set; } = new();
+
+    [Parameter]
+    public string Title { get; set; } = "Create Package Detail";
+
+    [Parameter]
+    public EventCallback<HolidayModel> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnNew { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<HolidayModel> OnReset { get; set; }
+
+    private EditForm? editForm;
+
+    private void ClosePopup()
+    {
+        Visible = false;
+        VisibleChanged.InvokeAsync(Visible);
+    }
+
+    private void ResetForm()
+    {
+        Model = new HolidayModel
+        {
+            Code = "PKD0000000003",
+            StartDate = DateTime.Today,
+            EndDate = DateTime.Today.AddDays(1),
+            Price = "",
+            Allowance = "",
+            Remark = "",
+            Sun = true,
+            Mon = true,
+            Tue = true,
+            Wed = true,
+            Thu = true,
+            Fri = true,
+            Sat = true
+        };
+        OnReset.InvokeAsync(Model);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await OnSave.InvokeAsync(Model);
+    }
+
+    private void HandleNew()
+    {
+        OnNew.InvokeAsync();
+    }
+
+    private void HandleSave()
+    {
+        OnSave.InvokeAsync(Model);
+    }
+
+    private void HandleToolbarSave()
+    {
+        if (editForm?.EditContext?.Validate() == true)
+        {
+            OnSave.InvokeAsync(Model);
+        }
+    }
+
+    private void HandleClose()
+    {
+        OnClose.InvokeAsync();
+    }
+}

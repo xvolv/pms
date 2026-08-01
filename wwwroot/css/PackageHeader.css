@@ -1,0 +1,415 @@
+/* Package Header Component Styles */
+
+.grid-container {
+    width: 99%;
+    margin: 10px auto;
+}
+
+.erp-grid {
+    width: 100%;
+    background: #fff;
+}
+
+    /* Header */
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        background: #e0e0e0 !important;
+        color: #222;
+        font-size: 12px;
+        font-weight: bolder;
+        border: 1px solid #cfcfcf;
+        padding: 6px 8px;
+    }
+
+    /* Data cells */
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        padding: 6px 8px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    /* Hover row */
+    .erp-grid .dxbs-data-row:hover > td,
+    .erp-grid tbody tr:hover td {
+        background: #3399FF !important;
+        color: white;
+    }
+
+    /* Manually-tracked selection */
+    .erp-grid tr.row-manually-selected > td {
+        background: #2f6fb3 !important;
+        color: white !important;
+    }
+
+    /* Remove extra spacing */
+    .erp-grid table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    /* Header text alignment */
+    .erp-grid .dxbs-header-row > td {
+        text-align: left;
+    }
+
+    /* Remove focus outline */
+    .erp-grid *:focus {
+        outline: none;
+    }
+
+/* ---------- popup header + toolbar ---------- */
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    gap: 3px;
+}
+
+.popup-header-icon {
+    flex-shrink: 0;
+    font-size: 25px;
+}
+
+.popup-header-title {
+    font-weight: 300;
+    font-size: 25px;
+    color: aqua;
+}
+
+.modal-toolbar {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #d9d9d9;
+    background: #fafafa;
+    margin: -1px -1px 0 -1px;
+}
+
+.toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 52px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: #333;
+    font-family: inherit;
+}
+
+    .toolbar-btn:hover {
+        background: #eaf2fb;
+        border: 1px solid #a9c9ec;
+    }
+
+    .toolbar-btn:active {
+        background: #d6e6fa;
+    }
+
+.form-wrapper {
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.erp-form {
+    border: 1px solid #cfcfcf;
+    padding: 10px;
+    width: 100%;
+    max-width: 680px;
+    min-width: 0;
+    background: #f2f2f2;
+    box-sizing: border-box;
+}
+
+.label {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.checkbox-center {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+}
+
+/* Only ComboBox override */
+.erp-combobox {
+    background-color: white !important;
+    cursor: pointer;
+}
+
+    .erp-combobox .dxbl-text-edit-input {
+        background-color: white !important;
+        cursor: pointer;
+    }
+
+.dxbl-text-edit,
+.dxbl-combo-box,
+.dxbl-memo {
+    font-size: 13px;
+}
+
+.erp-combobox-input {
+    background-color: white !important;
+}
+
+.erp-combobox,
+.erp-combobox * {
+    background-color: #fff !important;
+    border: hidden;
+}
+
+.erp-combobox {
+    border: 1px solid #cfcfcf !important;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+    .erp-combobox svg {
+        fill: #666 !important;
+        color: #666 !important;
+    }
+
+/* ---------- Article lookup (dropdown-style grid picker) ---------- */
+
+.lookup-field {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.lookup-input {
+    cursor: pointer;
+}
+
+.lookup-toggle-btn {
+    margin-left: -1px;
+    border: 1px solid #cfcfcf;
+    background: #f2f2f2;
+    cursor: pointer;
+    font-size: 20px;
+    color: #555;
+}
+
+    .lookup-toggle-btn:hover {
+        background: #e6e6e6;
+    }
+
+.article-lookup-panel {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    width: 440px;
+    background: #fff;
+    border: 1px solid #999;
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.lookup-close-btn {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+    .lookup-close-btn:hover {
+        color: #c0392b;
+    }
+
+.lookup-search-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.lookup-search-input {
+    font-size: 12px;
+}
+
+.lookup-find-btn {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #ececec;
+    border: 1px solid #b5b5b5;
+    border-radius: 2px;
+    cursor: pointer;
+    color: #333;
+}
+
+    .lookup-find-btn:hover {
+        background: #e0e0e0;
+    }
+
+.lookup-grid-wrap {
+    max-height: 170px;
+    overflow-y: auto;
+}
+
+.lookup-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+    .lookup-grid th {
+        text-align: left;
+        font-weight: 700;
+        padding: 5px 8px;
+        background: #eef0f2;
+        border-bottom: 1px solid #ccc;
+        position: sticky;
+        top: 0;
+    }
+
+    .lookup-grid td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+
+    .lookup-grid tr:hover td {
+        background: #eaf2fb;
+    }
+
+.lookup-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 8px;
+    border-top: 1px solid #ddd;
+}
+
+.lookup-clear-btn {
+    padding: 4px 14px;
+    font-size: 12px;
+    background: #ececec;
+    border: 1px solid #b5b5b5;
+    border-radius: 2px;
+    cursor: pointer;
+    color: #333;
+}
+
+    .lookup-clear-btn:hover {
+        background: #e0e0e0;
+    }
+
+/* ---------- delete confirmation popup ---------- */
+
+.confirm-header {
+    padding: 14px 20px !important;
+}
+
+.confirm-title {
+    font-size: 16px !important;
+    color: #c0392b !important;
+    font-weight: 600 !important;
+}
+
+.confirm-body {
+    padding: 16px 20px 4px 20px;
+    font-size: 13px;
+    color: #333;
+}
+
+    .confirm-body p {
+        margin: 0 0 8px 0;
+    }
+
+.confirm-subtext {
+    color: #888;
+    font-size: 12px;
+}
+
+.confirm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 20px 18px 20px;
+}
+
+.confirm-btn {
+    padding: 6px 16px;
+    font-size: 13px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.confirm-btn-cancel {
+    background: #ececec;
+    border: 1px solid #b5b5b5;
+    color: #333;
+}
+
+    .confirm-btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+.confirm-btn-delete {
+    background: #c0392b;
+    border: 1px solid #a5301f;
+    color: #fff;
+}
+
+    .confirm-btn-delete:hover {
+        background: #a5301f;
+    }
+
+/* Responsive tweaks */
+@media (max-width: 700px) {
+    .form-wrapper {
+        padding: 16px;
+    }
+
+    .erp-form {
+        padding: 8px;
+    }
+
+    .label {
+        font-size: 12px;
+        padding-right: 4px;
+        white-space: normal;
+        line-height: 1.1;
+    }
+
+    .dxbl-text-edit,
+    .dxbl-combo-box,
+    .dxbl-memo {
+        font-size: 12px;
+    }
+
+    .article-lookup-panel {
+        width: 280px;
+    }
+}
