@@ -1,0 +1,72 @@
+<DxToolbar CssClass="rt-toolbar">
+    <Items>
+        @foreach (var item in Items)
+        {
+            <DxToolbarItem BeginGroup="@item.BeginGroup" Click="item.OnClick">
+                <Template>
+                    <div class="toolbar-item">
+                        <i class="bi @item.Icon toolbar-icon text-secondary"></i>
+                        <span>@item.Label</span>
+                    </div>
+                </Template>
+            </DxToolbarItem>
+        }
+
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <DxToolbarItem Alignment="ToolbarItemAlignment.Right">
+                <Template>
+                    <span class="rt-status-message">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        @StatusMessage
+                    </span>
+                </Template>
+            </DxToolbarItem>
+        }
+    </Items>
+</DxToolbar>
+
+@code {
+    [Parameter] public List<ToolbarItem> Items { get; set; } = new();
+    [Parameter] public string? StatusMessage { get; set; }
+
+    public class ToolbarItem
+    {
+        public string Label { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public EventCallback OnClick { get; set; }
+        public bool BeginGroup { get; set; }
+    }
+}
+
+<style>
+    .toolbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 70px;
+        padding: 6px 12px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .toolbar-icon {
+        font-size: 1.8rem;
+        color: #5c5c5c;
+        margin-bottom: 4px;
+    }
+
+    .toolbar-item span {
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+    .toolbar-item:hover .toolbar-icon {
+        color: #0d6efd;
+    }
+
+    .toolbar-item:hover span {
+        color: #0d6efd;
+    }
+</style>
