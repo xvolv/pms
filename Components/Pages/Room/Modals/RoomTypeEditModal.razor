@@ -1,0 +1,206 @@
+@if (Visible && EditingItem != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title"><i class="bi bi-asterisk text-danger me-2"></i>Room Type</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <EditForm Model="@EditingItem" OnValidSubmit="Save">
+                <DataAnnotationsValidator />
+
+                <div class="rt-toolbar">
+                    @* <button type="button" class="rt-toolbar-btn" @onclick="New">
+                        <i class="bi bi-file-earmark-plus-fill text-primary"></i>
+                        <span>New</span>
+                    </button> *@
+                    <button type="submit" class="rt-toolbar-btn">
+                        <i class="bi bi-floppy text-secondary"></i>
+                        <span>Save</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                        <i class="bi bi-x-circle text-secondary"></i>
+                        <span>Close</span>
+                    </button>
+                </div>
+
+                <DxTabs @bind-ActiveTabIndex="activeSubTabIndex" CssClass="rt-modal-tabs">
+                    <DxTabPage Text="Basic Information" />
+                    <DxTabPage Text="HK-Credits" />
+                </DxTabs>
+
+                <div class="rt-modal-body">
+                    <ValidationSummary class="rt-validation-summary" />
+
+                    @if (activeSubTabIndex == 0)
+                    {
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Room Type Code</label>
+                                <DxTextBox @bind-Text="@EditingItem.Code" ReadOnly="true" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.Code)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field rt-form-field-inline">
+                                <DxCheckBox @bind-Checked="@EditingItem.Status">Active</DxCheckBox>
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Activation Date</label>
+                                <DxDateEdit @bind-Date="@EditingItem.ActivationDate" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.ActivationDate)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Description</label>
+                                <DxTextBox @bind-Text="@EditingItem.Description" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.Description)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>No of Rooms</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.NoOfRooms" MinValue="0" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.NoOfRooms)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Component Room</label>
+                                <DxComboBox Data="@RoomTypes" @bind-Value="@EditingItem.ComponentRoom"
+                                            TextFieldName="@nameof(RoomTypeRow.Description)" ValueFieldName="@nameof(RoomTypeRow.Code)"
+                                            NullText="-- None --" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input">
+                                    <ItemTemplate Context="rt">
+                                        @($"{rt.Code} - {rt.Description}")
+                                    </ItemTemplate>
+                                </DxComboBox>
+                                <ValidationMessage For="@(() => EditingItem.ComponentRoom)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Room Class</label>
+                                <DxComboBox Data="@RoomClasses" @bind-Value="@EditingItem.RoomClass" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.RoomClass)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row rt-form-row-groups">
+                            <fieldset class="rt-form-fieldset">
+                                <legend>Occupancy</legend>
+                                <div class="rt-occupancy-grid">
+                                    <div class="rt-form-field">
+                                        <label>Default Occupancy</label>
+                                        <DxSpinEdit @bind-Value="@EditingItem.DefaultOccupancy" MinValue="0"
+                                                    CssClass="rt-form-input" />
+                                        <ValidationMessage For="@(() => EditingItem.DefaultOccupancy)"
+                                                           class="rt-validation-message" />
+                                    </div>
+                                    <div class="rt-form-field">
+                                        <label>Maximum Occupancy</label>
+                                        <DxSpinEdit @bind-Value="@EditingItem.MaximumOccupancy" MinValue="0"
+                                                    CssClass="rt-form-input" />
+                                        <ValidationMessage For="@(() => EditingItem.MaximumOccupancy)"
+                                                           class="rt-validation-message" />
+                                    </div>
+                                    <div class="rt-form-field">
+                                        <label>Maximum Adult</label>
+                                        <DxSpinEdit @bind-Value="@EditingItem.MaximumAdult" MinValue="0"
+                                                    CssClass="rt-form-input" />
+                                        <ValidationMessage For="@(() => EditingItem.MaximumAdult)"
+                                                           class="rt-validation-message" />
+                                    </div>
+                                    <div class="rt-form-field">
+                                        <label>Maximum Childs</label>
+                                        <DxSpinEdit @bind-Value="@EditingItem.MaximumChilds" MinValue="0"
+                                                    CssClass="rt-form-input" />
+                                        <ValidationMessage For="@(() => EditingItem.MaximumChilds)"
+                                                           class="rt-validation-message" />
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="rt-form-fieldset">
+                                <legend>Type</legend>
+                                <DxCheckBox @bind-Checked="@EditingItem.IsPseudoRoom">Pseudo Room Type</DxCheckBox>
+                                <DxCheckBox @bind-Checked="@EditingItem.CanBeMeetingRoom">Can Be Meeting Room</DxCheckBox>
+                                <DxCheckBox @bind-Checked="@EditingItem.IsHouseKeeping">House Keeping</DxCheckBox>
+                                <DxCheckBox @bind-Checked="@EditingItem.AutoRoomAssign">Auto Room Assign</DxCheckBox>
+                            </fieldset>
+                        </div>
+                    }
+                    else
+                    {
+                        <fieldset class="rt-form-fieldset rt-hkcredits">
+                            <legend>HK-Credits</legend>
+                            <div class="rt-hkcredit-row">
+                                <label>Stayover Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.StayoverCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Departure Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.DepartureCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Turndown Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.TurndownCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Pickup Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.PickupCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Vacant Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.VacantCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Evening Section</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.EveningSectionCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                        </fieldset>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public RoomTypeRow? EditingItem { get; set; }
+    [Parameter] public List<RoomTypeRow> RoomTypes { get; set; } = new();
+    [Parameter] public List<string> RoomClasses { get; set; } = new();
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private int activeSubTabIndex = 0;
+
+    private async Task New()
+    {
+        activeSubTabIndex = 0;
+        await OnNew.InvokeAsync();
+    }
+
+    private async Task Save()
+    {
+        await OnSave.InvokeAsync();
+    }
+
+    private async Task Close()
+    {
+        activeSubTabIndex = 0;
+        await OnClose.InvokeAsync();
+    }
+}

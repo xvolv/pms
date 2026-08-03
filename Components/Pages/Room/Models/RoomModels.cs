@@ -23,10 +23,32 @@ public class RoomTileRow
     public string TypeCode { get; set; } = "";
     public string TypeDescription { get; set; } = "";
     public string Status { get; set; } = "Clean";
+
+    // Room Detail
+    public string RoomCode { get; set; } = "";
+    public int? MaxOccupancy { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string PhoneNo { get; set; } = "";
+    public string Measurement { get; set; } = "";
+    public string Remark { get; set; } = "";
+
+    // Space Capacity
+    public string SpaceArrangement { get; set; } = "";
+    public int? MaxCapacity { get; set; }
+    public string SpaceRemark { get; set; } = "";
+
+    // HK-Credits
+    public decimal StayoverCredit { get; set; }
+    public decimal DepartureCredit { get; set; }
+    public decimal TurndownCredit { get; set; }
+    public decimal PickupCredit { get; set; }
+    public decimal VacantCredit { get; set; }
+    public decimal EveningSectionCredit { get; set; }
 }
 
 public class BlockDraft
 {
+    public int Id { get; set; }
     public string Code { get; set; } = "";
     public string Name { get; set; } = "";
     public int NoOfFloors { get; set; } = 1;

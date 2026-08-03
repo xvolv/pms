@@ -143,16 +143,17 @@
 }
 
 /* Room Type Add/Edit Modal */
+/* Room Type Add/Edit Modal */
 .rt-modal-backdrop {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.45);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding-top: 8vh;
     z-index: 100;
 }
-
 .rt-modal {
     background-color: #ffffff;
     border-radius: 6px;
@@ -253,6 +254,27 @@
     width: 100%;
 }
 
+.rt-validation-summary {
+    background-color: #fdecea;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+}
+
+    .rt-validation-summary ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+.rt-validation-message {
+    color: #dc3545;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
 .rt-form-select {
     width: 100%;
     padding: 6px 8px;
@@ -287,11 +309,81 @@
     width: auto;
 }
 
-/* Room modal (add/edit single room) */
-.room-modal {
-    width: 420px;
+/* Room modal - Room Detail / Space Capacity tabs */
+.rt-detail-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 460px;
 }
 
+.rt-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rt-detail-row-top {
+    align-items: flex-start;
+}
+
+.rt-detail-row label {
+    flex: 0 0 120px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5f6368;
+}
+
+.rt-detail-input {
+    flex: 1 1 auto;
+}
+
+.rt-detail-inline-check {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+/* Room Type modal - HK-Credits tab */
+
+.rt-hkcredits {
+    gap: 14px;
+    max-width: 360px;
+}
+
+.rt-hkcredit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.rt-hkcredit-row label {
+    font-size: 0.85rem;
+    color: #202124;
+}
+
+.rt-hkcredit-input {
+    width: 150px;
+}
+
+.rt-hkcredit-input input {
+    text-align: right;
+}
+.rt-hkcredit-input .dxbs-spin-edit-button.inc{
+    background: white;
+    
+}
+.rt-hkcredit-input .dxbs-spin-edit-button.dec{
+    background: white;
+}
+.rt-hkcredit-input .dxbs-spin-edit-button {
+    color: gray;
+}
+.rt-hkcredit-input .dxbs-form-control {
+    padding-right: 30px !important;
+}
+
+/* Room modal (add/edit single room) */
 .room-modal-toolbar {
     margin: 0 16px 16px;
 }
@@ -341,6 +433,11 @@
 
 .block-header:hover {
     background-color: #1b7669;
+}
+
+.block-header.active {
+    background-color: #145d52;
+    box-shadow: inset 0 0 0 2px #0d6efd;
 }
 
 .floor-row {
@@ -476,4 +573,19 @@
 .property-tabs .nav-link:not(.active),
 .rooms-tabs .nav-link:not(.active) {
     color: #6c757d !important;
+}
+.rt-modal-tabs .nav-link:not(.active) {
+    color: #6c757d !important;
+    
+}
+
+.rt-form-input .dxbs-spin-edit-button.inc{
+    background: white;
+    
+}
+.rt-form-input .dxbs-spin-edit-button.dec{
+    background: white;
+}
+.rt-form-input .dxbs-spin-edit-button {
+    color: gray;
 }
