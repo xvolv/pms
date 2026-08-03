@@ -1,0 +1,344 @@
+@page "/package"
+@rendermode InteractiveServer
+
+@inject NavigationManager Navigation
+@using DevExpress.Blazor
+
+<PageTitle>Package</PageTitle>
+<div class="dashboard-wrapper">
+
+
+<div class="">
+
+
+    <!-- Ribbon -->
+    <DxTabs @bind-ActiveTabIndex="ribbonActiveTab"
+            CssClass="custom-ribbon-tabs">
+
+        <DxTabPage Text="Package" />
+
+    </DxTabs>
+
+
+    <div class="sub-section">
+    <!-- Toolbar -->
+    <PackageToolbar OnNew="New"
+                    OnEdit="Edit"
+                    OnDelete="Delete"
+                    OnPrint="Print" />
+
+
+
+
+    <!-- Work Area -->
+    <div class="erp-content">
+
+
+        <DxTabs @bind-ActiveTabIndex="ActiveTabIndex"
+                CssClass="custom-content-tabs">
+
+
+            <DxTabPage Text="Package Header">
+
+                <PackageHeader @ref="header" />
+
+            </DxTabPage>
+
+
+
+            <DxTabPage Text="Package Detail">
+
+                <PackageDetail @ref="detail" />
+
+            </DxTabPage>
+
+
+        </DxTabs>
+
+
+    </div>
+
+        </div>
+</div>
+</div>
+
+
+
+@code {
+
+    PackageHeader? header;
+    PackageDetail? detail;
+
+
+    int ActiveTabIndex = 0;
+
+    int ribbonActiveTab = 0;
+
+
+
+    void New()
+    {
+        if (ActiveTabIndex == 0)
+            header?.New();
+        else
+            detail?.New();
+    }
+     
+
+
+
+    void Edit()
+    {
+        if (ActiveTabIndex == 0)
+            header?.Edit();
+        else
+            detail?.Edit();
+    }
+
+
+
+    void Delete()
+    {
+        if (ActiveTabIndex == 0)
+            header?.Delete();
+        else
+            detail?.Delete();
+    }
+
+
+
+    void Print()
+    {
+
+    }
+
+    
+    void Save()
+    {
+
+    }
+
+
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+}
+
+
+
+
+
+<style>
+
+    /* =====================================================
+       ERP MAIN PAGE
+    ===================================================== */
+
+
+    .erp-page {
+        /* background: #f3f5f7; */
+        min-height: 100%;
+        padding: 8px;
+    }
+
+    .custom-content-tabs .nav-link:not(.active),
+    .rooms-tabs .nav-link:not(.active) {
+        color: #6c757d !important;
+    }
+
+
+
+
+    /* =====================================================
+       RIBBON HEADER TABS
+    ===================================================== */
+
+
+    .custom-ribbon-tabs {
+      
+        padding-left: 6px;
+    }
+
+
+
+        .custom-ribbon-tabs
+        ::deep .dxbl-tabs {
+            min-height: 42px;
+        }
+
+
+
+
+        .custom-ribbon-tabs
+        ::deep .dxbl-tabs-item {
+            height: 42px;
+            padding: 0 22px !important;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            background: #f8f9fa;
+            border-right: 1px solid #e1e5ea !important;
+            border-top: 3px solid transparent !important;
+            border-bottom: none !important;
+            transition: .15s ease;
+        }
+
+
+
+
+            .custom-ribbon-tabs
+            ::deep .dxbl-tabs-item:hover {
+                background: #eef4fb !important;
+                color: #1d73d4;
+            }
+
+
+
+
+
+        .custom-ribbon-tabs
+        ::deep .dxbl-tabs-item-active {
+            background: #ffffff !important;
+            color: #1d73d4 !important;
+            border-top: 3px solid #1d73d4 !important;
+        }
+
+
+
+
+            .custom-ribbon-tabs
+            ::deep .dxbl-tabs-item-active
+            .dxbl-tabs-item-text {
+                color: #1d73d4 !important;
+            }
+
+
+
+
+
+
+    /* =====================================================
+       MAIN WORK AREA
+    ===================================================== */
+    .sub-section{
+        padding-left : 20px;
+        padding-right : 20px;
+    }
+
+    .erp-content {
+        margin-top: 8px;
+        background: white;
+        border: 1px solid #d8dde5;
+        border-radius: 5px;
+        min-height: 500px;
+        
+    }
+
+
+
+
+
+    /* =====================================================
+       INNER CONTENT TABS
+    ===================================================== */
+
+
+    .custom-content-tabs {
+        
+     
+    }
+
+
+
+
+
+        .custom-content-tabs
+        ::deep .dxbl-tabs {
+            padding-left: 8px;
+        }
+
+
+
+
+        .custom-content-tabs
+        ::deep .dxbl-tabs-item {
+            padding: 10px 24px !important;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            border: none !important;
+            border-bottom: 3px solid transparent !important;
+            transition: .15s ease;
+        }
+
+
+
+
+            .custom-content-tabs
+            ::deep .dxbl-tabs-item:hover {
+                background: #f6f9fc;
+                color: #1d73d4;
+            }
+
+
+
+
+        .custom-content-tabs
+        ::deep .dxbl-tabs-item-active {
+            color: #1d73d4 !important;
+            background: white !important;
+            border-bottom: 3px solid #1d73d4 !important;
+        }
+
+
+
+
+            .custom-content-tabs
+            ::deep .dxbl-tabs-item-active
+            .dxbl-tabs-item-text {
+                color: #1d73d4 !important;
+            }
+
+
+    /* =====================================================
+       TAB CLOSE BUTTON
+    ===================================================== */
+
+
+    .tab-close {
+        border: none;
+        background: transparent;
+        color: #8b95a5;
+        font-size: 16px;
+        cursor: pointer;
+        margin-left: 8px;
+        padding: 0;
+    }
+
+
+
+
+        .tab-close:hover {
+            color: #dc3545;
+        }
+
+
+
+
+
+    /* =====================================================
+       TAB CONTENT PADDING
+    ===================================================== */
+
+
+    .erp-content
+    ::deep .dxbl-tabs-content {
+        padding: 12px;
+    }
+
+</style>

@@ -1,5 +1,6 @@
 using ERP.V7.WebPMS.Components;
 using ERP.V7.WebPMS.Services;
+using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDevExpressBlazor();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
+builder.Services.AddScoped<PackageDetailService>();
+builder.Services.AddScoped<PackageHeaderService>();
 
 var app = builder.Build();
 
