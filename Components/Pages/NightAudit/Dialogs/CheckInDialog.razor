@@ -1,0 +1,79 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+@if (Visible && Registration != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-checkin-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Check In</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="rt-detail-rows">
+                    <div class="rt-detail-row">
+                        <label>Reg. No</label>
+                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Guest</label>
+                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Room Type</label>
+                        <DxTextBox Text="@Registration.RoomType" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Room</label>
+                        <DxTextBox @bind-Text="@Registration.Room" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Arrival</label>
+                        <DxTextBox Text="@Registration.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Departure</label>
+                        <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Adults / Children</label>
+                        <DxTextBox Text="@($"{Registration.Adults} / {Registration.Children}")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Rate Code</label>
+                        <DxTextBox Text="@Registration.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                </div>
+
+                @if (string.IsNullOrWhiteSpace(Registration.Room) || Registration.Room == "-")
+                {
+                    <div class="rt-validation-summary" style="margin-top:14px;">A room number must be assigned before this guest can be checked in.</div>
+                }
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" disabled="@(string.IsNullOrWhiteSpace(Registration.Room) || Registration.Room == "-")"
+                        @onclick="CheckIn">
+                    <i class="bi bi-box-arrow-in-right text-secondary"></i>
+                    <span>Check In</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public NightAuditRegistration? Registration { get; set; }
+    [Parameter] public EventCallback OnCheckIn { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task CheckIn() => await OnCheckIn.InvokeAsync();
+    private async Task Close() => await OnClose.InvokeAsync();
+}

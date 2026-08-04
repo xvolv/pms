@@ -1,0 +1,70 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+@if (Visible && Registration != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-noshow-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">No Show Maintenance</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="rt-detail-rows">
+                    <div class="rt-detail-row">
+                        <label>Reg. No</label>
+                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Guest</label>
+                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Company</label>
+                        <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Room</label>
+                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Arrival</label>
+                        <DxTextBox Text="@Registration.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Rate Code</label>
+                        <DxTextBox Text="@Registration.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                </div>
+
+                <div class="rt-validation-summary" style="margin-top:14px;">
+                    Marking this reservation as No Show will release the room and close the reservation for the
+                    business date. This action cannot be undone from this screen.
+                </div>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="MarkNoShow">
+                    <i class="bi bi-person-x-fill text-secondary"></i>
+                    <span>No Show</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public NightAuditRegistration? Registration { get; set; }
+    [Parameter] public EventCallback OnNoShow { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task MarkNoShow() => await OnNoShow.InvokeAsync();
+    private async Task Close() => await OnClose.InvokeAsync();
+}

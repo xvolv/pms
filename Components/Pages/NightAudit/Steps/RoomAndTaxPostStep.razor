@@ -1,0 +1,108 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Dialogs
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>Room and Tax Post</h2>
+        <p>Posts room charges and tax for every in-house registration. Expand a row with the + icon to see any
+            package charges that will be posted along with it.</p>
+    </div>
+
+    <div class="rt-toolbar">
+        <button type="button" class="rt-toolbar-btn" disabled="@(Posts.Count == 0 || Posted)" @onclick="() => isAuthVisible = true">
+            <i class="bi bi-send-check text-secondary"></i>
+            <span>Post</span>
+        </button>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (Posts.Count == 0)
+        {
+            <div class="rt-placeholder">No in-house registrations require room and tax posting.</div>
+        }
+        else
+        {
+            <table class="na-post-table">
+                <thead>
+                    <tr>
+                        <th style="width:5%;"></th>
+                        <th style="width:6%;"></th>
+                        <th style="width:12%;">Reg. No</th>
+                        <th style="width:20%;">Guest</th>
+                        <th style="width:8%;">Room</th>
+                        <th style="width:15%;">Room Charge</th>
+                        <th style="width:15%;">Tax</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Posts)
+                    {
+                        <tr class="na-post-row">
+                            <td>
+                                @if (row.Packages.Count > 0)
+                                {
+                                    <i class="bi @(row.IsExpanded ? "bi-dash-square" : "bi-plus-square") na-post-toggle"
+                                       @onclick="() => row.IsExpanded = !row.IsExpanded"></i>
+                                }
+                            </td>
+                            <td><input type="checkbox" class="rt-grid-checkbox" checked="@row.Selected" disabled /></td>
+                            <td>@row.RegNo</td>
+                            <td>@row.Guest</td>
+                            <td>@row.Room</td>
+                            <td class="na-post-amount">@row.RoomCharge.ToString("N2")</td>
+                            <td class="na-post-amount">@row.Tax.ToString("N2")</td>
+                            <td class="na-post-amount">@((row.RoomCharge + row.Tax).ToString("N2"))</td>
+                        </tr>
+                        @if (row.IsExpanded)
+                        {
+                            @foreach (var pkg in row.Packages)
+                            {
+                                <tr class="na-post-package-row">
+                                    <td></td>
+                                    <td></td>
+                                    <td colspan="4">@pkg.Description</td>
+                                    <td colspan="2" class="na-post-amount">@pkg.Amount.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="rt-footer">
+                @Posts.Count registration(s) selected ・ Total to post = @TotalToPost.ToString("N2")
+                @(Posted ? " ・ Posted" : "")
+            </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="profile-status-bar">@statusMessage</div>
+    }
+</div>
+
+<AuthorizationDialog Visible="@isAuthVisible" OnAuthorized="DoPost" OnCancel="() => isAuthVisible = false" />
+
+@code {
+    [Parameter] public List<RoomTaxPostRow> Posts { get; set; } = new();
+    [Parameter] public bool Posted { get; set; }
+    [Parameter] public EventCallback<bool> PostedChanged { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private bool isAuthVisible;
+    private string? statusMessage;
+
+    private decimal TotalToPost => Posts.Where(p => p.Selected)
+        .Sum(p => p.RoomCharge + p.Tax + p.Packages.Sum(pkg => pkg.Amount));
+
+    private async Task DoPost()
+    {
+        isAuthVisible = false;
+        Posted = true;
+        statusMessage = $"Room and tax posted for {Posts.Count} registration(s). Total posted = {TotalToPost:N2}.";
+        await PostedChanged.InvokeAsync(Posted);
+        await OnChanged.InvokeAsync();
+    }
+}

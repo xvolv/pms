@@ -588,4 +588,25 @@
     .btn-danger:hover {
         background-color: #c82333;
     }
+    /* Make the Value column inputs have a visible border */
+.profile-address-table .col-value input,
+.profile-address-table .col-value .form-control,
+.profile-address-table input[type="text"],
+.profile-address-table input[type="password"] {
+    border: 1px solid #ced4da !important;
+    border-radius: 4px;
+    padding: 4px 8px;
+    width: 100%;
+    background-color: #fff;
+    box-sizing: border-box;
+    min-height: 28px;
+}
+
+/* Focus state so it looks nice */
+.profile-address-table .col-value input:focus {
+    border-color: #86b7fe !important;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
 </style>
+

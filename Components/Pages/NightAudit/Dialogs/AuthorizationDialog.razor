@@ -1,0 +1,68 @@
+@if (Visible)
+{
+    <div class="rt-modal-backdrop confirm-dialog-backdrop">
+        <div class="confirm-dialog na-auth-dialog">
+            <div class="confirm-dialog-header">
+                <i class="bi bi-shield-lock-fill confirm-dialog-icon text-primary"></i>
+                <span class="confirm-dialog-title">Authorization Required</span>
+            </div>
+            <div class="confirm-dialog-body">
+                <p>This action requires supervisor authorization. Please enter the password to continue.</p>
+                <input type="password" class="rt-form-select" @bind="password" @bind:event="oninput"
+                       @onkeydown="HandleKeyDown" placeholder="Password" autofocus />
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="rt-validation-message" style="margin-top:6px;">@error</div>
+                }
+            </div>
+            <div class="confirm-dialog-buttons">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Ok</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnAuthorized { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private string password = "";
+    private string? error;
+
+    protected override void OnParametersSet()
+    {
+        if (!Visible)
+        {
+            password = "";
+            error = null;
+        }
+    }
+
+    private async Task Confirm()
+    {
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            error = "Password is required.";
+            return;
+        }
+
+        error = null;
+        password = "";
+        await OnAuthorized.InvokeAsync();
+    }
+
+    private async Task Cancel()
+    {
+        password = "";
+        error = null;
+        await OnCancel.InvokeAsync();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await Confirm();
+    }
+}

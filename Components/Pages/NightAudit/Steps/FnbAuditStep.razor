@@ -1,0 +1,49 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>F&amp;B Audit</h2>
+        <p>Review the food and beverage revenue reported by each outlet for the business date.</p>
+    </div>
+
+    <div class="rt-toolbar">
+        <button type="button" class="rt-toolbar-btn" @onclick="MarkReviewed">
+            <i class="bi bi-clipboard-check text-secondary"></i>
+            <span>Mark Reviewed</span>
+        </button>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        <DxGrid Data="@Outlets" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(FnbOutletSummary.Outlet)" Caption="Outlet" Width="50%" />
+                <DxGridDataColumn FieldName="@nameof(FnbOutletSummary.Covers)" Caption="Covers" Width="20%"
+                                  TextAlignment="GridTextAlignment.Center" />
+                <DxGridDataColumn FieldName="@nameof(FnbOutletSummary.Revenue)" Caption="Revenue" Width="30%"
+                                  DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">Total F&amp;B Revenue = @Outlets.Sum(o => o.Revenue).ToString("N2")</div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="profile-status-bar">@statusMessage</div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<FnbOutletSummary> Outlets { get; set; } = new();
+    [Parameter] public bool Reviewed { get; set; }
+    [Parameter] public EventCallback<bool> ReviewedChanged { get; set; }
+
+    private string? statusMessage;
+
+    private async Task MarkReviewed()
+    {
+        Reviewed = true;
+        statusMessage = "F&B revenue reviewed for the business date.";
+        await ReviewedChanged.InvokeAsync(Reviewed);
+    }
+}

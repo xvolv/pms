@@ -1,0 +1,34 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>End of Night Audit</h2>
+        <p>The night audit for <strong>@State.BusinessDate.ToString("dddd, dd MMMM yyyy")</strong> is complete. Review the
+            summary below, then click Finish to roll the business date forward.</p>
+    </div>
+
+    <div class="rt-grid-area">
+        <div class="na-summary-voucher">
+            <div class="na-summary-row">
+                <span>Room and Tax Posted</span>
+                <strong>@(State.RoomTaxPosted ? "Yes" : "No")</strong>
+            </div>
+            <div class="na-summary-row">
+                <span>Revenue Journalized</span>
+                <strong>@(State.RevenueJournalized ? "Yes" : "No")</strong>
+            </div>
+            <div class="na-summary-row">
+                <span>Reports Archived</span>
+                <strong>@State.Reports.Count(r => r.Selected)</strong>
+            </div>
+            <div class="na-summary-row na-summary-total">
+                <span>Next Business Date</span>
+                <strong>@State.BusinessDate.AddDays(1).ToString("dd-MMM-yyyy")</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public NightAuditState State { get; set; } = null!;
+}

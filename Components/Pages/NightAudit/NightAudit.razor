@@ -1,0 +1,261 @@
+@page "/end-of-day"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Steps
+@inject NavigationManager NavigationManager
+
+<PageTitle>Night Audit</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Night Audit
+            <i class="bi bi-x fs-4" @onclick="RequestCancelWizard"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        @if (isFinished)
+        {
+            <div class="na-finished-panel">
+                <i class="bi bi-check-circle-fill"></i>
+                <h2>Night Audit Complete</h2>
+                <p>The business date has been advanced to <strong>@state.BusinessDate.ToString("dd-MMM-yyyy")</strong>.</p>
+                <button class="btn btn-primary" @onclick="ReturnToDashboard">Return to Dashboard</button>
+            </div>
+        }
+        else
+        {
+            <div class="na-wizard">
+                <div class="na-steps-sidebar">
+                    <div class="na-steps-subtitle">Business Date: @state.BusinessDate.ToString("dd-MMM-yyyy")</div>
+                    <ul class="na-steps-list">
+                        @for (var i = 0; i < steps.Count; i++)
+                        {
+                            var index = i;
+                            var cssClass = index == currentStepIndex ? "current" : index < currentStepIndex ? "done" : "upcoming";
+                            var clickable = index <= maxReachedIndex;
+                            <li class="na-step-item @cssClass @(clickable ? "clickable" : "")"
+                                @onclick="() => GoTo(index)">
+                                <span class="na-step-index">
+                                    @if (index < currentStepIndex)
+                                    {
+                                        <i class="bi bi-check-lg"></i>
+                                    }
+                                    else
+                                    {
+                                        @(index + 1)
+                                    }
+                                </span>
+                                <span class="na-step-label">@steps[index]</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="na-main-panel">
+                    <div class="na-main-body">
+                        @switch (currentStepIndex)
+                        {
+                            case 0:
+                                <RegistrationListStep Title="Overdue Out"
+                                                       Description="Guests who were expected to check out one or more days ago but have not yet checked out. Amend the departure date or check the guest out to resolve each entry."
+                                                       Registrations="@state.OverdueOut" ColumnMode="RegistrationListStep.RegistrationColumnMode.Financial"
+                                                       ShowAmend="true" AmendLabel="Amend" AmendAllowArrivalEdit="false"
+                                                       ShowCheckOut="true" OnChanged="Refresh" />
+                                break;
+                            case 1:
+                                <RegistrationListStep Title="Due Out"
+                                                       Description="Guests who are still in-house but are expected to check out today. Check the guest out, or extend the departure date if they are staying longer."
+                                                       Registrations="@state.DueOut" ColumnMode="RegistrationListStep.RegistrationColumnMode.Financial"
+                                                       ShowCheckOut="true" ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="false"
+                                                       OnChanged="Refresh" />
+                                break;
+                            case 2:
+                                <RegistrationListStep Title="Waiting List"
+                                                       Description="Reservations on the waiting list that are not yet checked in. Check the guest in, amend the arrival date, or cancel the reservation."
+                                                       Registrations="@state.WaitingList" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
+                                                       ShowCheckIn="true" ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
+                                                       ShowCancellation="true" Reasons="@state.CancellationReasons" OnChanged="Refresh" />
+                                break;
+                            case 3:
+                                <RegistrationListStep Title="6 PM Arrival"
+                                                       Description="6PM-hold reservations expected to arrive on the business date. Amend the arrival date, check the guest in, or cancel the reservation."
+                                                       Registrations="@state.SixPmArrivals" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
+                                                       ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
+                                                       ShowCheckIn="true" ShowCancellation="true" Reasons="@state.CancellationReasons"
+                                                       OnChanged="Refresh" />
+                                break;
+                            case 4:
+                                <RegistrationListStep Title="Guaranteed Arrival"
+                                                       Description="Guaranteed reservations expected to arrive today but not yet checked in. Amend the arrival date, check the guest in, cancel the reservation, or mark it as a No Show."
+                                                       Registrations="@state.GuaranteedArrivals" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
+                                                       ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
+                                                       ShowCheckIn="true" ShowNoShow="true" ShowCancellation="true"
+                                                       Reasons="@state.CancellationReasons" OnChanged="Refresh" />
+                                break;
+                            case 5:
+                                <RoomDiscrepancyStep Discrepancies="@state.RoomDiscrepancies" />
+                                break;
+                            case 6:
+                                <ClearHeldBillsStep HeldBills="@state.HeldBills" OnChanged="Refresh" />
+                                break;
+                            case 7:
+                                <BucketCheckStep BucketChecks="@state.BucketChecks" />
+                                break;
+                            case 8:
+                                <RoomAndTaxPostStep Posts="@state.RoomTaxPosts" Posted="@state.RoomTaxPosted"
+                                                     PostedChanged="@(v => state.RoomTaxPosted = v)" OnChanged="Refresh" />
+                                break;
+                            case 9:
+                                <SummarizeTransactionStep Posts="@state.RoomTaxPosts" Summarized="@state.TransactionsSummarized"
+                                                           SummarizedChanged="@(v => state.TransactionsSummarized = v)" />
+                                break;
+                            case 10:
+                                <FnbAuditStep Outlets="@state.FnbOutlets" Reviewed="@state.FnbAuditDone"
+                                              ReviewedChanged="@(v => state.FnbAuditDone = v)" />
+                                break;
+                            case 11:
+                                <JournalizeRevenueStep Lines="@state.RevenueJournal" Journalized="@state.RevenueJournalized"
+                                                        JournalizedChanged="@(v => state.RevenueJournalized = v)" />
+                                break;
+                            case 12:
+                                <ReportArchiveStep State="@state" OnChanged="Refresh" />
+                                break;
+                            case 13:
+                                <EndOfNightAuditStep State="@state" />
+                                break;
+                        }
+                    </div>
+
+                    <div class="na-wizard-footer">
+                        <div class="na-footer-hint">
+                            @if (currentStepIndex < steps.Count - 1 && !IsCurrentStepResolved())
+                            {
+                                <span><i class="bi bi-exclamation-circle"></i> Resolve every item in this step before continuing.</span>
+                            }
+                        </div>
+                        <div class="na-footer-buttons">
+                            <button type="button" class="btn btn-secondary" disabled="@(currentStepIndex == 0)" @onclick="GoBack">
+                                &lt; Back
+                            </button>
+                            @if (currentStepIndex == steps.Count - 1)
+                            {
+                                <button type="button" class="btn btn-primary" @onclick="RequestFinish">Finish</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-primary" disabled="@(!IsCurrentStepResolved())" @onclick="GoNext">
+                                    Next &gt;
+                                </button>
+                            }
+                            <button type="button" class="btn btn-secondary" @onclick="RequestCancelWizard">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<ConfirmDialog Visible="@isCancelConfirmVisible" Title="Cancel Night Audit"
+               Message="Are you sure you want to cancel the Night Audit process? You will exit this wizard and return to the dashboard."
+               Danger="true" ConfirmText="Yes" CancelText="No" OnConfirm="ConfirmCancelWizard"
+               OnCancel="() => isCancelConfirmVisible = false" />
+
+<ConfirmDialog Visible="@isFinishConfirmVisible" Title="Finish Night Audit"
+               Message="@($"This will complete the Night Audit and advance the business date to {state.BusinessDate.AddDays(1):dd-MMM-yyyy}. Continue?")"
+               Danger="false" ConfirmText="Finish" CancelText="Cancel" OnConfirm="ConfirmFinish"
+               OnCancel="() => isFinishConfirmVisible = false" />
+
+@code {
+    private NightAuditState state = NightAuditState.CreateSample();
+    private int currentStepIndex;
+    private int maxReachedIndex;
+    private bool isCancelConfirmVisible;
+    private bool isFinishConfirmVisible;
+    private bool isFinished;
+
+    private readonly List<string> steps = new()
+    {
+        "Overdue Out",
+        "Due Out",
+        "Waiting List",
+        "6 PM Arrival",
+        "Guaranteed Arrival",
+        "Room Discrepancy",
+        "Clear Held Bills",
+        "Bucket Check",
+        "Room and Tax Post",
+        "Summarize Transaction",
+        "F&B Audit",
+        "Journalize Revenue",
+        "Report Archive",
+        "End of Night Audit",
+    };
+
+    private void Refresh() => StateHasChanged();
+
+    private bool IsCurrentStepResolved() => currentStepIndex switch
+    {
+        0 => state.OverdueOut.Count == 0,
+        1 => state.DueOut.Count == 0,
+        2 => state.WaitingList.Count == 0,
+        3 => state.SixPmArrivals.Count == 0,
+        4 => state.GuaranteedArrivals.Count == 0,
+        5 => true,
+        6 => state.HeldBills.Count == 0,
+        7 => true,
+        8 => state.RoomTaxPosted,
+        9 => true,
+        10 => true,
+        11 => state.RevenueJournalized,
+        12 => state.ReportArchived,
+        _ => true,
+    };
+
+    private void GoNext()
+    {
+        if (!IsCurrentStepResolved() || currentStepIndex >= steps.Count - 1)
+            return;
+
+        currentStepIndex++;
+        if (currentStepIndex > maxReachedIndex)
+            maxReachedIndex = currentStepIndex;
+    }
+
+    private void GoBack()
+    {
+        if (currentStepIndex > 0)
+            currentStepIndex--;
+    }
+
+    private void GoTo(int index)
+    {
+        if (index <= maxReachedIndex)
+            currentStepIndex = index;
+    }
+
+    private void RequestCancelWizard() => isCancelConfirmVisible = true;
+
+    private void ConfirmCancelWizard()
+    {
+        isCancelConfirmVisible = false;
+        NavigationManager.NavigateTo("/dashboard");
+    }
+
+    private void RequestFinish() => isFinishConfirmVisible = true;
+
+    private void ConfirmFinish()
+    {
+        isFinishConfirmVisible = false;
+        state.BusinessDate = state.BusinessDate.AddDays(1);
+        isFinished = true;
+    }
+
+    private void ReturnToDashboard()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}
