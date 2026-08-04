@@ -209,6 +209,49 @@
     padding: 16px;
 }
 
+/* Confirm Dialog */
+.confirm-dialog-backdrop {
+    z-index: 200;
+}
+
+.confirm-dialog {
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 380px;
+    max-width: 92vw;
+}
+
+.confirm-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px 0;
+}
+
+.confirm-dialog-icon {
+    font-size: 1.3rem;
+}
+
+.confirm-dialog-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #202124;
+}
+
+.confirm-dialog-body {
+    padding: 10px 20px 4px;
+    color: #3c4043;
+    font-size: 0.88rem;
+}
+
+.confirm-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 20px 20px;
+}
+
 .rt-form-row {
     display: flex;
     flex-wrap: wrap;

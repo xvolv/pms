@@ -72,6 +72,24 @@
             }
         </div>
 
+        <!-- Cashiering Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleCashiering">
+                <i class="bi bi-chevron-right chevron-icon @(isCashieringExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-cash-stack group-icon" style="color: #198754;"></i>
+                <span class="group-title">Cashiering</span>
+            </div>
+            @if (isCashieringExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="manual-charge">
+                        <i class="bi bi-receipt item-icon" style="color: #fd7e14;"></i>
+                        <span>Manual Charge</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
         <!-- Profile Group -->
         <div class="menu-group">
             <div class="group-header" @onclick="ToggleProfile">
@@ -190,6 +208,7 @@
 @code {
     private bool isMainPageExpanded = true;
     private bool isRegistrationExpanded = true;
+    private bool isCashieringExpanded = true;
     private bool isProfileExpanded = true;
     private bool isNightAuditExpanded = true;
     private bool isSettingsExpanded = true;
@@ -198,6 +217,7 @@
 
     private void ToggleMainPage() => isMainPageExpanded = !isMainPageExpanded;
     private void ToggleRegistration() => isRegistrationExpanded = !isRegistrationExpanded;
+    private void ToggleCashiering() => isCashieringExpanded = !isCashieringExpanded;
     private void ToggleProfile() => isProfileExpanded = !isProfileExpanded;
     private void ToggleNightAudit() => isNightAuditExpanded = !isNightAuditExpanded;
     private void ToggleSettings() => isSettingsExpanded = !isSettingsExpanded;
@@ -207,6 +227,7 @@
         allExpanded = !allExpanded;
         isMainPageExpanded = allExpanded;
         isRegistrationExpanded = allExpanded;
+        isCashieringExpanded = allExpanded;
         isProfileExpanded = allExpanded;
         isNightAuditExpanded = allExpanded;
         isSettingsExpanded = allExpanded;

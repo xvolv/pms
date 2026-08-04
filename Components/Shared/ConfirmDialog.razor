@@ -1,0 +1,34 @@
+@if (Visible)
+{
+    <div class="rt-modal-backdrop confirm-dialog-backdrop">
+        <div class="confirm-dialog">
+            <div class="confirm-dialog-header">
+                <i class="bi @IconClass confirm-dialog-icon @(Danger ? "text-danger" : "text-primary")"></i>
+                <span class="confirm-dialog-title">@Title</span>
+            </div>
+            <div class="confirm-dialog-body">
+                <p>@Message</p>
+            </div>
+            <div class="confirm-dialog-buttons">
+                <button type="button" class="btn btn-secondary" @onclick="HandleCancel">@CancelText</button>
+                <button type="button" class="btn @(Danger ? "btn-danger" : "btn-primary")" @onclick="HandleConfirm">@ConfirmText</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirm";
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public string ConfirmText { get; set; } = "Yes";
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+    [Parameter] public bool Danger { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private string IconClass => Danger ? "bi-exclamation-triangle-fill" : "bi-question-circle-fill";
+
+    private async Task HandleConfirm() => await OnConfirm.InvokeAsync();
+    private async Task HandleCancel() => await OnCancel.InvokeAsync();
+}

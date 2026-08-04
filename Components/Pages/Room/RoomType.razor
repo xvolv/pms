@@ -200,7 +200,40 @@
 <BlockEditModal Visible="isBlockModalOpen" IsNew="isBlockNewEntry" EditingItem="editingBlockDraft" OnSave="SaveNewBlock"
                 OnClose="CloseBlockModal" />
 
+<ConfirmDialog Visible="@isConfirmVisible" Title="@confirmTitle" Message="@confirmMessage" Danger="@confirmDanger"
+               OnConfirm="HandleConfirmYes" OnCancel="HandleConfirmNo" />
+
 @code {
+    private bool isConfirmVisible;
+    private string confirmTitle = "";
+    private string confirmMessage = "";
+    private bool confirmDanger;
+    private Func<Task>? pendingConfirmAction;
+
+    private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
+    {
+        confirmTitle = title;
+        confirmMessage = message;
+        confirmDanger = danger;
+        pendingConfirmAction = action;
+        isConfirmVisible = true;
+    }
+
+    private async Task HandleConfirmYes()
+    {
+        isConfirmVisible = false;
+        var action = pendingConfirmAction;
+        pendingConfirmAction = null;
+        if (action != null)
+            await action();
+    }
+
+    private void HandleConfirmNo()
+    {
+        isConfirmVisible = false;
+        pendingConfirmAction = null;
+    }
+
     private int activeTabIndex = 0;
     private string activeSubTab = "roomtype";
 
@@ -409,11 +442,21 @@ RefreshBlocks) },
 
     private void DeleteRoomTiles()
     {
-        if (currentFloor == null)
+        if (currentFloor == null || selectedTileIds.Count == 0)
             return;
+
+        RequestConfirm("Delete Rooms", $"Are you sure you want to delete {selectedTileIds.Count} selected room(s)?", true,
+            DeleteRoomTilesConfirmed);
+    }
+
+    private Task DeleteRoomTilesConfirmed()
+    {
+        if (currentFloor == null)
+            return Task.CompletedTask;
 
         currentFloor.Rooms.RemoveAll(r => selectedTileIds.Contains(r.Id));
         selectedTileIds.Clear();
+        return Task.CompletedTask;
     }
 
     private void ApplyRoomType()
@@ -477,6 +520,20 @@ RefreshBlocks) },
         if (block == null)
             return;
 
+        RequestConfirm("Delete Block",
+            $"Are you sure you want to delete block '{block.Name}'? This will remove all its floors and rooms.", true,
+            DeleteSelectedBlockConfirmed);
+    }
+
+    private Task DeleteSelectedBlockConfirmed()
+    {
+        if (selectedBlockId == null)
+            return Task.CompletedTask;
+
+        var block = blocks.FirstOrDefault(b => b.Id == selectedBlockId);
+        if (block == null)
+            return Task.CompletedTask;
+
         bool wasCurrentFloor = block.Floors.Any(f => f.Id == currentFloorId);
         blocks.Remove(block);
         selectedBlockId = null;
@@ -488,6 +545,7 @@ RefreshBlocks) },
         }
 
         blocksStatusMessage = "Block deleted.";
+        return Task.CompletedTask;
     }
 
 
@@ -578,8 +636,15 @@ RefreshBlocks) },
 
     private void SaveBlocks()
     {
+        RequestConfirm("Save Blocks", "Are you sure you want to save all changes to blocks and floors?", false,
+            SaveBlocksConfirmed);
+    }
+
+    private Task SaveBlocksConfirmed()
+    {
         // TODO: persist blocks/floors via ApiService once the Property API endpoint is available.
         blocksStatusMessage = "Changes saved.";
+        return Task.CompletedTask;
     }
 
     private void RefreshBlocks()
@@ -832,6 +897,15 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
 
     private void DeleteRoomType()
     {
+        if (selectedRoomType == null)
+            return;
+
+        RequestConfirm("Delete Room Type", $"Are you sure you want to delete room type '{selectedRoomType.Description}'?", true,
+            DeleteRoomTypeConfirmed);
+    }
+
+    private Task DeleteRoomTypeConfirmed()
+    {
         if (selectedRoomType != null)
         {
             roomTypes.Remove(selectedRoomType);
@@ -839,6 +913,7 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
             statusMessage = null;
             RenumberRoomTypes();
         }
+        return Task.CompletedTask;
     }
 
     private void RenumberRoomTypes()
@@ -849,8 +924,15 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
 
     private void SaveRoomTypes()
     {
+        RequestConfirm("Save Room Types", "Are you sure you want to save all changes to room types?", false,
+            SaveRoomTypesConfirmed);
+    }
+
+    private Task SaveRoomTypesConfirmed()
+    {
         // TODO: persist via ApiService once the Room Type API endpoint is available.
         statusMessage = "Changes saved.";
+        return Task.CompletedTask;
     }
     private int roomsSubTabIndex = 0;
     private void CloseProperty()

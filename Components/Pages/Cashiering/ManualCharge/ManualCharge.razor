@@ -1,0 +1,418 @@
+@page "/manual-charge"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Cashiering.ManualCharge.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Cashiering - Manual Charge</PageTitle>
+<div class="top-tab-header">
+    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+        Manual Charge
+        <i class="bi bi-x fs-4" @onclick="Close" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+    </div>
+</div>
+
+<div class="profile-page-wrapper">
+    <div class="profile-card">
+        <div class="rt-toolbar">
+            <button class="rt-toolbar-btn" @onclick="NewCharge">
+                <i class="bi bi-file-earmark-plus text-secondary"></i>
+                <span>New</span>
+            </button>
+            <button class="rt-toolbar-btn" @onclick="SaveCharge">
+                <i class="bi bi-floppy text-secondary"></i>
+                <span>Save</span>
+            </button>
+            <button class="rt-toolbar-btn" @onclick="Close">
+                <i class="bi bi-x-circle text-secondary"></i>
+                <span>Close</span>
+            </button>
+
+            <div class="profile-toolbar-code">
+                <label>No</label>
+                <DxTextBox @bind-Text="@header.No" ReadOnly="true" CssClass="rt-form-input" />
+            </div>
+        </div>
+
+        <div class="rt-modal-body" style="padding:0px;">
+            <fieldset class="rt-form-fieldset">
+                <legend>Charge Information</legend>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Date</label>
+                        <DxDateEdit @bind-Date="@header.Date" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>Registration</label>
+                        <DxTextBox @bind-Text="@header.Registration" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Room</label>
+                        <DxTextBox @bind-Text="@header.Room" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>Reference</label>
+                        <DxTextBox @bind-Text="@header.Reference" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Window</label>
+                        <DxComboBox Data="@windows" @bind-Value="@header.Window" NullText="-- Select --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>Currency</label>
+                        <DxComboBox Data="@currencies" @bind-Value="@header.Currency" NullText="-- Select --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Charge Type</label>
+                        <DxComboBox Data="@chargeTypes" @bind-Value="@header.ChargeType" NullText="-- Select --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>Transaction Type</label>
+                        <DxComboBox Data="@transactionTypes" @bind-Value="@header.TransactionType" NullText="-- Select --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field rt-form-field-wide">
+                        <label>Remark</label>
+                        <DxTextBox @bind-Text="@header.Remark" CssClass="rt-form-input" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="rt-form-fieldset">
+                <legend>Line Items</legend>
+
+                <div class="mc-line-entry">
+                    <div class="rt-form-field mc-entry-article">
+                        <label>Article</label>
+                        <DxComboBox Data="@articles" @bind-Value="@newLineItem.Article" NullText="-- Select --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field mc-entry-narrow">
+                        <label>Qty</label>
+                        <DxSpinEdit @bind-Value="@newLineItem.Qty" MinValue="0" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field mc-entry-narrow">
+                        <label>Amount</label>
+                        <DxSpinEdit @bind-Value="@newLineItem.Amount" MinValue="0" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field mc-entry-remark">
+                        <label>Remark</label>
+                        <DxTextBox @bind-Text="@newLineItem.Remark" CssClass="rt-form-input" />
+                    </div>
+                    <button class="rt-toolbar-btn mc-entry-add" @onclick="AddLineItem">
+                        <i class="bi bi-plus-circle text-secondary"></i>
+                        <span>Add</span>
+                    </button>
+                </div>
+
+                <div class="rt-grid-area">
+                    <DxGrid @ref="lineItemGrid" Width="100%" Data="@lineItems" KeyFieldName="Id" CssClass="rt-grid"
+                            RowClick="@OnLineItemRowClick" CustomizeElement="@OnLineItemCustomizeElement">
+                        <Columns>
+                            <DxGridDataColumn FieldName="Article" Caption="Article" Width="30%" />
+                            <DxGridDataColumn FieldName="Qty" Caption="Qty" Width="12%" />
+                            <DxGridDataColumn FieldName="Amount" Caption="Amount" Width="15%" DisplayFormat="N2" />
+                            <DxGridDataColumn FieldName="Total" Caption="Total" Width="15%" DisplayFormat="N2" />
+                            <DxGridDataColumn FieldName="Remark" Caption="Remark" Width="28%" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+
+                <div class="mc-line-actions">
+                    <button class="rt-toolbar-btn" disabled="@(selectedLineItem == null)" @onclick="RemoveLineItem">
+                        <i class="bi bi-dash-circle text-secondary"></i>
+                        <span>Remove</span>
+                    </button>
+                </div>
+            </fieldset>
+
+            <fieldset class="rt-form-fieldset mc-totals">
+                <legend>Totals</legend>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Subtotal</label>
+                        <DxTextBox Text="@Subtotal.ToString("N2")" ReadOnly="true" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>Discount</label>
+                        <DxSpinEdit @bind-Value="@header.Discount" MinValue="0" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Additional Charge</label>
+                        <DxSpinEdit @bind-Value="@header.AdditionalCharge" MinValue="0" CssClass="rt-form-input" />
+                    </div>
+                    <div class="rt-form-field">
+                        <label>VAT 15%</label>
+                        <DxTextBox Text="@Vat.ToString("N2")" ReadOnly="true" CssClass="rt-form-input" />
+                    </div>
+                </div>
+
+                <div class="rt-form-row">
+                    <div class="rt-form-field">
+                        <label>Grand Total</label>
+                        <DxTextBox Text="@GrandTotal.ToString("N2")" ReadOnly="true" CssClass="rt-form-input mc-grand-total" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="profile-status-bar">@statusMessage</div>
+    </div>
+</div>
+
+<DxPopup @bind-Visible="@isAuthPopupVisible" Width="340px" HeaderText="Authorization Required"
+         ShowFooter="false" CloseOnOutsideClick="false">
+    <BodyContentTemplate>
+        <div class="mc-auth-body">
+            <label>Password</label>
+            <input type="password" class="rt-form-input" @bind="authPassword" @bind:event="oninput" />
+            <div class="mc-auth-buttons">
+                <button class="btn btn-secondary" @onclick="CancelAuth">Cancel</button>
+                <button class="btn btn-danger" @onclick="ConfirmSave">OK</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    private ManualChargeHeader header = new();
+    private List<ManualChargeLineItem> lineItems = new();
+    private ManualChargeLineItem newLineItem = new();
+    private ManualChargeLineItem? selectedLineItem;
+    private IGrid? lineItemGrid;
+    private string? statusMessage;
+
+    private bool isAuthPopupVisible;
+    private string authPassword = "";
+
+    private List<string> windows = new() { "Window 1", "Window 2", "Window 3", "Window 4" };
+    private List<string> currencies = new() { "ETB", "USD", "EUR", "GBP", "AED" };
+    private List<string> chargeTypes = new() { "Room Charge", "Food & Beverage", "Laundry", "Telephone", "Mini Bar", "Miscellaneous" };
+    private List<string> transactionTypes = new() { "Credit Sales", "Cash Sales" };
+    private List<string> articles = new() { "Room Service", "Laundry Service", "Telephone Call", "Mini Bar Item", "Airport Transfer", "Miscellaneous Charge" };
+
+    private decimal Subtotal => lineItems.Sum(i => i.Total);
+    private decimal Vat => Math.Max(0, (Subtotal - header.Discount + header.AdditionalCharge)) * 0.15m;
+    private decimal GrandTotal => Subtotal - header.Discount + header.AdditionalCharge + Vat;
+
+    protected override void OnInitialized()
+    {
+        header = CreateBlankHeader();
+        lineItems = CreateMockLineItems();
+    }
+
+    private ManualChargeHeader CreateBlankHeader()
+    {
+        return new ManualChargeHeader
+        {
+            No = GenerateNo(),
+            Window = windows.First(),
+            Currency = currencies.First(),
+            TransactionType = transactionTypes.First(),
+        };
+    }
+
+    private string GenerateNo()
+    {
+        var sequence = new Random().Next(1, 99999);
+        return $"MCH-{sequence:D5}-{DateTime.Now:yy}";
+    }
+
+    private List<ManualChargeLineItem> CreateMockLineItems()
+    {
+        return new List<ManualChargeLineItem>
+        {
+            new() { Id = 1, Article = "Room Service", Qty = 1, Amount = 350, Remark = "Breakfast tray" },
+            new() { Id = 2, Article = "Laundry Service", Qty = 2, Amount = 120, Remark = "Same-day laundry" },
+        };
+    }
+
+    private void NewCharge()
+    {
+        header = CreateBlankHeader();
+        lineItems = new();
+        newLineItem = new();
+        selectedLineItem = null;
+        statusMessage = null;
+    }
+
+    private void AddLineItem()
+    {
+        if (string.IsNullOrWhiteSpace(newLineItem.Article) || newLineItem.Qty <= 0)
+        {
+            statusMessage = "Select an article and quantity before adding.";
+            return;
+        }
+
+        newLineItem.Id = lineItems.Count == 0 ? 1 : lineItems.Max(i => i.Id) + 1;
+        lineItems.Add(newLineItem);
+        newLineItem = new();
+        statusMessage = null;
+    }
+
+    private void OnLineItemRowClick(GridRowClickEventArgs e)
+    {
+        var row = (ManualChargeLineItem)lineItemGrid!.GetDataItem(e.VisibleIndex);
+        selectedLineItem = selectedLineItem?.Id == row.Id ? null : row;
+    }
+
+    private void OnLineItemCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow)
+            return;
+
+        var row = (ManualChargeLineItem)lineItemGrid!.GetDataItem(e.VisibleIndex);
+        if (selectedLineItem?.Id == row.Id)
+            e.CssClass = "rt-row-selected";
+    }
+
+    private void RemoveLineItem()
+    {
+        if (selectedLineItem == null)
+            return;
+
+        lineItems.Remove(selectedLineItem);
+        selectedLineItem = null;
+    }
+
+    private void SaveCharge()
+    {
+        if (lineItems.Count == 0)
+        {
+            statusMessage = "Add at least one line item before saving.";
+            return;
+        }
+
+        authPassword = "";
+        isAuthPopupVisible = true;
+    }
+
+    private void ConfirmSave()
+    {
+        isAuthPopupVisible = false;
+
+        if (string.IsNullOrWhiteSpace(authPassword))
+        {
+            statusMessage = "Authorization password is required.";
+            return;
+        }
+
+        authPassword = "";
+        statusMessage = "Manual charge saved.";
+    }
+
+    private void CancelAuth()
+    {
+        isAuthPopupVisible = false;
+        authPassword = "";
+    }
+
+    private void Close()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}
+
+<style>
+    .mc-line-entry {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .mc-entry-article {
+        flex: 1 1 220px;
+    }
+
+    .mc-entry-narrow {
+        flex: 0 0 90px;
+    }
+
+    .mc-entry-remark {
+        flex: 1 1 220px;
+    }
+
+    .mc-entry-add {
+        flex: 0 0 auto;
+    }
+
+    .mc-line-actions {
+        margin-top: 10px;
+    }
+
+    .mc-totals {
+        max-width: 520px;
+    }
+
+    .mc-grand-total input {
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .mc-auth-body {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mc-auth-body label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #5f6368;
+    }
+
+    .mc-auth-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>

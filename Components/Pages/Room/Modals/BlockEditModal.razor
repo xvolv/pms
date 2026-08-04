@@ -9,72 +9,85 @@
                 </button>
             </div>
 
-            <div class="rt-toolbar">
-                <button class="rt-toolbar-btn" @onclick="Save">
-                    <i class="bi bi-floppy text-secondary"></i>
-                    <span>@(IsNew ? "Generate" : "Save")</span>
-                </button>
-                <button class="rt-toolbar-btn" @onclick="Close">
-                    <i class="bi bi-x-circle text-secondary"></i>
-                    <span>Close</span>
-                </button>
-            </div>
+            <EditForm Model="@EditingItem" OnValidSubmit="Save">
+                <DataAnnotationsValidator />
 
-            <div class="rt-modal-body">
-                <div class="rt-form-row">
-                    <div class="rt-form-field">
-                        <label>Building Code</label>
-                        <DxTextBox @bind-Text="@EditingItem.Code" CssClass="rt-form-input" />
-                    </div>
-                    <div class="rt-form-field rt-form-field-wide">
-                        <label>Building Name</label>
-                        <DxTextBox @bind-Text="@EditingItem.Name" CssClass="rt-form-input" />
-                    </div>
+                <div class="rt-toolbar">
+                    <button type="submit" class="rt-toolbar-btn">
+                        <i class="bi bi-floppy text-secondary"></i>
+                        <span>@(IsNew ? "Generate" : "Save")</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                        <i class="bi bi-x-circle text-secondary"></i>
+                        <span>Close</span>
+                    </button>
                 </div>
 
-                @if (IsNew)
-                {
-                    <div class="rt-form-row">
-                        <div class="rt-form-field">
-                            <label>No of Floors</label>
-                            <DxSpinEdit @bind-Value="@EditingItem.NoOfFloors" MinValue="1" CssClass="rt-form-input" />
-                        </div>
-                        <div class="rt-form-field">
-                            <label>Floor Starts From</label>
-                            <DxSpinEdit @bind-Value="@EditingItem.FloorStartsFrom" MinValue="0" CssClass="rt-form-input" />
-                        </div>
-                    </div>
+                <div class="rt-modal-body">
+                    <ValidationSummary class="rt-validation-summary" />
 
                     <div class="rt-form-row">
                         <div class="rt-form-field">
-                            <label>Room No Digit</label>
-                            <DxSpinEdit @bind-Value="@EditingItem.RoomNoDigit" MinValue="1" MaxValue="6"
-                                        CssClass="rt-form-input" />
+                            <label>Building Code</label>
+                            <DxTextBox @bind-Text="@EditingItem.Code" CssClass="rt-form-input" />
+                            <ValidationMessage For="@(() => EditingItem.Code)" class="rt-validation-message" />
                         </div>
-                        <div class="rt-form-field">
-                            <label>Room No Starts From</label>
-                            <DxSpinEdit @bind-Value="@EditingItem.RoomNoStartsFrom" MinValue="0" CssClass="rt-form-input" />
-                        </div>
-                        <div class="rt-form-field">
-                            <label>Rooms on Each Floor</label>
-                            <DxSpinEdit @bind-Value="@EditingItem.RoomsPerFloor" MinValue="0" CssClass="rt-form-input" />
-                        </div>
-                    </div>
-
-                    <div class="rt-form-row">
                         <div class="rt-form-field rt-form-field-wide">
-                            <label>Remarks</label>
-                            <DxTextBox @bind-Text="@EditingItem.Remarks" CssClass="rt-form-input" />
+                            <label>Building Name</label>
+                            <DxTextBox @bind-Text="@EditingItem.Name" CssClass="rt-form-input" />
+                            <ValidationMessage For="@(() => EditingItem.Name)" class="rt-validation-message" />
                         </div>
                     </div>
 
-                    <div class="block-generate-summary">
-                        <i class="bi bi-info-circle-fill me-1"></i>
-                        Will generate @EditingItem.NoOfFloors floor(s) starting at Floor - @EditingItem.FloorStartsFrom,
-                        each with @EditingItem.RoomsPerFloor room(s) (e.g. room @SampleRoomNumber).
-                    </div>
-                }
-            </div>
+                    @if (IsNew)
+                    {
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>No of Floors</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.NoOfFloors" MinValue="1" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.NoOfFloors)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Floor Starts From</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.FloorStartsFrom" MinValue="0" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.FloorStartsFrom)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Room No Digit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.RoomNoDigit" MinValue="1" MaxValue="6"
+                                            CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.RoomNoDigit)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Room No Starts From</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.RoomNoStartsFrom" MinValue="0" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.RoomNoStartsFrom)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Rooms on Each Floor</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.RoomsPerFloor" MinValue="0" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.RoomsPerFloor)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Remarks</label>
+                                <DxTextBox @bind-Text="@EditingItem.Remarks" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="block-generate-summary">
+                            <i class="bi bi-info-circle-fill me-1"></i>
+                            Will generate @EditingItem.NoOfFloors floor(s) starting at Floor - @EditingItem.FloorStartsFrom,
+                            each with @EditingItem.RoomsPerFloor room(s) (e.g. room @SampleRoomNumber).
+                        </div>
+                    }
+                </div>
+            </EditForm>
         </div>
     </div>
 }

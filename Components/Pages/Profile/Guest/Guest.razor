@@ -13,43 +13,46 @@
 
 
 <div class="profile-page-wrapper">
-    <div class="background-color:#f8f9fa margin-bottom: 5rem;">
-        <div class="rt-toolbar">
-            <button class="rt-toolbar-btn" @onclick="NewGuest">
-                <i class="bi bi-file-earmark-plus text-secondary"></i>
-                <span>New</span>
-            </button>
-            <button class="rt-toolbar-btn" @onclick="SaveGuest">
-                <i class="bi bi-floppy text-secondary"></i>
-                <span>Save</span>
-            </button>
-            <button class="rt-toolbar-btn" @onclick="SearchGuest">
-                <i class="bi bi-search text-secondary"></i>
-                <span>Search</span>
-            </button>
-            <button class="rt-toolbar-btn" @onclick="ScanPassport">
-                <i class="bi bi-fingerprint text-secondary"></i>
-                <span>Passport Scanner</span>
-            </button>
-            <button class="rt-toolbar-btn" @onclick="OpenNote">
-                <i class="bi bi-sticky text-secondary"></i>
-                <span>Note</span>
-            </button>
-            <button class="rt-toolbar-btn" @onclick="Close">
-                <i class="bi bi-x-circle text-secondary"></i>
-                <span>Close</span>
-            </button>
+    <EditForm Model="@guest" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="background-color:#f8f9fa margin-bottom: 5rem;">
+            <div class="rt-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="NewGuest">
+                    <i class="bi bi-file-earmark-plus text-secondary"></i>
+                    <span>New</span>
+                </button>
+                <button type="submit" class="rt-toolbar-btn">
+                    <i class="bi bi-floppy text-secondary"></i>
+                    <span>Save</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="SearchGuest">
+                    <i class="bi bi-search text-secondary"></i>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="ScanPassport">
+                    <i class="bi bi-fingerprint text-secondary"></i>
+                    <span>Passport Scanner</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="OpenNote">
+                    <i class="bi bi-sticky text-secondary"></i>
+                    <span>Note</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
 
-            <div class="profile-toolbar-code">
-                <label>Code</label>
-                <DxTextBox @bind-Text="@guest.Code" ReadOnly="true" CssClass="rt-form-input" />
+                <div class="profile-toolbar-code">
+                    <label>Code</label>
+                    <DxTextBox @bind-Text="@guest.Code" ReadOnly="true" CssClass="rt-form-input" />
+                </div>
             </div>
-        </div>
 
-    </div>
-    <div class="profile-card">
-        <div class="rt-modal-body " style="padding:0px;">
-            <div class="profile-body-columns">
+        </div>
+        <div class="profile-card">
+            <div class="rt-modal-body " style="padding:0px;">
+                <ValidationSummary class="rt-validation-summary" />
+                <div class="profile-body-columns">
                 <div class="profile-main-col">
                     <fieldset class="rt-form-fieldset">
                         <legend>Personal Information</legend>
@@ -58,6 +61,7 @@
                             <div class="rt-form-field rt-form-field-wide">
                                 <label>Last Name</label>
                                 <DxTextBox @bind-Text="@guest.LastName" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => guest.LastName)" class="rt-validation-message" />
                             </div>
                         </div>
 
@@ -65,6 +69,7 @@
                             <div class="rt-form-field rt-form-field-wide">
                                 <label>First Name</label>
                                 <DxTextBox @bind-Text="@guest.FirstName" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => guest.FirstName)" class="rt-validation-message" />
                             </div>
                         </div>
 
@@ -139,8 +144,14 @@
                     <div class="profile-search-tabs-body">
                         @if (searchTabIndex == 0)
                         {
-                            <DxGrid Data="@searchResults" KeyFieldName="Id" CssClass="rt-grid">
+                            <div class="profile-search-box">
+                                <i class="bi bi-search"></i>
+                                <input type="text" placeholder="Search by name or code..." @bind="searchQuery" @bind:event="oninput" />
+                            </div>
+                            <DxGrid @ref="searchGrid" Data="@FilteredSearchResults" KeyFieldName="Id" CssClass="rt-grid"
+                                    RowClick="@OnSearchRowClick" CustomizeElement="@OnSearchCustomizeElement">
                                 <Columns>
+                                    <DxGridDataColumn FieldName="Code" Caption="Code" Width="18%" />
                                     <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
                                     <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
                                     <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
@@ -237,17 +248,52 @@
             </div>
         </div>
 
-        <div class="profile-status-bar">@statusMessage</div>
-    </div>
+            <div class="profile-status-bar">@statusMessage</div>
+        </div>
+    </EditForm>
 </div>
+
+<ConfirmDialog Visible="@isConfirmVisible" Title="@confirmTitle" Message="@confirmMessage" Danger="@confirmDanger"
+               OnConfirm="HandleConfirmYes" OnCancel="HandleConfirmNo" />
+
+<DxPopup @bind-Visible="@isNotePopupVisible" Width="420px" HeaderText="@($"Note - {guest.FirstName} {guest.LastName}".Trim())"
+         ShowFooter="false" CloseOnOutsideClick="false">
+    <BodyContentTemplate>
+        <div class="profile-note-body">
+            <DxMemo @bind-Text="@guest.Note" Rows="6" CssClass="rt-form-input" />
+            <div class="profile-note-buttons">
+                <button class="btn btn-secondary" @onclick="CloseNote">Close</button>
+                <button class="btn btn-danger" @onclick="SaveNote">Save</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
 
 @code {
     private GuestRow guest = new();
     private List<GuestRow> searchResults = new();
+    private int? editingId;
+    private string searchQuery = "";
+    private IGrid? searchGrid;
+    private bool isNotePopupVisible;
+    private bool isConfirmVisible;
+    private string confirmTitle = "";
+    private string confirmMessage = "";
+    private bool confirmDanger;
+    private Func<Task>? pendingConfirmAction;
     private int searchTabIndex = 0;
     private bool isAddressGroupExpanded = true;
     private string? selectedAddressItem = "Email";
     private string? statusMessage = "passport scanner device is not detected!";
+
+    private IEnumerable<GuestRow> FilteredSearchResults =>
+        string.IsNullOrWhiteSpace(searchQuery)
+            ? searchResults
+            : searchResults.Where(g =>
+                (g.Code?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.FirstName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.MiddleName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.LastName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
 
     private List<string> titles = new() { "Mr", "Mrs", "Ms", "Dr", "Prof" };
     private List<string> genders = new() { "Male", "Female" };
@@ -268,6 +314,19 @@
     protected override void OnInitialized()
     {
         guest = CreateBlankGuest();
+        searchResults = CreateMockSearchResults();
+    }
+
+    private List<GuestRow> CreateMockSearchResults()
+    {
+        return new List<GuestRow>
+        {
+            new() { Id = 1, Code = "PGU-00123-26", FirstName = "Abebe", MiddleName = "Kebede", LastName = "Tesfaye" },
+            new() { Id = 2, Code = "PGU-00124-26", FirstName = "Sara", MiddleName = "Yohannes", LastName = "Girma" },
+            new() { Id = 3, Code = "PGU-00125-26", FirstName = "John", MiddleName = "M.", LastName = "Smith" },
+            new() { Id = 4, Code = "PGU-00126-26", FirstName = "Liya", MiddleName = "Alemu", LastName = "Bekele" },
+            new() { Id = 5, Code = "PGU-00127-26", FirstName = "Daniel", MiddleName = "Tesfaye", LastName = "Worku" },
+        };
     }
 
     private GuestRow CreateBlankGuest()
@@ -290,12 +349,57 @@
     private void NewGuest()
     {
         guest = CreateBlankGuest();
+        editingId = null;
         statusMessage = null;
     }
 
-    private void SaveGuest()
+    private void HandleValidSubmit()
     {
+        var verb = editingId is null ? "create" : "save changes to";
+        RequestConfirm("Save Guest", $"Are you sure you want to {verb} this guest?", false, SaveGuestConfirmed);
+    }
+
+    private Task SaveGuestConfirmed()
+    {
+        if (editingId is int id)
+        {
+            var target = searchResults.FirstOrDefault(g => g.Id == id);
+            if (target != null)
+                CopyGuest(guest, target);
+        }
+        else
+        {
+            guest.Id = searchResults.Count == 0 ? 1 : searchResults.Max(g => g.Id) + 1;
+            searchResults.Add(CloneGuest(guest));
+            editingId = guest.Id;
+        }
+
         statusMessage = "Guest saved.";
+        return Task.CompletedTask;
+    }
+
+    private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
+    {
+        confirmTitle = title;
+        confirmMessage = message;
+        confirmDanger = danger;
+        pendingConfirmAction = action;
+        isConfirmVisible = true;
+    }
+
+    private async Task HandleConfirmYes()
+    {
+        isConfirmVisible = false;
+        var action = pendingConfirmAction;
+        pendingConfirmAction = null;
+        if (action != null)
+            await action();
+    }
+
+    private void HandleConfirmNo()
+    {
+        isConfirmVisible = false;
+        pendingConfirmAction = null;
     }
 
     private void SearchGuest()
@@ -310,6 +414,102 @@
 
     private void OpenNote()
     {
+        isNotePopupVisible = true;
+    }
+
+    private void SaveNote()
+    {
+        if (editingId is int id)
+        {
+            var target = searchResults.FirstOrDefault(g => g.Id == id);
+            if (target != null)
+                target.Note = guest.Note;
+        }
+
+        isNotePopupVisible = false;
+        statusMessage = "Note saved.";
+    }
+
+    private void CloseNote()
+    {
+        isNotePopupVisible = false;
+    }
+
+    private void OnSearchRowClick(GridRowClickEventArgs e)
+    {
+        var row = (GuestRow)searchGrid!.GetDataItem(e.VisibleIndex);
+        if (editingId == row.Id)
+        {
+            NewGuest();
+            return;
+        }
+
+        guest = CloneGuest(row);
+        editingId = row.Id;
+        statusMessage = null;
+    }
+
+    private void OnSearchCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow || searchGrid == null)
+            return;
+
+        var row = (GuestRow)searchGrid.GetDataItem(e.VisibleIndex);
+        if (editingId == row.Id)
+            e.CssClass = "rt-row-selected";
+    }
+
+    private static GuestRow CloneGuest(GuestRow source) => new()
+    {
+        Id = source.Id,
+        Code = source.Code,
+        LastName = source.LastName,
+        FirstName = source.FirstName,
+        MiddleName = source.MiddleName,
+        Title = source.Title,
+        Gender = source.Gender,
+        Language = source.Language,
+        IsActive = source.IsActive,
+        Nationality = source.Nationality,
+        DateOfBirth = source.DateOfBirth,
+        IdType = source.IdType,
+        PassportNum = source.PassportNum,
+        Email = source.Email,
+        POBox = source.POBox,
+        Category = source.Category,
+        Currency = source.Currency,
+        Status = source.Status,
+        Religion = source.Religion,
+        Account = source.Account,
+        MailingAction = source.MailingAction,
+        RateCode = source.RateCode,
+        Note = source.Note,
+    };
+
+    private static void CopyGuest(GuestRow source, GuestRow target)
+    {
+        target.Code = source.Code;
+        target.LastName = source.LastName;
+        target.FirstName = source.FirstName;
+        target.MiddleName = source.MiddleName;
+        target.Title = source.Title;
+        target.Gender = source.Gender;
+        target.Language = source.Language;
+        target.IsActive = source.IsActive;
+        target.Nationality = source.Nationality;
+        target.DateOfBirth = source.DateOfBirth;
+        target.IdType = source.IdType;
+        target.PassportNum = source.PassportNum;
+        target.Email = source.Email;
+        target.POBox = source.POBox;
+        target.Category = source.Category;
+        target.Currency = source.Currency;
+        target.Status = source.Status;
+        target.Religion = source.Religion;
+        target.Account = source.Account;
+        target.MailingAction = source.MailingAction;
+        target.RateCode = source.RateCode;
+        target.Note = source.Note;
     }
 
     private void ToggleAddressGroup()
@@ -356,5 +556,67 @@
 
     .toolbar-item:hover span {
         color: #0d6efd;
+    }
+
+    .profile-search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px 10px;
+        margin-bottom: 10px;
+        background-color: #ffffff;
+    }
+
+    .profile-search-box i {
+        color: #6c757d;
+    }
+
+    .profile-search-box input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 0.85rem;
+    }
+
+    .profile-note-body {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .profile-note-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
     }
 </style>
