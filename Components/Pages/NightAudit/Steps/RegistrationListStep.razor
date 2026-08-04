@@ -1,0 +1,358 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Dialogs
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>@Title</h2>
+        <p>@Description</p>
+    </div>
+
+    <div class="rt-toolbar">
+        @if (ShowAmend)
+        {
+            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenAmend">
+                <i class="bi bi-calendar-event text-secondary"></i>
+                <span>@AmendLabel</span>
+            </button>
+        }
+        @if (ShowCheckOut)
+        {
+            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenCheckOut">
+                <i class="bi bi-box-arrow-right text-secondary"></i>
+                <span>@CheckOutLabel</span>
+            </button>
+        }
+        @if (ShowCheckIn)
+        {
+            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenCheckIn">
+                <i class="bi bi-box-arrow-in-right text-secondary"></i>
+                <span>@CheckInLabel</span>
+            </button>
+        }
+        @if (ShowNoShow)
+        {
+            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenNoShow">
+                <i class="bi bi-person-x text-secondary"></i>
+                <span>@NoShowLabel</span>
+            </button>
+        }
+        @if (ShowCancellation)
+        {
+            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="RequestCancelConfirm">
+                <i class="bi bi-x-octagon text-secondary"></i>
+                <span>@CancellationLabel</span>
+            </button>
+        }
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (Registrations.Count == 0)
+        {
+            <div class="rt-placeholder">
+                <i class="bi bi-check-circle-fill" style="color:#198754; font-size:1.4rem;"></i>
+                <div style="margin-top:6px;">Nothing pending for @Title. You can proceed to the next step.</div>
+            </div>
+        }
+        else
+        {
+            <DxGrid @ref="grid" Data="@Registrations" KeyFieldName="Id" CssClass="rt-grid" RowClick="@OnRowClick"
+                    CustomizeElement="@OnCustomizeElement">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RegNo)" Caption="Reg. No" Width="10%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Guest)" Caption="Guest" Width="16%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Company)" Caption="Company" Width="14%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Room)" Caption="Room" Width="7%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RoomType)" Caption="Room Type" Width="10%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.ArrivalDate)" Caption="Arrival" Width="9%"
+                                      DisplayFormat="dd-MMM-yyyy" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.DepartureDate)" Caption="Departure" Width="9%"
+                                      DisplayFormat="dd-MMM-yyyy" />
+                    @if (ColumnMode == RegistrationColumnMode.Financial)
+                    {
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.TotalBill)" Caption="Total Bill" Width="8%"
+                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Remaining)" Caption="Remaining" Width="8%"
+                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                    }
+                    else
+                    {
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Adults)" Caption="Adults" Width="6%"
+                                          TextAlignment="GridTextAlignment.Center" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Amount)" Caption="Amount" Width="9%"
+                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                    }
+                </Columns>
+            </DxGrid>
+
+            <div class="rt-footer">@Registrations.Count remaining ・ select a row to enable the actions above</div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="profile-status-bar">@statusMessage</div>
+    }
+</div>
+
+<DateAmendmentDialog Visible="@isAmendVisible" Title="@AmendDialogTitle" Draft="@amendDraft" AllowArrivalEdit="@AmendAllowArrivalEdit"
+                      Error="@amendError" OnSave="SaveAmend" OnClose="CloseAmend" />
+
+<CheckOutDialog Visible="@isCheckOutVisible" Registration="@selected" OnCheckOut="ConfirmCheckOut" OnViewFolio="OpenFolio"
+                OnClose="() => isCheckOutVisible = false" />
+
+<FolioViewDialog Visible="@isFolioVisible" Registration="@selected" Charges="@folioCharges" OnClose="() => isFolioVisible = false" />
+
+<CheckInDialog Visible="@isCheckInVisible" Registration="@selected" OnCheckIn="ConfirmCheckIn" OnClose="() => isCheckInVisible = false" />
+
+<NoShowDialog Visible="@isNoShowVisible" Registration="@selected" OnNoShow="ConfirmNoShow" OnClose="() => isNoShowVisible = false" />
+
+<ConfirmDialog Visible="@isCancelConfirmVisible" Title="Cancellation"
+               Message="@($"Are you sure you want to cancel reservation {selected?.RegNo} for {selected?.Guest}?")"
+               Danger="true" ConfirmText="Yes" CancelText="No" OnConfirm="ProceedToAuthorization"
+               OnCancel="() => isCancelConfirmVisible = false" />
+
+<AuthorizationDialog Visible="@isAuthVisible" OnAuthorized="OpenCancellationReason" OnCancel="() => isAuthVisible = false" />
+
+<CancellationDialog Visible="@isCancelReasonVisible" Registration="@selected" Reasons="@Reasons" OnCancelReservation="ConfirmCancellation"
+                     OnClose="() => isCancelReasonVisible = false" />
+
+@code {
+    public enum RegistrationColumnMode { Financial, Arrival }
+
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public List<NightAuditRegistration> Registrations { get; set; } = new();
+    [Parameter] public RegistrationColumnMode ColumnMode { get; set; } = RegistrationColumnMode.Financial;
+    [Parameter] public List<string> Reasons { get; set; } = new();
+
+    [Parameter] public bool ShowAmend { get; set; }
+    [Parameter] public bool AmendAllowArrivalEdit { get; set; }
+    [Parameter] public string AmendLabel { get; set; } = "Amend Date";
+
+    [Parameter] public bool ShowCheckOut { get; set; }
+    [Parameter] public string CheckOutLabel { get; set; } = "Check Out";
+
+    [Parameter] public bool ShowCheckIn { get; set; }
+    [Parameter] public string CheckInLabel { get; set; } = "Check In";
+
+    [Parameter] public bool ShowNoShow { get; set; }
+    [Parameter] public string NoShowLabel { get; set; } = "No Show";
+
+    [Parameter] public bool ShowCancellation { get; set; }
+    [Parameter] public string CancellationLabel { get; set; } = "Cancellation";
+
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private IGrid? grid;
+    private NightAuditRegistration? selected;
+    private string? statusMessage;
+
+    private bool isAmendVisible;
+    private NightAuditRegistration? amendDraft;
+    private string? amendError;
+    private string AmendDialogTitle => ShowAmend ? $"{AmendLabel} - {selected?.RegNo}" : AmendLabel;
+
+    private bool isCheckOutVisible;
+    private bool isFolioVisible;
+    private List<FolioChargeRow> folioCharges = new();
+
+    private bool isCheckInVisible;
+    private bool isNoShowVisible;
+
+    private bool isCancelConfirmVisible;
+    private bool isAuthVisible;
+    private bool isCancelReasonVisible;
+
+    private void OnRowClick(GridRowClickEventArgs e)
+    {
+        var row = (NightAuditRegistration)grid!.GetDataItem(e.VisibleIndex);
+        selected = selected?.Id == row.Id ? null : row;
+        statusMessage = null;
+    }
+
+    private void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow)
+            return;
+
+        var row = (NightAuditRegistration)grid!.GetDataItem(e.VisibleIndex);
+        if (selected?.Id == row.Id)
+            e.CssClass = "rt-row-selected";
+    }
+
+    private async Task Notify()
+    {
+        selected = null;
+        await OnChanged.InvokeAsync();
+    }
+
+    // ---- Amend Date ----
+    private void OpenAmend()
+    {
+        if (selected == null)
+            return;
+
+        amendDraft = selected.Clone();
+        amendError = null;
+        isAmendVisible = true;
+    }
+
+    private async Task SaveAmend()
+    {
+        if (amendDraft == null || selected == null)
+            return;
+
+        if (amendDraft.DepartureDate <= amendDraft.ArrivalDate)
+        {
+            amendError = "Departure date must be after the arrival date.";
+            return;
+        }
+
+        selected.CopyFrom(amendDraft);
+        isAmendVisible = false;
+        statusMessage = $"{amendDraft.RegNo}: dates amended. Arrival {amendDraft.ArrivalDate:dd-MMM-yyyy}, Departure {amendDraft.DepartureDate:dd-MMM-yyyy}.";
+        Registrations.Remove(selected);
+        amendDraft = null;
+        await Notify();
+    }
+
+    private void CloseAmend()
+    {
+        isAmendVisible = false;
+        amendDraft = null;
+        amendError = null;
+    }
+
+    // ---- Check Out ----
+    private void OpenCheckOut()
+    {
+        if (selected == null)
+            return;
+
+        isCheckOutVisible = true;
+    }
+
+    private async Task ConfirmCheckOut()
+    {
+        if (selected == null)
+            return;
+
+        statusMessage = $"{selected.RegNo}: {selected.Guest} checked out from room {selected.Room}.";
+        Registrations.Remove(selected);
+        isCheckOutVisible = false;
+        isFolioVisible = false;
+        await Notify();
+    }
+
+    private void OpenFolio()
+    {
+        if (selected == null)
+            return;
+
+        folioCharges = BuildFolioCharges(selected);
+        isFolioVisible = true;
+    }
+
+    private static List<FolioChargeRow> BuildFolioCharges(NightAuditRegistration reg)
+    {
+        var nights = Math.Max(1, (reg.DepartureDate - reg.ArrivalDate).Days);
+        var charges = new List<FolioChargeRow>();
+        for (var i = 0; i < nights; i++)
+        {
+            charges.Add(new FolioChargeRow
+            {
+                Date = reg.ArrivalDate.AddDays(i),
+                Description = $"Room Charge - {reg.RoomType}",
+                Reference = reg.RegNo,
+                Charge = reg.Amount,
+            });
+        }
+
+        if (reg.Paid > 0)
+        {
+            charges.Add(new FolioChargeRow
+            {
+                Date = reg.ArrivalDate,
+                Description = $"Payment - {reg.PaymentType}",
+                Reference = reg.RegNo,
+                Payment = reg.Paid,
+            });
+        }
+
+        return charges;
+    }
+
+    // ---- Check In ----
+    private void OpenCheckIn()
+    {
+        if (selected == null)
+            return;
+
+        isCheckInVisible = true;
+    }
+
+    private async Task ConfirmCheckIn()
+    {
+        if (selected == null)
+            return;
+
+        statusMessage = $"{selected.RegNo}: {selected.Guest} checked in to room {selected.Room}.";
+        Registrations.Remove(selected);
+        isCheckInVisible = false;
+        await Notify();
+    }
+
+    // ---- No Show ----
+    private void OpenNoShow()
+    {
+        if (selected == null)
+            return;
+
+        isNoShowVisible = true;
+    }
+
+    private async Task ConfirmNoShow()
+    {
+        if (selected == null)
+            return;
+
+        statusMessage = $"{selected.RegNo}: {selected.Guest} marked as No Show.";
+        Registrations.Remove(selected);
+        isNoShowVisible = false;
+        await Notify();
+    }
+
+    // ---- Cancellation (Confirm -> Authorization -> Reason) ----
+    private void RequestCancelConfirm()
+    {
+        if (selected == null)
+            return;
+
+        isCancelConfirmVisible = true;
+    }
+
+    private void ProceedToAuthorization()
+    {
+        isCancelConfirmVisible = false;
+        isAuthVisible = true;
+    }
+
+    private void OpenCancellationReason()
+    {
+        isAuthVisible = false;
+        isCancelReasonVisible = true;
+    }
+
+    private async Task ConfirmCancellation(string reason)
+    {
+        if (selected == null)
+            return;
+
+        statusMessage = $"{selected.RegNo}: reservation for {selected.Guest} cancelled. Reason: {reason}.";
+        Registrations.Remove(selected);
+        isCancelReasonVisible = false;
+        await Notify();
+    }
+}

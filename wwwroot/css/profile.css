@@ -1,0 +1,265 @@
+/* Profile Pages (Guest / Contact / Company / ...) */
+.profile-page-wrapper {
+    padding: 16px;
+    background-color: #f8f9fa;
+}
+
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 6px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-card .rt-toolbar {
+    margin: 12px 16px 0;
+    
+}
+
+.profile-toolbar-code {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+}
+
+.profile-toolbar-code label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5f6368;
+    white-space: nowrap;
+}
+
+.profile-toolbar-code .rt-form-input {
+    width: 170px;
+}
+
+.profile-body-columns {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background-color: #ffff;
+}
+
+.profile-main-col {
+    flex: 1 1 55%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-side-col {
+    flex: 1 1 40%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-search-tabs-body {
+    border: 1px solid #d3d3d3;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    padding: 10px;
+    min-height: 160px;
+}
+
+/* Address tree */
+.profile-address-table {
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 0.82rem;
+}
+
+.profile-address-header {
+    display: flex;
+    background-color: #eef1f3;
+    font-weight: 700;
+    color: #202124;
+}
+
+.profile-address-header > div {
+    padding: 6px 10px;
+    flex: 1;
+}
+
+.profile-address-header .col-value {
+    border-left: 1px solid #d3d3d3;
+}
+
+.profile-address-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-weight: 600;
+    color: #1f8a7a;
+    cursor: pointer;
+    user-select: none;
+}
+
+.profile-address-row {
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+}
+
+.profile-address-row > div {
+    padding: 6px 10px 6px 30px;
+    flex: 1;
+}
+
+.profile-address-row .col-value {
+    border-left: 1px solid #eee;
+    padding-left: 10px;
+}
+
+.profile-address-row:hover:not(.selected) {
+    background-color: #f1f3f4;
+}
+
+.profile-address-row.selected {
+    background-color: #0d6efd;
+    color: #ffffff;
+}
+
+/* Nested sub-group (e.g. Contact > Email) and its leaf rows */
+.profile-address-subgroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px 6px 26px;
+    font-weight: 600;
+    color: #1f8a7a;
+    cursor: pointer;
+    user-select: none;
+}
+
+.profile-address-leaf {
+    display: flex;
+}
+
+.profile-address-leaf > div {
+    padding: 4px 10px 4px 46px;
+    flex: 1;
+}
+
+.profile-address-leaf .col-value {
+    border-left: 1px solid #eee;
+    padding-left: 10px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.profile-address-leaf .col-value input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 4px 0;
+    font-size: 0.82rem;
+    font-family: inherit;
+    color: inherit;
+}
+
+.profile-address-leaf .col-value input:focus {
+    outline: none;
+    background-color: #fffde7;
+}
+
+.profile-address-detail {
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    flex: 1;
+    min-height: 140px;
+}
+
+.profile-status-bar {
+    color: #dc3545;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 16px 12px;
+    min-height: 1.2em;
+}
+
+/* DxComboBox overrides */
+.rt-form-input .dxbs-editor-input {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    padding: 6px 12px !important;
+}
+
+.rt-form-input .dxbs-editor-input:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15) !important;
+}
+
+.rt-form-input .dxbs-dropdown-button {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* For any text inputs */
+.rt-form-input input[type="text"],
+.rt-form-input input[type="password"],
+.rt-form-input input:not([type]) {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    padding: 6px 12px !important;
+}
+
+/* ── Arrow Button ── */
+.dxbs-editor-dropdown-button {
+    background-color: transparent !important;
+    border: none !important;
+    color: #6c757d !important;
+    width: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.dxbs-editor-dropdown-button:hover {
+    background-color: #e9ecef !important;
+    color: #0d6efd !important;
+}
+
+.dxbs-editor-dropdown-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Dropdown Box ── */
+.dxbs-dropdown-box {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    padding: 4px 0 !important;
+}
+
+/* ── Dropdown Items ── */
+.dxbs-dropdown-box .dxbs-list-item {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item:hover {
+    background-color: #f1f3f5 !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item.dxbs-selected {
+    background-color: #e7f1ff !important;
+    color: #0d6efd !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item.dxbs-focused {
+    background-color: #f8f9fa !important;
+}

@@ -1,0 +1,76 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+@if (Visible && Registration != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-cancel-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Cancellation</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="rt-detail-rows">
+                    <div class="rt-detail-row">
+                        <label>Reg. No</label>
+                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Guest</label>
+                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Room</label>
+                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Reason</label>
+                        <DxComboBox Data="@Reasons" @bind-Value="@selectedReason" NullText="-- Select Reason --"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" disabled="@string.IsNullOrEmpty(selectedReason)" @onclick="Cancel">
+                    <i class="bi bi-x-circle-fill text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-arrow-return-left text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public NightAuditRegistration? Registration { get; set; }
+    [Parameter] public List<string> Reasons { get; set; } = new();
+    [Parameter] public EventCallback<string> OnCancelReservation { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string? selectedReason;
+
+    protected override void OnParametersSet()
+    {
+        if (!Visible)
+            selectedReason = null;
+    }
+
+    private async Task Cancel()
+    {
+        if (string.IsNullOrEmpty(selectedReason))
+            return;
+
+        var reason = selectedReason;
+        selectedReason = null;
+        await OnCancelReservation.InvokeAsync(reason);
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

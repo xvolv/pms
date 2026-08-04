@@ -1,0 +1,154 @@
+@if (Visible && EditingItem != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Room Detail</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <EditForm Model="@EditingItem" OnValidSubmit="Save">
+                <DataAnnotationsValidator />
+
+                <div class="rt-toolbar room-modal-toolbar">
+                    <button type="submit" class="rt-toolbar-btn">
+                        <i class="bi bi-floppy text-secondary"></i>
+                        <span>Save</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                        <i class="bi bi-x-circle text-secondary"></i>
+                        <span>Close</span>
+                    </button>
+                </div>
+
+                <DxTabs @bind-ActiveTabIndex="activeSubTabIndex" CssClass="rt-modal-tabs">
+                    <DxTabPage Text="Room Detail" />
+                    <DxTabPage Text="Space Capacity" />
+                    <DxTabPage Text="HK-Credits" />
+                </DxTabs>
+
+                <div class="rt-modal-body">
+                    <ValidationSummary class="rt-validation-summary" />
+
+                    @if (activeSubTabIndex == 0)
+                    {
+                        <div class="rt-detail-rows">
+                            <div class="rt-detail-row">
+                                <label>Room Code</label>
+                                <DxTextBox @bind-Text="@EditingItem.RoomCode" CssClass="rt-detail-input" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Room</label>
+                                <DxTextBox @bind-Text="@EditingItem.Number" CssClass="rt-detail-input" />
+                                <ValidationMessage For="@(() => EditingItem.Number)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Max. Occup</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.MaxOccupancy" MinValue="0" CssClass="rt-detail-input" />
+                                <DxCheckBox @bind-Checked="@EditingItem.IsActive" CssClass="rt-detail-inline-check">isActive</DxCheckBox>
+                                <ValidationMessage For="@(() => EditingItem.MaxOccupancy)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Room Type</label>
+                                <DxComboBox Data="@RoomTypes" @bind-Value="@EditingItem.TypeCode"
+                                            TextFieldName="@nameof(RoomTypeRow.Description)" ValueFieldName="@nameof(RoomTypeRow.Code)"
+                                            NullText="-- Select --" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-detail-input" />
+                                <ValidationMessage For="@(() => EditingItem.TypeCode)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Phone No</label>
+                                <DxTextBox @bind-Text="@EditingItem.PhoneNo" CssClass="rt-detail-input" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Measurement</label>
+                                <DxTextBox @bind-Text="@EditingItem.Measurement" CssClass="rt-detail-input" />
+                            </div>
+                            <div class="rt-detail-row rt-detail-row-top">
+                                <label>Remark</label>
+                                <DxMemo @bind-Text="@EditingItem.Remark" Rows="4" CssClass="rt-detail-input" />
+                            </div>
+                        </div>
+                    }
+                    else if (activeSubTabIndex == 1)
+                    {
+                        <div class="rt-detail-rows">
+                            <div class="rt-detail-row">
+                                <label>Space Arrangement</label>
+                                <DxComboBox Data="@SpaceArrangements" @bind-Value="@EditingItem.SpaceArrangement" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                            </div>
+                            <div class="rt-detail-row">
+                                <label>Max. Capacity</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.MaxCapacity" MinValue="0" CssClass="rt-detail-input" />
+                                <ValidationMessage For="@(() => EditingItem.MaxCapacity)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-detail-row rt-detail-row-top">
+                                <label>Remark</label>
+                                <DxMemo @bind-Text="@EditingItem.SpaceRemark" Rows="4" CssClass="rt-detail-input" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <fieldset class="rt-form-fieldset rt-hkcredits">
+                            <legend>HK-Credits</legend>
+                            <div class="rt-hkcredit-row">
+                                <label>Stayover Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.StayoverCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Departure Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.DepartureCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Turndown Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.TurndownCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Pickup Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.PickupCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Vacant Credit</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.VacantCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                            <div class="rt-hkcredit-row">
+                                <label>Evening Section</label>
+                                <DxSpinEdit @bind-Value="@EditingItem.EveningSectionCredit" MinValue="0" NumberFormat="F1"
+                                            CssClass="rt-hkcredit-input" />
+                            </div>
+                        </fieldset>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public bool IsNew { get; set; }
+    [Parameter] public RoomTileRow? EditingItem { get; set; }
+    [Parameter] public List<RoomTypeRow> RoomTypes { get; set; } = new();
+    [Parameter] public List<string> SpaceArrangements { get; set; } = new();
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private int activeSubTabIndex = 0;
+
+    private async Task Save() => await OnSave.InvokeAsync();
+
+    private async Task Close()
+    {
+        activeSubTabIndex = 0;
+        await OnClose.InvokeAsync();
+    }
+}

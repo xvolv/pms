@@ -1,0 +1,53 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>Journalize Revenue</h2>
+        <p>Posts today's revenue to the general ledger accounts shown below.</p>
+    </div>
+
+    <div class="rt-toolbar">
+        <button type="button" class="rt-toolbar-btn" disabled="@Journalized" @onclick="Journalize">
+            <i class="bi bi-journals text-secondary"></i>
+            <span>Journalize</span>
+        </button>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        <DxGrid Data="@Lines" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(RevenueJournalLine.Account)" Caption="Account" Width="30%" />
+                <DxGridDataColumn FieldName="@nameof(RevenueJournalLine.Description)" Caption="Description" Width="40%" />
+                <DxGridDataColumn FieldName="@nameof(RevenueJournalLine.Debit)" Caption="Debit" Width="15%"
+                                  DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RevenueJournalLine.Credit)" Caption="Credit" Width="15%"
+                                  DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">
+            Total Debit = @Lines.Sum(l => l.Debit).ToString("N2") ・ Total Credit = @Lines.Sum(l => l.Credit).ToString("N2")
+            @(Journalized ? " ・ Journalized" : "")
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="profile-status-bar">@statusMessage</div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<RevenueJournalLine> Lines { get; set; } = new();
+    [Parameter] public bool Journalized { get; set; }
+    [Parameter] public EventCallback<bool> JournalizedChanged { get; set; }
+
+    private string? statusMessage;
+
+    private async Task Journalize()
+    {
+        Journalized = true;
+        statusMessage = "Revenue journalized to the general ledger.";
+        await JournalizedChanged.InvokeAsync(Journalized);
+    }
+}

@@ -1,0 +1,82 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>Report Archive</h2>
+        <p>Select the reports to generate and archive as PDF for this business date.</p>
+    </div>
+
+    <div class="rt-toolbar">
+        <button type="button" class="rt-toolbar-btn" disabled="@(SelectedCount == 0 || State.ArchiveInProgress || State.ReportArchived)"
+                @onclick="ArchiveReports">
+            <i class="bi bi-archive text-secondary"></i>
+            <span>Archive Report</span>
+        </button>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        <DxGrid Data="@State.Reports" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(ReportArchiveRow.Selected)" Caption="" Width="8%">
+                    <CellDisplayTemplate>
+                        @{ var row = (ReportArchiveRow)context.DataItem; }
+                        <input type="checkbox" class="rt-grid-checkbox" checked="@row.Selected" disabled="@State.ReportArchived"
+                               @onchange="e => ToggleSelected(row, e)" style="cursor:pointer;" />
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="@nameof(ReportArchiveRow.ReportName)" Caption="Report Name" Width="32%" />
+                <DxGridDataColumn FieldName="@nameof(ReportArchiveRow.Description)" Caption="Description" Width="60%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@SelectedCount of @State.Reports.Count report(s) selected</div>
+
+        @if (State.ArchiveInProgress)
+        {
+            <div class="na-progress-wrap">
+                <div class="na-progress-label">Archiving reports... @State.ArchiveProgress%</div>
+                <div class="na-progress-track">
+                    <div class="na-progress-fill" style="width:@(State.ArchiveProgress)%;"></div>
+                </div>
+            </div>
+        }
+        else if (State.ReportArchived)
+        {
+            <div class="na-info-banner" style="margin-top:14px;">
+                <i class="bi bi-check-circle-fill" style="color:#198754;"></i>
+                All selected reports were generated and archived. Next is now enabled.
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public NightAuditState State { get; set; } = null!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private int SelectedCount => State.Reports.Count(r => r.Selected);
+
+    private async Task ToggleSelected(ReportArchiveRow row, ChangeEventArgs e)
+    {
+        row.Selected = e.Value is bool b && b;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task ArchiveReports()
+    {
+        State.ArchiveInProgress = true;
+        State.ArchiveProgress = 0;
+        await OnChanged.InvokeAsync();
+
+        while (State.ArchiveProgress < 100)
+        {
+            await Task.Delay(180);
+            State.ArchiveProgress = Math.Min(100, State.ArchiveProgress + 20);
+            await OnChanged.InvokeAsync();
+        }
+
+        State.ArchiveInProgress = false;
+        State.ReportArchived = true;
+        await OnChanged.InvokeAsync();
+    }
+}

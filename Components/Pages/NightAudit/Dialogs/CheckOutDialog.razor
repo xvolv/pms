@@ -1,0 +1,171 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+@if (Visible && Registration != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-checkout-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Check Out</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="rt-detail-rows">
+                    <div class="rt-detail-row">
+                        <label>Reg. No</label>
+                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Guest</label>
+                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Company</label>
+                        <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Room</label>
+                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Payment Type</label>
+                        <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Total Bill</label>
+                        <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Paid</label>
+                        <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Remaining</label>
+                        <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Departure</label>
+                        <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Agent</label>
+                        <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                    <div class="rt-detail-row">
+                        <label>Source</label>
+                        <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
+                    </div>
+                </div>
+
+                @if (Registration.Remaining > 0)
+                {
+                    <div class="rt-validation-summary" style="margin-top:14px;">
+                        This registration has an outstanding remaining balance of @Registration.Remaining.ToString("N2"). It can still be checked out, but the balance will transfer to the city ledger.
+                    </div>
+                }
+
+                @if (showPrinterNotice)
+                {
+                    <div class="na-info-banner" style="margin-top:14px;">
+                        <i class="bi bi-printer"></i>
+                        Fiscal printer is not set. The last invoice could not be printed automatically. Click Continue to
+                        finish the checkout without printing.
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(infoMessage))
+                {
+                    <div class="na-info-banner" style="margin-top:14px;">
+                        <i class="bi bi-info-circle"></i>
+                        @infoMessage
+                    </div>
+                }
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                @if (showPrinterNotice)
+                {
+                    <button type="button" class="rt-toolbar-btn" @onclick="ConfirmCheckOut">
+                        <i class="bi bi-check-circle text-secondary"></i>
+                        <span>Continue</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="() => showPrinterNotice = false">
+                        <i class="bi bi-x-circle text-secondary"></i>
+                        <span>Cancel</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="rt-toolbar-btn" @onclick="StartCheckOut">
+                        <i class="bi bi-box-arrow-right text-secondary"></i>
+                        <span>Check Out</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="ReturnCard">
+                        <i class="bi bi-credit-card text-secondary"></i>
+                        <span>Return Card</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="ViewFolio">
+                        <i class="bi bi-receipt text-secondary"></i>
+                        <span>View Folio</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="ViewAttachment">
+                        <i class="bi bi-paperclip text-secondary"></i>
+                        <span>View Attachment</span>
+                    </button>
+                    <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                        <i class="bi bi-x-circle text-secondary"></i>
+                        <span>Close</span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public NightAuditRegistration? Registration { get; set; }
+    [Parameter] public EventCallback OnCheckOut { get; set; }
+    [Parameter] public EventCallback OnViewFolio { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private bool showPrinterNotice;
+    private string? infoMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (!Visible)
+        {
+            showPrinterNotice = false;
+            infoMessage = null;
+        }
+    }
+
+    private void StartCheckOut()
+    {
+        infoMessage = null;
+        showPrinterNotice = true;
+    }
+
+    private async Task ConfirmCheckOut()
+    {
+        showPrinterNotice = false;
+        await OnCheckOut.InvokeAsync();
+    }
+
+    private void ReturnCard()
+    {
+        infoMessage = "Room key card returned.";
+    }
+
+    private void ViewAttachment()
+    {
+        infoMessage = "No attachments found for this registration.";
+    }
+
+    private async Task ViewFolio() => await OnViewFolio.InvokeAsync();
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

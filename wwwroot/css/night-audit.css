@@ -1,0 +1,334 @@
+/* Night Audit Wizard */
+.na-wizard {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    height: 100%;
+    min-height: 0;
+}
+
+.na-steps-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background-color: #ffffff;
+    color: #202124;
+    border-radius: 6px;
+    padding: 0 0 12px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #d3d3d3;
+}
+
+.na-steps-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 14px 18px 4px;
+    color: #1a73e8;
+}
+
+.na-steps-subtitle {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4f5d73;
+    padding: 14px 18px;
+    background-color: #f5f6f8;
+    border-bottom: 1px solid #e1e5ea;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.na-steps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.na-step-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 18px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    width: calc(100% - 16px);
+    box-sizing: border-box;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: #8a8f98;
+    cursor: default;
+    border-left: 3px solid transparent;
+    transition:
+        background-color 0.15s,
+        color 0.15s;
+}
+
+.na-step-item.clickable {
+    cursor: pointer;
+    color: #4f5d73;
+}
+
+.na-step-item.clickable:hover {
+    background-color: rgba(26, 115, 232, 0.08);
+    color: #1a73e8;
+}
+
+.na-step-item .na-step-index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #5f6368;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.na-step-item.current {
+    background-color: rgba(26, 115, 232, 0.12);
+    border-left-color: #1a73e8;
+    color: #1a73e8;
+    font-weight: 700;
+}
+
+.na-step-item.current .na-step-index {
+    background-color: #1a73e8;
+    color: #ffffff;
+}
+
+.na-step-item.done {
+    color: #4f5d73;
+}
+
+.na-step-item.done .na-step-index {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+.na-main-panel {
+    flex: 1;
+    min-width: 0;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.na-main-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+}
+
+.na-step-header {
+    margin-bottom: 14px;
+}
+
+.na-step-header h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #202124;
+    margin: 0 0 4px;
+}
+
+.na-step-header p {
+    font-size: 0.85rem;
+    color: #5f6368;
+    margin: 0;
+    max-width: 900px;
+}
+
+.na-wizard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid #e1e5ea;
+    background-color: #fafbfc;
+    border-radius: 0 0 6px 6px;
+}
+
+.na-footer-hint {
+    font-size: 0.8rem;
+    color: #b02a37;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.na-footer-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.na-info-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #e8f0fe;
+    color: #1a3d6d;
+    border: 1px solid #c5d9f5;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+}
+
+/* Summary voucher */
+.na-summary-voucher {
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 4px 16px;
+    max-width: 420px;
+}
+
+.na-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f3f4;
+    font-size: 0.88rem;
+    color: #3c4043;
+}
+
+.na-summary-row:last-child {
+    border-bottom: none;
+}
+
+.na-summary-total {
+    color: #1a73e8;
+    font-size: 0.95rem;
+}
+
+/* Room and Tax Post table */
+.na-post-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.na-post-table th {
+    text-align: left;
+    background-color: #eef1f4;
+    color: #4f5d73;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.na-post-row td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f1f3f4;
+    color: #202124;
+}
+
+.na-post-package-row td {
+    padding: 5px 10px 5px 30px;
+    border-bottom: 1px solid #f1f3f4;
+    color: #5f6368;
+    font-size: 0.8rem;
+    font-style: italic;
+    background-color: #fafbfc;
+}
+
+.na-post-amount {
+    text-align: right;
+}
+
+.na-post-toggle {
+    cursor: pointer;
+    color: #1a73e8;
+}
+
+/* Report archive progress bar */
+.na-progress-wrap {
+    margin-top: 14px;
+}
+
+.na-progress-label {
+    font-size: 0.82rem;
+    color: #4f5d73;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.na-progress-track {
+    width: 100%;
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.na-progress-fill {
+    height: 100%;
+    background-color: #1a73e8;
+    transition: width 0.18s ease-out;
+}
+
+/* Finished panel */
+.na-finished-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 6px;
+    padding: 60px 20px;
+    height: 100%;
+}
+
+.na-finished-panel i {
+    font-size: 3rem;
+    color: #198754;
+    margin-bottom: 12px;
+}
+
+.na-finished-panel h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #202124;
+    margin: 0 0 8px;
+}
+
+.na-finished-panel p {
+    color: #5f6368;
+    margin: 0 0 20px;
+}
+
+/* Night audit dialog width overrides */
+.na-amend-modal,
+.na-checkout-modal,
+.na-checkin-modal,
+.na-noshow-modal,
+.na-cancel-modal {
+    width: 520px;
+}
+
+.na-folio-modal {
+    width: 720px;
+}
+
+.na-modal-toolbar {
+    margin: 0 16px 16px;
+}
+
+.na-auth-dialog input[type="password"] {
+    margin-top: 10px;
+    width: 100%;
+}

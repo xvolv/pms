@@ -1,0 +1,62 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>Bucket Check</h2>
+        <p>Compares the information on each guest's Registration Card against what is currently in the system
+            (room, departure date, occupancy and rate). Print the report if needed, then click Next to save it and continue.</p>
+    </div>
+
+    <div class="rt-toolbar">
+        <button type="button" class="rt-toolbar-btn" disabled="@(BucketChecks.Count == 0)" @onclick="PrintReport">
+            <i class="bi bi-printer text-secondary"></i>
+            <span>Print Report</span>
+        </button>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (BucketChecks.Count == 0)
+        {
+            <div class="rt-placeholder">No in-house registrations to reconcile.</div>
+        }
+        else
+        {
+            <DxGrid Data="@BucketChecks" KeyFieldName="Id" CssClass="rt-grid">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.Selected)" Caption="" Width="6%">
+                        <CellDisplayTemplate>
+                            <input type="checkbox" class="rt-grid-checkbox" checked="@(((BucketCheckRow)context.DataItem).Selected)" disabled />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.RegNo)" Caption="Reg. No" Width="12%" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.Guest)" Caption="Guest" Width="18%" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.Room)" Caption="Room" Width="8%" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.RoomType)" Caption="Room Type" Width="14%" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.Departure)" Caption="Departure" Width="12%"
+                                      DisplayFormat="dd-MMM-yyyy" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.Adults)" Caption="Adults" Width="8%"
+                                      TextAlignment="GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="@nameof(BucketCheckRow.RateCode)" Caption="Rate Code" Width="12%" />
+                </Columns>
+            </DxGrid>
+
+            <div class="rt-footer">@BucketChecks.Count registration(s) checked against the system</div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="profile-status-bar">@statusMessage</div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<BucketCheckRow> BucketChecks { get; set; } = new();
+
+    private string? statusMessage;
+
+    private void PrintReport()
+    {
+        statusMessage = "Bucket check report sent to printer.";
+    }
+}

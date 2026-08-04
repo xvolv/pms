@@ -1,14 +1,18 @@
 @page "/property"
 @rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Room.Modals
 @using ERP.V7.WebPMS.Components.Pages.Room.shared
+@inject NavigationManager NavigationManager
 
 <PageTitle>Property - Room Type</PageTitle>
 
 <div class="dashboard-wrapper">
     <!-- Top Tabs -->
     <div class="top-tab-header">
-        <div class="tab-item active">
-            Property <i class="bi bi-x ms-2"></i>
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Property
+            <i class="bi bi-x fs-4" @onclick="CloseProperty"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
         </div>
     </div>
 
@@ -86,7 +90,8 @@
                     <div class="rooms-tree-body">
                         @foreach (var block in blocks)
                         {
-                            <div class="block-header" @onclick="() => ToggleBlock(block.Id)">
+                            <div class="block-header @(selectedBlockId == block.Id ? "active" : "")"
+                                 @onclick="() => ToggleBlock(block.Id)">
                                 <i class="bi @(block.IsExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
                                 <span>@block.Name</span>
                             </div>
@@ -111,11 +116,10 @@
                             <!-- Toolbar goes HERE -->
                             <div class="rooms-toolbar">
                                 <button class="rt-toolbar-btn" @onclick="AddRoomTile">
-                                    <i class="bi bi bi-file-earmark-plus text-secondary"></i>
+                                    <i class="bi  bi-file-earmark-plus text-secondary"></i>
                                     <span>Add</span>
                                 </button>
-                                <button class="rt-toolbar-btn" "
-                                        @onclick=" DeleteRoomTiles">
+                                <button class="rt-toolbar-btn" @onclick="DeleteRoomTiles">
                                     <i class="bi bi-trash3 text-secondary"></i>
                                     <span>Delete</span>
                                 </button>
@@ -125,7 +129,7 @@
                                     <span>Edit</span>
                                 </button>
                                 <button class="rt-toolbar-btn" @onclick="ApplyRoomType">
-                                    <i class="bi bi-check-circle-fill text-secondary"></i>
+                                    <i class="bi bi-check-circle text-secondary"></i>
                                     <span>Apply</span>
                                 </button>
                                 <div class="rooms-toolbar-field">
@@ -137,6 +141,7 @@
                                 </div>
                                 <div class="rooms-toolbar-field">
                                     <label>Filter Rooms By</label>
+
                                     <select class="rt-form-select" @bind="statusFilter">
                                         <option value="">All</option>
                                         <option value="Clean">Clean</option>
@@ -190,17 +195,50 @@
                    OnNew="NewRoomTypeInModal" OnSave="SaveModalRoomType" OnClose="CloseModal" />
 
 <RoomEditModal Visible="isRoomModalOpen" IsNew="isRoomNewEntry" EditingItem="editingRoomTile" RoomTypes="roomTypes"
-               OnSave="SaveRoomTile" OnClose="CloseRoomModal" />
+               SpaceArrangements="spaceArrangements" OnSave="SaveRoomTile" OnClose="CloseRoomModal" />
 
-<BlockEditModal Visible="isBlockModalOpen" EditingItem="editingBlockDraft" OnSave="SaveNewBlock"
+<BlockEditModal Visible="isBlockModalOpen" IsNew="isBlockNewEntry" EditingItem="editingBlockDraft" OnSave="SaveNewBlock"
                 OnClose="CloseBlockModal" />
 
+<ConfirmDialog Visible="@isConfirmVisible" Title="@confirmTitle" Message="@confirmMessage" Danger="@confirmDanger"
+               OnConfirm="HandleConfirmYes" OnCancel="HandleConfirmNo" />
+
 @code {
+    private bool isConfirmVisible;
+    private string confirmTitle = "";
+    private string confirmMessage = "";
+    private bool confirmDanger;
+    private Func<Task>? pendingConfirmAction;
+
+    private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
+    {
+        confirmTitle = title;
+        confirmMessage = message;
+        confirmDanger = danger;
+        pendingConfirmAction = action;
+        isConfirmVisible = true;
+    }
+
+    private async Task HandleConfirmYes()
+    {
+        isConfirmVisible = false;
+        var action = pendingConfirmAction;
+        pendingConfirmAction = null;
+        if (action != null)
+            await action();
+    }
+
+    private void HandleConfirmNo()
+    {
+        isConfirmVisible = false;
+        pendingConfirmAction = null;
+    }
+
     private int activeTabIndex = 0;
-    private string activeSubTab = "roomtype";
+
 
     // --- Rooms tab (Block / Floor management) ---
-    private string roomsSubTab = "rooms";
+  
     private List<BlockRow> blocks = CreateSampleBlocks();
     private int? currentFloorId;
     private HashSet<int> selectedTileIds = new();
@@ -212,8 +250,10 @@
     private RoomTileRow? editingRoomTile;
 
     private bool isBlockModalOpen;
+    private bool isBlockNewEntry;
     private BlockDraft? editingBlockDraft;
     private string? blocksStatusMessage;
+    private int? selectedBlockId;
 
     private FloorRow? currentFloor => blocks.SelectMany(b => b.Floors).FirstOrDefault(f => f.Id == currentFloorId);
 
@@ -224,18 +264,22 @@
     {
         roomTypeToolbarItems = new()
         {
-            new() { Label = "Add", Icon = "bi-file-earmark-plus", OnClick = EventCallback.Factory.Create(this, AddRoomType) },
-            new() { Label = "Delete", Icon = "bi-trash3", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
-DeleteRoomType) },
-            new() { Label = "Save", Icon = "bi-floppy", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
-SaveRoomTypes) },
-            new() { Label = "Edit", Icon = "bi-pencil-square", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
-EditRoomType) },
-        };
+                new() { Label = "Add", Icon = "bi-file-earmark-plus", OnClick = EventCallback.Factory.Create(this, AddRoomType) },
+                new() { Label = "Delete", Icon = "bi-trash3", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+    DeleteRoomType) },
+                new() { Label = "Save", Icon = "bi-floppy", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+    SaveRoomTypes) },
+                new() { Label = "Edit", Icon = "bi-pencil-square", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+    EditRoomType) },
+            };
 
         blocksToolbarItems = new()
         {
             new() { Label = "Add", Icon = "bi-file-earmark-plus", OnClick = EventCallback.Factory.Create(this, OpenAddBlockModal) },
+            new() { Label = "Edit", Icon = "bi-pencil-square", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+EditSelectedBlock) },
+            new() { Label = "Delete", Icon = "bi-trash3", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
+DeleteSelectedBlock) },
             new() { Label = "Save", Icon = "bi-floppy", BeginGroup = true, OnClick = EventCallback.Factory.Create(this, SaveBlocks)
 },
             new() { Label = "Refresh", Icon = "bi-arrow-clockwise", BeginGroup = true, OnClick = EventCallback.Factory.Create(this,
@@ -255,6 +299,8 @@ RefreshBlocks) },
         var block = blocks.FirstOrDefault(b => b.Id == blockId);
         if (block != null)
             block.IsExpanded = !block.IsExpanded;
+
+        selectedBlockId = blockId;
     }
 
     private void SelectFloor(int floorId)
@@ -322,6 +368,21 @@ RefreshBlocks) },
             TypeCode = source.TypeCode,
             TypeDescription = source.TypeDescription,
             Status = source.Status,
+            RoomCode = source.RoomCode,
+            MaxOccupancy = source.MaxOccupancy,
+            IsActive = source.IsActive,
+            PhoneNo = source.PhoneNo,
+            Measurement = source.Measurement,
+            Remark = source.Remark,
+            SpaceArrangement = source.SpaceArrangement,
+            MaxCapacity = source.MaxCapacity,
+            SpaceRemark = source.SpaceRemark,
+            StayoverCredit = source.StayoverCredit,
+            DepartureCredit = source.DepartureCredit,
+            TurndownCredit = source.TurndownCredit,
+            PickupCredit = source.PickupCredit,
+            VacantCredit = source.VacantCredit,
+            EveningSectionCredit = source.EveningSectionCredit,
         };
         isRoomNewEntry = false;
         isRoomModalOpen = true;
@@ -351,6 +412,21 @@ RefreshBlocks) },
                 target.TypeCode = editingRoomTile.TypeCode;
                 target.TypeDescription = editingRoomTile.TypeDescription;
                 target.Status = editingRoomTile.Status;
+                target.RoomCode = editingRoomTile.RoomCode;
+                target.MaxOccupancy = editingRoomTile.MaxOccupancy;
+                target.IsActive = editingRoomTile.IsActive;
+                target.PhoneNo = editingRoomTile.PhoneNo;
+                target.Measurement = editingRoomTile.Measurement;
+                target.Remark = editingRoomTile.Remark;
+                target.SpaceArrangement = editingRoomTile.SpaceArrangement;
+                target.MaxCapacity = editingRoomTile.MaxCapacity;
+                target.SpaceRemark = editingRoomTile.SpaceRemark;
+                target.StayoverCredit = editingRoomTile.StayoverCredit;
+                target.DepartureCredit = editingRoomTile.DepartureCredit;
+                target.TurndownCredit = editingRoomTile.TurndownCredit;
+                target.PickupCredit = editingRoomTile.PickupCredit;
+                target.VacantCredit = editingRoomTile.VacantCredit;
+                target.EveningSectionCredit = editingRoomTile.EveningSectionCredit;
             }
         }
 
@@ -366,11 +442,21 @@ RefreshBlocks) },
 
     private void DeleteRoomTiles()
     {
-        if (currentFloor == null)
+        if (currentFloor == null || selectedTileIds.Count == 0)
             return;
+
+        RequestConfirm("Delete Rooms", $"Are you sure you want to delete {selectedTileIds.Count} selected room(s)?", true,
+            DeleteRoomTilesConfirmed);
+    }
+
+    private Task DeleteRoomTilesConfirmed()
+    {
+        if (currentFloor == null)
+            return Task.CompletedTask;
 
         currentFloor.Rooms.RemoveAll(r => selectedTileIds.Contains(r.Id));
         selectedTileIds.Clear();
+        return Task.CompletedTask;
     }
 
     private void ApplyRoomType()
@@ -401,7 +487,65 @@ RefreshBlocks) },
             RoomNoStartsFrom = 1,
             RoomsPerFloor = 10,
         };
+        isBlockNewEntry = true;
         isBlockModalOpen = true;
+    }
+
+    private void EditSelectedBlock()
+    {
+        if (selectedBlockId == null)
+            return;
+
+        var block = blocks.FirstOrDefault(b => b.Id == selectedBlockId);
+        if (block == null)
+            return;
+
+        blocksStatusMessage = null;
+        editingBlockDraft = new BlockDraft
+        {
+            Id = block.Id,
+            Code = block.Code,
+            Name = block.Name,
+        };
+        isBlockNewEntry = false;
+        isBlockModalOpen = true;
+    }
+
+    private void DeleteSelectedBlock()
+    {
+        if (selectedBlockId == null)
+            return;
+
+        var block = blocks.FirstOrDefault(b => b.Id == selectedBlockId);
+        if (block == null)
+            return;
+
+        RequestConfirm("Delete Block",
+            $"Are you sure you want to delete block '{block.Name}'? This will remove all its floors and rooms.", true,
+            DeleteSelectedBlockConfirmed);
+    }
+
+    private Task DeleteSelectedBlockConfirmed()
+    {
+        if (selectedBlockId == null)
+            return Task.CompletedTask;
+
+        var block = blocks.FirstOrDefault(b => b.Id == selectedBlockId);
+        if (block == null)
+            return Task.CompletedTask;
+
+        bool wasCurrentFloor = block.Floors.Any(f => f.Id == currentFloorId);
+        blocks.Remove(block);
+        selectedBlockId = null;
+
+        if (wasCurrentFloor)
+        {
+            currentFloorId = blocks.SelectMany(b => b.Floors).FirstOrDefault()?.Id;
+            selectedTileIds.Clear();
+        }
+
+        blocksStatusMessage = "Block deleted.";
+        return Task.CompletedTask;
     }
 
 
@@ -427,8 +571,25 @@ RefreshBlocks) },
     {
         if (editingBlockDraft == null
             || string.IsNullOrWhiteSpace(editingBlockDraft.Code)
-            || string.IsNullOrWhiteSpace(editingBlockDraft.Name)
-            || editingBlockDraft.NoOfFloors <= 0)
+            || string.IsNullOrWhiteSpace(editingBlockDraft.Name))
+            return;
+
+        if (!isBlockNewEntry)
+        {
+            var target = blocks.FirstOrDefault(b => b.Id == editingBlockDraft.Id);
+            if (target != null)
+            {
+                target.Code = editingBlockDraft.Code.Trim();
+                target.Name = editingBlockDraft.Name.Trim();
+            }
+
+            isBlockModalOpen = false;
+            editingBlockDraft = null;
+            blocksStatusMessage = "Block updated.";
+            return;
+        }
+
+        if (editingBlockDraft.NoOfFloors <= 0)
             return;
 
         var allFloors = blocks.SelectMany(b => b.Floors).ToList();
@@ -475,8 +636,15 @@ RefreshBlocks) },
 
     private void SaveBlocks()
     {
+        RequestConfirm("Save Blocks", "Are you sure you want to save all changes to blocks and floors?", false,
+            SaveBlocksConfirmed);
+    }
+
+    private Task SaveBlocksConfirmed()
+    {
         // TODO: persist blocks/floors via ApiService once the Property API endpoint is available.
         blocksStatusMessage = "Changes saved.";
+        return Task.CompletedTask;
     }
 
     private void RefreshBlocks()
@@ -599,6 +767,7 @@ RefreshBlocks) },
     private RoomTypeRow? editingItem;
 
     private List<string> roomClasses = new() { "Non-VIP", "VIP", "VIIP" };
+    private List<string> spaceArrangements = new() { "Theater", "Classroom", "U-Shape", "Boardroom", "Banquet", "Reception", "Hollow Square" };
 
     private List<RoomTypeRow> roomTypes = new()
     {
@@ -728,6 +897,15 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
 
     private void DeleteRoomType()
     {
+        if (selectedRoomType == null)
+            return;
+
+        RequestConfirm("Delete Room Type", $"Are you sure you want to delete room type '{selectedRoomType.Description}'?", true,
+            DeleteRoomTypeConfirmed);
+    }
+
+    private Task DeleteRoomTypeConfirmed()
+    {
         if (selectedRoomType != null)
         {
             roomTypes.Remove(selectedRoomType);
@@ -735,6 +913,7 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
             statusMessage = null;
             RenumberRoomTypes();
         }
+        return Task.CompletedTask;
     }
 
     private void RenumberRoomTypes()
@@ -745,8 +924,20 @@ RoomClass = "Non-VIP", IsHouseKeeping = true, IsPseudoRoom = false, CanBeMeeting
 
     private void SaveRoomTypes()
     {
+        RequestConfirm("Save Room Types", "Are you sure you want to save all changes to room types?", false,
+            SaveRoomTypesConfirmed);
+    }
+
+    private Task SaveRoomTypesConfirmed()
+    {
         // TODO: persist via ApiService once the Room Type API endpoint is available.
         statusMessage = "Changes saved.";
+        return Task.CompletedTask;
     }
     private int roomsSubTabIndex = 0;
+    private void CloseProperty()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+
 }

@@ -1,0 +1,54 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+@if (Visible && Registration != null)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-folio-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Folio - @Registration.Guest (@Registration.RegNo)</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="rt-grid-area" style="padding:0;">
+                    <DxGrid Data="@Charges" CssClass="rt-grid" ShowFilterRow="false">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Date)" Caption="Date" Width="16%"
+                                              DisplayFormat="dd-MMM-yyyy" />
+                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Description)" Caption="Description" Width="34%" />
+                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Reference)" Caption="Reference" Width="16%" />
+                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Charge)" Caption="Charge" Width="17%"
+                                              DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Payment)" Caption="Payment" Width="17%"
+                                              DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+
+                <div class="rt-footer">
+                    Total Charges = @Charges.Sum(c => c.Charge).ToString("N2") &nbsp;|&nbsp;
+                    Total Payments = @Charges.Sum(c => c.Payment).ToString("N2") &nbsp;|&nbsp;
+                    Balance = @((Charges.Sum(c => c.Charge) - Charges.Sum(c => c.Payment)).ToString("N2"))
+                </div>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public NightAuditRegistration? Registration { get; set; }
+    [Parameter] public List<FolioChargeRow> Charges { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

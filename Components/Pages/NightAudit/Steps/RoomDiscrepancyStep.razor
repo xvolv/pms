@@ -1,0 +1,38 @@
+@using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
+
+<div class="na-step">
+    <div class="na-step-header">
+        <h2>Room Discrepancy</h2>
+        <p>Rooms where the system status disagrees with the status reported by Housekeeping. Discrepancies are
+            resolved from the Housekeeping &gt; Room Discrepancy screen, not from here.</p>
+    </div>
+
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (Discrepancies.Count == 0)
+        {
+            <div class="rt-placeholder">
+                <i class="bi bi-check-circle-fill" style="color:#198754; font-size:1.4rem;"></i>
+                <div style="margin-top:6px;">No room status discrepancies were found.</div>
+            </div>
+        }
+        else
+        {
+            <DxGrid Data="@Discrepancies" KeyFieldName="Id" CssClass="rt-grid">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(RoomDiscrepancyRow.Room)" Caption="Room" Width="10%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomDiscrepancyRow.SystemStatus)" Caption="Status Per System" Width="18%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomDiscrepancyRow.HousekeepingStatus)" Caption="Status Per Housekeeping" Width="18%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomDiscrepancyRow.ReportedDate)" Caption="Reported" Width="12%"
+                                      DisplayFormat="dd-MMM-yyyy" />
+                    <DxGridDataColumn FieldName="@nameof(RoomDiscrepancyRow.Remark)" Caption="Remark" Width="42%" />
+                </Columns>
+            </DxGrid>
+
+            <div class="rt-footer">@Discrepancies.Count room(s) with a status discrepancy ・ this step does not block the audit</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<RoomDiscrepancyRow> Discrepancies { get; set; } = new();
+}

@@ -1,0 +1,623 @@
+@page "/guest"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Profile - Guest</PageTitle>
+<div class="top-tab-header">
+    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+        Guest
+        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+    </div>
+</div>
+
+
+<div class="profile-page-wrapper">
+    <EditForm Model="@guest" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="background-color:#f8f9fa margin-bottom: 5rem;">
+            <div class="rt-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="NewGuest">
+                    <i class="bi bi-file-earmark-plus text-secondary"></i>
+                    <span>New</span>
+                </button>
+                <button type="submit" class="rt-toolbar-btn">
+                    <i class="bi bi-floppy text-secondary"></i>
+                    <span>Save</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="SearchGuest">
+                    <i class="bi bi-search text-secondary"></i>
+                    <span>Search</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="ScanPassport">
+                    <i class="bi bi-fingerprint text-secondary"></i>
+                    <span>Passport Scanner</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="OpenNote">
+                    <i class="bi bi-sticky text-secondary"></i>
+                    <span>Note</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+
+                <div class="profile-toolbar-code">
+                    <label>Code</label>
+                    <DxTextBox @bind-Text="@guest.Code" ReadOnly="true" CssClass="rt-form-input" />
+                </div>
+            </div>
+
+        </div>
+        <div class="profile-card">
+            <div class="rt-modal-body " style="padding:0px;">
+                <ValidationSummary class="rt-validation-summary" />
+                <div class="profile-body-columns">
+                <div class="profile-main-col">
+                    <fieldset class="rt-form-fieldset">
+                        <legend>Personal Information</legend>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Last Name</label>
+                                <DxTextBox @bind-Text="@guest.LastName" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => guest.LastName)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>First Name</label>
+                                <DxTextBox @bind-Text="@guest.FirstName" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => guest.FirstName)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Middle Name</label>
+                                <DxTextBox @bind-Text="@guest.MiddleName" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Title</label>
+                                <DxComboBox Data="@titles" @bind-Value="@guest.Title" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Gender</label>
+                                <DxComboBox Data="@genders" @bind-Value="@guest.Gender" NullText="-- Select --"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Language</label>
+                                <DxComboBox Data="@languages" @bind-Value="@guest.Language" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                            <div class="rt-form-field rt-form-field-inline">
+                                <DxCheckBox @bind-Checked="@guest.IsActive">Is Active</DxCheckBox>
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Nationality</label>
+                                <DxComboBox Data="@nationalities" @bind-Value="@guest.Nationality"
+                                            NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Date Of Birth</label>
+                                <DxDateEdit @bind-Date="@guest.DateOfBirth" CssClass="rt-form-input" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>ID. Type</label>
+                                <DxComboBox Data="@idTypes" @bind-Value="@guest.IdType" NullText="-- Select --"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Passport Num</label>
+                                <DxTextBox @bind-Text="@guest.PassportNum" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <DxTabs @bind-ActiveTabIndex="searchTabIndex" CssClass="rt-modal-tabs">
+                        <DxTabPage Text="Search" />
+                        <DxTabPage Text="Personal Details" />
+                    </DxTabs>
+
+                    <div class="profile-search-tabs-body">
+                        @if (searchTabIndex == 0)
+                        {
+                            <div class="profile-search-box">
+                                <i class="bi bi-search"></i>
+                                <input type="text" placeholder="Search by name or code..." @bind="searchQuery" @bind:event="oninput" />
+                            </div>
+                            <DxGrid @ref="searchGrid" Data="@FilteredSearchResults" KeyFieldName="Id" CssClass="rt-grid"
+                                    RowClick="@OnSearchRowClick" CustomizeElement="@OnSearchCustomizeElement">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Code" Caption="Code" Width="18%" />
+                                    <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
+                                    <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
+                                    <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
+                                </Columns>
+                            </DxGrid>
+                        }
+                        else
+                        {
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Category</label>
+                                    <DxComboBox Data="@categories" @bind-Value="@guest.Category" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Currency</label>
+                                    <DxComboBox Data="@currencies" @bind-Value="@guest.Currency" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Status</label>
+                                    <DxComboBox Data="@statuses" @bind-Value="@guest.Status" NullText="-- Select --"
+                                                CssClass="rt-form-input" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Religion</label>
+                                    <DxComboBox Data="@religions" @bind-Value="@guest.Religion" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Account</label>
+                                    <DxTextBox @bind-Text="@guest.Account" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Mailing Action</label>
+                                    <DxComboBox Data="@mailingActions" @bind-Value="@guest.MailingAction"
+                                                NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Rate Code</label>
+                                    <DxComboBox Data="@rateCodes" @bind-Value="@guest.RateCode" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="profile-side-col">
+                    <fieldset class="rt-form-fieldset">
+                        <legend>Address</legend>
+                        <div class="profile-address-table">
+                            <div class="profile-address-header">
+                                <div class="col-desc">Description</div>
+                                <div class="col-value">Value</div>
+                            </div>
+                            <div class="profile-address-group" @onclick="ToggleAddressGroup">
+                                <i class="bi @(isAddressGroupExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
+                                <span>Contact</span>
+                            </div>
+                            @if (isAddressGroupExpanded)
+                            {
+                                <div class="profile-address-row @(selectedAddressItem == "Email" ? "selected" : "")"
+                                     @onclick='() => SelectAddressItem("Email")'>
+                                    <div class="col-desc">Email</div>
+                                    <div class="col-value">@guest.Email</div>
+                                </div>
+                                <div class="profile-address-row @(selectedAddressItem == "POBox" ? "selected" : "")"
+                                     @onclick='() => SelectAddressItem("POBox")'>
+                                    <div class="col-desc">POBox</div>
+                                    <div class="col-value">@guest.POBox</div>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+
+                    <div class="profile-address-detail"></div>
+                </div>
+            </div>
+        </div>
+
+            <div class="profile-status-bar">@statusMessage</div>
+        </div>
+    </EditForm>
+</div>
+
+<ConfirmDialog Visible="@isConfirmVisible" Title="@confirmTitle" Message="@confirmMessage" Danger="@confirmDanger"
+               OnConfirm="HandleConfirmYes" OnCancel="HandleConfirmNo" />
+
+<DxPopup @bind-Visible="@isNotePopupVisible" Width="420px" HeaderText="@($"Note - {guest.FirstName} {guest.LastName}".Trim())"
+         ShowFooter="false" CloseOnOutsideClick="false">
+    <BodyContentTemplate>
+        <div class="profile-note-body">
+            <DxMemo @bind-Text="@guest.Note" Rows="6" CssClass="rt-form-input" />
+            <div class="profile-note-buttons">
+                <button class="btn btn-secondary" @onclick="CloseNote">Close</button>
+                <button class="btn btn-danger" @onclick="SaveNote">Save</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    private GuestRow guest = new();
+    private List<GuestRow> searchResults = new();
+    private int? editingId;
+    private string searchQuery = "";
+    private IGrid? searchGrid;
+    private bool isNotePopupVisible;
+    private bool isConfirmVisible;
+    private string confirmTitle = "";
+    private string confirmMessage = "";
+    private bool confirmDanger;
+    private Func<Task>? pendingConfirmAction;
+    private int searchTabIndex = 0;
+    private bool isAddressGroupExpanded = true;
+    private string? selectedAddressItem = "Email";
+    private string? statusMessage = "passport scanner device is not detected!";
+
+    private IEnumerable<GuestRow> FilteredSearchResults =>
+        string.IsNullOrWhiteSpace(searchQuery)
+            ? searchResults
+            : searchResults.Where(g =>
+                (g.Code?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.FirstName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.MiddleName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.LastName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    private List<string> titles = new() { "Mr", "Mrs", "Ms", "Dr", "Prof" };
+    private List<string> genders = new() { "Male", "Female" };
+    private List<string> languages = new() { "English", "Amharic", "French", "Arabic" };
+    private List<string> nationalities = new() { "Ethiopian", "American", "British", "Kenyan", "Other" };
+    private List<string> idTypes = new() { "Passport", "National ID", "Driving License", "Kebele ID" };
+
+    private List<string> categories = new() { "Business", "Leisure", "Group", "Corporate", "Government", "Travel Agent",
+"Walk-In", "Crew", "Complimentary", "VIP" };
+    private List<string> currencies = new() { "ETB", "USD", "EUR", "GBP", "AED", "SAR", "KES", "TZS", "UGX" };
+    private List<string> statuses = new() { "Active", "Inactive" };
+    private List<string> religions = new() { "Christian", "Muslim", "Orthodox", "Hindu", "Buddhist", "Jewish", "Other",
+"None" };
+    private List<string> mailingActions = new() { "Email", "Post", "SMS", "Phone", "Fax", "None" };
+    private List<string> rateCodes = new() { "CORP-001", "GOV-002", "GROUP-003", "VVIP-004", "LEISURE-005", "AGENT-006",
+"RACK-007", "COMP-008" };
+
+    protected override void OnInitialized()
+    {
+        guest = CreateBlankGuest();
+        searchResults = CreateMockSearchResults();
+    }
+
+    private List<GuestRow> CreateMockSearchResults()
+    {
+        return new List<GuestRow>
+        {
+            new() { Id = 1, Code = "PGU-00123-26", FirstName = "Abebe", MiddleName = "Kebede", LastName = "Tesfaye" },
+            new() { Id = 2, Code = "PGU-00124-26", FirstName = "Sara", MiddleName = "Yohannes", LastName = "Girma" },
+            new() { Id = 3, Code = "PGU-00125-26", FirstName = "John", MiddleName = "M.", LastName = "Smith" },
+            new() { Id = 4, Code = "PGU-00126-26", FirstName = "Liya", MiddleName = "Alemu", LastName = "Bekele" },
+            new() { Id = 5, Code = "PGU-00127-26", FirstName = "Daniel", MiddleName = "Tesfaye", LastName = "Worku" },
+        };
+    }
+
+    private GuestRow CreateBlankGuest()
+    {
+        return new GuestRow
+        {
+            Code = GenerateGuestCode(),
+            Gender = "Male",
+            IdType = "Passport",
+            Email = "sayele@abc.com",
+        };
+    }
+
+    private string GenerateGuestCode()
+    {
+        var sequence = new Random().Next(1, 99999);
+        return $"PGU-{sequence:D5}-{DateTime.Now:yy}";
+    }
+
+    private void NewGuest()
+    {
+        guest = CreateBlankGuest();
+        editingId = null;
+        statusMessage = null;
+    }
+
+    private void HandleValidSubmit()
+    {
+        var verb = editingId is null ? "create" : "save changes to";
+        RequestConfirm("Save Guest", $"Are you sure you want to {verb} this guest?", false, SaveGuestConfirmed);
+    }
+
+    private Task SaveGuestConfirmed()
+    {
+        if (editingId is int id)
+        {
+            var target = searchResults.FirstOrDefault(g => g.Id == id);
+            if (target != null)
+                CopyGuest(guest, target);
+        }
+        else
+        {
+            guest.Id = searchResults.Count == 0 ? 1 : searchResults.Max(g => g.Id) + 1;
+            searchResults.Add(CloneGuest(guest));
+            editingId = guest.Id;
+        }
+
+        statusMessage = "Guest saved.";
+        return Task.CompletedTask;
+    }
+
+    private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
+    {
+        confirmTitle = title;
+        confirmMessage = message;
+        confirmDanger = danger;
+        pendingConfirmAction = action;
+        isConfirmVisible = true;
+    }
+
+    private async Task HandleConfirmYes()
+    {
+        isConfirmVisible = false;
+        var action = pendingConfirmAction;
+        pendingConfirmAction = null;
+        if (action != null)
+            await action();
+    }
+
+    private void HandleConfirmNo()
+    {
+        isConfirmVisible = false;
+        pendingConfirmAction = null;
+    }
+
+    private void SearchGuest()
+    {
+        searchTabIndex = 0;
+    }
+
+    private void ScanPassport()
+    {
+        statusMessage = "passport scanner device is not detected!";
+    }
+
+    private void OpenNote()
+    {
+        isNotePopupVisible = true;
+    }
+
+    private void SaveNote()
+    {
+        if (editingId is int id)
+        {
+            var target = searchResults.FirstOrDefault(g => g.Id == id);
+            if (target != null)
+                target.Note = guest.Note;
+        }
+
+        isNotePopupVisible = false;
+        statusMessage = "Note saved.";
+    }
+
+    private void CloseNote()
+    {
+        isNotePopupVisible = false;
+    }
+
+    private void OnSearchRowClick(GridRowClickEventArgs e)
+    {
+        var row = (GuestRow)searchGrid!.GetDataItem(e.VisibleIndex);
+        if (editingId == row.Id)
+        {
+            NewGuest();
+            return;
+        }
+
+        guest = CloneGuest(row);
+        editingId = row.Id;
+        statusMessage = null;
+    }
+
+    private void OnSearchCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow || searchGrid == null)
+            return;
+
+        var row = (GuestRow)searchGrid.GetDataItem(e.VisibleIndex);
+        if (editingId == row.Id)
+            e.CssClass = "rt-row-selected";
+    }
+
+    private static GuestRow CloneGuest(GuestRow source) => new()
+    {
+        Id = source.Id,
+        Code = source.Code,
+        LastName = source.LastName,
+        FirstName = source.FirstName,
+        MiddleName = source.MiddleName,
+        Title = source.Title,
+        Gender = source.Gender,
+        Language = source.Language,
+        IsActive = source.IsActive,
+        Nationality = source.Nationality,
+        DateOfBirth = source.DateOfBirth,
+        IdType = source.IdType,
+        PassportNum = source.PassportNum,
+        Email = source.Email,
+        POBox = source.POBox,
+        Category = source.Category,
+        Currency = source.Currency,
+        Status = source.Status,
+        Religion = source.Religion,
+        Account = source.Account,
+        MailingAction = source.MailingAction,
+        RateCode = source.RateCode,
+        Note = source.Note,
+    };
+
+    private static void CopyGuest(GuestRow source, GuestRow target)
+    {
+        target.Code = source.Code;
+        target.LastName = source.LastName;
+        target.FirstName = source.FirstName;
+        target.MiddleName = source.MiddleName;
+        target.Title = source.Title;
+        target.Gender = source.Gender;
+        target.Language = source.Language;
+        target.IsActive = source.IsActive;
+        target.Nationality = source.Nationality;
+        target.DateOfBirth = source.DateOfBirth;
+        target.IdType = source.IdType;
+        target.PassportNum = source.PassportNum;
+        target.Email = source.Email;
+        target.POBox = source.POBox;
+        target.Category = source.Category;
+        target.Currency = source.Currency;
+        target.Status = source.Status;
+        target.Religion = source.Religion;
+        target.Account = source.Account;
+        target.MailingAction = source.MailingAction;
+        target.RateCode = source.RateCode;
+        target.Note = source.Note;
+    }
+
+    private void ToggleAddressGroup()
+    {
+        isAddressGroupExpanded = !isAddressGroupExpanded;
+    }
+
+    private void SelectAddressItem(string item)
+    {
+        selectedAddressItem = item;
+    }
+
+    private void Close()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}
+<style>
+    .toolbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 70px;
+        padding: 6px 12px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .toolbar-icon {
+        font-size: 1.8rem;
+        color: #5c5c5c;
+        margin-bottom: 4px;
+    }
+
+    .toolbar-item span {
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+    .toolbar-item:hover .toolbar-icon {
+        color: #0d6efd !important;
+    }
+
+    .toolbar-item:hover span {
+        color: #0d6efd;
+    }
+
+    .profile-search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px 10px;
+        margin-bottom: 10px;
+        background-color: #ffffff;
+    }
+
+    .profile-search-box i {
+        color: #6c757d;
+    }
+
+    .profile-search-box input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 0.85rem;
+    }
+
+    .profile-note-body {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .profile-note-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+</style>
