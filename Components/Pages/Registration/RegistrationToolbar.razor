@@ -1,0 +1,359 @@
+@rendermode InteractiveServer
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration
+
+<div class="erp-toolbar">
+    @if (ToolbarContext == ToolbarContextType.CommandPanel)
+    {
+        @* Command Panel Toolbar *@
+        <div class="toolbar-group">
+            @if (OnNew.HasDelegate)
+            {
+                <button class="toolbar-btn" @onclick="OnNew">
+                    <div class="toolbar-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                    <div class="toolbar-text">New</div>
+                </button>
+            }
+            @if (OnSave.HasDelegate)
+            {
+                <button class="toolbar-btn" @onclick="OnSave">
+                    <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                    <div class="toolbar-text">Save</div>
+                </button>
+            }
+        </div>
+
+        @if (StateContent != null)
+        {
+            <div class="toolbar-group state-group">
+                <span class="state-label">State</span>
+                @StateContent
+            </div>
+        }
+
+        <div class="toolbar-group">
+            @if (OnDailyDetail.HasDelegate)
+            {
+                <button class="toolbar-btn" @onclick="OnDailyDetail">
+                    <div class="toolbar-icon"><i class="bi bi-calendar"></i></div>
+                    <div class="toolbar-text">Daily Detail</div>
+                </button>
+            }
+            @if (OnTravelDetail.HasDelegate)
+            {
+                <button class="toolbar-btn" @onclick="OnTravelDetail">
+                    <div class="toolbar-icon"><i class="bi bi-briefcase"></i></div>
+                    <div class="toolbar-text">Travel Detail</div>
+                </button>
+            }
+            @if (OnComments.HasDelegate)
+            {
+                <button class="toolbar-btn" @onclick="OnComments">
+                    <div class="toolbar-icon"><i class="bi bi-chat-square"></i></div>
+                    <div class="toolbar-text">Comments</div>
+                </button>
+            }
+            @if (OnClose.HasDelegate)
+            {
+                <button class="toolbar-btn toolbar-close" @onclick="OnClose">
+                    <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                    <div class="toolbar-text">Close</div>
+                </button>
+            }
+        </div>
+    }
+    else if (ToolbarContext == ToolbarContextType.RoomSearch)
+    {
+        @* Room Search Popup Toolbar *@
+        @if (OnSelect.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-select" @onclick="OnSelect">
+                <div class="toolbar-icon"><i class="bi bi-check-lg"></i></div>
+                <div class="toolbar-text">Select</div>
+            </button>
+        }
+        @if (CustomContent != null)
+        {
+            @CustomContent
+        }
+        @if (OnClose.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-close" style="margin-left: auto;" @onclick="OnClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        }
+    }
+    else if (ToolbarContext == ToolbarContextType.RateSearch)
+    {
+        @* Rate Search Popup Toolbar *@
+        @if (OnSelect.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-select" @onclick="OnSelect">
+                <div class="toolbar-icon"><i class="bi bi-check-lg"></i></div>
+                <div class="toolbar-text">Select</div>
+            </button>
+        }
+        @if (CustomContent != null)
+        {
+            @CustomContent
+        }
+        @if (OnSearch.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnSearch">
+                <div class="toolbar-icon"><i class="bi bi-search"></i></div>
+                <div class="toolbar-text">Search</div>
+            </button>
+        }
+        @if (OnRateInfo.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnRateInfo">
+                <div class="toolbar-icon"><i class="bi bi-percent"></i></div>
+                <div class="toolbar-text">Rate Info</div>
+            </button>
+        }
+        @if (OnClose.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-close" @onclick="OnClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        }
+    }
+    else if (ToolbarContext == ToolbarContextType.TravelDetail)
+    {
+        @* Travel Detail Popup Toolbar *@
+        @if (OnReset.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnReset">
+                <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="toolbar-text">Reset</div>
+            </button>
+        }
+        @if (OnSave.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+        }
+        @if (OnClose.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-close" @onclick="OnClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        }
+    }
+    else if (ToolbarContext == ToolbarContextType.Comments)
+    {
+        @* Comments Popup Toolbar *@
+        @if (OnClear.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnClear">
+                <div class="toolbar-icon"><i class="bi bi-eraser"></i></div>
+                <div class="toolbar-text">Clear</div>
+            </button>
+        }
+        @if (OnSave.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+        }
+        @if (OnClose.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-close" @onclick="OnClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        }
+    }
+    else if (ToolbarContext == ToolbarContextType.Lookup)
+    {
+        @* Lookup Popup Toolbar *@
+        @if (CustomContent != null)
+        {
+            @CustomContent
+        }
+    }
+    else if (ToolbarContext == ToolbarContextType.GuestSearch)
+    {
+        @* Guest Search Popup Toolbar *@
+        @if (CustomContent != null)
+        {
+            @CustomContent
+        }
+    }
+    else
+    {
+        @* Default/Standard Toolbar *@
+        @if (OnRefresh.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnRefresh">
+                <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="toolbar-text">Refresh</div>
+            </button>
+        }
+        @if (OnNew.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnNew">
+                <div class="toolbar-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <div class="toolbar-text">New</div>
+            </button>
+        }
+        @if (OnEdit.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnEdit">
+                <div class="toolbar-icon"><i class="bi bi-pencil-square"></i></div>
+                <div class="toolbar-text">Edit</div>
+            </button>
+        }
+        @if (OnSave.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+        }
+        @if (OnDelete.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnDelete">
+                <div class="toolbar-icon"><i class="bi bi-trash3"></i></div>
+                <div class="toolbar-text">Delete</div>
+            </button>
+        }
+        @if (OnPrint.HasDelegate)
+        {
+            <button class="toolbar-btn toolbar-print" @onclick="OnPrint">
+                <div class="toolbar-icon"><i class="bi bi-printer"></i></div>
+                <div class="toolbar-text">Print</div>
+            </button>
+        }
+        @if (OnClose.HasDelegate)
+        {
+            <button class="toolbar-btn" @onclick="OnClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public ToolbarContextType ToolbarContext { get; set; } = ToolbarContextType.Default;
+    [Parameter] public RenderFragment? StateContent { get; set; }
+    [Parameter] public RenderFragment? CustomContent { get; set; }
+
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnEdit { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnRefresh { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnSelect { get; set; }
+    [Parameter] public EventCallback OnDailyDetail { get; set; }
+    [Parameter] public EventCallback OnTravelDetail { get; set; }
+    [Parameter] public EventCallback OnComments { get; set; }
+    [Parameter] public EventCallback OnReset { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+    [Parameter] public EventCallback OnSearch { get; set; }
+    [Parameter] public EventCallback OnRateInfo { get; set; }
+}
+
+<style>
+    .erp-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 5px 10px;
+        min-height: 74px;
+        background: white;
+        border: 1px solid #d6d6d6;
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+
+    .toolbar-group {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .state-group {
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding: 0 10px;
+        margin: 0 5px;
+    }
+
+    .state-label {
+        font-size: 12px;
+        color: #555;
+        margin-right: 5px;
+    }
+
+    .toolbar-btn {
+        background: transparent !important;
+        border: none !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+        padding: 4px 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 4px;
+        height: 50px;
+    }
+
+    .toolbar-btn:hover {
+        background: #f8f9fa !important;
+        border: none !important;
+    }
+
+    /* Special button styles */
+    .toolbar-btn.toolbar-print,
+    .toolbar-btn.toolbar-select {
+        border-left: 2px solid #d6d6d6 !important;
+        border-right: 2px solid #d6d6d6 !important;
+    }
+
+    .toolbar-btn.toolbar-close {
+        margin-left: auto;
+    }
+
+    .toolbar-icon {
+        font-size: 28px;
+        line-height: 28px;
+        color: #555;
+    }
+
+    .toolbar-icon i {
+        font-size: 28px;
+        transition: color 0.2s ease;
+    }
+
+    .toolbar-btn:hover .toolbar-icon i {
+        color: #0d6efd;
+    }
+
+    .toolbar-text {
+        margin-top: 4px;
+        font-size: 11px;
+        color: #444;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .toolbar-btn:hover .toolbar-text {
+        color: #0d6efd;
+    }
+</style>

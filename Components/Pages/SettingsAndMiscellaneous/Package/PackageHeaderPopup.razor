@@ -2,11 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
 
-<DxPopup @bind-Visible="@Visible"
-         Width="740px"
-         ShowFooter="false"
-         ShowCloseButton="true"
-         CloseOnOutsideClick="false">
+<DxPopup @bind-Visible="@Visible" Width="740px" ShowFooter="false" ShowCloseButton="true" CloseOnOutsideClick="false">
 
     <HeaderTemplate>
         <div class="popup-header">
@@ -18,9 +14,7 @@
     </HeaderTemplate>
 
     <BodyContentTemplate Context="popupContext">
-        <PackageToolbar OnNew="HandleNew"
-                        OnSave="HandleToolbarSave"
-                        OnClose="HandleClose" />
+        <PackageToolbar OnNew="HandleNew" OnSave="HandleToolbarSave" OnClose="HandleClose" />
 
         <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" @ref="editForm">
             <DataAnnotationsValidator />
@@ -59,9 +53,7 @@
 
                         <DxGridLayoutItem Row="0" Column="1" ColumnSpan="4">
                             <Template>
-                                <DxTextBox @bind-Text="@Model.Code"
-                                           ReadOnly="true"
-                                           Width="100%" />
+                                <DxTextBox @bind-Text="@Model.Code" ReadOnly="true" Width="100%" />
                                 <ValidationMessage For="@(() => Model.Code)" />
                             </Template>
                         </DxGridLayoutItem>
@@ -90,20 +82,18 @@
                         <DxGridLayoutItem Row="2" Column="1">
                             <Template>
                                 <div class="lookup-field">
-                                    <DxTextBox @bind-Text="@Model.Article"
-                                               ReadOnly="true"
-                                               Width="100%"
-                                               CssClass="erp-combobox lookup-input"
-                                               Click="@(() => ToggleArticleLookup())" />
-                                    <button type="button" class="lookup-toggle-btn" @onclick="@(() => ToggleArticleLookup())">▾</button>
+                                    <DxTextBox @bind-Text="@Model.Article" ReadOnly="true" Width="100%"
+                                               CssClass="erp-combobox lookup-input" Click="@(() => ToggleArticleLookup())" />
+                                    <button type="button" class="lookup-toggle-btn"
+                                            @onclick="@(() => ToggleArticleLookup())">▾</button>
 
                                     @if (isArticleLookupOpen)
                                     {
                                         <div class="article-lookup-panel">
-                                            <button type="button" class="lookup-close-btn" @onclick="@(() => isArticleLookupOpen = false)">×</button>
+                                            <button type="button" class="lookup-close-btn"
+                                                    @onclick="@(() => isArticleLookupOpen = false)">×</button>
                                             <div class="lookup-search-row">
-                                                <DxTextBox @bind-Text="@articleSearchText"
-                                                           Width="100%"
+                                                <DxTextBox @bind-Text="@articleSearchText" Width="100%"
                                                            CssClass="lookup-search-input" />
                                                 <button type="button" class="lookup-find-btn">Find</button>
                                             </div>
@@ -129,7 +119,8 @@
                                                 </table>
                                             </div>
                                             <div class="lookup-footer">
-                                                <button type="button" class="lookup-clear-btn" @onclick="ClearArticleSelection">Clear</button>
+                                                <button type="button" class="lookup-clear-btn"
+                                                        @onclick="ClearArticleSelection">Clear</button>
                                             </div>
                                         </div>
                                     }
@@ -147,12 +138,8 @@
 
                         <DxGridLayoutItem Row="2" Column="4">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@currencyItems"
-                                            @bind-Value="@Model.Currency"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@currencyItems"
+                                            @bind-Value="@Model.Currency" Width="100%" CssClass="erp-combobox" />
                                 <ValidationMessage For="@(() => Model.Currency)" />
                             </Template>
                         </DxGridLayoutItem>
@@ -166,12 +153,8 @@
 
                         <DxGridLayoutItem Row="3" Column="1">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@groupItems"
-                                            @bind-Value="@Model.Group"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@groupItems" @bind-Value="@Model.Group"
+                                            Width="100%" CssClass="erp-combobox" />
                                 <ValidationMessage For="@(() => Model.Group)" />
                             </Template>
                         </DxGridLayoutItem>
@@ -185,12 +168,8 @@
 
                         <DxGridLayoutItem Row="3" Column="4">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@typeItems"
-                                            @bind-Value="@Model.Type"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@typeItems" @bind-Value="@Model.Type"
+                                            Width="100%" CssClass="erp-combobox" />
                                 <ValidationMessage For="@(() => Model.Type)" />
                             </Template>
                         </DxGridLayoutItem>
@@ -204,12 +183,8 @@
 
                         <DxGridLayoutItem Row="4" Column="1">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@rateAppearanceItems"
-                                            @bind-Value="@Model.RateAppearance"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@rateAppearanceItems"
+                                            @bind-Value="@Model.RateAppearance" Width="100%" CssClass="erp-combobox" />
                             </Template>
                         </DxGridLayoutItem>
 
@@ -237,12 +212,8 @@
 
                         <DxGridLayoutItem Row="5" Column="1" ColumnSpan="4">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@postingRhythmItems"
-                                            @bind-Value="@Model.PostingRhythm"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@postingRhythmItems"
+                                            @bind-Value="@Model.PostingRhythm" Width="100%" CssClass="erp-combobox" />
                                 <ValidationMessage For="@(() => Model.PostingRhythm)" />
                             </Template>
                         </DxGridLayoutItem>
@@ -256,12 +227,8 @@
 
                         <DxGridLayoutItem Row="6" Column="1">
                             <Template>
-                                <DxComboBox TData="string"
-                                            TValue="string"
-                                            Data="@calculateRuleItems"
-                                            @bind-Value="@Model.CalculateRule"
-                                            Width="100%"
-                                            CssClass="erp-combobox" />
+                                <DxComboBox TData="string" TValue="string" Data="@calculateRuleItems"
+                                            @bind-Value="@Model.CalculateRule" Width="100%" CssClass="erp-combobox" />
                             </Template>
                         </DxGridLayoutItem>
 

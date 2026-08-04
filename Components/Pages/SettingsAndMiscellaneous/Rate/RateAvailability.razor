@@ -1,0 +1,409 @@
+@using DevExpress.Blazor
+@rendermode InteractiveServer
+
+<div class="ra-page">
+    <div class="ra-content">
+        <!-- Left Pane: Rate Tree (expand/collapse) -->
+        <div class="ra-left-pane">
+            <div class="ra-pane-header">Rate Codes</div>
+            <div class="ra-tree">
+                @foreach (var node in TreeNodes)
+                {
+                    <div class="ra-tree-parent">
+                        <div class="ra-tree-row @(SelectedNodeId == node.Id ? "ra-tree-selected" : "")"
+                             @onclick="() => OnTreeNodeClick(node)">
+                            <span class="ra-tree-toggle" @onclick="() => ToggleNode(node)" @onclick:stopPropagation="true">
+                                @(node.IsExpanded ? "\u25be" : "\u25b8")
+                            </span>
+                            <span class="ra-tree-label">@node.Name</span>
+                        </div>
+                        @if (node.IsExpanded)
+                        {
+                            @foreach (var child in node.Children)
+                            {
+                                <div class="ra-tree-row ra-tree-child @(SelectedNodeId == child.Id ? "ra-tree-selected" : "")"
+                                     @onclick="() => OnTreeNodeClick(child)">
+                                    <span class="ra-tree-label">@child.Name</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right Pane: Year Availability Matrix -->
+        <div class="ra-right-pane">
+            <div class="ra-pane-header">
+                <span>Availability Calendar</span>
+                @if (SelectedNodeName != null)
+                {
+                    <span class="ra-selected-rate">@SelectedNodeName</span>
+                }
+            </div>
+
+            <div class="ra-availability-table-wrapper">
+                <table class="ra-availability-table">
+                    <thead>
+                        <tr>
+                            <th class="ra-name-col">Name</th>
+                            @for (int d = 1; d <= 31; d++)
+                            {
+                                <th>@d</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var monthRow in MonthRows)
+                        {
+                            <tr class="@(SelectedMonth == monthRow.MonthNumber ? "ra-row-selected" : "")">
+                                <td class="ra-name-col" @onclick="() => OnMonthRowClick(monthRow.MonthNumber)">@monthRow.MonthName</td>
+                                @{
+                                    var daysInMonth = DateTime.DaysInMonth(CurrentYear, monthRow.MonthNumber);
+                                }
+                                @for (int d = 1; d <= 31; d++)
+                                {
+                                    var dayNumber = d;
+                                    if (dayNumber > daysInMonth)
+                                    {
+                                        <td class="ra-day-cell ra-day-invalid"></td>
+                                    }
+                                    else
+                                    {
+                                        var state = GetAvailability(monthRow.MonthNumber, dayNumber);
+                                        <td class="ra-day-cell @(state == 0 ? "ra-day-available" : "ra-day-unavailable")"
+                                            @onclick="() => ToggleAvailability(monthRow.MonthNumber, dayNumber)">
+                                            @(state == 0 ? "O" : "")
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ra-legend">
+                <div class="ra-legend-item">
+                    <div class="ra-legend-box ra-day-available"></div>
+                    <span>Available (O)</span>
+                </div>
+                <div class="ra-legend-item">
+                    <div class="ra-legend-box ra-day-unavailable"></div>
+                    <span>Unavailable</span>
+                </div>
+                <div class="ra-legend-item">
+                    <div class="ra-legend-box ra-day-invalid"></div>
+                    <span>N/A</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ra-page {
+        font-family: Segoe UI, Arial, sans-serif;
+        background: #fff;
+        padding: 10px;
+        height: calc(100vh - 20px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ra-content {
+        display: flex;
+        flex: 1;
+        gap: 15px;
+        overflow: hidden;
+    }
+
+    .ra-left-pane {
+        flex: 0 0 260px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d7d7d7;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .ra-right-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d7d7d7;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .ra-pane-header {
+        background: #f5f5f5;
+        padding: 10px;
+        font-weight: 600;
+        border-bottom: 1px solid #d7d7d7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ra-selected-rate {
+        font-size: 12px;
+        color: #666;
+        font-weight: normal;
+    }
+
+    /* ---------------- Tree (left pane) ---------------- */
+    .ra-tree {
+        flex: 1;
+        overflow: auto;
+        padding: 4px 0;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .ra-tree-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        cursor: pointer;
+        white-space: nowrap;
+        user-select: none;
+    }
+
+    .ra-tree-row:hover {
+        background: #f2f6fb;
+    }
+
+    .ra-tree-row.ra-tree-selected {
+        background: #0078d4 !important;
+        color: #fff !important;
+    }
+
+    .ra-tree-child {
+        padding-left: 34px;
+        color: #333;
+    }
+
+    .ra-tree-toggle {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 14px;
+        font-size: 11px;
+        color: #666;
+        cursor: pointer;
+    }
+
+    .ra-tree-selected .ra-tree-toggle {
+        color: #fff;
+    }
+
+    .ra-tree-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ---------------- Year availability table (right pane) ---------------- */
+    .ra-availability-table-wrapper {
+        flex: 1;
+        overflow: auto;
+        padding: 10px;
+    }
+
+    .ra-availability-table {
+        border-collapse: collapse;
+        font-size: 12px;
+        width: max-content;
+    }
+
+    .ra-availability-table th,
+    .ra-availability-table td {
+        border: 1px solid #d7d7d7;
+        text-align: center;
+        padding: 0;
+    }
+
+    .ra-availability-table th {
+        background: #eef1f4;
+        font-weight: 600;
+        padding: 6px 4px;
+        min-width: 26px;
+    }
+
+    .ra-name-col {
+        min-width: 110px;
+        text-align: left !important;
+        padding: 6px 8px !important;
+        font-weight: 600;
+        background: #f9f9f9;
+        cursor: pointer;
+        position: sticky;
+        left: 0;
+    }
+
+    .ra-day-cell {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #0078d4;
+    }
+
+    .ra-day-cell.ra-day-available {
+        background: #dbeaff;
+    }
+
+    .ra-day-cell.ra-day-unavailable {
+        background: #ffe1e1;
+        color: #d13438;
+    }
+
+    .ra-day-cell.ra-day-invalid {
+        background: #000;
+        cursor: default;
+    }
+
+    tr.ra-row-selected .ra-name-col {
+        background: #0078d4 !important;
+        color: #fff !important;
+    }
+
+    tr.ra-row-selected .ra-day-cell.ra-day-available {
+        background: #4a9cf6;
+        color: #fff;
+    }
+
+    .ra-legend {
+        display: flex;
+        gap: 20px;
+        padding: 10px;
+        background: #f9f9f9;
+        border-top: 1px solid #d7d7d7;
+    }
+
+    .ra-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .ra-legend-box {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #d7d7d7;
+        border-radius: 2px;
+    }
+</style>
+
+@code {
+    // ---------- Delete Confirmation Callback ----------
+    [Parameter]
+    public Action<string, Action>? OnDeleteRequest { get; set; }
+
+    // ---------------- Left pane: rate tree ----------------
+    private class RateTreeNode
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<RateTreeNode> Children { get; set; } = new();
+        public bool IsExpanded { get; set; } = true;
+    }
+
+    private List<RateTreeNode> TreeNodes = new()
+    {
+        new RateTreeNode { Id = 1, Name = "Standard Rate", Children = new() { new RateTreeNode { Id = 2, Name = "Standard Rate" } } },
+        new RateTreeNode { Id = 3, Name = "Special Rate", Children = new() { new RateTreeNode { Id = 4, Name = "Special Rate" } } },
+        new RateTreeNode { Id = 5, Name = "Posting Date Rate", Children = new() { new RateTreeNode { Id = 6, Name = "Posting Date Rate" } } },
+        new RateTreeNode { Id = 7, Name = "Arrival Date Rate", Children = new() { new RateTreeNode { Id = 8, Name = "Arrival Date Rate" } } },
+    };
+
+    private int? SelectedNodeId = null;
+    private string? SelectedNodeName = null;
+
+    private void OnTreeNodeClick(RateTreeNode node)
+    {
+        SelectedNodeId = node.Id;
+        SelectedNodeName = node.Name;
+    }
+
+    private void ToggleNode(RateTreeNode node)
+    {
+        node.IsExpanded = !node.IsExpanded;
+    }
+
+    // ---------------- Right pane: year availability matrix ----------------
+    private class MonthRowItem
+    {
+        public int MonthNumber { get; set; }
+        public string MonthName { get; set; } = string.Empty;
+    }
+
+    private int CurrentYear = DateTime.Today.Year;
+
+    private List<MonthRowItem> MonthRows => Enumerable.Range(1, 12)
+        .Select(m => new MonthRowItem
+        {
+            MonthNumber = m,
+            MonthName = new DateTime(CurrentYear, m, 1).ToString("MMMM")
+        })
+        .ToList();
+
+    // Key: (month, day) -> 0 = available, -1 = unavailable
+    private Dictionary<(int Month, int Day), int> AvailabilityData = new();
+
+    private int SelectedMonth = 0;
+
+    private int GetAvailability(int month, int day)
+    {
+        return AvailabilityData.TryGetValue((month, day), out var v) ? v : 0;
+    }
+
+    private void ToggleAvailability(int month, int day)
+    {
+        var current = GetAvailability(month, day);
+        AvailabilityData[(month, day)] = current == 0 ? -1 : 0;
+    }
+
+    private void OnMonthRowClick(int monthNumber)
+    {
+        SelectedMonth = monthNumber;
+    }
+
+    // ---------- Public methods for toolbar delegation ----------
+    public void New()
+    {
+        OnClearClick();
+    }
+
+    public void Save()
+    {
+        OnSaveClick();
+    }
+
+    public void Delete()
+    {
+        OnDeleteRequest?.Invoke("Are you sure you want to clear the availability data?", () =>
+        {
+            AvailabilityData.Clear();
+        });
+    }
+
+    // ---------------- Toolbar actions ----------------
+    private void OnRefreshClick()
+    {
+        // Reload availability data from service/database
+    }
+
+    private void OnSaveClick()
+    {
+        // Persist AvailabilityData for the selected rate node
+    }
+
+    private void OnClearClick()
+    {
+        AvailabilityData.Clear();
+    }
+}

@@ -1,0 +1,710 @@
+
+@using DevExpress.Blazor
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+
+<div class="rh-page">
+    <div class="rh-content">
+        <!-- Left Section: Basic Information -->
+        <div class="rh-section rh-left-section">
+            <div class="rh-form-row">
+                <label>Rate Name</label>
+                <div class="rh-input-group">
+                    <DxTextBox @bind-Text="@EditModel.RateName" CssClass="rh-input" />
+                    <DxButton Text="R" Click="OnRateNameClick" CssClass="rh-small-btn" />
+                </div>
+            </div>
+
+            <div class="rh-form-row">
+                <label>Folio Text</label>
+                <DxTextBox @bind-Text="@EditModel.FolioText" CssClass="rh-input" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Rate Category</label>
+                <DxComboBox Data="@RateCategoryOptions"
+                            @bind-Value="@EditModel.RateCategory"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
+            </div>
+
+            <div class="rh-form-row-split">
+                <div class="rh-form-col">
+                    <label>Start Date</label>
+                    <DxDateEdit @bind-Date="@EditModel.StartDate" CssClass="rh-input" />
+                </div>
+                <div class="rh-form-col">
+                    <label>End Date</label>
+                    <DxDateEdit @bind-Date="@EditModel.EndDate" CssClass="rh-input" />
+                </div>
+            </div>
+
+            <div class="rh-form-row">
+                <label>Article</label>
+                <div class="rh-input-group">
+                    <DxTextBox @bind-Text="@EditModel.Article" ReadOnly="true" CssClass="rh-input" />
+                    <DxButton Text="..." Click="OnArticleLookupClick" CssClass="rh-small-btn" />
+                </div>
+            </div>
+
+            <div class="rh-form-row">
+                <label>Currency</label>
+                <DxComboBox Data="@CurrencyOptions"
+                            @bind-Value="@EditModel.Currency"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Exchange</label>
+                <DxComboBox Data="@ExchangeOptions"
+                            @bind-Value="@EditModel.Exchange"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Market</label>
+                <DxComboBox Data="@MarketOptions"
+                            @bind-Value="@EditModel.Market"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Source</label>
+                <DxComboBox Data="@SourceOptions"
+                            @bind-Value="@EditModel.Source"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
+            </div>
+        </div>
+
+        <!-- Middle Section: Numeric Fields -->
+        <div class="rh-section rh-middle-section">
+            <div class="rh-form-row">
+                <label>Commission</label>
+                <DxSpinEdit @bind-Value="@EditModel.Commission" CssClass="rh-input" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Addition</label>
+                <DxSpinEdit @bind-Value="@EditModel.Addition" CssClass="rh-input" />
+            </div>
+
+            <div class="rh-form-row-split">
+                <div class="rh-form-col">
+                    <label>Max. Occupancy</label>
+                    <DxSpinEdit @bind-Value="@EditModel.MaxOccupancy" CssClass="rh-input" Min="1" />
+                </div>
+                <div class="rh-form-col">
+                    <label>Min. Occupancy</label>
+                    <DxSpinEdit @bind-Value="@EditModel.MinOccupancy" CssClass="rh-input" Min="1" />
+                </div>
+            </div>
+
+            <div class="rh-form-row">
+                <label>Multiplication</label>
+                <DxSpinEdit @bind-Value="@EditModel.Multiplication" CssClass="rh-input" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Remark</label>
+                <DxMemo @bind-Text="@EditModel.Remark" Rows="4" CssClass="rh-input rh-memo" />
+            </div>
+        </div>
+
+        <!-- Right Section: Components -->
+        <div class="rh-section rh-right-section">
+            <div class="rh-components-box">
+                <div class="rh-components-title">Components</div>
+                <div class="rh-components-list">
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.PackageComponent" Enabled="false" />
+                        <span>Package</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.Negotiated" />
+                        <span>Negotiated</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.DayType" />
+                        <span>Day Type</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.SuppressRate" />
+                        <span>Suppress Rate</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.PrintRate" />
+                        <span>Print Rate</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.Discount" />
+                        <span>Discount</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.Tiered" />
+                        <span>Tiered</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.DayUse" />
+                        <span>Day Use</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.Membership" />
+                        <span>Membership</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.Complimentary" />
+                        <span>Complimentary</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.HouseUse" />
+                        <span>House Use</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.OwnerRate" />
+                        <span>Owner Rate</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.ChannelAllowed" />
+                        <span>Channel Allowed</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.BAR" />
+                        <span>BAR</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.CateringPackage" />
+                        <span>Catering Package</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.DailyRates" />
+                        <span>Daily Rates</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.BenefitRateCode" />
+                        <span>Benefit Rate Code</span>
+                    </div>
+                    <div class="rh-checkbox-item">
+                        <DxCheckBox @bind-Checked="@EditModel.RegionalAvailability" />
+                        <span>Regional Availability</span>
+                    </div>
+                </div>
+
+                <!-- <div class="rh-weekend-section">
+                    <div class="rh-section-title">Weekend Days</div>
+                    <div class="rh-weekend-row">
+                        @foreach (var day in WeekDays)
+                        {
+                            <div class="rh-weekend-checkbox">
+                                <DxCheckBox @bind-Checked="@day.Selected" />
+                                <span>@day.Name</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="rh-weekend-section">
+                    <div class="rh-section-title">Closed to Arrival</div>
+                    <div class="rh-weekend-row">
+                        @foreach (var day in ClosedToArrivalDays)
+                        {
+                            <div class="rh-weekend-checkbox">
+                                <DxCheckBox @bind-Checked="@day.Selected" />
+                                <span>@day.Name</span>
+                            </div>
+                        }
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Room Type and Package Tabs -->
+    <div class="rh-bottom-section">
+        <DxTabs @bind-ActiveTabIndex="@ActiveBottomTabIndex" CssClass="rh-bottom-tabs">
+           <DxTabPage Text="Package">
+                <div class="rh-grid-container">
+                    <DxGrid Data="@Packages"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            CssClass="rh-grid"
+                            ShowAlternatingRows="true">
+                        <Columns>
+                            <DxGridSelectionColumn />
+                            <DxGridDataColumn FieldName="Name" Caption="Package" />
+                            <DxGridDataColumn FieldName="IsIncluded" Caption="Is Included" />
+                            <DxGridDataColumn FieldName="Quantity" Caption="Quantity" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+            </DxTabPage>
+            <DxTabPage Text="Room Type">
+                <div class="rh-grid-container">
+                    <DxGrid Data="@RoomTypes"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            CssClass="rh-grid"
+                            ShowAlternatingRows="true">
+                        <Columns>
+                            <DxGridSelectionColumn />
+                            <DxGridDataColumn FieldName="Name" Caption="Room Type" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+            </DxTabPage>
+         
+        </DxTabs>
+    </div>
+</div>
+
+@* ===================== ARTICLE LOOKUP POPUP ===================== *@
+<DxPopup @bind-Visible="@IsArticleLookupVisible"
+         HeaderText="Article Lookup"
+         Width="420px"
+         CssClass="rh-lookup-popup"
+         PopupCssClass="rh-lookup-popup-content"
+         ShowFooter="false"
+         AllowResize="true"
+         ShowCloseButton="true">
+    <BodyContentTemplate>
+        <div class="rh-lookup-search-row">
+            <DxTextBox @bind-Text="@ArticleSearchText" CssClass="rh-lookup-search-input" />
+            <DxButton Text="Find" Click="OnArticleFindClick" CssClass="rh-lookup-find-btn" />
+        </div>
+
+        <DxGrid Data="@FilteredArticleOptions"
+                CssClass="rh-lookup-grid"
+                ShowAlternatingRows="true"
+                RowClick="OnArticleRowClick">
+            <Columns>
+                <DxGridDataColumn FieldName="Code" Caption="code" Width="40%" />
+                <DxGridDataColumn FieldName="Name" Caption="name" Width="60%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rh-lookup-footer">
+            <DxButton Text="Clear" Click="OnArticleClearClick" CssClass="rh-lookup-clear-btn" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .rh-page {
+        font-family: Segoe UI, Arial, sans-serif;
+        background: #fff;
+        padding: 10px;
+    }
+
+    .rh-content {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .rh-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .rh-left-section {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .rh-middle-section {
+        flex: 0.8;
+        min-width: 200px;
+    }
+
+    .rh-right-section {
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .rh-form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .rh-form-row label {
+        font-size: 12px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .rh-form-row-split {
+        display: flex;
+        gap: 10px;
+    }
+
+    .rh-form-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .rh-input {
+        width: 100%;
+    }
+
+    .rh-input-group {
+        display: flex;
+        gap: 4px;
+    }
+
+    .rh-input-group .rh-input {
+        flex: 1;
+    }
+
+    .rh-small-btn {
+        min-width: 30px;
+        padding: 0 8px;
+    }
+
+    .rh-memo {
+        min-height: 80px;
+    }
+
+    .rh-components-box {
+        border: 1px solid #d7d7d7;
+        border-radius: 4px;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+    .rh-components-title {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .rh-components-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .rh-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .rh-weekend-section {
+        margin-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 10px;
+    }
+
+    .rh-section-title {
+        font-weight: 600;
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: #333;
+    }
+
+    .rh-weekend-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .rh-weekend-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+    }
+
+    .rh-bottom-section {
+        border-top: 1px solid #d7d7d7;
+        padding-top: 10px;
+    }
+
+    .rh-bottom-tabs {
+        margin-bottom: 10px;
+    }
+
+    .rh-grid-container {
+        border: 1px solid #d7d7d7;
+        border-radius: 4px;
+    }
+
+    .rh-grid {
+        width: 100%;
+    }
+
+    /* Alternating row stripes.
+       DxGrid normally paints alternating rows via its own theme variable,
+       but that variable isn't always populated by the default theme in
+       this project, so the "ShowAlternatingRows" flag alone renders no
+       visible stripe. Forcing the cell-background variable on every
+       even data row guarantees the stripe shows regardless of theme. */
+    .rh-grid .dxbl-grid-data-row:nth-of-type(even),
+    .rh-lookup-grid .dxbl-grid-data-row:nth-of-type(even) {
+        --dxbl-grid-cell-back: #f5f7fa;
+        background-color: #f5f7fa;
+    }
+
+    /* ---- Article lookup popup ---- */
+    .rh-lookup-search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .rh-lookup-search-input {
+        flex: 1;
+    }
+
+    .rh-lookup-grid {
+        width: 100%;
+        max-height: 260px;
+        overflow-y: auto;
+    }
+
+    .rh-lookup-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+    }
+</style>
+
+@code {
+    private int ActiveBottomTabIndex = 0;
+    private bool IsEditMode = false;
+
+    // ---------- Public methods for toolbar delegation ----------
+    public void New()
+    {
+        IsEditMode = false;
+        EditModel = new RateHeaderEditModel();
+    }
+
+    public void Edit()
+    {
+        IsEditMode = true;
+        // Load selected item into EditModel
+    }
+
+    public void Delete()
+    {
+        OnDeleteRequest?.Invoke("Are you sure you want to delete this rate header?", () =>
+        {
+            // Delete selected item
+        });
+    }
+
+    public void Save()
+    {
+        // Save changes
+    }
+
+    // Edit Model
+    private RateHeaderEditModel EditModel = new();
+
+    // Options
+    private readonly List<string> RateCategoryOptions = new() { "Standard Rate", "Special Rate", "Group Room Rate" };
+    private readonly List<string> CurrencyOptions = new() { "Birr", "USD", "EUR", "GBP" };
+    private readonly List<string> ExchangeOptions = new() { "Arrival Day Rate", "Reservation Day Rate", "Posting Date Rate" };
+    private readonly List<string> MarketOptions = new() { "Corporate Business", "Leisure", "Group" };
+    private readonly List<string> SourceOptions = new() { "Company Direct", "Travel Agent", "Online" };
+
+    // ---------- Article Lookup (searchable code/name popup) ----------
+    private bool IsArticleLookupVisible = false;
+    private string ArticleSearchText = string.Empty;
+
+    // ---------- Delete Confirmation Callback ----------
+    [Parameter]
+    public Action<string, Action>? OnDeleteRequest { get; set; }
+
+    private readonly List<ArticleLookupItem> ArticleLookupOptions = new()
+    {
+        new ArticleLookupItem { Code = "SE-00001", Name = "ACCOMMODATION" },
+        new ArticleLookupItem { Code = "SE-00002", Name = "SERVICE CHARGE" },
+        new ArticleLookupItem { Code = "SE-00005", Name = "ROOM CHARGE" },
+    };
+
+    private List<ArticleLookupItem> FilteredArticleOptions =>
+        string.IsNullOrWhiteSpace(ArticleSearchText)
+            ? ArticleLookupOptions
+            : ArticleLookupOptions
+                .Where(a => a.Code.Contains(ArticleSearchText, StringComparison.OrdinalIgnoreCase)
+                         || a.Name.Contains(ArticleSearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+    private void OnArticleLookupClick()
+    {
+        ArticleSearchText = string.Empty;
+        IsArticleLookupVisible = true;
+    }
+
+    private void OnArticleFindClick()
+    {
+        // FilteredArticleOptions recomputes automatically from ArticleSearchText.
+    }
+
+    private void OnArticleRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as ArticleLookupItem;
+        if (item != null)
+        {
+            EditModel.Article = $"{item.Code} - {item.Name}";
+            IsArticleLookupVisible = false;
+        }
+    }
+
+    private void OnArticleClearClick()
+    {
+        EditModel.Article = string.Empty;
+        IsArticleLookupVisible = false;
+    }
+
+    // Weekend Days
+    private List<DaySelection> WeekDays = new()
+    {
+        new DaySelection { Name = "Sunday", Selected = false },
+        new DaySelection { Name = "Monday", Selected = false },
+        new DaySelection { Name = "Tuesday", Selected = false },
+        new DaySelection { Name = "Wednesday", Selected = false },
+        new DaySelection { Name = "Thursday", Selected = false },
+        new DaySelection { Name = "Friday", Selected = false },
+        new DaySelection { Name = "Saturday", Selected = false }
+    };
+
+    // Closed to Arrival Days
+    private List<DaySelection> ClosedToArrivalDays = new()
+    {
+        new DaySelection { Name = "Sunday", Selected = false },
+        new DaySelection { Name = "Monday", Selected = false },
+        new DaySelection { Name = "Tuesday", Selected = false },
+        new DaySelection { Name = "Wednesday", Selected = false },
+        new DaySelection { Name = "Thursday", Selected = false },
+        new DaySelection { Name = "Friday", Selected = false },
+        new DaySelection { Name = "Saturday", Selected = false }
+    };
+
+    // Room Types
+    private List<RoomTypeItem> RoomTypes = new()
+    {
+        new RoomTypeItem { Id = 1, Name = "Standard Room" },
+        new RoomTypeItem { Id = 2, Name = "Executive" },
+        new RoomTypeItem { Id = 3, Name = "Pseudo Rooms" }
+    };
+
+    // Packages
+    private List<PackageItem> Packages = new()
+    {
+        new PackageItem { Id = 1, Name = "Lunch", IsIncluded = true, Quantity = 0 },
+        new PackageItem { Id = 2, Name = "Suit Lunch", IsIncluded = true, Quantity = 0 }
+    };
+
+    // Event Handlers
+    private void OnNewClick()
+    {
+        EditModel = new RateHeaderEditModel();
+        IsEditMode = false;
+    }
+
+    private void OnEditClick()
+    {
+        IsEditMode = true;
+    }
+
+    private void OnSaveClick()
+    {
+        // Save logic here
+    }
+
+    private void OnDeleteClick()
+    {
+        // Delete logic here
+    }
+
+    private void OnRefreshClick()
+    {
+        // Refresh logic here
+    }
+
+    private void OnRateNameClick()
+    {
+        // Rate name button logic
+    }
+
+    // Models
+    public class RateHeaderEditModel
+    {
+        public string RateName { get; set; } = string.Empty;
+        public string FolioText { get; set; } = string.Empty;
+        public string RateCategory { get; set; } = string.Empty;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Article { get; set; } = string.Empty;
+        public string Currency { get; set; } = string.Empty;
+        public string Exchange { get; set; } = string.Empty;
+        public string Market { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty;
+        public decimal Commission { get; set; }
+        public decimal Addition { get; set; }
+        public int MaxOccupancy { get; set; } = 1;
+        public int MinOccupancy { get; set; } = 1;
+        public decimal Multiplication { get; set; }
+        public string Remark { get; set; } = string.Empty;
+
+        // Components
+        public bool PackageComponent { get; set; }
+        public bool Negotiated { get; set; }
+        public bool DayType { get; set; }
+        public bool SuppressRate { get; set; }
+        public bool PrintRate { get; set; }
+        public bool Discount { get; set; }
+        public bool Tiered { get; set; }
+        public bool DayUse { get; set; }
+        public bool Membership { get; set; }
+        public bool Complimentary { get; set; }
+        public bool HouseUse { get; set; }
+        public bool OwnerRate { get; set; }
+        public bool ChannelAllowed { get; set; }
+        public bool BAR { get; set; }
+        public bool CateringPackage { get; set; }
+        public bool DailyRates { get; set; }
+        public bool BenefitRateCode { get; set; }
+        public bool RegionalAvailability { get; set; }
+    }
+
+    public class DaySelection
+    {
+        public string Name { get; set; } = string.Empty;
+        public bool Selected { get; set; }
+    }
+
+    public class RoomTypeItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class PackageItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public bool IsIncluded { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class ArticleLookupItem
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}
