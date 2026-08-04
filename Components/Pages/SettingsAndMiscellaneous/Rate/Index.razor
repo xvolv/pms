@@ -171,7 +171,7 @@
 </DxPopup>
 
 @* ===================== CONFIRMATION DIALOG ===================== *@
-<ConfirmDialog @ref="confirmDialog"
+<DxConfirmDialog @ref="confirmDialog"
                Visible="@showConfirmDialog"
                Title="Confirm Delete"
                Message="@confirmMessage"
@@ -474,7 +474,7 @@ EndDate = new DateTime(2018,4,7), Type = "Rate Class", Remark = "", RatePolicy =
 
     // ---------- Confirmation Dialog ----------
     private bool showConfirmDialog = false;
-    private ConfirmDialog? confirmDialog;
+    private DxConfirmDialog? confirmDialog;
     private string confirmMessage = "Are you sure you want to delete this item?";
     private Action? pendingDeleteAction;
 
