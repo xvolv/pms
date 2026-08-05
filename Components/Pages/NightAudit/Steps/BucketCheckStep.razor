@@ -1,17 +1,17 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@(BucketChecks.Count == 0)" @onclick="PrintReport">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print Report</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Bucket Check</h2>
         <p>Compares the information on each guest's Registration Card against what is currently in the system
             (room, departure date, occupancy and rate). Print the report if needed, then click Next to save it and continue.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" disabled="@(BucketChecks.Count == 0)" @onclick="PrintReport">
-            <i class="bi bi-printer text-secondary"></i>
-            <span>Print Report</span>
-        </button>
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">

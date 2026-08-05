@@ -1,18 +1,18 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Dialogs
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@(Posts.Count == 0 || Posted)" @onclick="() => isAuthVisible = true">
+        <i class="bi bi-send-check text-secondary"></i>
+        <span>Post</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Room and Tax Post</h2>
         <p>Posts room charges and tax for every in-house registration. Expand a row with the + icon to see any
             package charges that will be posted along with it.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" disabled="@(Posts.Count == 0 || Posted)" @onclick="() => isAuthVisible = true">
-            <i class="bi bi-send-check text-secondary"></i>
-            <span>Post</span>
-        </button>
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">

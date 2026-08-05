@@ -1,28 +1,28 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="ClearSelected">
+        <i class="bi bi-check2-circle text-secondary"></i>
+        <span>Clear</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" disabled="@(HeldBills.Count == 0)" @onclick="ClearAll">
+        <i class="bi bi-check2-all text-secondary"></i>
+        <span>Clear All</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Clear Held Bills</h2>
         <p>Bills that were placed on hold and are still attached to a registration. Review and clear each one
             before continuing.</p>
     </div>
 
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="ClearSelected">
-            <i class="bi bi-check2-circle text-secondary"></i>
-            <span>Clear</span>
-        </button>
-        <button type="button" class="rt-toolbar-btn" disabled="@(HeldBills.Count == 0)" @onclick="ClearAll">
-            <i class="bi bi-check2-all text-secondary"></i>
-            <span>Clear All</span>
-        </button>
-    </div>
-
     <div class="rt-grid-area" @onclick:stopPropagation="true">
         @if (HeldBills.Count == 0)
         {
             <div class="rt-placeholder">
-                <i class="bi bi-check-circle-fill" style="color:#198754; font-size:1.4rem;"></i>
+                <i class="bi bi-check-circle-fill" style="color:gray; font-size:1.4rem;"></i>
                 <div style="margin-top:6px;">There are no held bills for this business date.</div>
             </div>
         }

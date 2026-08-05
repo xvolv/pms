@@ -118,11 +118,32 @@ public class ReportArchiveRow
 
 public class FolioChargeRow
 {
+    public int Sn { get; set; }
     public DateTime Date { get; set; }
     public string Description { get; set; } = "";
     public string Reference { get; set; } = "";
+    public string RoomNo { get; set; } = "";
+    public string RoomType { get; set; } = "";
+    public string RoomRate { get; set; } = "";
+    public int Adults { get; set; }
+    public int Children { get; set; }
+    public string Remark { get; set; } = "";
     public decimal Charge { get; set; }
     public decimal Payment { get; set; }
+}
+
+public class FolioExtraBillRow
+{
+    public int Sn { get; set; }
+    public string RoomNo { get; set; } = "";
+    public DateTime Date { get; set; }
+    public string InvoiceId { get; set; } = "";
+    public decimal ServiceCharge { get; set; }
+    public decimal Discount { get; set; }
+    public decimal Vat { get; set; }
+    public decimal SubTotal { get; set; }
+    public string Remark { get; set; } = "";
+    public decimal GrandTotal { get; set; }
 }
 
 public class FnbOutletSummary

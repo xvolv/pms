@@ -11,74 +11,6 @@
                 </button>
             </div>
 
-            <div class="rt-modal-body">
-                <div class="rt-detail-rows">
-                    <div class="rt-detail-row">
-                        <label>Reg. No</label>
-                        <DxTextBox Text="@Draft.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Guest</label>
-                        <DxTextBox Text="@Draft.Guest" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-
-                    <div class="rt-detail-row">
-                        <label>Arrival Date</label>
-                        @if (AllowArrivalEdit)
-                        {
-                            <DxDateEdit @bind-Date="@Draft.ArrivalDate" CssClass="rt-detail-input" />
-                        }
-                        else
-                        {
-                            <DxTextBox Text="@Draft.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
-                        }
-                    </div>
-
-                    <div class="rt-detail-row">
-                        <label>Departure Date</label>
-                        <DxDateEdit @bind-Date="@Draft.DepartureDate" CssClass="rt-detail-input" MinDate="@(MinDeparture ?? DateTime.Today)" />
-                    </div>
-
-                    <div class="rt-detail-row">
-                        <label>Room Type</label>
-                        <DxTextBox Text="@Draft.RoomType" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room</label>
-                        <DxTextBox Text="@Draft.Room" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Amount</label>
-                        <DxTextBox Text="@Draft.Amount.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Adult</label>
-                        <DxTextBox Text="@Draft.Adults.ToString()" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Child</label>
-                        <DxTextBox Text="@Draft.Children.ToString()" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>RTC</label>
-                        <DxTextBox Text="@Draft.Rtc" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Rate Code</label>
-                        <DxTextBox Text="@Draft.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Fixed</label>
-                        <DxCheckBox Checked="@Draft.IsFixedRate" ReadOnly="true" CssClass="rt-detail-inline-check" />
-                    </div>
-                </div>
-
-                @if (!string.IsNullOrEmpty(Error))
-                {
-                    <div class="rt-validation-summary" style="margin-top:14px;">@Error</div>
-                }
-            </div>
-
             <div class="rt-toolbar na-modal-toolbar">
                 <button type="button" class="rt-toolbar-btn" @onclick="Save">
                     <i class="bi bi-floppy text-secondary"></i>
@@ -88,6 +20,75 @@
                     <i class="bi bi-x-circle text-secondary"></i>
                     <span>Close</span>
                 </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        @* <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Draft.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div> *@
+                        <div class="rt-detail-row">
+                            <label>Guest</label>
+                            <DxTextBox Text="@Draft.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Arrival Date</label>
+                            @if (AllowArrivalEdit)
+                            {
+                                <DxDateEdit @bind-Date="@Draft.ArrivalDate" CssClass="rt-detail-input" />
+                            }
+                            else
+                            {
+                                <DxTextBox Text="@Draft.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                            }
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Departure Date</label>
+                            <DxDateEdit @bind-Date="@Draft.DepartureDate" CssClass="rt-detail-input" MinDate="@(MinDeparture ?? DateTime.Today)" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room Type</label>
+                            <DxTextBox Text="@Draft.RoomType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room</label>
+                            <DxTextBox Text="@Draft.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Amount</label>
+                            <DxTextBox Text="@Draft.Amount.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Adult</label>
+                            <DxTextBox Text="@Draft.Adults.ToString()" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Child</label>
+                            <DxTextBox Text="@Draft.Children.ToString()" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>RTC</label>
+                            <DxTextBox Text="@Draft.Rtc" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Rate Code</label>
+                            <DxTextBox Text="@Draft.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Fixed</label>
+                            <DxCheckBox Checked="@Draft.IsFixedRate" ReadOnly="true" CssClass="rt-detail-inline-check" />
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Error))
+                {
+                    <div class="rt-validation-summary" style="margin-top:14px;">@Error</div>
+                }
             </div>
         </div>
     </div>

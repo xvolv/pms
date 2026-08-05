@@ -35,15 +35,13 @@ public class NightAuditState
         "Other",
     };
 
-    public static NightAuditState CreateSample()
+    private static int _nextId;
+    private static int NextId() => ++_nextId;
+
+    public static List<NightAuditRegistration> CreateOverdueOutSample()
     {
         var today = DateTime.Today;
-        int id = 0;
-        int NextId() => ++id;
-
-        var state = new NightAuditState { BusinessDate = today };
-
-        state.OverdueOut = new List<NightAuditRegistration>
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10021", Guest = "Abebe Kebede", Company = "Ethio Trading PLC", Room = "204",
                 RoomType = "Standard", ArrivalDate = today.AddDays(-4), DepartureDate = today.AddDays(-1), Adults = 1,
@@ -54,8 +52,12 @@ public class NightAuditState
                 Children = 1, Rtc = "RTC02", RateCode = "RACK-007", Amount = 2600m, IsFixedRate = false, PaymentType = "Credit Card",
                 TotalBill = 10400m, Paid = 10400m, Agent = "Direct", Source = "OTA" },
         };
+    }
 
-        state.DueOut = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateDueOutSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10041", Guest = "Samuel Girma", Company = "Sunrise Tours", Room = "108",
                 RoomType = "Standard", ArrivalDate = today.AddDays(-2), DepartureDate = today, Adults = 1, Children = 0,
@@ -70,22 +72,34 @@ public class NightAuditState
                 Rtc = "RTC03", RateCode = "CORP-002", Amount = 4200m, IsFixedRate = false, PaymentType = "Credit Card",
                 TotalBill = 12600m, Paid = 8400m, Agent = "Direct", Source = "Corporate" },
         };
+    }
 
-        state.WaitingList = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateWaitingListSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10063", Guest = "Hana Wolde", Company = "", Room = "-",
                 RoomType = "Standard", ArrivalDate = today, DepartureDate = today.AddDays(2), Adults = 1, Children = 0,
                 Rtc = "RTC01", RateCode = "RACK-007", Amount = 1900m, PaymentType = "Cash", Agent = "Direct", Source = "Phone" },
         };
+    }
 
-        state.SixPmArrivals = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateSixPmArrivalsSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10071", Guest = "Dawit Mulugeta", Company = "", Room = "112",
                 RoomType = "Standard", ArrivalDate = today, DepartureDate = today.AddDays(1), Adults = 1, Children = 0,
                 Rtc = "RTC01", RateCode = "RACK-007", Amount = 1900m, PaymentType = "Cash", Agent = "Direct", Source = "Walk-In" },
         };
+    }
 
-        state.GuaranteedArrivals = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateGuaranteedArrivalsSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10079", Guest = "Selam Fikru", Company = "Blue Nile Logistics", Room = "218",
                 RoomType = "Deluxe", ArrivalDate = today, DepartureDate = today.AddDays(3), Adults = 1, Children = 0,
@@ -95,6 +109,19 @@ public class NightAuditState
                 RoomType = "Suite", ArrivalDate = today, DepartureDate = today.AddDays(1), Adults = 2, Children = 0,
                 Rtc = "RTC03", RateCode = "RACK-007", Amount = 4200m, PaymentType = "Cash", Agent = "Direct", Source = "OTA" },
         };
+    }
+
+    public static NightAuditState CreateSample()
+    {
+        var today = DateTime.Today;
+
+        var state = new NightAuditState { BusinessDate = today };
+
+        state.OverdueOut = CreateOverdueOutSample();
+        state.DueOut = CreateDueOutSample();
+        state.WaitingList = CreateWaitingListSample();
+        state.SixPmArrivals = CreateSixPmArrivalsSample();
+        state.GuaranteedArrivals = CreateGuaranteedArrivalsSample();
 
         state.RoomDiscrepancies = new List<RoomDiscrepancyRow>
         {

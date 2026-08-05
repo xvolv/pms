@@ -1,16 +1,16 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="Summarize">
+        <i class="bi bi-journal-check text-secondary"></i>
+        <span>Summarize</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Summarize Transaction</h2>
         <p>Summarizes all of today's transactions into a single summary voucher.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" @onclick="Summarize">
-            <i class="bi bi-journal-check text-secondary"></i>
-            <span>Summarize</span>
-        </button>
     </div>
 
     <div class="rt-grid-area">
