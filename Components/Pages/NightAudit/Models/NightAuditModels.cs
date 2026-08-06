@@ -22,6 +22,7 @@ public class NightAuditRegistration
     public decimal Remaining => TotalBill - Paid;
     public string Agent { get; set; } = "";
     public string Source { get; set; } = "";
+    public string Market { get; set; } = "";
 
     public NightAuditRegistration Clone() => new()
     {
@@ -44,6 +45,7 @@ public class NightAuditRegistration
         Paid = Paid,
         Agent = Agent,
         Source = Source,
+        Market = Market,
     };
 
     public void CopyFrom(NightAuditRegistration source)
@@ -79,33 +81,46 @@ public class RoomDiscrepancyRow
 public class BucketCheckRow
 {
     public int Id { get; set; }
+    public int Sn { get; set; }
     public string RegNo { get; set; } = "";
-    public string Guest { get; set; } = "";
     public string Room { get; set; } = "";
-    public string RoomType { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public DateTime Arrival { get; set; }
     public DateTime Departure { get; set; }
     public int Adults { get; set; }
-    public string RateCode { get; set; } = "";
-    public bool Selected { get; set; } = true;
+    public int Children { get; set; }
+    public string RoomType { get; set; } = "";
+    public string Currency { get; set; } = "USD";
+    public string ActualRtc { get; set; } = "";
+    public decimal RateAmount { get; set; }
+    public decimal UnitRoomRate { get; set; }
+    public decimal Variance => UnitRoomRate - RateAmount;
+    public bool Selected { get; set; }
 }
 
-public class PackagePostLine
+public class RoomTaxPostLineItem
 {
-    public string Description { get; set; } = "";
-    public decimal Amount { get; set; }
+    public string ArticleCode { get; set; } = "";
+    public string Name { get; set; } = "";
+    public decimal UnitAmount { get; set; }
+    public decimal Quantity { get; set; } = 1;
+    public decimal TotalAmount => UnitAmount * Quantity;
 }
 
 public class RoomTaxPostRow
 {
     public int Id { get; set; }
+    public int Sn { get; set; }
     public string RegNo { get; set; } = "";
     public string Guest { get; set; } = "";
     public string Room { get; set; } = "";
     public decimal RoomCharge { get; set; }
     public decimal Tax { get; set; }
+    public decimal Amount => LineItems.Sum(l => l.TotalAmount);
     public bool Selected { get; set; } = true;
     public bool IsExpanded { get; set; }
-    public List<PackagePostLine> Packages { get; set; } = new();
+    public List<RoomTaxPostLineItem> LineItems { get; set; } = new();
 }
 
 public class ReportArchiveRow

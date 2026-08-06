@@ -1,5 +1,16 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@(Discrepancies.Count == 0)" @onclick="Print">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
+</div>
+
 <div class="na-step">
     <div class="na-step-header">
         <h2>Room Discrepancy</h2>
@@ -35,4 +46,21 @@
 
 @code {
     [Parameter] public List<RoomDiscrepancyRow> Discrepancies { get; set; } = new();
+    [Parameter] public EventCallback OnChanged { get; set; }
+    [Parameter] public Func<List<RoomDiscrepancyRow>>? ReloadSample { get; set; }
+
+    private async Task Print()
+    {
+        // will be implemented in the future
+    }
+
+    private async Task Refresh()
+    {
+        if (ReloadSample != null)
+        {
+            Discrepancies.Clear();
+            Discrepancies.AddRange(ReloadSample());
+        }
+        await OnChanged.InvokeAsync();
+    }
 }

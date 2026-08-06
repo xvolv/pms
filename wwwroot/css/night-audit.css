@@ -266,15 +266,8 @@
     color: #202124;
 }
 
-.na-post-package-row td {
-    padding: 5px 10px 5px 30px;
-    border-bottom: 1px solid #f1f3f4;
-    color: #5f6368;
-    font-size: 0.8rem;
-    font-style: italic;
-    background-color: #fafbfc;
-}
-
+.na-post-table th.na-post-amount,
+.na-post-lineitems-table th.na-post-amount,
 .na-post-amount {
     text-align: right;
 }
@@ -282,6 +275,62 @@
 .na-post-toggle {
     cursor: pointer;
     color: #1a73e8;
+}
+
+.na-post-checkbox {
+    display: block;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #4f5d73;
+}
+
+.na-post-lineitems-row td {
+    padding: 0 10px 10px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.na-post-lineitems {
+    border: 1px solid #a9cbee;
+    border-radius: 4px;
+    background-color: #eaf3fd;
+    overflow: hidden;
+}
+
+.na-post-lineitems-title {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1a73e8;
+    background-color: #ffffff;
+    border-bottom: 1px solid #a9cbee;
+    border-right: 1px solid #a9cbee;
+    border-radius: 0 0 4px 0;
+}
+
+.na-post-lineitems-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.na-post-lineitems-table th {
+    text-align: left;
+    padding: 6px 10px;
+    color: #4f5d73;
+    font-weight: 700;
+    border-bottom: 1px solid #a9cbee;
+}
+
+.na-post-lineitems-table td {
+    padding: 6px 10px;
+    color: #202124;
+    border-bottom: 1px solid #d6e6f9;
+}
+
+.na-post-lineitems-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* Report archive progress bar */
@@ -343,9 +392,12 @@
 }
 
 /* Night audit dialog width overrides */
-.na-noshow-modal,
-.na-cancel-modal {
-    width: 520px;
+.na-noshow-modal {
+    width: 640px;
+}
+
+.na-noshow-modal .na-modal-toolbar {
+    margin: 12px 16px 12px;
 }
 
 .na-amend-modal,
@@ -356,6 +408,22 @@
 .na-amend-modal .na-modal-toolbar,
 .na-checkin-modal .na-modal-toolbar {
     margin: 12px 16px 12px;
+}
+
+/* Cancellation dialog: action buttons on top, details in two columns like Check Out */
+.na-cancel-modal {
+    width: 640px;
+}
+
+.na-cancel-modal .na-modal-toolbar {
+    margin: 12px 16px 12px;
+}
+
+.na-cancel-banner {
+    color: #c0392b;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
 }
 
 .na-checkin-banner {
@@ -374,6 +442,7 @@
 }
 
 .na-folio-window {
+    padding-right:15px;
     margin-left: auto;
     display: flex;
     align-items: center;
@@ -442,7 +511,44 @@
     gap: 14px;
 }
 
-.na-auth-dialog input[type="password"] {
-    margin-top: 10px;
-    width: 100%;
+.na-auth-dialog {
+    width: 460px;
+}
+
+.na-auth-dialog .na-modal-toolbar {
+    margin: 12px 16px 12px;
+}
+
+.na-auth-dialog .rt-modal-body p {
+    margin: 0 0 14px;
+    color: #5f6368;
+    font-size: 0.85rem;
+}
+
+/* Bucket Check: wide multi-column grid, scrolls horizontally instead of wrapping */
+.na-bucket-grid-area {
+    overflow-x: auto;
+}
+
+.na-bucket-grid {
+    min-width: 1300px;
+}
+
+.na-bucket-checkbox {
+    display: block;
+    margin: 0 auto;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #4f5d73;
+}
+
+.na-bucket-variance-alert {
+    display: inline-block;
+    min-width: 56px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background-color: #dc3545;
+    color: #ffffff;
+    font-weight: 600;
 }

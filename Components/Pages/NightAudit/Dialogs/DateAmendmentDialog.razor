@@ -46,7 +46,14 @@
                         </div>
                         <div class="rt-detail-row">
                             <label>Departure Date</label>
-                            <DxDateEdit @bind-Date="@Draft.DepartureDate" CssClass="rt-detail-input" MinDate="@(MinDeparture ?? DateTime.Today)" />
+                            @if (AllowArrivalEdit)
+                            {
+                                <DxTextBox Text="@Draft.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                            }
+                            else
+                            {
+                                <DxDateEdit @bind-Date="@Draft.DepartureDate" CssClass="rt-detail-input" MinDate="@(MinDeparture ?? DateTime.Today)" />
+                            }
                         </div>
                         <div class="rt-detail-row">
                             <label>Room Type</label>

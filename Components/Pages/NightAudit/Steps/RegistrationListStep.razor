@@ -19,7 +19,7 @@
     }
     @if (ShowCheckIn)
     {
-        <button type="button" class="rt-toolbar-btn" @onclick="OpenCheckIn">
+        <button type="button" class="rt-toolbar-btn" @onclick="RequestCheckInConfirm">
             <i class="bi bi-box-arrow-in-right text-secondary"></i>
             <span>@CheckInLabel</span>
         </button>
@@ -41,7 +41,7 @@
 
     @* <div class="toolbar-separator"></div> *@
 
-    <button type="button" class="rt-toolbar-btn" disabled="@(Registrations.Count == 0)" @onclick="Print">
+    <button type="button" class="rt-toolbar-btn"  @onclick="Print">
         <i class="bi bi-printer text-secondary"></i>
         <span>Print</span>
     </button>
@@ -70,24 +70,20 @@
             <DxGrid @ref="grid" Data="@Registrations" KeyFieldName="Id" CssClass="rt-grid" RowClick="@OnRowClick"
                     CustomizeElement="@OnCustomizeElement">
                 <Columns>
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RegNo)" Caption="Reg. No" Width="10%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Guest)" Caption="Guest" Width="16%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Company)" Caption="Company" Width="14%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RegNo)" Caption="Registration No" Width="10%" />
                     <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Room)" Caption="Room" Width="7%" />
                     <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RoomType)" Caption="Room Type"
                                       Width="10%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.ArrivalDate)" Caption="Arrival" Width="14%"
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Guest)" Caption="Guest" Width="16%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Company)" Caption="Company" Width="14%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.ArrivalDate)" Caption="Arrival Date" Width="14%"
                                       DisplayFormat="dd-MMM-yyyy" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.DepartureDate)" Caption="Departure"
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.DepartureDate)" Caption="Departure Date"
                                       Width="14%" DisplayFormat="dd-MMM-yyyy" />
                     @if (ColumnMode == RegistrationColumnMode.Financial)
                     {
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%" />
-                        @* <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.TotalBill)" Caption="Total Bill"
-                Width="8%"
-                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" /> *@
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Remaining)" Caption="Remaining" Width="8%"
-                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.PaymentType)" Caption="Payment" Width="9%" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Market)" Caption="Market" Width="9%" />
                     }
                     else
                     {
@@ -122,6 +118,9 @@
 
 <FolioViewDialog Visible="@isFolioVisible" Registration="@selected" Charges="@folioCharges"
                  OnClose="() => isFolioVisible = false" />
+
+<InfoDialog Visible="@isCheckInConfirmVisible" Title="Information"
+            Message="@CheckInConfirmMessage" OnOk="ConfirmCheckInRequest" />
 
 <CheckInDialog Visible="@isCheckInVisible" Registration="@selected" OnCheckIn="ConfirmCheckIn"
                OnClose="() => isCheckInVisible = false" />
@@ -158,6 +157,7 @@
 
     [Parameter] public bool ShowCheckIn { get; set; }
     [Parameter] public string CheckInLabel { get; set; } = "Check In";
+    [Parameter] public string CheckInConfirmMessage { get; set; } = "Do you want to check in this guest?";
 
     [Parameter] public bool ShowNoShow { get; set; }
     [Parameter] public string NoShowLabel { get; set; } = "No Show";
@@ -183,6 +183,7 @@
     private List<FolioChargeRow> folioCharges = new();
 
     private bool isCheckInVisible;
+    private bool isCheckInConfirmVisible;
     private bool isNoShowVisible;
 
     private bool isCancelConfirmVisible;
@@ -306,6 +307,7 @@
         {
             charges.Add(new FolioChargeRow
             {
+                Sn = i + 1,
                 Date = reg.ArrivalDate.AddDays(i),
                 Description = $"Room Charge - {reg.RoomType}",
                 Reference = reg.RegNo,
@@ -322,6 +324,20 @@
     }
 
     // ---- Check In ----
+    private void RequestCheckInConfirm()
+    {
+        if (selected == null)
+            return;
+
+        isCheckInConfirmVisible = true;
+    }
+
+    private void ConfirmCheckInRequest()
+    {
+        isCheckInConfirmVisible = false;
+        OpenCheckIn();
+    }
+
     private void OpenCheckIn()
     {
         if (selected == null)

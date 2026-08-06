@@ -45,11 +45,13 @@
                         </div>
                         <div class="rt-detail-row">
                             <label>Arrival</label>
-                            <DxTextBox Text="@Registration.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                            <DxDateEdit @bind-Date="@Registration.ArrivalDate" CssClass="rt-detail-input"
+                                        MaxDate="@Registration.DepartureDate.AddDays(-1)" />
                         </div>
                         <div class="rt-detail-row">
                             <label>Departure</label>
-                            <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                            <DxDateEdit @bind-Date="@Registration.DepartureDate" CssClass="rt-detail-input"
+                                        MinDate="@Registration.ArrivalDate.AddDays(1)" />
                         </div>
                         <div class="rt-detail-row">
                             <label>Room Type</label>
@@ -121,7 +123,6 @@
         </div>
     </div>
 }
-
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public NightAuditRegistration? Registration { get; set; }

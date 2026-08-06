@@ -4,7 +4,7 @@
 {
     <div class="rt-modal-backdrop">
         <div class="rt-modal na-folio-modal">
-            <div class="rt-modal-header">
+            <div class="rt-modal-header" >
                 <span class="rt-modal-header-title">Folio</span>
                 <button class="rt-modal-close-btn" @onclick="Close" title="Close">
                     <i class="bi bi-x-lg"></i>
@@ -98,9 +98,9 @@
                                     <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomNo)" Caption="Room No." Width="9%" />
                                     <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomType)" Caption="Room Type" Width="11%" />
                                     <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomRate)" Caption="Room Rate" Width="12%" />
-                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Adults)" Caption="No. Of Adult" Width="10%"
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Adults)" Caption="Adult" Width="10%"
                                                       TextAlignment="GridTextAlignment.Center" />
-                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Children)" Caption="No. Of Child" Width="10%"
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Children)" Caption="Child" Width="10%"
                                                       TextAlignment="GridTextAlignment.Center" />
                                     <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Remark)" Caption="Remark" Width="18%" />
                                     <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Charge)" Caption="Amount" Width="14%"
@@ -129,8 +129,8 @@
                                 <strong>@Vat.ToString("N2")</strong>
                             </div>
                             <div class="na-summary-row na-summary-total">
-                                <span>Grand Total</span>
-                                <strong>@GrandTotal.ToString("N2")</strong>
+                                <span>Grand Total </span>
+                                <strong>:  @GrandTotal.ToString("N2")</strong>
                             </div>
                         </div>
                     </div>

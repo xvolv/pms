@@ -64,7 +64,8 @@
                                                        Description="6PM-hold reservations expected to arrive on the business date. Amend the arrival date, check the guest in, or cancel the reservation."
                                                        Registrations="@state.SixPmArrivals" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
                                                        ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
-                                                       ShowCheckIn="true" ShowCancellation="true" Reasons="@state.CancellationReasons"
+                                                       ShowCheckIn="true" CheckInConfirmMessage="Do you want to change 6pm state to Check in?"
+                                                       ShowCancellation="true" Reasons="@state.CancellationReasons"
                                                        OnChanged="Refresh" ReloadSample="NightAuditState.CreateSixPmArrivalsSample" />
                                 break;
                             case 4:
@@ -77,17 +78,21 @@
                                                        ReloadSample="NightAuditState.CreateGuaranteedArrivalsSample" />
                                 break;
                             case 5:
-                                <RoomDiscrepancyStep Discrepancies="@state.RoomDiscrepancies" />
+                                <RoomDiscrepancyStep Discrepancies="@state.RoomDiscrepancies" OnChanged="Refresh"
+                                                      ReloadSample="NightAuditState.CreateRoomDiscrepancySample" />
                                 break;
                             case 6:
-                                <ClearHeldBillsStep HeldBills="@state.HeldBills" OnChanged="Refresh" />
+                                <ClearHeldBillsStep HeldBills="@state.HeldBills" OnChanged="Refresh"
+                                                     ReloadSample="NightAuditState.CreateHeldBillsSample" />
                                 break;
                             case 7:
-                                <BucketCheckStep BucketChecks="@state.BucketChecks" />
+                                <BucketCheckStep BucketChecks="@state.BucketChecks" OnChanged="Refresh"
+                                                  ReloadSample="@(() => NightAuditState.CreateBucketCheckSample(state.DueOut.Concat(state.GuaranteedArrivals)))" />
                                 break;
                             case 8:
                                 <RoomAndTaxPostStep Posts="@state.RoomTaxPosts" Posted="@state.RoomTaxPosted"
-                                                     PostedChanged="@(v => state.RoomTaxPosted = v)" OnChanged="Refresh" />
+                                                     PostedChanged="@(v => state.RoomTaxPosted = v)" OnChanged="Refresh"
+                                                     ReloadSample="@(() => NightAuditState.CreateRoomTaxPostSample(state.DueOut.Concat(state.GuaranteedArrivals)))" />
                                 break;
                             case 9:
                                 <SummarizeTransactionStep Posts="@state.RoomTaxPosts" Summarized="@state.TransactionsSummarized"

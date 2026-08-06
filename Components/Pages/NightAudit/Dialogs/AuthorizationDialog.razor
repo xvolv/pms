@@ -1,23 +1,40 @@
 @if (Visible)
 {
-    <div class="rt-modal-backdrop confirm-dialog-backdrop">
-        <div class="confirm-dialog na-auth-dialog">
-            <div class="confirm-dialog-header">
-                <i class="bi bi-shield-lock-fill confirm-dialog-icon text-primary"></i>
-                <span class="confirm-dialog-title">Authorization Required</span>
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal na-auth-dialog">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Confirm User</span>
+                <button class="rt-modal-close-btn" @onclick="Cancel" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-            <div class="confirm-dialog-body">
-                <p>This action requires supervisor authorization. Please enter the password to continue.</p>
-                <input type="password" class="rt-form-select" @bind="password" @bind:event="oninput"
-                       @onkeydown="HandleKeyDown" placeholder="Password" autofocus />
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Confirm">
+                    <i class="bi bi-floppy text-secondary"></i>
+                    <span>ok</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Cancel">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                <p>This action requires supervisor authorization. Please confirm the password to continue.</p>
+                <div class="rt-detail-row">
+                    <label>User</label>
+                    <DxTextBox Text="@CurrentUser" ReadOnly="true" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Password</label>
+                    <input type="password" class="rt-detail-input rt-form-select" @bind="password" @bind:event="oninput"
+                           @onkeydown="HandleKeyDown" placeholder="Password" autofocus />
+                </div>
                 @if (!string.IsNullOrEmpty(error))
                 {
                     <div class="rt-validation-message" style="margin-top:6px;">@error</div>
                 }
-            </div>
-            <div class="confirm-dialog-buttons">
-                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                <button type="button" class="btn btn-primary" @onclick="Confirm">Ok</button>
             </div>
         </div>
     </div>
@@ -25,6 +42,7 @@
 
 @code {
     [Parameter] public bool Visible { get; set; }
+    [Parameter] public string CurrentUser { get; set; } = "Front Desk Supervisor";
     [Parameter] public EventCallback OnAuthorized { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
 
