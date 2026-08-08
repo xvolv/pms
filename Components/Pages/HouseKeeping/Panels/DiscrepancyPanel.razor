@@ -1,0 +1,139 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
+
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="() => showNewDiscrepancy = true">
+        <i class="bi bi-file-earmark text-secondary"></i>
+        <span>New</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="() => showPrintPreview = true">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="ClearFilters">
+        <i class="bi bi-x-circle text-secondary"></i>
+        <span>Cancel</span>
+    </button>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-chk-row">
+        <DxCheckBox @bind-Checked="sleeps">Sleeps</DxCheckBox>
+        <DxCheckBox @bind-Checked="skips">Skips</DxCheckBox>
+        <DxCheckBox @bind-Checked="person">Person Discrepancy</DxCheckBox>
+        <DxCheckBox @bind-Checked="sleepPerson">Sleep/Person</DxCheckBox>
+        <DxCheckBox @bind-Checked="skipPerson">Skip/Person</DxCheckBox>
+        <DxCheckBox @bind-Checked="dueOutOnly">Due Out Only</DxCheckBox>
+    </div>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-toolbar-filters">
+        <span class="tb-label">Floor</span>
+        <DxComboBox Data="@State.Floors" @bind-Value="floor" CssClass="rt-detail-input" style="width:120px;" />
+        <span class="tb-label">Room</span>
+        <DxComboBox Data="@State.RoomList" @bind-Value="room" CssClass="rt-detail-input" style="width:90px;" />
+        <span class="tb-label">Room Type</span>
+        <DxComboBox Data="@State.RoomTypes" @bind-Value="roomType" CssClass="rt-detail-input" style="width:120px;" />
+        <span class="tb-label">Date</span>
+        <DxDateEdit @bind-Date="date" CssClass="rt-detail-input" style="width:140px;" />
+    </div>
+</div>
+
+<div class="na-step-card">
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (FilteredDiscrepancies.Count == 0)
+        {
+            <div class="rt-placeholder">No records to display.</div>
+        }
+        else
+        {
+            <DxGrid Data="@FilteredDiscrepancies" KeyFieldName="Id" CssClass="rt-grid">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.RoomNumber)" Caption="Room Number" Width="11%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.RoomType)" Caption="Room Type" Width="13%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.RoomStatus)" Caption="Room Status" Width="11%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.HouseKeepingStatus)" Caption="HouseKeeping Status" Width="13%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.FoStatus)" Caption="FO Status" Width="11%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.ResStatus)" Caption="Res. Status" Width="12%" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.FoPerson)" Caption="FO Person" Width="9%"
+                                      TextAlignment="GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.HkPerson)" Caption="HK Person" Width="9%"
+                                      TextAlignment="GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="@nameof(DiscrepancyRow.Discrepancy)" Caption="Discrepancy" Width="11%" />
+                </Columns>
+            </DxGrid>
+
+            <div class="rt-footer">@FilteredDiscrepancies.Count record(s)</div>
+        }
+    </div>
+</div>
+
+<NewDiscrepancyDialog Visible="@showNewDiscrepancy" State="@State" OnClose="() => showNewDiscrepancy = false"
+                       OnSaved="OnDiscrepancySaved" />
+
+<PrintPreviewDialog Visible="@showPrintPreview" Assignment="@State.TaskAssignments.LastOrDefault()"
+                     OnClose="() => showPrintPreview = false" />
+
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="Discrepancy saved successfully."
+            OnOk="() => showInfoPopup = false" />
+
+@code {
+    [Parameter] public HouseKeepingState State { get; set; } = null!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private bool sleeps, skips, person, sleepPerson, skipPerson, dueOutOnly;
+    private string? floor, room, roomType;
+    private DateTime date = DateTime.Today;
+    private bool showNewDiscrepancy;
+    private bool showPrintPreview;
+    private bool showInfoPopup;
+
+    private List<DiscrepancyRow> FilteredDiscrepancies
+    {
+        get
+        {
+            var query = State.Discrepancies.AsEnumerable();
+
+            if (sleeps)
+                query = query.Where(x => x.Discrepancy.Contains("Sleep"));
+            if (skips)
+                query = query.Where(x => x.Discrepancy.Contains("Skip") && !x.Discrepancy.Contains("Sleep"));
+            if (person)
+                query = query.Where(x => x.Discrepancy.Contains("Person"));
+            if (sleepPerson)
+                query = query.Where(x => x.Discrepancy == "Sleep/Person");
+            if (skipPerson)
+                query = query.Where(x => x.Discrepancy == "Skip/Person");
+            if (dueOutOnly)
+                query = query.Where(x => x.ResStatus == "Due Out");
+
+            if (!string.IsNullOrWhiteSpace(floor))
+                query = query.Where(x => x.RoomNumber.StartsWith(floor switch { "Floor - 1" => "1", "Floor - 3" => "3", _ => x.RoomNumber }));
+            if (!string.IsNullOrWhiteSpace(room))
+                query = query.Where(x => x.RoomNumber == room);
+            if (!string.IsNullOrWhiteSpace(roomType))
+                query = query.Where(x => x.RoomType == roomType);
+
+            return query.ToList();
+        }
+    }
+
+    private async Task Refresh() => await OnChanged.InvokeAsync();
+
+    private async Task ClearFilters()
+    {
+        sleeps = skips = person = sleepPerson = skipPerson = dueOutOnly = false;
+        floor = room = roomType = null;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task OnDiscrepancySaved(DiscrepancyRow discrepancy)
+    {
+        discrepancy.Id = State.Discrepancies.Count == 0 ? 1 : State.Discrepancies.Max(d => d.Id) + 1;
+        State.Discrepancies.Add(discrepancy);
+        showNewDiscrepancy = false;
+        showInfoPopup = true;
+        await OnChanged.InvokeAsync();
+    }
+}

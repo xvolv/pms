@@ -1,0 +1,449 @@
+@page "/guest-registration"
+@rendermode InteractiveServer
+
+<PageTitle>Guest Registration - CNET ERP</PageTitle>
+
+<div class="reg-slip-page">
+    <div class="reg-slip" id="guestRegistrationSlip">
+
+        <!-- Header -->
+        <div class="slip-header">
+            <div class="hotel-info">
+                <div class="hotel-name-left">Eden Hotel</div>
+                <div class="hotel-addr">Addis Ababa, Ethiopia</div>
+                <div class="hotel-line">Tel:</div>
+                <div class="hotel-line">Fax:</div>
+                <div class="hotel-line">Email:</div>
+                <div class="hotel-line">Web:</div>
+            </div>
+            <div class="hotel-brand">Eden Hotel</div>
+        </div>
+
+        <!-- Title bar -->
+        <div class="slip-title-bar">GUEST REGISTRATION</div>
+
+        <!-- Reservation # -->
+        <div class="res-no-row">
+            <span class="label-black">Reservation #:</span>
+            <span class="res-no">@ReservationNo</span>
+        </div>
+
+        <!-- Main info table -->
+        <table class="slip-table">
+            <tr>
+                <td class="cell label-black" rowspan="2" style="width:22%; vertical-align:top;">
+                    Full name<br />
+                    <span class="value-text">@FullName</span>
+                </td>
+                <td class="cell header-cell" style="width:18%;">Arrival</td>
+                <td class="cell header-cell" style="width:18%;">Departure</td>
+                <td class="cell header-cell" style="width:14%;">Nights</td>
+            </tr>
+            <tr>
+                <td class="cell center">@ArrivalDate</td>
+                <td class="cell center">@DepartureDate</td>
+                <td class="cell center">@Nights</td>
+            </tr>
+            <tr>
+                <td class="cell label-black" rowspan="2" style="vertical-align:top;">
+                    Company / Travel Agent<br />
+                    <span class="value-text">@Company</span>
+                </td>
+                <td class="cell header-cell">Room</td>
+                <td class="cell header-cell">Room Type</td>
+                <td class="cell header-cell">Adults/Children</td>
+            </tr>
+            <tr>
+                <td class="cell center">@Room</td>
+                <td class="cell center">@RoomType</td>
+                <td class="cell center">@Adults / @Children</td>
+            </tr>
+            <tr>
+                <td class="cell header-cell">Rate</td>
+                <td class="cell header-cell" colspan="2">Payment method</td>
+                <td class="cell" rowspan="2"></td>
+            </tr>
+            <tr>
+                <td class="cell center">@Rate</td>
+                <td class="cell" colspan="2">
+                    <label><input type="checkbox" checked="@PayCash" disabled /> Cash</label>
+                    <label><input type="checkbox" checked="@PayDirectBill" disabled /> Direct Bill</label>
+                    <label><input type="checkbox" checked="@PayCreditCard" disabled /> Credit Card</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="cell header-cell">Package</td>
+                <td class="cell" colspan="3">
+                    <label><input type="checkbox" checked="@PkgCheck" disabled /> Check</label>
+                    <label><input type="checkbox" checked="@PkgOther" disabled /> Other ___________</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="cell header-cell">Arriving from</td>
+                <td class="cell" colspan="1">@ArrivingFrom</td>
+                <td class="cell header-cell">Next destination</td>
+                <td class="cell">@NextDestination</td>
+            </tr>
+        </table>
+
+        <!-- Personal Details -->
+        <div class="section-title">Personal Details</div>
+        <table class="slip-table">
+            <tr>
+                <td class="cell header-cell" style="width:22%;">Identification</td>
+                <td class="cell header-cell" style="width:20%;">City</td>
+                <td class="cell header-cell" style="width:20%;">Country</td>
+                <td class="cell header-cell" style="width:20%;">Nationality</td>
+            </tr>
+            <tr>
+                <td class="cell">@Identification</td>
+                <td class="cell">@City</td>
+                <td class="cell">@Country</td>
+                <td class="cell">@Nationality</td>
+            </tr>
+            <tr>
+                <td class="cell header-cell">passport/ID</td>
+                <td class="cell header-cell">Birth date</td>
+                <td class="cell header-cell" colspan="2">Wedding date</td>
+            </tr>
+            <tr>
+                <td class="cell">@PassportId</td>
+                <td class="cell">@BirthDate</td>
+                <td class="cell" colspan="2">@WeddingDate</td>
+            </tr>
+            <tr>
+                <td class="cell header-cell">Telephone #</td>
+                <td class="cell header-cell">Email</td>
+                <td class="cell header-cell" colspan="2">Title</td>
+            </tr>
+            <tr>
+                <td class="cell">@Telephone</td>
+                <td class="cell">@Email</td>
+                <td class="cell" colspan="2">@Title</td>
+            </tr>
+        </table>
+
+        <!-- Interests -->
+        <div class="interests-row">
+            <span class="label-black">Interests</span>
+            <label><input type="checkbox" checked="@IntCityTour" disabled /> City Tour</label>
+            <label><input type="checkbox" checked="@IntSpa" disabled /> Spa/Wellness</label>
+            <label><input type="checkbox" checked="@IntShopping" disabled /> Shopping</label>
+            <label><input type="checkbox" checked="@IntMuseum" disabled /> Museum</label>
+        </div>
+
+        <!-- Marketing opt-in -->
+        <div class="opt-in-row">
+            <span>
+                We would like to send you information from time to time by email, regular mail or telephone about special offers and
+                services. If you do not wish to receive this information, please tick the box on your right.
+            </span>
+            <input type="checkbox" checked="@OptOut" disabled class="opt-box" />
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            The hotel will not be responsible for any money, jewellery, or valuables left in the guest rooms. Safe deposit boxes are provided in the guest rooms.
+        </div>
+
+        <!-- Times -->
+        <div class="times-row">
+            <strong>Check In Time : @CheckInTime</strong>
+            &nbsp;&nbsp;&nbsp;
+            <strong>Check Out Time : @CheckOutTime</strong>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms">
+            I personally hold myself responsible for the payment of all costs relating to my accommodation at the hotel, including (though not
+            restricted to), room charges, telephone charges, the cost of goods supplied to me or services ordered by me should they not be paid
+            for when they fall due.
+            <br /><br />
+            The undersigned do by signing to confirm that I have read and understand the conditions of residence and the welcome card, and I
+            personally (irrespective of the capacity in which I so sign) agree to be bound by such conditions.
+        </div>
+
+        <!-- Signatures -->
+        <div class="signatures">
+            <div class="sig-block">
+                <div class="sig-line">C.S.A Signature ________________</div>
+            </div>
+            <div class="sig-block right">
+                <div class="sig-line">Guest Signature ________________</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print toolbar (screen only) -->
+    <div class="print-toolbar no-print">
+        <button class="print-btn" @onclick="PrintSlip">🖨 Print</button>
+        <button class="print-btn secondary" @onclick="Close">Close</button>
+    </div>
+</div>
+
+<style>
+    .reg-slip-page {
+        font-family: "Times New Roman", Times, serif;
+        background: #e8e8e8;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .reg-slip {
+        background: #fff;
+        width: 210mm;
+        max-width: 100%;
+        padding: 12mm 14mm;
+        box-shadow: 0 2px 12px rgba(0,0,0,.15);
+        border: 1px solid #999;
+        color: #000;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .slip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 6px;
+    }
+    .hotel-info {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+    .hotel-name-left {
+        font-weight: 700;
+        font-size: 13px;
+    }
+    .hotel-brand {
+        font-family: "Georgia", serif;
+        font-size: 28px;
+        font-style: italic;
+        color: #1565c0;
+        font-weight: 600;
+    }
+
+    .slip-title-bar {
+        background: #000;
+        color: #fff;
+        text-align: center;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 2px;
+        padding: 5px 0;
+        margin-bottom: 8px;
+    }
+
+    .res-no-row {
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+    .res-no {
+        font-weight: 600;
+        margin-left: 4px;
+    }
+
+    .slip-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+        table-layout: fixed;
+    }
+    .slip-table .cell {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: middle;
+        font-size: 12px;
+    }
+    .header-cell {
+        background: #000 !important;
+        color: #fff !important;
+        font-weight: 700;
+        text-align: center;
+        font-size: 11px !important;
+    }
+    .label-black {
+        font-weight: 700;
+    }
+    .value-text {
+        font-weight: 400;
+        display: block;
+        margin-top: 2px;
+    }
+    .center {
+        text-align: center;
+    }
+
+    .section-title {
+        background: #000;
+        color: #fff;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 3px 8px;
+        margin: 10px 0 0 0;
+    }
+
+    .interests-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+        font-size: 12px;
+    }
+    .interests-row label {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .opt-in-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 8px 0;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+    .opt-box {
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .disclaimer {
+        font-size: 11px;
+        margin: 6px 0;
+        line-height: 1.4;
+    }
+
+    .times-row {
+        margin: 8px 0;
+        font-size: 12px;
+    }
+
+    .terms {
+        font-size: 11px;
+        line-height: 1.45;
+        margin: 8px 0 16px 0;
+        text-align: justify;
+    }
+
+    .signatures {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        font-size: 12px;
+    }
+    .sig-block {
+        width: 45%;
+    }
+    .sig-block.right {
+        text-align: right;
+    }
+    .sig-line {
+        border-bottom: 1px solid #000;
+        padding-bottom: 2px;
+        min-height: 28px;
+    }
+
+    .print-toolbar {
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
+    }
+    .print-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        border: 1px solid #333;
+        background: #1565c0;
+        color: #fff;
+        border-radius: 4px;
+    }
+    .print-btn.secondary {
+        background: #555;
+    }
+    .print-btn:hover {
+        opacity: .9;
+    }
+
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        .reg-slip, .reg-slip * {
+            visibility: visible;
+        }
+        .reg-slip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none;
+            border: none;
+            padding: 8mm 10mm;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .reg-slip-page {
+            background: #fff;
+            padding: 0;
+        }
+    }
+</style>
+
+@code {
+    string ReservationNo = "REG-00157-17";
+    string FullName = "Leo Rojas";
+    string Company = "";
+    string ArrivalDate = "8/19/2017";
+    string DepartureDate = "8/20/2017";
+    string Nights = "1";
+    string Room = "102";
+    string RoomType = "Standard Room";
+    string Adults = "1";
+    string Children = "0";
+    string Rate = "200.00 USD";
+    bool PayCash = false;
+    bool PayDirectBill = false;
+    bool PayCreditCard = true;
+    bool PkgCheck = false;
+    bool PkgOther = false;
+    string ArrivingFrom = "";
+    string NextDestination = "";
+
+    string Identification = "";
+    string City = "";
+    string Country = "";
+    string Nationality = "Argentinean";
+    string PassportId = "3342343434";
+    string BirthDate = "8/20/2017";
+    string WeddingDate = "";
+    string Telephone = "";
+    string Email = "leo.rojas@gmail.com";
+    string Title = "Capitain";
+
+    bool IntCityTour = false;
+    bool IntSpa = false;
+    bool IntShopping = false;
+    bool IntMuseum = false;
+    bool OptOut = false;
+
+    string CheckInTime = "09:10";
+    string CheckOutTime = "10:00";
+
+    void PrintSlip()
+    {
+        // Use JS interop in real app: await JS.InvokeVoidAsync("print");
+    }
+
+    void Close()
+    {
+        // Navigate back in real app
+    }
+}

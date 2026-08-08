@@ -4,41 +4,175 @@
 {
     <div class="rt-modal-backdrop">
         <div class="rt-modal na-folio-modal">
-            <div class="rt-modal-header">
-                <span class="rt-modal-header-title">Folio - @Registration.Guest (@Registration.RegNo)</span>
+            <div class="rt-modal-header" >
+                <span class="rt-modal-header-title">Folio</span>
                 <button class="rt-modal-close-btn" @onclick="Close" title="Close">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
-            <div class="rt-modal-body">
-                <div class="rt-grid-area" style="padding:0;">
-                    <DxGrid Data="@Charges" CssClass="rt-grid" ShowFilterRow="false">
-                        <Columns>
-                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Date)" Caption="Date" Width="16%"
-                                              DisplayFormat="dd-MMM-yyyy" />
-                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Description)" Caption="Description" Width="34%" />
-                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Reference)" Caption="Reference" Width="16%" />
-                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Charge)" Caption="Charge" Width="17%"
-                                              DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                            <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Payment)" Caption="Payment" Width="17%"
-                                              DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                        </Columns>
-                    </DxGrid>
-                </div>
-
-                <div class="rt-footer">
-                    Total Charges = @Charges.Sum(c => c.Charge).ToString("N2") &nbsp;|&nbsp;
-                    Total Payments = @Charges.Sum(c => c.Payment).ToString("N2") &nbsp;|&nbsp;
-                    Balance = @((Charges.Sum(c => c.Charge) - Charges.Sum(c => c.Payment)).ToString("N2"))
-                </div>
-            </div>
-
             <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+                    <i class="bi bi-arrow-clockwise text-secondary"></i>
+                    <span>Refresh</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="ExportExcel">
+                    <i class="bi bi-file-earmark-excel text-secondary"></i>
+                    <span>Excel</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="ExportPdf">
+                    <i class="bi bi-file-earmark-pdf text-secondary"></i>
+                    <span>PDF</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Print">
+                    <i class="bi bi-printer text-secondary"></i>
+                    <span>Print</span>
+                </button>
                 <button type="button" class="rt-toolbar-btn" @onclick="Close">
                     <i class="bi bi-x-circle text-secondary"></i>
                     <span>Close</span>
                 </button>
+
+                <div class="na-folio-window">
+                    <label>Window</label>
+                    <DxComboBox Data="@windowOptions" @bind-Value="@windowFilter" CssClass="na-folio-window-input" />
+                </div>
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Guest Name</label>
+                            <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Company</label>
+                            <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>FS Num.</label>
+                            <DxTextBox Text="" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Arrival Date</label>
+                            <DxTextBox Text="@Registration.ArrivalDate.ToString("dddd, MMMM dd, yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Departure Date</label>
+                            <DxTextBox Text="@Registration.DepartureDate.ToString("dddd, MMMM dd, yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>TIN</label>
+                            <DxTextBox Text="" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                </div>
+
+                <DxTabs CssClass="rt-modal-tabs">
+                    <DxTabPage Text="Guest Ledger" />
+                </DxTabs>
+
+                @if (windowFilter != "Extra")
+                {
+                    <div class="na-folio-section-title">Room Charges</div>
+
+                    <div class="rt-grid-area" style="padding:0;">
+                        @if (Charges.Count == 0)
+                        {
+                            <div class="rt-placeholder">No room charges for this registration.</div>
+                        }
+                        else
+                        {
+                            <DxGrid Data="@Charges" CssClass="rt-grid" ShowFilterRow="false">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Sn)" Caption="SN" Width="5%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Date)" Caption="Date" Width="11%"
+                                                      DisplayFormat="M/d/yyyy" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomNo)" Caption="Room No." Width="9%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomType)" Caption="Room Type" Width="11%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.RoomRate)" Caption="Room Rate" Width="12%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Adults)" Caption="Adult" Width="10%"
+                                                      TextAlignment="GridTextAlignment.Center" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Children)" Caption="Child" Width="10%"
+                                                      TextAlignment="GridTextAlignment.Center" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Remark)" Caption="Remark" Width="18%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioChargeRow.Charge)" Caption="Amount" Width="14%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                </Columns>
+                            </DxGrid>
+                        }
+                    </div>
+
+                    <div class="na-folio-summary-wrap">
+                        <div class="na-summary-voucher">
+                            <div class="na-summary-row">
+                                <span>Subtotal</span>
+                                <strong>@Subtotal.ToString("N2")</strong>
+                            </div>
+                            <div class="na-summary-row">
+                                <span>Discount</span>
+                                <strong>@Discount.ToString("N2")</strong>
+                            </div>
+                            <div class="na-summary-row">
+                                <span>Service Charge</span>
+                                <strong>@ServiceCharge.ToString("N2")</strong>
+                            </div>
+                            <div class="na-summary-row">
+                                <span>VAT</span>
+                                <strong>@Vat.ToString("N2")</strong>
+                            </div>
+                            <div class="na-summary-row na-summary-total">
+                                <span>Grand Total </span>
+                                <strong>:  @GrandTotal.ToString("N2")</strong>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (windowFilter != "Room")
+                {
+                    <div class="na-folio-extra-header">
+                        <span class="na-folio-section-title" style="margin:0;">Extra Bills</span>
+                        <DxCheckBox @bind-Checked="@expandAllExtra">Expand All</DxCheckBox>
+                    </div>
+
+                    <div class="rt-grid-area" style="padding:0;">
+                        @if (ExtraBills.Count == 0)
+                        {
+                            <div class="rt-placeholder">No extra bills for this registration.</div>
+                        }
+                        else
+                        {
+                            <DxGrid Data="@ExtraBills" CssClass="rt-grid" ShowFilterRow="false">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.Sn)" Caption="SN" Width="5%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.RoomNo)" Caption="Room No." Width="9%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.Date)" Caption="Date" Width="10%"
+                                                      DisplayFormat="M/d/yyyy" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.InvoiceId)" Caption="Invoice ID" Width="11%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.ServiceCharge)" Caption="Ser. Charge" Width="11%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.Discount)" Caption="Discount" Width="9%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.Vat)" Caption="VAT" Width="9%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.SubTotal)" Caption="Sub Total" Width="11%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.Remark)" Caption="Remark" Width="13%" />
+                                    <DxGridDataColumn FieldName="@nameof(FolioExtraBillRow.GrandTotal)" Caption="Grand Total" Width="12%"
+                                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                                </Columns>
+                            </DxGrid>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -48,7 +182,26 @@
     [Parameter] public bool Visible { get; set; }
     [Parameter] public NightAuditRegistration? Registration { get; set; }
     [Parameter] public List<FolioChargeRow> Charges { get; set; } = new();
+    [Parameter] public List<FolioExtraBillRow> ExtraBills { get; set; } = new();
     [Parameter] public EventCallback OnClose { get; set; }
+
+    private readonly List<string> windowOptions = new() { "All", "Room", "Extra" };
+    private string windowFilter = "All";
+    private bool expandAllExtra;
+
+    private decimal Subtotal => Charges.Sum(c => c.Charge);
+    private decimal Discount => 0m;
+    private decimal ServiceCharge => Math.Round(Subtotal * 0.10m, 2);
+    private decimal Vat => Math.Round((Subtotal - Discount + ServiceCharge) * 0.15m, 2);
+    private decimal GrandTotal => Subtotal - Discount + ServiceCharge + Vat;
+
+    private void Refresh() { }
+
+    private void ExportExcel() { }
+
+    private void ExportPdf() { }
+
+    private void Print() { }
 
     private async Task Close() => await OnClose.InvokeAsync();
 }

@@ -1,0 +1,1112 @@
+
+@using DevExpress.Blazor
+@rendermode InteractiveServer
+
+<style>
+    .rate-detail-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .rate-detail-content {
+        display: flex;
+        flex: 1;
+        gap: 8px;
+        padding: 8px;
+        overflow: hidden;
+    }
+
+    .rate-list-panel {
+        width: 260px;
+        border: 1px solid #c0c0c0;
+        display: flex;
+        flex-direction: column;
+        background: white;
+    }
+
+    .rate-code-grid {
+        width: 100%;
+        border: none;
+    }
+
+    .rate-code-grid .dxbl-grid {
+        border: none;
+    }
+
+    .rate-code-grid .dxbl-grid-data-row {
+        cursor: pointer;
+    }
+
+    .rate-code-grid .dxbl-grid-cell {
+        border: 1px solid #d7d7d7;
+        padding: 6px 8px;
+    }
+
+    .rate-code-grid .dxbl-grid-header-row {
+        display: none;
+    }
+
+    .rc-row-selected,
+    .rc-row-selected td,
+    .rc-row-selected .dxbl-grid-cell {
+        --dxbl-grid-cell-back: #0078d4 !important;
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
+
+    .rate-list-header {
+        background: #e8e8e8;
+        padding: 4px 8px;
+        border-bottom: 1px solid #c0c0c0;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .detail-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        overflow: hidden;
+    }
+
+    .detail-tabs { }
+
+    .grid-container {
+        flex: 1;
+        overflow: auto;
+        padding: 4px;
+    }
+
+    .form-section {
+        border: 1px solid #c0c0c0;
+        padding: 8px;
+        margin-bottom: 6px;
+        background: #fafafa;
+    }
+
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    /* Prevent DxTabs from changing URL to # */
+    .no-hash-tabs .dxbl-tabs-item-link,
+    .no-hash-tabs a {
+        cursor: pointer !important;
+    }
+
+    .dxbl-tabs .dxbl-tabs-item a {
+        href: javascript:void(0) !important;
+    }
+
+    .dxbl-listbox .dxbl-listbox-item.dxbl-selected {
+        background-color: #0078d7 !important;
+        color: white !important;
+    }
+
+    .weekday-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .weekday-row .dxbl-checkbox {
+        margin-right: 4px;
+    }
+
+    /* Selected row highlight (same approach as the Rate Category grid) */
+    .rd-row-selected,
+    .rd-row-selected td,
+    .rd-row-selected .dxbl-grid-cell {
+        --dxbl-grid-cell-back: #0078d4 !important;
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
+
+    .grid-container .dxbl-grid-data-row {
+        cursor: pointer;
+    }
+
+    .validation-summary {
+        color: #d32f2f;
+        background: #ffebee;
+        border: 1px solid #ef9a9a;
+        padding: 6px 10px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        border-radius: 3px;
+    }
+</style>
+
+<div class="rate-detail-wrapper">
+    <div class="rate-detail-content">
+        <!-- Left Rate list -->
+        <div class="rate-list-panel">
+            <div class="rate-list-header">
+                Code &nbsp;&nbsp;&nbsp; Description
+            </div>
+            <DxGrid Data="@rateCodes"
+                    KeyFieldName="Code"
+                    RowClick="OnRateCodeRowClick"
+                    CustomizeElement="OnRateCodeCustomizeElement"
+                    CssClass="rate-code-grid"
+                    ShowColumnHeaders="false"
+                    ShowPager="false">
+                <Columns>
+                    <DxGridDataColumn FieldName="Code" Width="100px" />
+                    <DxGridDataColumn FieldName="Description" />
+                </Columns>
+            </DxGrid>
+        </div>
+
+        <!-- Right Detail panel -->
+        <div class="detail-panel">
+            <div class="detail-tabs">
+                <DxTabs ActiveTabIndex="detailTabIndex"
+                        ActiveTabIndexChanged="OnTabChanged"
+                        RenderMode="TabsRenderMode.OnDemand"
+                        CssClass="no-hash-tabs">
+                    <DxTab Text="Detail" />
+                    <DxTab Text="Negotiation Rates" />
+                    <DxTab Text="Strategy" />
+                </DxTabs>
+            </div>
+
+            <div class="grid-container">
+                @if (detailTabIndex == 0)
+                {
+                    <DxGrid Data="@rateDetails"
+                            KeyFieldName="SN"
+                            PageSize="20"
+                            RowClick="OnDetailRowClick"
+                            CustomizeElement="OnDetailCustomizeElement">
+                        <Columns>
+                            <DxGridDataColumn FieldName="SN" Caption="SN" Width="50px" />
+                            <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="160" />
+                            <DxGridDataColumn FieldName="StartDate" Caption="Start Date" Width="110px" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="EndDate" Caption="End Date" Width="110px" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="Remark" Caption="Remark" />
+                        </Columns>
+                    </DxGrid>
+                }
+                else if (detailTabIndex == 1)
+                {
+                    <DxGrid Data="@negotiatedRates"
+                            KeyFieldName="SN"
+                            PageSize="20"
+                            RowClick="OnNegotiatedRowClick"
+                            CustomizeElement="OnNegotiatedCustomizeElement">
+                        <Columns>
+                            <DxGridDataColumn FieldName="SN" Caption="..." Width="40px" />
+                            <DxGridDataColumn FieldName="Name" Caption="Name" MinWidth="160" />
+                            <DxGridDataColumn FieldName="Type" Caption="Type" Width="100px" />
+                            <DxGridDataColumn FieldName="Address" Caption="Address" MinWidth="160" />
+                            <DxGridDataColumn FieldName="Identification" Caption="Identification" Width="140px" />
+                        </Columns>
+                    </DxGrid>
+                }
+                else
+                {
+                    <DxGrid Data="@strategies"
+                            KeyFieldName="SN"
+                            PageSize="20"
+                            RowClick="OnStrategyRowClick"
+                            CustomizeElement="OnStrategyCustomizeElement">
+                        <Columns>
+                            <DxGridDataColumn FieldName="SN" Caption="SN" Width="50px" />
+                            <DxGridDataColumn FieldName="Code" Caption="Code" Width="110px" />
+                            <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="120" />
+                            <DxGridDataColumn FieldName="Condition" Caption="Condition" Width="100px" />
+                            <DxGridDataColumn FieldName="Restriction" Caption="Restriction" Width="90px" />
+                            <DxGridDataColumn FieldName="Value" Caption="Value" Width="70px" />
+                            <DxGridDataColumn FieldName="ValueType" Caption="Value Type" Width="100px" />
+                        </Columns>
+                    </DxGrid>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== POPUP: Rate Detail ==================== -->
+<DxPopup @bind-Visible="showRateDetailPopup"
+         HeaderText="@(isDetailEditMode ? "★ Rate Detail - EDIT" : "★ Rate Detail - NEW")"
+         Width="100%"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true">
+    <BodyContentTemplate>
+        <div style="padding:8px;">
+            <RateToolbar OnNew="OnPopupNew" OnSave="OnPopupSave" OnClose="OnPopupClose" />
+
+            @if (!string.IsNullOrEmpty(detailValidationError))
+            {
+                <div class="validation-summary">@detailValidationError</div>
+            }
+
+            <div class="row mt-2">
+                <div class="col-md-5">
+                    <div class="form-section">
+                        <label>Description <span style="color:red">*</span></label>
+                        <DxTextBox @bind-Text="detailForm.Description" />
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Date</div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label>Start Date <span style="color:red">*</span></label>
+                                <DxDateEdit @bind-Date="detailForm.StartDate" />
+                            </div>
+                            <div class="col-6">
+                                <label>End Date <span style="color:red">*</span></label>
+                                <DxDateEdit @bind-Date="detailForm.EndDate" />
+                            </div>
+                        </div>
+                        <div class="mt-2 weekday-row">
+                            <DxCheckBox @bind-Checked="detailForm.Sun">Sun</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Mon">Mon</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Tue">Tue</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Wed">Wed</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Thu">Thu</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Fri">Fri</DxCheckBox>
+                            <DxCheckBox @bind-Checked="detailForm.Sat">Sat</DxCheckBox>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Range</div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label>Min</label>
+                                <DxSpinEdit @bind-Value="detailForm.Min" MinValue="1" />
+                            </div>
+                            <div class="col-6">
+                                <label>Max</label>
+                                <DxSpinEdit @bind-Value="detailForm.Max" MinValue="1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-section h-100">
+                        <div class="form-section-title">Adult Count</div>
+                        <label>1 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult1" />
+                        <label>2 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult2" />
+                        <label>3 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult3" />
+                        <label>4 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult4" />
+                        <label>5 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult5" />
+                        <label>Extra Adult</label><DxSpinEdit @bind-Value="detailForm.ExtraAdult" />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-section h-100">
+                        <div class="form-section-title">Extra Child</div>
+                        <label>Default Child Amt.</label>
+                        <DxSpinEdit @bind-Value="detailForm.DefaultChildAmt" />
+                        <label>0-3</label><DxSpinEdit @bind-Value="detailForm.Child0to3" />
+                        <label>4-12</label><DxSpinEdit @bind-Value="detailForm.Child4to12" />
+                        <label>13-18</label><DxSpinEdit @bind-Value="detailForm.Child13to18" />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-section h-100">
+                        <div class="form-section-title">Room Types</div>
+                        <DxCheckBox @bind-Checked="detailForm.StdRoom">Standard Room</DxCheckBox>
+                        <DxCheckBox @bind-Checked="detailForm.Executive">Executive</DxCheckBox>
+                        <DxCheckBox @bind-Checked="detailForm.PseudoRooms">Pseudo Rooms</DxCheckBox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ==================== POPUP: Negotiated Rate ==================== -->
+<DxPopup @bind-Visible="showNegotiatedPopup"
+         HeaderText="@(isNegotiatedEditMode ? "★ Negotiated Rate - EDIT" : "★ Negotiated Rate - NEW")"
+         Width="420px"
+         CloseOnOutsideClick="false">
+    <BodyContentTemplate>
+        <div style="padding:10px;">
+            <RateToolbar OnNew="OnNegotiatedNew" OnSave="OnNegotiatedSave" OnClose="OnNegotiatedClose" />
+
+            @if (!string.IsNullOrEmpty(negotiatedValidationError))
+            {
+                <div class="validation-summary">@negotiatedValidationError</div>
+            }
+
+            <div class="mt-3">
+                <label>Type <span style="color:red">*</span></label>
+                <DxComboBox Data="@(new[] { "Customer", "Guest", "Company" })"
+                            @bind-Value="negotiatedForm.Type" />
+            </div>
+            <div class="mt-2">
+                <label>Consignee <span style="color:red">*</span></label>
+                <div class="d-flex gap-1">
+                    <DxTextBox @bind-Text="negotiatedForm.Consignee" CssClass="flex-grow-1" />
+                    <DxButton Text="..." Click="@(() => showConsigneeFind = true)" />
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- Consignee Find dialog -->
+<DxPopup @bind-Visible="showConsigneeFind"
+         HeaderText="Find"
+         Width="520px">
+    <BodyContentTemplate>
+        <div style="padding:8px;">
+            <DxGrid Data="@consignees"
+                    KeyFieldName="Code"
+                    PageSize="10"
+                    Height="280px"
+                    RowClick="OnConsigneeRowClick"
+                    CustomizeElement="OnConsigneeCustomizeElement">
+                <Columns>
+                    <DxGridDataColumn FieldName="Code" Caption="code" Width="110px" />
+                    <DxGridDataColumn FieldName="Name" Caption="name" />
+                    <DxGridDataColumn FieldName="IdNumber" Caption="idNumber" Width="130px" />
+                </Columns>
+            </DxGrid>
+            <div class="text-end mt-2 d-flex gap-2 justify-content-end">
+                <DxButton Text="Select" Click="OnConsigneeSelect" Enabled="@(selectedConsignee != null)" />
+                <DxButton Text="Clear" Click="@(() => { selectedConsignee = null; showConsigneeFind = false; })" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ==================== POPUP: Strategy ==================== -->
+<DxPopup @bind-Visible="showStrategyPopup"
+         HeaderText="@(isStrategyEditMode ? "★ Strategy - EDIT" : "★ Strategy - NEW")"
+         Width="520px"
+         CloseOnOutsideClick="false">
+    <BodyContentTemplate>
+        <div style="padding:10px;">
+            <RateToolbar OnNew="OnStrategyNew" OnSave="OnStrategySave" OnClose="OnStrategyClose" />
+
+            @if (!string.IsNullOrEmpty(strategyValidationError))
+            {
+                <div class="validation-summary">@strategyValidationError</div>
+            }
+
+            <div class="mt-2">
+                <label>Description <span style="color:red">*</span></label>
+                <DxTextBox @bind-Text="strategyForm.Description" />
+            </div>
+            <div class="mt-2">
+                <label>Condition <span style="color:red">*</span></label>
+                <DxComboBox Data="@(new[] { "Occupied", "Times Sold" })"
+                            @bind-Value="strategyForm.Condition" />
+            </div>
+            <div class="row mt-2">
+                <div class="col-6">
+                    <label>Value</label>
+                    <DxSpinEdit @bind-Value="strategyForm.Value" />
+                </div>
+                <div class="col-6">
+                    <label>Value Type</label>
+                    <DxComboBox Data="@(new[] { "Percent (%)", "Flat" })"
+                                @bind-Value="strategyForm.ValueType" />
+                </div>
+            </div>
+            <div class="mt-2">
+                <label>Restriction Type</label>
+                <DxComboBox Data="@(new[] { "Open", "Close" })"
+                            @bind-Value="strategyForm.RestrictionType" />
+            </div>
+            <div class="row mt-2">
+                <div class="col-6">
+                    <label>Priority</label>
+                    <DxSpinEdit @bind-Value="strategyForm.Priority" MinValue="1" />
+                </div>
+                <div class="col-6 d-flex align-items-end">
+                    <DxCheckBox @bind-Checked="strategyForm.IsActive">Is Active</DxCheckBox>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-6">
+                    <div class="form-section-title">Restriction Dates</div>
+                    <label>From</label><DxDateEdit @bind-Date="strategyForm.RestFrom" />
+                    <label>To</label><DxDateEdit @bind-Date="strategyForm.RestTo" />
+                </div>
+                <div class="col-6">
+                    <div class="form-section-title">Control Dates</div>
+                    <label>From</label><DxDateEdit @bind-Date="strategyForm.CtrlFrom" />
+                    <label>To</label><DxDateEdit @bind-Date="strategyForm.CtrlTo" />
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <div class="form-section-title">Weekdays</div>
+                <div class="weekday-row">
+                    <DxCheckBox @bind-Checked="strategyForm.Sun">Sun</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Mon">Mon</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Tue">Tue</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Wed">Wed</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Thu">Thu</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Fri">Fri</DxCheckBox>
+                    <DxCheckBox @bind-Checked="strategyForm.Sat">Sat</DxCheckBox>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <label>Remark</label>
+                <DxMemo @bind-Text="strategyForm.Remark" Rows="2" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    int detailTabIndex = 0;
+    string selectedRateCode = "ROH000000001";
+
+    // ---------- Selection (same pattern as Rate Category) ----------
+    RateDetailItem? selectedRateDetail;
+    NegotiatedItem? selectedNegotiated;
+    StrategyItem? selectedStrategy;
+    ConsigneeItem? selectedConsignee;
+
+    // ---------- Popup flags ----------
+    bool showRateDetailPopup = false;
+    bool showNegotiatedPopup = false;
+    bool showStrategyPopup = false;
+    bool showConsigneeFind = false;
+
+    // ---------- Delete Confirmation Callback ----------
+    [Parameter]
+    public Action<string, Action>? OnDeleteRequest { get; set; }
+
+    bool isDetailEditMode = false;
+    bool isNegotiatedEditMode = false;
+    bool isStrategyEditMode = false;
+
+    // ---------- Forms ----------
+    RateDetailForm detailForm = new();
+    NegotiatedForm negotiatedForm = new();
+    StrategyForm strategyForm = new();
+
+    // ---------- Validation messages ----------
+    string detailValidationError = "";
+    string negotiatedValidationError = "";
+    string strategyValidationError = "";
+
+    // ===================== Tab change =====================
+    void OnTabChanged(int index)
+    {
+        detailTabIndex = index;
+        selectedRateDetail = null;
+        selectedNegotiated = null;
+        selectedStrategy = null;
+    }
+
+    // ===================== Rate Code Grid =====================
+    void OnRateCodeRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateCodeItem;
+        if (item != null)
+        {
+            selectedRateCode = item.Code;
+        }
+    }
+
+    void OnRateCodeCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateCodeItem;
+            if (item != null && item.Code == selectedRateCode)
+            {
+                e.CssClass = "rc-row-selected";
+            }
+        }
+    }
+
+    // ===================== Row click + highlight (Detail) =====================
+    void OnDetailRowClick(GridRowClickEventArgs e)
+    {
+        selectedRateDetail = e.Grid?.GetDataItem(e.VisibleIndex) as RateDetailItem;
+    }
+
+    void OnDetailCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateDetailItem;
+            if (item != null && selectedRateDetail != null && item.SN == selectedRateDetail.SN)
+            {
+                e.CssClass = "rd-row-selected";
+            }
+        }
+    }
+
+    // ===================== Row click + highlight (Negotiated) =====================
+    void OnNegotiatedRowClick(GridRowClickEventArgs e)
+    {
+        selectedNegotiated = e.Grid?.GetDataItem(e.VisibleIndex) as NegotiatedItem;
+    }
+
+    void OnNegotiatedCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as NegotiatedItem;
+            if (item != null && selectedNegotiated != null && item.SN == selectedNegotiated.SN)
+            {
+                e.CssClass = "rd-row-selected";
+            }
+        }
+    }
+
+    // ===================== Row click + highlight (Strategy) =====================
+    void OnStrategyRowClick(GridRowClickEventArgs e)
+    {
+        selectedStrategy = e.Grid?.GetDataItem(e.VisibleIndex) as StrategyItem;
+    }
+
+    void OnStrategyCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as StrategyItem;
+            if (item != null && selectedStrategy != null && item.SN == selectedStrategy.SN)
+            {
+                e.CssClass = "rd-row-selected";
+            }
+        }
+    }
+
+    // ===================== Consignee finder =====================
+    void OnConsigneeRowClick(GridRowClickEventArgs e)
+    {
+        selectedConsignee = e.Grid?.GetDataItem(e.VisibleIndex) as ConsigneeItem;
+    }
+
+    void OnConsigneeCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as ConsigneeItem;
+            if (item != null && selectedConsignee != null && item.Code == selectedConsignee.Code)
+            {
+                e.CssClass = "rd-row-selected";
+            }
+        }
+    }
+
+    void OnConsigneeSelect()
+    {
+        if (selectedConsignee != null)
+        {
+            negotiatedForm.Consignee = selectedConsignee.Name;
+        }
+        showConsigneeFind = false;
+        selectedConsignee = null;
+    }
+
+    // ===================== Public methods (called from parent toolbar) =====================
+    public void New()
+    {
+        OnMainNewClick();
+    }
+
+    public void Edit()
+    {
+        if (detailTabIndex == 0)
+        {
+            if (selectedRateDetail == null) return;
+            isDetailEditMode = true;
+            detailValidationError = "";
+            detailForm = new RateDetailForm
+            {
+                Description = selectedRateDetail.Description,
+                StartDate = selectedRateDetail.StartDate,
+                EndDate = selectedRateDetail.EndDate,
+                Sun = true, Mon = true, Tue = true, Wed = true,
+                Thu = true, Fri = true, Sat = true,
+                Min = 1, Max = 1,
+                StdRoom = true
+            };
+            showRateDetailPopup = true;
+        }
+        else if (detailTabIndex == 1)
+        {
+            if (selectedNegotiated == null) return;
+            isNegotiatedEditMode = true;
+            negotiatedValidationError = "";
+            negotiatedForm = new NegotiatedForm
+            {
+                Type = selectedNegotiated.Type,
+                Consignee = selectedNegotiated.Name
+            };
+            showNegotiatedPopup = true;
+        }
+        else
+        {
+            if (selectedStrategy == null) return;
+            isStrategyEditMode = true;
+            strategyValidationError = "";
+            strategyForm = new StrategyForm
+            {
+                Description = selectedStrategy.Description,
+                Condition = selectedStrategy.Condition,
+                Value = selectedStrategy.Value,
+                ValueType = selectedStrategy.ValueType,
+                RestrictionType = selectedStrategy.Restriction,
+                Priority = 1,
+                IsActive = true,
+                Sun = true, Mon = true, Tue = true, Wed = true,
+                Thu = true, Fri = true, Sat = true
+            };
+            showStrategyPopup = true;
+        }
+        StateHasChanged();
+    }
+
+    public void Delete()
+    {
+        if (detailTabIndex == 0)
+        {
+            if (selectedRateDetail == null) return;
+            OnDeleteRequest?.Invoke("Are you sure you want to delete this rate detail?", () =>
+            {
+                rateDetails.Remove(selectedRateDetail);
+                selectedRateDetail = null;
+                rateDetails = rateDetails.ToList();
+                StateHasChanged();
+            });
+        }
+        else if (detailTabIndex == 1)
+        {
+            if (selectedNegotiated == null) return;
+            OnDeleteRequest?.Invoke("Are you sure you want to delete this negotiated rate?", () =>
+            {
+                negotiatedRates.Remove(selectedNegotiated);
+                selectedNegotiated = null;
+                negotiatedRates = negotiatedRates.ToList();
+                StateHasChanged();
+            });
+        }
+        else
+        {
+            if (selectedStrategy == null) return;
+            OnDeleteRequest?.Invoke("Are you sure you want to delete this strategy?", () =>
+            {
+                strategies.Remove(selectedStrategy);
+                selectedStrategy = null;
+                strategies = strategies.ToList();
+                StateHasChanged();
+            });
+        }
+    }
+
+    // ===================== NEW (main toolbar) =====================
+    void OnMainNewClick()
+    {
+        if (detailTabIndex == 0)
+        {
+            isDetailEditMode = false;
+            detailValidationError = "";
+            detailForm = new RateDetailForm
+            {
+                Description = "",
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1),
+                Sun = true, Mon = true, Tue = true, Wed = true,
+                Thu = true, Fri = true, Sat = true,
+                Min = 1, Max = 1,
+                StdRoom = true
+            };
+            showRateDetailPopup = true;
+        }
+        else if (detailTabIndex == 1)
+        {
+            isNegotiatedEditMode = false;
+            negotiatedValidationError = "";
+            negotiatedForm = new NegotiatedForm { Type = "Customer" };
+            showNegotiatedPopup = true;
+        }
+        else
+        {
+            isStrategyEditMode = false;
+            strategyValidationError = "";
+            strategyForm = new StrategyForm
+            {
+                RestFrom = DateTime.Today,
+                RestTo = DateTime.Today,
+                CtrlFrom = DateTime.Today,
+                CtrlTo = DateTime.Today,
+                Sun = true, Mon = true, Tue = true, Wed = true,
+                Thu = true, Fri = true, Sat = true,
+                IsActive = true,
+                Priority = 1,
+                Condition = "Occupied",
+                ValueType = "Percent (%)",
+                RestrictionType = "Open"
+            };
+            showStrategyPopup = true;
+        }
+        StateHasChanged();
+    }
+
+    // ===================== Detail popup =====================
+    void OnPopupNew()
+    {
+        isDetailEditMode = false;
+        detailValidationError = "";
+        detailForm = new RateDetailForm
+        {
+            StartDate = DateTime.Today,
+            EndDate = DateTime.Today.AddYears(1),
+            Sun = true, Mon = true, Tue = true, Wed = true,
+            Thu = true, Fri = true, Sat = true,
+            Min = 1, Max = 1,
+            StdRoom = true
+        };
+    }
+
+    void OnPopupSave()
+    {
+        detailValidationError = ValidateDetailForm();
+        if (!string.IsNullOrEmpty(detailValidationError))
+        {
+            StateHasChanged();
+            return;
+        }
+
+        if (isDetailEditMode && selectedRateDetail != null)
+        {
+            selectedRateDetail.Description = detailForm.Description;
+            selectedRateDetail.StartDate = detailForm.StartDate ?? DateTime.Today;
+            selectedRateDetail.EndDate = detailForm.EndDate ?? DateTime.Today;
+            rateDetails = rateDetails.ToList();
+        }
+        else
+        {
+            int nextSn = rateDetails.Count == 0 ? 1 : rateDetails.Max(x => x.SN) + 1;
+            rateDetails.Add(new RateDetailItem
+            {
+                SN = nextSn,
+                Description = detailForm.Description,
+                StartDate = detailForm.StartDate ?? DateTime.Today,
+                EndDate = detailForm.EndDate ?? DateTime.Today,
+                Remark = ""
+            });
+            rateDetails = rateDetails.ToList();
+        }
+
+        showRateDetailPopup = false;
+        StateHasChanged();
+    }
+
+    void OnPopupClose()
+    {
+        showRateDetailPopup = false;
+        detailValidationError = "";
+    }
+
+    string ValidateDetailForm()
+    {
+        if (string.IsNullOrWhiteSpace(detailForm.Description))
+            return "Description is required.";
+        if (!detailForm.StartDate.HasValue)
+            return "Start Date is required.";
+        if (!detailForm.EndDate.HasValue)
+            return "End Date is required.";
+        if (detailForm.EndDate < detailForm.StartDate)
+            return "End Date cannot be before Start Date.";
+        if (detailForm.Min > detailForm.Max)
+            return "Min cannot be greater than Max.";
+        return "";
+    }
+
+    // ===================== Negotiated popup =====================
+    void OnNegotiatedNew()
+    {
+        isNegotiatedEditMode = false;
+        negotiatedValidationError = "";
+        negotiatedForm = new NegotiatedForm { Type = "Customer" };
+    }
+
+    void OnNegotiatedSave()
+    {
+        negotiatedValidationError = ValidateNegotiatedForm();
+        if (!string.IsNullOrEmpty(negotiatedValidationError))
+        {
+            StateHasChanged();
+            return;
+        }
+
+        if (isNegotiatedEditMode && selectedNegotiated != null)
+        {
+            selectedNegotiated.Name = negotiatedForm.Consignee;
+            selectedNegotiated.Type = negotiatedForm.Type;
+            negotiatedRates = negotiatedRates.ToList();
+        }
+        else
+        {
+            int nextSn = negotiatedRates.Count == 0 ? 1 : negotiatedRates.Max(x => x.SN) + 1;
+            negotiatedRates.Add(new NegotiatedItem
+            {
+                SN = nextSn,
+                Name = negotiatedForm.Consignee,
+                Type = negotiatedForm.Type,
+                Address = "",
+                Identification = ""
+            });
+            negotiatedRates = negotiatedRates.ToList();
+        }
+
+        showNegotiatedPopup = false;
+        StateHasChanged();
+    }
+
+    void OnNegotiatedClose()
+    {
+        showNegotiatedPopup = false;
+        negotiatedValidationError = "";
+    }
+
+    string ValidateNegotiatedForm()
+    {
+        if (string.IsNullOrWhiteSpace(negotiatedForm.Type))
+            return "Type is required.";
+        if (string.IsNullOrWhiteSpace(negotiatedForm.Consignee))
+            return "Consignee is required.";
+        return "";
+    }
+
+    // ===================== Strategy popup =====================
+    void OnStrategyNew()
+    {
+        isStrategyEditMode = false;
+        strategyValidationError = "";
+        strategyForm = new StrategyForm
+        {
+            RestFrom = DateTime.Today,
+            RestTo = DateTime.Today,
+            CtrlFrom = DateTime.Today,
+            CtrlTo = DateTime.Today,
+            Sun = true, Mon = true, Tue = true, Wed = true,
+            Thu = true, Fri = true, Sat = true,
+            IsActive = true,
+            Priority = 1,
+            Condition = "Occupied",
+            ValueType = "Percent (%)",
+            RestrictionType = "Open"
+        };
+    }
+
+    void OnStrategySave()
+    {
+        strategyValidationError = ValidateStrategyForm();
+        if (!string.IsNullOrEmpty(strategyValidationError))
+        {
+            StateHasChanged();
+            return;
+        }
+
+        if (isStrategyEditMode && selectedStrategy != null)
+        {
+            selectedStrategy.Description = strategyForm.Description;
+            selectedStrategy.Condition = strategyForm.Condition;
+            selectedStrategy.Restriction = strategyForm.RestrictionType;
+            selectedStrategy.Value = strategyForm.Value;
+            selectedStrategy.ValueType = strategyForm.ValueType;
+            strategies = strategies.ToList();
+        }
+        else
+        {
+            int nextSn = strategies.Count == 0 ? 1 : strategies.Max(x => x.SN) + 1;
+            strategies.Add(new StrategyItem
+            {
+                SN = nextSn,
+                Code = $"RAS{nextSn:D7}",
+                Description = strategyForm.Description,
+                Condition = strategyForm.Condition,
+                Restriction = strategyForm.RestrictionType,
+                Value = strategyForm.Value,
+                ValueType = strategyForm.ValueType
+            });
+            strategies = strategies.ToList();
+        }
+
+        showStrategyPopup = false;
+        StateHasChanged();
+    }
+
+    void OnStrategyClose()
+    {
+        showStrategyPopup = false;
+        strategyValidationError = "";
+    }
+
+    string ValidateStrategyForm()
+    {
+        if (string.IsNullOrWhiteSpace(strategyForm.Description))
+            return "Description is required.";
+        if (string.IsNullOrWhiteSpace(strategyForm.Condition))
+            return "Condition is required.";
+        if (strategyForm.RestFrom.HasValue && strategyForm.RestTo.HasValue &&
+            strategyForm.RestTo < strategyForm.RestFrom)
+            return "Restriction To date cannot be before From date.";
+        if (strategyForm.CtrlFrom.HasValue && strategyForm.CtrlTo.HasValue &&
+            strategyForm.CtrlTo < strategyForm.CtrlFrom)
+            return "Control To date cannot be before From date.";
+        return "";
+    }
+
+    // ===================== Existing sample data (unchanged) =====================
+    List<RateCodeItem> rateCodes = new()
+    {
+        new() { Code = "ROH000000001", Description = "Standard Rate" },
+        new() { Code = "ROH000000002", Description = "Special Rate" },
+        new() { Code = "ROH000000003", Description = "posting Date Rate" },
+        new() { Code = "ROH000000004", Description = "Arriva Date Rate" }
+    };
+
+    List<RateDetailItem> rateDetails = new()
+    {
+        new() { SN = 1, Description = "Standard Rate", StartDate = new DateTime(2017,5,6), EndDate = new DateTime(2018,5,6) },
+        new() { SN = 2, Description = "Standard Rate", StartDate = new DateTime(2017,5,6), EndDate = new DateTime(2018,5,6) },
+        new() { SN = 3, Description = "Standard Rate", StartDate = new DateTime(2017,5,6), EndDate = new DateTime(2018,5,6) }
+    };
+
+    List<NegotiatedItem> negotiatedRates = new()
+    {
+        new() { SN = 1, Name = "Debebe Sefu", Type = "Company", Address = "", Identification = "2365512362" },
+        new() { SN = 2, Name = "TEST ORGANIZATION", Type = "Company", Address = "[Telephone: 343243432]", Identification = "3432432423-43" },
+        new() { SN = 3, Name = "ERMIAS LTD", Type = "Company", Address = "", Identification = "5555555555-55" }
+    };
+
+    List<StrategyItem> strategies = new()
+    {
+        new() { SN = 1, Code = "RAS0000...", Description = "My Strategy", Condition = "Occupied", Restriction = "Open", Value = 10, ValueType = "Percent (%)" },
+        new() { SN = 2, Code = "RAS0000...", Description = "dfgf", Condition = "Occupied", Restriction = "Close", Value = 60, ValueType = "Percent (%)" }
+    };
+
+    List<ConsigneeItem> consignees = new()
+    {
+        new() { Code = "111134666", Name = "MAMO", IdNumber = "111111111-11" },
+        new() { Code = "11133Axxu", Name = "Mamo", IdNumber = "123888888" },
+        new() { Code = "27116", Name = "ZERHUN GIRMA W/GIORGIS", IdNumber = "888888888-87" },
+        new() { Code = "OCJ-00031-17", Name = "ABDUBER LTD", IdNumber = "777777770-77" },
+        new() { Code = "OCJ-00032-17", Name = "MESKER LTD", IdNumber = "666666666-66" },
+        new() { Code = "OCJ-00034-17", Name = "ERMIAS LTD", IdNumber = "5555555555-55" },
+        new() { Code = "OCJ-00035-17", Name = "Christopher Columbus", IdNumber = "012365484-7" },
+        new() { Code = "OCJ-00036-17", Name = "Debebe Sefu", IdNumber = "2365512362" },
+        new() { Code = "OCJ-00038-17", Name = "MELKAMU GEBRE EGZIABHER", IdNumber = "0912632145-09" },
+        new() { Code = "OCJ-00039-17", Name = "GIRMAH", IdNumber = "0123456789-1" }
+    };
+
+    // ===================== Models =====================
+    public class RateCodeItem
+    {
+        public string Code { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string DisplayText => $"{Code}  {Description}";
+    }
+
+    public class RateDetailItem
+    {
+        public int SN { get; set; }
+        public string Description { get; set; } = "";
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Remark { get; set; } = "";
+    }
+
+    public class NegotiatedItem
+    {
+        public int SN { get; set; }
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Address { get; set; } = "";
+        public string Identification { get; set; } = "";
+    }
+
+    public class StrategyItem
+    {
+        public int SN { get; set; }
+        public string Code { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Condition { get; set; } = "";
+        public string Restriction { get; set; } = "";
+        public decimal Value { get; set; }
+        public string ValueType { get; set; } = "";
+    }
+
+    public class ConsigneeItem
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string IdNumber { get; set; } = "";
+    }
+
+    public class RateDetailForm
+    {
+        public string Description { get; set; } = "";
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool Sun { get; set; } = true;
+        public bool Mon { get; set; } = true;
+        public bool Tue { get; set; } = true;
+        public bool Wed { get; set; } = true;
+        public bool Thu { get; set; } = true;
+        public bool Fri { get; set; } = true;
+        public bool Sat { get; set; } = true;
+        public int Min { get; set; } = 1;
+        public int Max { get; set; } = 1;
+        public decimal Adult1 { get; set; }
+        public decimal Adult2 { get; set; }
+        public decimal Adult3 { get; set; }
+        public decimal Adult4 { get; set; }
+        public decimal Adult5 { get; set; }
+        public decimal ExtraAdult { get; set; }
+        public decimal DefaultChildAmt { get; set; }
+        public decimal Child0to3 { get; set; }
+        public decimal Child4to12 { get; set; }
+        public decimal Child13to18 { get; set; }
+        public bool StdRoom { get; set; }
+        public bool Executive { get; set; }
+        public bool PseudoRooms { get; set; }
+    }
+
+    public class NegotiatedForm
+    {
+        public string Type { get; set; } = "Customer";
+        public string Consignee { get; set; } = "";
+    }
+
+    public class StrategyForm
+    {
+        public string Description { get; set; } = "";
+        public string Condition { get; set; } = "Occupied";
+        public decimal Value { get; set; }
+        public string ValueType { get; set; } = "Percent (%)";
+        public string RestrictionType { get; set; } = "Open";
+        public int Priority { get; set; } = 1;
+        public bool IsActive { get; set; } = true;
+        public DateTime? RestFrom { get; set; }
+        public DateTime? RestTo { get; set; }
+        public DateTime? CtrlFrom { get; set; }
+        public DateTime? CtrlTo { get; set; }
+        public bool Sun { get; set; } = true;
+        public bool Mon { get; set; } = true;
+        public bool Tue { get; set; } = true;
+        public bool Wed { get; set; } = true;
+        public bool Thu { get; set; } = true;
+        public bool Fri { get; set; } = true;
+        public bool Sat { get; set; } = true;
+        public string Remark { get; set; } = "";
+    }
+}

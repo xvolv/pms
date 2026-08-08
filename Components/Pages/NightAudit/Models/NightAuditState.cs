@@ -35,57 +35,71 @@ public class NightAuditState
         "Other",
     };
 
-    public static NightAuditState CreateSample()
+    private static int _nextId;
+    private static int NextId() => ++_nextId;
+
+    public static List<NightAuditRegistration> CreateOverdueOutSample()
     {
         var today = DateTime.Today;
-        int id = 0;
-        int NextId() => ++id;
-
-        var state = new NightAuditState { BusinessDate = today };
-
-        state.OverdueOut = new List<NightAuditRegistration>
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10021", Guest = "Abebe Kebede", Company = "Ethio Trading PLC", Room = "204",
                 RoomType = "Standard", ArrivalDate = today.AddDays(-4), DepartureDate = today.AddDays(-1), Adults = 1,
                 Children = 0, Rtc = "RTC01", RateCode = "CORP-001", Amount = 1800m, IsFixedRate = true, PaymentType = "Cash",
-                TotalBill = 7200m, Paid = 5200m, Agent = "Direct", Source = "Walk-In" },
+                TotalBill = 7200m, Paid = 5200m, Agent = "Direct", Source = "Walk-In", Market = "Corporate Bl" },
             new() { Id = NextId(), RegNo = "REG-10034", Guest = "Liya Tesfaye", Company = "", Room = "311",
                 RoomType = "Deluxe", ArrivalDate = today.AddDays(-6), DepartureDate = today.AddDays(-2), Adults = 2,
                 Children = 1, Rtc = "RTC02", RateCode = "RACK-007", Amount = 2600m, IsFixedRate = false, PaymentType = "Credit Card",
-                TotalBill = 10400m, Paid = 10400m, Agent = "Direct", Source = "OTA" },
+                TotalBill = 10400m, Paid = 10400m, Agent = "Direct", Source = "OTA", Market = "Leisure" },
         };
+    }
 
-        state.DueOut = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateDueOutSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10041", Guest = "Samuel Girma", Company = "Sunrise Tours", Room = "108",
                 RoomType = "Standard", ArrivalDate = today.AddDays(-2), DepartureDate = today, Adults = 1, Children = 0,
                 Rtc = "RTC01", RateCode = "AGENT-006", Amount = 1900m, IsFixedRate = false, PaymentType = "City Ledger",
-                TotalBill = 3800m, Paid = 2000m, Agent = "Sunrise Tours", Source = "Agent" },
+                TotalBill = 3800m, Paid = 2000m, Agent = "Sunrise Tours", Source = "Agent", Market = "Group" },
             new() { Id = NextId(), RegNo = "REG-10052", Guest = "Marta Alemu", Company = "", Room = "215",
                 RoomType = "Deluxe", ArrivalDate = today.AddDays(-1), DepartureDate = today, Adults = 2, Children = 0,
                 Rtc = "RTC02", RateCode = "RACK-007", Amount = 2600m, IsFixedRate = true, PaymentType = "Cash",
-                TotalBill = 2600m, Paid = 2600m, Agent = "Direct", Source = "Walk-In" },
+                TotalBill = 2600m, Paid = 2600m, Agent = "Direct", Source = "Walk-In", Market = "Leisure" },
             new() { Id = NextId(), RegNo = "REG-10058", Guest = "Yonas Bekele", Company = "Nile Exports", Room = "402",
                 RoomType = "Suite", ArrivalDate = today.AddDays(-3), DepartureDate = today, Adults = 1, Children = 0,
                 Rtc = "RTC03", RateCode = "CORP-002", Amount = 4200m, IsFixedRate = false, PaymentType = "Credit Card",
-                TotalBill = 12600m, Paid = 8400m, Agent = "Direct", Source = "Corporate" },
+                TotalBill = 12600m, Paid = 8400m, Agent = "Direct", Source = "Corporate", Market = "Corporate Bl" },
         };
+    }
 
-        state.WaitingList = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateWaitingListSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10063", Guest = "Hana Wolde", Company = "", Room = "-",
                 RoomType = "Standard", ArrivalDate = today, DepartureDate = today.AddDays(2), Adults = 1, Children = 0,
                 Rtc = "RTC01", RateCode = "RACK-007", Amount = 1900m, PaymentType = "Cash", Agent = "Direct", Source = "Phone" },
         };
+    }
 
-        state.SixPmArrivals = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateSixPmArrivalsSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10071", Guest = "Dawit Mulugeta", Company = "", Room = "112",
                 RoomType = "Standard", ArrivalDate = today, DepartureDate = today.AddDays(1), Adults = 1, Children = 0,
                 Rtc = "RTC01", RateCode = "RACK-007", Amount = 1900m, PaymentType = "Cash", Agent = "Direct", Source = "Walk-In" },
         };
+    }
 
-        state.GuaranteedArrivals = new List<NightAuditRegistration>
+    public static List<NightAuditRegistration> CreateGuaranteedArrivalsSample()
+    {
+        var today = DateTime.Today;
+        return new List<NightAuditRegistration>
         {
             new() { Id = NextId(), RegNo = "REG-10079", Guest = "Selam Fikru", Company = "Blue Nile Logistics", Room = "218",
                 RoomType = "Deluxe", ArrivalDate = today, DepartureDate = today.AddDays(3), Adults = 1, Children = 0,
@@ -95,47 +109,116 @@ public class NightAuditState
                 RoomType = "Suite", ArrivalDate = today, DepartureDate = today.AddDays(1), Adults = 2, Children = 0,
                 Rtc = "RTC03", RateCode = "RACK-007", Amount = 4200m, PaymentType = "Cash", Agent = "Direct", Source = "OTA" },
         };
+    }
 
-        state.RoomDiscrepancies = new List<RoomDiscrepancyRow>
+    public static List<RoomDiscrepancyRow> CreateRoomDiscrepancySample()
+    {
+        var today = DateTime.Today;
+        return new List<RoomDiscrepancyRow>
         {
             new() { Id = NextId(), Room = "306", SystemStatus = "Occupied", HousekeepingStatus = "Vacant Dirty",
                 ReportedDate = today, Remark = "Guest checked out early, HK not updated by front desk." },
             new() { Id = NextId(), Room = "410", SystemStatus = "Vacant Clean", HousekeepingStatus = "Occupied",
                 ReportedDate = today, Remark = "Walk-in assigned without system update." },
         };
+    }
 
-        state.HeldBills = new List<HeldBillRow>
+    public static List<HeldBillRow> CreateHeldBillsSample()
+    {
+        var today = DateTime.Today;
+        return new List<HeldBillRow>
         {
-            new() { Id = NextId(), RegNo = "REG-10041", Guest = "Samuel Girma", Room = "108", BillNo = "BILL-5581",
-                Amount = 1800m, HeldDate = today.AddDays(-1), HeldBy = "F. Desta", Reason = "Awaiting company approval" },
+            new() { Id = NextId(), Sn = 1, VoucherNo = "VCH-5581", DeviceName = "POS-01", WaiterName = "F. Desta",
+                HeldDate = today.AddDays(-1), Amount = 1800m, HeldBy = "F. Desta" },
         };
+    }
 
-        state.BucketChecks = state.DueOut.Concat(state.GuaranteedArrivals)
-            .Select(r => new BucketCheckRow
+    private static readonly Dictionary<string, (string ArticleCode, string Name, decimal Amount)> RoomTaxPostPackages = new()
+    {
+        ["REG-10058"] = ("B-0001", "BED AND BREAKFAST", 350m),
+        ["REG-10079"] = ("B-0002", "AIRPORT TRANSFER", 200m),
+    };
+
+    public static List<RoomTaxPostRow> CreateRoomTaxPostSample(IEnumerable<NightAuditRegistration> inHouse)
+    {
+        return inHouse.Select((r, index) =>
+        {
+            var roomCharge = r.Amount;
+            var tax = Math.Round(r.Amount * 0.15m, 2);
+
+            var lineItems = new List<RoomTaxPostLineItem>
+            {
+                new() { ArticleCode = "SE-0001", Name = "ROOM CHARGE", UnitAmount = roomCharge, Quantity = 1 },
+                new() { ArticleCode = "TX-0001", Name = "TAX", UnitAmount = tax, Quantity = 1 },
+            };
+
+            if (RoomTaxPostPackages.TryGetValue(r.RegNo, out var package))
+            {
+                lineItems.Add(new RoomTaxPostLineItem
+                {
+                    ArticleCode = package.ArticleCode,
+                    Name = package.Name,
+                    UnitAmount = package.Amount,
+                    Quantity = 1,
+                });
+            }
+
+            return new RoomTaxPostRow
             {
                 Id = NextId(),
+                Sn = index + 1,
                 RegNo = r.RegNo,
                 Guest = r.Guest,
                 Room = r.Room,
-                RoomType = r.RoomType,
-                Departure = r.DepartureDate,
-                Adults = r.Adults,
-                RateCode = r.RateCode,
-            }).ToList();
+                RoomCharge = roomCharge,
+                Tax = tax,
+                LineItems = lineItems,
+            };
+        }).ToList();
+    }
 
-        var inHouse = state.DueOut.Concat(state.GuaranteedArrivals).ToList();
-        state.RoomTaxPosts = inHouse.Select(r => new RoomTaxPostRow
+    public static List<BucketCheckRow> CreateBucketCheckSample(IEnumerable<NightAuditRegistration> inHouse)
+    {
+        return inHouse.Select((r, index) => new BucketCheckRow
         {
             Id = NextId(),
+            Sn = index + 1,
             RegNo = r.RegNo,
-            Guest = r.Guest,
             Room = r.Room,
-            RoomCharge = r.Amount,
-            Tax = Math.Round(r.Amount * 0.15m, 2),
-            Packages = r.RegNo == "REG-10058"
-                ? new List<PackagePostLine> { new() { Description = "Breakfast Package", Amount = 350m } }
-                : new List<PackagePostLine>(),
+            Guest = r.Guest,
+            Company = r.Company,
+            Arrival = r.ArrivalDate,
+            Departure = r.DepartureDate,
+            Adults = r.Adults,
+            Children = r.Children,
+            RoomType = r.RoomType,
+            Currency = "USD",
+            ActualRtc = r.RoomType,
+            RateAmount = r.Amount,
+            UnitRoomRate = r.Amount,
         }).ToList();
+    }
+
+    public static NightAuditState CreateSample()
+    {
+        var today = DateTime.Today;
+
+        var state = new NightAuditState { BusinessDate = today };
+
+        state.OverdueOut = CreateOverdueOutSample();
+        state.DueOut = CreateDueOutSample();
+        state.WaitingList = CreateWaitingListSample();
+        state.SixPmArrivals = CreateSixPmArrivalsSample();
+        state.GuaranteedArrivals = CreateGuaranteedArrivalsSample();
+
+        state.RoomDiscrepancies = CreateRoomDiscrepancySample();
+
+        state.HeldBills = CreateHeldBillsSample();
+
+        state.BucketChecks = CreateBucketCheckSample(state.DueOut.Concat(state.GuaranteedArrivals));
+
+        var inHouse = state.DueOut.Concat(state.GuaranteedArrivals).ToList();
+        state.RoomTaxPosts = CreateRoomTaxPostSample(inHouse);
 
         state.FnbOutlets = new List<FnbOutletSummary>
         {

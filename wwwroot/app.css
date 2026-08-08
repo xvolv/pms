@@ -32,6 +32,9 @@ a,
         0 0 0 0.25rem #258cfb;
 }
 
+i {
+    color: #6c757d
+}
 .content {
     padding-top: 1.1rem;
 }
@@ -333,7 +336,7 @@ select.form-control-custom.select-custom {
 .dashboard-content {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 16px;
     box-sizing: border-box;
 }
 

@@ -1,281 +1,649 @@
 @page "/dashboard"
-@using System.Globalization
+@rendermode InteractiveServer
+@using DevExpress.Blazor
 
-<PageTitle>Dashboard - CNET ERP V7</PageTitle>
+<PageTitle>Dashboard - CNET ERP</PageTitle>
 
-<div class="dashboard-wrapper">
-    <!-- Top HOME tab -->
-    <div class="top-tab-header">
-        <div class="tab-item active">HOME</div>
-    </div>
+<div class="dashboard-page">
 
-    <div class="dashboard-content">
-        <!-- Profile Header Section -->
-        <div class="profile-header-card">
-            <div class="profile-photo-area">
-                <div class="photo-placeholder">
-                    <i class="bi bi-person-bounding-box mb-1"></i>
-                    <span>No image data</span>
-                </div>
-            </div>
-            
-            <div class="profile-info-grid">
-                <div class="welcome-title">Welcome Red Cloud ICT Solutions PLC</div>
-                <div class="info-row">
-                    <div class="info-cell"><span class="cell-label">Name</span><span class="cell-value">CNET ADMINISTRATOR</span></div>
-                    <div class="info-cell"><span class="cell-label">Version</span><span class="cell-value">1.0</span></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-cell"><span class="cell-label">Role</span><span class="cell-value">CNET ADMIN</span></div>
-                    <div class="info-cell"><span class="cell-label">Current Date</span><span class="cell-value">@currentDateString</span></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-cell"><span class="cell-label">Department</span><span class="cell-value">Administration</span></div>
-                    <div class="info-cell"></div>
-                </div>
-            </div>
-            
-            <div class="profile-logo-area">
-                @* <div class="e-invoice-tag">E-Invoice</div> *@
-                <div class="red-cloud-logo">
-                    <div class="logo-cloud"><i class="bi bi-cloud-fill"></i></div>
-                    <div class="logo-text">RED<span>CLOUD</span><div class="sub-text">ICT Solutions</div></div>
-                </div>
-            </div>
-        </div>
+    <!-- ===================== TOP HEADER ===================== -->
+    <div class="top-header">
+        <div class="user-card">
+            <!-- Left: female avatar icon -->
+            <div class="avatar">
+                <svg viewBox="0 0 100 100" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
 
-        <!-- Sub Tabs Area -->
-        <div class="sub-tabs-bar">
-            <div class="sub-tab-item active">
-                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-            </div>
-            <div class="sub-tab-item">
-                <i class="bi bi-shield-lock me-1"></i>Security
-            </div>
-        </div>
+                    <!-- Background -->
+                    <rect width="100" height="100" fill="#b5b9d3" />
 
-        <!-- Columns Area -->
-        <div class="dashboard-main-grid">
-            <!-- Left Column: Tables -->
-            <div class="grid-left-col">
-                <div class="actions-row">
-                    <div class="action-buttons">
-                        <button class="action-btn text-success" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
-                        <button class="action-btn text-danger" title="Export PDF"><i class="bi bi-file-pdf"></i></button>
-                        <button class="action-btn text-primary" title="Statistics"><i class="bi bi-bar-chart-line"></i></button>
-                    </div>
-                    <div class="hotel-select-area">
-                        <span class="select-label">Hotel</span>
-                        <select class="hotel-select">
-                            <option>WASSAMAR HOTEL</option>
-                        </select>
-                    </div>
-                </div>
+                    <!-- Female profile placeholder silhouette -->
+                    <path d="
+                    M 50,7
 
-                <!-- Table 1: Tasks -->
-                <div class="table-container mb-4">
-                    <table class="dashboard-table font-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 45%;">Task</th>
-                                <th style="width: 15%; text-align: center;">Statistics</th>
-                                <th style="width: 40%;">Remark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var task in tasksList)
-                            {
-                                <tr class="@(task.Stats > 0 ? "highlight-row" : "")">
-                                    <td>@task.TaskName</td>
-                                    <td class="stat-cell">@task.Stats</td>
-                                    <td class="text-muted">@task.Remark</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                    C 35,7 25,16 23,31
+                    C 21,41 21,51 19,59
 
-                <!-- Table 2: Room Statistics -->
-                <div class="table-container">
-                    <div class="table-section-title">Today's Room Statistics</div>
-                    <table class="dashboard-table room-stats-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%; text-align: center;">SN</th>
-                                <th style="width: 70%;">Description</th>
-                                <th style="width: 20%; text-align: center;">Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var stat in roomStatsList)
-                            {
-                                <tr class="@(stat.Count > 0 && stat.Description.Contains("Dirty") ? "highlight-count-row-dirty" : stat.Count > 0 ? "highlight-count-row" : "")">
-                                    <td class="sn-cell">@stat.SN</td>
-                                    <td>@stat.Description</td>
-                                    <td class="count-cell">@stat.Count</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                    C 17,64 14,67 11,70
+                    C 15,70 18,68 21,65
+
+                    C 19,69 17,72 14,75
+                    C 19,76 23,74 26,71
+
+                    C 25,76 23,79 21,82
+                    C 28,85 35,86 40,87
+
+                    L 40,91
+
+                    C 34,93 28,96 21,98
+                    L 79,98
+
+                    C 72,96 66,93 60,91
+                    L 60,87
+
+                    C 65,86 72,85 79,82
+
+                    C 77,79 75,76 74,71
+
+                    C 77,74 81,76 86,75
+                    C 83,72 81,69 79,65
+
+                    C 82,68 85,70 89,70
+                    C 86,67 83,64 81,59
+
+                    C 79,51 79,41 77,31
+                    C 75,16 65,7 50,7
+
+                    Z
+                    " fill="#ffffff" />
+                </svg>
             </div>
 
-            <!-- Right Column: Charts -->
-            <div class="grid-right-col">
-                <!-- Pie Chart Widget -->
-                <div class="chart-widget mb-4">
-                    <div class="chart-widget-header">Room Occupancy (Today)</div>
-                    <div class="chart-widget-body pie-chart-layout">
-                        <!-- SVG Pie Chart -->
-                        <div class="pie-svg-wrapper">
-                            <svg viewBox="0 0 120 120" width="160" height="160">
-                                <!-- Base grey circle -->
-                                <circle cx="60" cy="60" r="50" fill="#f1f3f4" />
-                                <!-- Vacant slice (73.33%): length = 230.37, offset = 0 -->
-                                <circle cx="60" cy="60" r="25" fill="transparent" stroke="#3b71ca" stroke-width="50" 
-                                        stroke-dasharray="230.37 314.16" transform="rotate(-90 60 60)" />
-                                <!-- Occupied slice (26.67%): length = 83.79, offset = 230.37 -->
-                                <circle cx="60" cy="60" r="25" fill="transparent" stroke="#b02a37" stroke-width="50" 
-                                        stroke-dasharray="83.79 314.16" stroke-dashoffset="-230.37" transform="rotate(-90 60 60)" />
-                                <!-- Center white hole to make it look like a donut/pie -->
-                                <circle cx="60" cy="60" r="10" fill="#ffffff" />
-                            </svg>
-                            <div class="pie-percentage-label">73.33%</div>
-                            <div class="pie-percentage-label-occupied">26.67%</div>
+            <!-- Right: flex column -->
+            <div class="user-details">
+                <!-- Row 1: hotel name full width -->
+                <div class="welcome-row">
+                    Welcome to <span class="hotel-name">Eden Hotel</span>
+                </div>
+                <!-- Row 2: grid left + right -->
+                <div class="info-grid">
+                    <div class="info-left">
+                        <div class="info-row"><span class="lbl">Name</span><span class="val">System CNET
+                            ADMINISTRATOR</span></div>
+                            <div class="info-row"><span class="lbl">Role</span><span class="val">Cnet Admin</span></div>
+                            <div class="info-row"><span class="lbl">Department</span><span class="val"></span></div>
                         </div>
-
-                        <!-- Legend -->
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <span class="legend-color-box bg-primary-slice"></span>
-                                <span class="legend-text">Vacant (66): 73.33%</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color-box bg-danger-slice"></span>
-                                <span class="legend-text">Occupied (24): 26.67%</span>
+                        <div class="info-right">
+                            <div class="info-row"><span class="lbl">Access Level</span><span class="val">81.07%</span></div>
+                            <div class="info-row"><span class="lbl">Release Date</span><span class="val">15-05-2017
+                                (V6.0.1.21)</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Area Chart Widget -->
-                <div class="chart-widget">
-                    <div class="chart-widget-header d-flex justify-content-between align-items-center">
-                        <span>Reservations (2026) Total=837</span>
+                <div class="calendar-box">
+                    <div class="cal-left">
+                        <div class="cal-toggle">
+                            <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="cal-mode-combo" />
+                        </div>
+                        <div class="cal-nav-vert">
+                            <span class="cal-lbl">Month</span>
+                            <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" />
+                            <span class="cal-lbl">Year</span>
+                            <DxSpinEdit @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
+                        </div>
+                        <div class="cal-footer-vert">
+                            <DxButton Text="Today" RenderStyle="ButtonRenderStyle.Link" Click="GoToday" />
+                            <span class="cal-date">@selectedDate.ToString("dd/MM/yyyy")</span>
+                        </div>
                     </div>
-                    <div class="chart-widget-body area-chart-layout">
-                        <!-- SVG Area Chart -->
-                        <svg viewBox="0 0 520 220" width="100%" height="220" class="svg-area-chart">
-                            <!-- Grids background -->
-                            <line x1="40" y1="30" x2="500" y2="30" stroke="#f1f3f4" stroke-width="1" />
-                            <line x1="40" y1="60" x2="500" y2="60" stroke="#e9eef2" stroke-width="1" />
-                            <line x1="40" y1="90" x2="500" y2="90" stroke="#e9eef2" stroke-width="1" />
-                            <line x1="40" y1="120" x2="500" y2="120" stroke="#e9eef2" stroke-width="1" />
-                            <line x1="40" y1="150" x2="500" y2="150" stroke="#e9eef2" stroke-width="1" />
-                            <line x1="40" y1="180" x2="500" y2="180" stroke="#e9eef2" stroke-width="1" />
-                            
-                            <!-- Y Axis Labels -->
-                            <text x="30" y="35" class="chart-axis-text" text-anchor="end">240</text>
-                            <text x="30" y="65" class="chart-axis-text" text-anchor="end">210</text>
-                            <text x="30" y="95" class="chart-axis-text" text-anchor="end">180</text>
-                            <text x="30" y="125" class="chart-axis-text" text-anchor="end">150</text>
-                            <text x="30" y="155" class="chart-axis-text" text-anchor="end">120</text>
-                            <text x="30" y="185" class="chart-axis-text" text-anchor="end">90</text>
-                            <text x="30" y="215" class="chart-axis-text" text-anchor="end">0</text>
-                            
-                            <!-- Filled Area Path -->
-                            <path d="M 40,60 C 60,70 70,75 80,80 C 100,90 110,110 120,126 C 130,135 150,110 160,100 C 170,90 190,110 200,120 C 215,130 230,165 240,180 C 250,190 270,210 280,210 L 480,210 L 40,210 Z" 
-                                  fill="rgba(59, 113, 202, 0.15)" stroke="none" />
-                            
-                            <!-- Stroke Path -->
-                            <path d="M 40,60 C 60,70 70,75 80,80 C 100,90 110,110 120,126 C 130,135 150,110 160,100 C 170,90 190,110 200,120 C 215,130 230,165 240,180 C 250,190 270,210 280,210 L 480,210" 
-                                  fill="none" stroke="#3b71ca" stroke-width="3" />
-                            
-                            <!-- X Axis line -->
-                            <line x1="40" y1="210" x2="500" y2="210" stroke="#cccccc" stroke-width="1.5" />
-                            
-                            <!-- X Axis Labels -->
-                            <text x="40" y="222" class="chart-axis-text" text-anchor="middle">Jan</text>
-                            <text x="80" y="222" class="chart-axis-text" text-anchor="middle">Mar</text>
-                            <text x="120" y="222" class="chart-axis-text" text-anchor="middle">Apr</text>
-                            <text x="160" y="222" class="chart-axis-text" text-anchor="middle">May</text>
-                            <text x="200" y="222" class="chart-axis-text" text-anchor="middle">Jun</text>
-                            <text x="240" y="222" class="chart-axis-text" text-anchor="middle">Jul</text>
-                            <text x="280" y="222" class="chart-axis-text" text-anchor="middle">Aug</text>
-                            <text x="320" y="222" class="chart-axis-text" text-anchor="middle">Sep</text>
-                            <text x="360" y="222" class="chart-axis-text" text-anchor="middle">Oct</text>
-                            <text x="400" y="222" class="chart-axis-text" text-anchor="middle">Nov</text>
-                            <text x="440" y="222" class="chart-axis-text" text-anchor="middle">Dec</text>
-                        </svg>
+                    <div class="cal-right">
+                        <DxCalendar @bind-SelectedDate="selectedDate" CssClass="dash-calendar" VisibleDate="@visibleDate"
+                                    VisibleDateChanged="OnVisibleDateChanged" />
                     </div>
                 </div>
+
+                <div class="logo-box">
+                    <img src="cnet logo.jpg" alt="CNET Logo" class="cnet-logo-img" />
+                </div>
             </div>
+
+            <!-- ===================== MAIN TABS ===================== -->
+            <DxTabs @bind-ActiveTabIndex="activeTab" CssClass="main-tabs">
+                <DxTabPage Text="Dashboard">
+                    <div class="dashboard-body">
+
+                        <!-- Left: Task Statistics Grid -->
+                        <div class="left-panel">
+                            <div class="panel-toolbar">
+                                <DxButton Text="Refresh" IconCssClass="oi oi-reload" Click="RefreshTasks"
+                                          RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
+                            </div>
+                            <DxGrid Data="@taskItems" KeyFieldName="SN" CssClass="task-grid" RowClick="OnTaskRowClick"
+                                    CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false"
+                                    TextWrapEnabled="true">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                                    <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
+                                    <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
+                                    <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
+                                </Columns>
+                            </DxGrid>
+                        </div>
+
+                        <!-- Right: Charts -->
+                        <div class="right-panel">
+                            <!-- Pie: Room Occupancy -->
+                            <div class="chart-card">
+                                <div class="chart-title">Room Occupancy (Today)</div>
+                                <DxPieChart Data="@occupancyData" Height="200px" Width="100%">
+                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
+                                    </DxPieChartSeries>
+                                </DxPieChart>
+                                <div class="legend-manual">
+                                    <span class="leg-item"><span class="dot vacant"></span> Vacant (2): 6.90 %</span>
+                                    <span class="leg-item"><span class="dot occupied"></span> Occupied (1): 93.10 %</span>
+                                </div>
+                            </div>
+
+                            <!-- Line: Reservations -->
+                            <div class="chart-card">
+                                <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
+                                <DxChart Data="@reservationData" Height="200px" Width="100%">
+                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                                    <DxChartArgumentAxis>
+                                        <DxChartAxisLabel />
+                                    </DxChartArgumentAxis>
+                                    <DxChartValueAxis>
+                                        <DxChartAxisRange StartValue="0" EndValue="80" />
+                                    </DxChartValueAxis>
+                                    <DxChartLineSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                                       ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                                       Color="@reservationLineColor">
+                                        <DxChartSeriesPoint Visible="true" />
+                                    </DxChartLineSeries>
+                                </DxChart>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom: Today's Room Status -->
+                    <div class="room-status-panel">
+                        <div class="room-status-title">Today's Room Status</div>
+                        <div class="room-status-placeholder">
+                            <!-- Placeholder – wire to real room status data when available -->
+                        </div>
+                    </div>
+                </DxTabPage>
+
+                <DxTabPage Text="Task Notification">
+                    <div class="tab-placeholder">Task Notification content</div>
+                </DxTabPage>
+                <DxTabPage Text="Activity">
+                    <div class="tab-placeholder">Activity content</div>
+                </DxTabPage>
+                <DxTabPage Text="Message">
+                    <div class="tab-placeholder">Message content</div>
+                </DxTabPage>
+                <DxTabPage Text="E-mail">
+                    <div class="tab-placeholder">E-mail content</div>
+                </DxTabPage>
+                <DxTabPage Text="Security">
+                    <div class="tab-placeholder">Security content</div>
+                </DxTabPage>
+                <DxTabPage Text="Personal Record">
+                    <div class="tab-placeholder">Personal Record content</div>
+                </DxTabPage>
+                <DxTabPage Text="My Note">
+                    <div class="tab-placeholder">My Note content</div>
+                </DxTabPage>
+            </DxTabs>
         </div>
-    </div>
-</div>
+
+        <style>
+            .dashboard-page {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: #f0f2f5;
+                min-height: 100vh;
+                padding: 0;
+            }
+
+            /* ---------- Top header ---------- */
+            .top-header {
+                display: flex;
+                gap: 12px;
+                padding: 6px 12px;
+                background: #fff;
+                border-bottom: 1px solid #d0d5dd;
+                align-items: stretch;
+            }
+
+            .user-card {
+                display: flex;
+                gap: 12px;
+                flex: 1;
+                padding: 4px 0;
+            }
+
+            /* Left: female icon */
+            .avatar {
+                width: 300px;
+                height: 300px;
+                border-radius: 4px;
+                background: #eceff1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #cfd8dc;
+                flex-shrink: 0;
+                overflow: hidden;
+            }
+
+            /* Right: flex column */
+            .user-details {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                gap: 4px;
+                padding-top: 2px;
+
+                
+            }
+
+            /* Row 1: full-width hotel name */
+            .welcome-row {
+                width: 100%;
+                font-size: 35px;
+                font-weight: 700;
+                color: #222;
+                line-height: 2.3;
+            }
+
+            .hotel-name {
+                color: #1565c0;
+            }
+
+            /* Row 2: two-column grid */
+            .info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0 24px;
+            }
+
+            .info-left,
+            .info-right {
+                display: flex;
+                flex-direction: column;
+                gap: 1px;
+            }
+
+            .info-row {
+                font-size: 12px;
+                line-height: 1.5;
+                color: #555;
+                white-space: nowrap;
+            }
+
+            .info-row .lbl {
+                display: inline-block;
+                width: 95px;
+                color: #777;
+            }
+
+            .info-row .val {
+                font-weight: 500;
+                color: #222;
+            }
+
+            /* ---------- Calendar (landscape) ---------- */
+            .calendar-box {
+                display: flex;
+                flex-direction: row;
+                align-items: stretch;
+                border: 1px solid #bdbdbd;
+                background: #fff;
+                padding: 5px 7px;
+                flex-shrink: 0;
+                gap: 8px;
+                height: 155px;
+                box-sizing: border-box;
+            }
+
+            /* Left sidebar: controls */
+            .cal-left {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: 4px;
+                min-width: 95px;
+                border-right: 1px solid #e0e0e0;
+                padding-right: 8px;
+            }
+
+            .cal-toggle {
+                font-size: 11px;
+            }
+
+            .cal-nav-vert {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                font-size: 11px;
+            }
+
+            .cal-lbl {
+                color: #777;
+                font-size: 10px;
+            }
+
+            .cal-footer-vert {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                text-align: center;
+                gap: 1px;
+                margin-top: 20px;
+                font-size: 11px;
+            }
+
+            .cal-date {
+                color: #555;
+                font-size: 14px;
+                text-align: center;
+                padding: 3px;
+                border: 1px solid lightgrey;
+                border-radius: 5px;
+            }
+
+            /* Right: calendar grid */
+            .cal-right {
+                flex: 1;
+                overflow: hidden;
+            }
+
+            .dash-calendar {
+                width: 100%;
+                font-size: 10px;
+            }
+
+            /* ---------- Logo ---------- */
+            .logo-box {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 180px;
+                flex-shrink: 0;
+                height: 155px;
+                box-sizing: border-box;
+                padding: 6px;
+            }
+
+            .cnet-logo-img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            /* ---------- Main tabs ---------- */
+            .main-tabs {
+                background: #fff;
+                margin: 0 8px;
+            }
+
+            .main-tabs ::deep .dxbl-tabs {
+                border-bottom: 1px solid #d0d5dd;
+                padding-left: 8px;
+            }
+
+            .main-tabs ::deep .dxbl-tabs-item {
+                padding: 8px 16px !important;
+                font-size: 13px;
+                font-weight: 600;
+                color: #666;
+            }
+
+            .main-tabs ::deep .dxbl-tabs-item-active {
+                color: #1565c0 !important;
+                border-bottom: 2px solid #1565c0 !important;
+            }
+
+            /* ---------- Dashboard body ---------- */
+            .dashboard-body {
+                display: flex;
+                gap: 10px;
+                padding: 10px;
+                background: #f5f6f8;
+                min-height: 380px;
+            }
+
+            .left-panel {
+                flex: 1.2;
+                background: #fff;
+                border: 1px solid #c8cdd4;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .panel-toolbar {
+                padding: 4px 6px;
+                border-bottom: 1px solid #e0e0e0;
+                background: #f8f9fa;
+            }
+
+            .task-grid {
+                flex: 1;
+                font-size: 12px;
+            }
+
+            /* Selected row */
+            .task-row-selected,
+            .task-row-selected td,
+            .task-row-selected .dxbl-grid-cell {
+                --dxbl-grid-cell-back: #0078d4 !important;
+                background-color: #0078d4 !important;
+                color: white !important;
+            }
+
+            .task-grid .dxbl-grid-data-row {
+                cursor: pointer;
+            }
+
+            .right-panel {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .chart-card {
+                background: #fff;
+                border: 1px solid #c8cdd4;
+                padding: 8px 12px;
+                flex: 1;
+            }
+
+            .chart-title {
+                text-align: center;
+                font-size: 15px;
+                font-weight: 600;
+                color: #1565c0;
+                margin-bottom: 4px;
+            }
+
+            .legend-manual {
+                display: flex;
+                justify-content: center;
+                gap: 18px;
+                font-size: 11px;
+                margin-top: 4px;
+            }
+
+            .leg-item {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 2px;
+                display: inline-block;
+            }
+
+            .dot.vacant {
+                background: #1e88e5;
+            }
+
+            .dot.occupied {
+                background: #c62828;
+            }
+
+            /* ---------- Room status ---------- */
+            .room-status-panel {
+                margin: 0 10px 10px;
+                background: #fff;
+                border: 1px solid #c8cdd4;
+                min-height: 120px;
+            }
+
+            .room-status-title {
+                text-align: center;
+                font-size: 16px;
+                font-weight: 600;
+                color: #1565c0;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .room-status-placeholder {
+                height: 80px;
+            }
+
+            .tab-placeholder {
+                padding: 40px;
+                text-align: center;
+                color: #999;
+                font-size: 14px;
+            }
+        </style>
 
 @code {
-    private string currentDateString = DateTime.Now.ToString("dddd, MMMM dd, yyyy", CultureInfo.InvariantCulture);
+    // ---------- Header / Calendar ----------
+    string calendarMode = "Gregorian";
+    string[] calendarModes = new[] { "Ethiopian", "Gregorian" };
+    int selectedMonth = 8;
+    int selectedYear = 2017;
+    DateTime selectedDate = new DateTime(2017, 8, 19);
+    DateTime visibleDate = new DateTime(2017, 8, 1);
 
-    private List<DashboardTask> tasksList = new()
+    List<int> months = Enumerable.Range(1, 12).ToList();
+
+    void OnVisibleDateChanged(DateTime date)
     {
-        new("HuluBeje App Registrations", 0, "Registrations Made By HuluBeje APP"),
-        new("Guest's Birthday", 0, "In-House Registrations where the guest's birthday is today."),
-        new("Today's Pickup", 0, "Registrations whose pickup for shuttle service is today."),
-        new("Today's Drop-off", 0, "Registrations whose drop-off for shuttle service is today."),
-        new("Over Due Out", 1, "Check In Registration Where Departure Date <= for Given Date"),
-        new("Due Out", 0, "Check In Registration Where Departure Date Is Today."),
-        new("No Show", 0, "6PM or Confirmed Reservation Where Departure Date <= for Given Date"),
-        new("Waiting List", 0, "Waiting Registration"),
-        new("Six PM Arrivals", 0, "All SIX PM Arrivals"),
-        new("Guaranteed Arrivals", 0, "All Guaranteed Arrivals"),
-        new("All Arrivals", 0, "All Arrivals")
+        visibleDate = date;
+        selectedMonth = date.Month;
+        selectedYear = date.Year;
+    }
+
+    void GoToday()
+    {
+        selectedDate = DateTime.Today;
+        visibleDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        selectedMonth = DateTime.Today.Month;
+        selectedYear = DateTime.Today.Year;
+    }
+
+    // ---------- Tabs ----------
+    int activeTab = 0;
+
+    // ---------- Task grid ----------
+    TaskItem? selectedTask;
+
+    List<TaskItem> taskItems = new()
+    {
+        new() { SN = 1, Task = "Over Due Out", Statistics = 79, Remark = "Check In Registration Where Departure Date <= for Given Date" },
+        new() { SN = 2, Task = "Due Out", Statistics = 0, Remark = "Check In Registration Where Departure Date Is Today." },
+        new() { SN = 3, Task = "No Show", Statistics = 0, Remark = "GPM or Confirmed Reservation Where Departure Date <= for Given Date" },
+        new() { SN = 4, Task = "Unassigned Reservation", Statistics = 7, Remark = "GPM or Confirmed Reservation Where Room is not assigned to them" },
+        new() { SN = 5, Task = "Waiting List", Statistics = 1, Remark = "Waiting Registration" },
+        new() { SN = 6, Task = "Arrival List", Statistics = 3, Remark = "All Arrival List" },
+        new() { SN = 7, Task = "Stay Overs", Statistics = 0, Remark = "Inhouse Registrations whose departure date is greater than today" },
+        new() { SN = 8, Task = "Departures", Statistics = 0, Remark = "Registrations that have already checked-out today" },
+        new() { SN = 9, Task = "Post Masters", Statistics = 5, Remark = "Check In Registrations Whose room type is Pseudo Room type" },
+        new() { SN = 10, Task = "Cancellations", Statistics = 0, Remark = "Registrations with cancel state" },
+        new() { SN = 11, Task = "Arrived", Statistics = 1, Remark = "Check-In registrations that have already arrived today" },
     };
 
-    private List<RoomStat> roomStatsList = new()
+    void OnTaskRowClick(GridRowClickEventArgs e)
     {
-        new(1, "Total House Keeping Rooms", 66),
-        new(2, "Total Clean", 58),
-        new(3, "Total Dirty", 8),
-        new(4, "Total Inspected", 0),
-        new(5, "Total Pickup", 0),
-        new(6, "Total Out Of Order", 0),
-        new(7, "Total Out Of Service", 0),
-        new(8, "Not Reserved - Clean", 58),
-        new(9, "Not Reserved - Dirty", 8),
-        new(10, "Not Reserved - Inspected", 0),
-        new(11, "Not Reserved - Pickup", 0),
-        new(12, "Not Reserved - Out Of Service", 0),
-        new(13, "Reserved - Clean", 0),
-        new(14, "Reserved - Dirty", 0),
-        new(15, "Reserved - Inspected", 0)
-    };
+        selectedTask = e.Grid?.GetDataItem(e.VisibleIndex) as TaskItem;
+    }
 
-    public class DashboardTask
+    void OnTaskCustomizeElement(GridCustomizeElementEventArgs e)
     {
-        public string TaskName { get; set; }
-        public int Stats { get; set; }
-        public string Remark { get; set; }
-
-        public DashboardTask(string taskName, int stats, string remark)
+        if (e.ElementType == GridElementType.DataRow)
         {
-            TaskName = taskName;
-            Stats = stats;
-            Remark = remark;
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as TaskItem;
+            if (item != null && selectedTask != null && item.SN == selectedTask.SN)
+                e.CssClass = "task-row-selected";
         }
     }
 
-    public class RoomStat
+    void RefreshTasks()
+    {
+        selectedTask = null;
+        StateHasChanged();
+    }
+
+    // ---------- Occupancy pie ----------
+    List<OccupancySlice> occupancyData = new()
+    {
+        new() { Name = "Vacant", Value = 6.90m },
+        new() { Name = "Occupied", Value = 93.10m }
+    };
+
+    // ---------- Reservations line ----------
+    int totalReservations = 141;
+    System.Drawing.Color reservationLineColor = System.Drawing.Color.FromArgb(0x1e, 0x88, 0xe5);
+
+    List<ReservationPoint> reservationData = new()
+    {
+        new() { Month = new DateTime(2017, 1, 1), Count = 12 },
+        new() { Month = new DateTime(2017, 2, 1), Count = 18 },
+        new() { Month = new DateTime(2017, 3, 1), Count = 25 },
+        new() { Month = new DateTime(2017, 4, 1), Count = 32 },
+        new() { Month = new DateTime(2017, 5, 1), Count = 55 },
+        new() { Month = new DateTime(2017, 6, 1), Count = 68 },
+        new() { Month = new DateTime(2017, 7, 1), Count = 42 },
+        new() { Month = new DateTime(2017, 8, 1), Count = 22 },
+        new() { Month = new DateTime(2017, 9, 1), Count = 15 },
+        new() { Month = new DateTime(2017, 10, 1), Count = 10 },
+        new() { Month = new DateTime(2017, 11, 1), Count = 8 },
+        new() { Month = new DateTime(2017, 12, 1), Count = 5 },
+    };
+
+    // ---------- Models ----------
+    public class TaskItem
     {
         public int SN { get; set; }
-        public string Description { get; set; }
-        public int Count { get; set; }
+        public string Task { get; set; } = "";
+        public int Statistics { get; set; }
+        public string Remark { get; set; } = "";
+    }
 
-        public RoomStat(int sn, string description, int count)
-        {
-            SN = sn;
-            Description = description;
-            Count = count;
-        }
+    public class OccupancySlice
+    {
+        public string Name { get; set; } = "";
+        public decimal Value { get; set; }
+    }
+
+    public class ReservationPoint
+    {
+        public DateTime Month { get; set; }
+        public int Count { get; set; }
     }
 }

@@ -1,0 +1,81 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Room Search" Width="780px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="ci-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSelect">
+                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check-lg"></i></div>
+                <div class="ci-text">Select</div>
+            </button>
+            <span style="margin-left:12px;">Feature</span>
+            <DxComboBox Data="@Features" @bind-Value="SelectedFeature" Width="130px" SizeMode="SizeMode.Small" />
+            <span style="margin-left:8px;">Room</span>
+            <DxTextBox @bind-Text="FilterText" Width="90px" SizeMode="SizeMode.Small" />
+            <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <DxTabs>
+            <DxTabPage Text="Rooms">
+                <DxGrid Data="@Rooms" KeyFieldName="SN" PageSize="10" ShowPager="false"
+                        SizeMode="SizeMode.Small" Height="280px" FocusedRowEnabled="true"
+                        FocusedRowKey="@(SelectedRoom?.SN)" FocusedRowKeyChanged="OnRoomFocusedKeyChanged"
+                        RowClick="OnRoomRowClick" CustomizeElement="OnRoomCustomize">
+                    <Columns>
+                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                        <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
+                        <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="110px" />
+                        <DxGridDataColumn FieldName="HKStatus" Caption="HK Status" Width="90px" />
+                        <DxGridDataColumn FieldName="FOStatus" Caption="FO Status" Width="90px" />
+                        <DxGridDataColumn FieldName="Floor" Caption="Floor" Width="90px" />
+                        <DxGridDataColumn FieldName="Feature" Caption="Feature" />
+                        <DxGridDataColumn FieldName="Remark" Caption="Remark" />
+                    </Columns>
+                </DxGrid>
+            </DxTabPage>
+            <DxTabPage Text="Pseudo Rooms">
+                <div style="padding:30px; text-align:center; color:#999;">Pseudo Rooms</div>
+            </DxTabPage>
+        </DxTabs>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public List<RoomSearchItem> Rooms { get; set; } = new();
+    [Parameter] public RoomSearchItem? SelectedRoom { get; set; }
+    [Parameter] public EventCallback<RoomSearchItem?> SelectedRoomChanged { get; set; }
+    [Parameter] public List<string> Features { get; set; } = new();
+    [Parameter] public string? SelectedFeature { get; set; }
+    [Parameter] public string FilterText { get; set; } = "";
+    [Parameter] public EventCallback OnSelect { get; set; }
+
+    void OnRoomRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid.GetDataItem(e.VisibleIndex) as RoomSearchItem;
+        SelectedRoomChanged.InvokeAsync(item);
+    }
+    void OnRoomFocusedKeyChanged(object newKey)
+    {
+        if (newKey is int sn)
+            SelectedRoomChanged.InvokeAsync(Rooms.FirstOrDefault(r => r.SN == sn));
+    }
+    void OnRoomCustomize(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataCell) return;
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomSearchItem;
+        if (item == null) return;
+        if (e.Column?.Caption == "HK Status")
+        {
+            if (item.HKStatus == "Clean") e.CssClass = "hk-clean";
+            else if (item.HKStatus == "Dirty") e.CssClass = "hk-dirty";
+        }
+        if (e.Column?.Caption == "FO Status" && item.FOStatus == "Vacant") e.CssClass = "fo-vacant";
+    }
+    async Task HandleSelect() => await OnSelect.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

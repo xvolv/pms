@@ -1,0 +1,261 @@
+/* House Keeping */
+.hk-tabs {
+    margin-bottom: 4px;
+}
+.dxbs-tabs ul.nav>li>a:not(.disabled) {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+/* Inactive tabs */
+.dxbs-tabs ul.nav > li > a:not(.active):not(.disabled) {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    color: rgb(28, 29, 29);
+}
+/* on inactive  */
+
+.hk-toolbar-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: 4px;
+}
+
+.hk-chk-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.hk-toolbar-sep {
+    width: 1px;
+    align-self: stretch;
+    background: #d3d3d3;
+    margin: 4px 6px;
+}
+
+/* Task Assignment: master/detail table (mirrors the Room & Tax Post expandable rows) */
+.hk-task-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.hk-task-table th {
+    text-align: left;
+    background-color: #eef1f4;
+    color: #4f5d73;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.hk-task-row td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f1f3f4;
+    color: #202124;
+}
+
+.hk-task-toggle {
+    cursor: pointer;
+    color: #1a73e8;
+}
+
+.hk-task-detail-row td {
+    padding: 0 10px 10px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.hk-task-detail {
+    border: 1px solid #a9cbee;
+    border-radius: 4px;
+    background-color: #eaf3fd;
+    overflow: hidden;
+}
+
+.hk-task-detail-title {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1a73e8;
+    background-color: #ffffff;
+    border-bottom: 1px solid #a9cbee;
+    border-right: 1px solid #a9cbee;
+    border-radius: 0 0 4px 0;
+}
+
+.hk-task-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.hk-task-detail-table th {
+    text-align: left;
+    padding: 6px 10px;
+    color: #4f5d73;
+    font-weight: 700;
+    border-bottom: 1px solid #a9cbee;
+}
+
+.hk-task-detail-table td {
+    padding: 6px 10px;
+    color: #202124;
+    border-bottom: 1px solid #d6e6f9;
+}
+
+.hk-task-detail-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Modal width overrides */
+.hk-task-details-modal,
+.hk-new-discrepancy-modal {
+    width: 560px;
+}
+
+.hk-task-grid-modal {
+    width: 640px;
+}
+
+.hk-add-employee-modal {
+    width: 420px;
+}
+
+.hk-print-modal {
+    width: 800px;
+}
+
+.hk-task-details-modal .rt-toolbar,
+.hk-task-grid-modal .rt-toolbar,
+.hk-add-employee-modal .rt-toolbar,
+.hk-new-discrepancy-modal .rt-toolbar {
+    margin: 12px 16px 0;
+}
+
+/* Attendant multi-select dropdown (Task Sheet Details) */
+.hk-attendant-field {
+    display: flex;
+    flex: 1;
+}
+
+.hk-attendant-field input {
+    flex: 1;
+    border-radius: 0;
+}
+
+.hk-attendant-dropdown {
+    border: 1px solid #bbb;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    margin-top: 4px;
+}
+
+.hk-attendant-dropdown-header {
+    background: #0078d7;
+    color: #ffffff;
+    padding: 6px 10px;
+}
+
+.hk-attendant-dropdown-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.hk-attendant-dropdown-footer {
+    padding: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    background: #f5f5f5;
+}
+
+/* Task Sheet Grid attendant tabs */
+.hk-attendant-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hk-attendant-tab {
+    border: 1px solid #bbb;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.hk-attendant-tab-active {
+    background: #0078d7;
+    border-color: #0078d7;
+    color: #ffffff;
+}
+
+.hk-attendant-tab-count {
+    opacity: 0.75;
+}
+
+/* Task Sheet Grid rooms list */
+.hk-task-grid-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+}
+
+.hk-task-grid-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: #5f6368;
+}
+
+.hk-yellow-col {
+    background-color: #fffbcc !important;
+}
+
+/* Print Preview */
+.hk-print-page {
+    background: #ffffff;
+    border: 2px solid #00a8e8;
+    padding: 20px;
+    width: 720px;
+    margin: 0 auto 20px;
+    font-size: 11px;
+}
+
+.hk-print-page:last-child {
+    margin-bottom: 0;
+}
+
+.hk-print-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.hk-print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.hk-print-table th,
+.hk-print-table td {
+    border: 1px solid #333;
+    padding: 3px 6px;
+    font-size: 10px;
+}
+
+.hk-print-table th {
+    background: #e8e8e8;
+}
+
+.hk-print-detail-table {
+    border: none;
+    margin: 0;
+}

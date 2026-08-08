@@ -1,56 +1,68 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Dialogs
 
-<div class="na-step">
+<div class="rt-toolbar">
+
+    @if (ShowAmend)
+    {
+        <button type="button" class="rt-toolbar-btn" @onclick="OpenAmend">
+            <i class="bi bi-calendar-event text-secondary"></i>
+            <span>@AmendLabel</span>
+        </button>
+    }
+    @if (ShowCheckOut)
+    {
+        <button type="button" class="rt-toolbar-btn" @onclick="OpenCheckOut">
+            <i class="bi bi-box-arrow-right text-secondary"></i>
+            <span>@CheckOutLabel</span>
+        </button>
+    }
+    @if (ShowCheckIn)
+    {
+        <button type="button" class="rt-toolbar-btn" @onclick="RequestCheckInConfirm">
+            <i class="bi bi-box-arrow-in-right text-secondary"></i>
+            <span>@CheckInLabel</span>
+        </button>
+    }
+    @if (ShowNoShow)
+    {
+        <button type="button" class="rt-toolbar-btn" @onclick="OpenNoShow">
+            <i class="bi bi-person-x text-secondary"></i>
+            <span>@NoShowLabel</span>
+        </button>
+    }
+    @if (ShowCancellation)
+    {
+        <button type="button" class="rt-toolbar-btn" @onclick="RequestCancelConfirm">
+            <i class="bi bi-x-octagon text-secondary"></i>
+            <span>@CancellationLabel</span>
+        </button>
+    }
+
+    @* <div class="toolbar-separator"></div> *@
+
+    <button type="button" class="rt-toolbar-btn"  @onclick="Print">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>@Title</h2>
         <p>@Description</p>
-    </div>
-
-    <div class="rt-toolbar">
-        @if (ShowAmend)
-        {
-            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenAmend">
-                <i class="bi bi-calendar-event text-secondary"></i>
-                <span>@AmendLabel</span>
-            </button>
-        }
-        @if (ShowCheckOut)
-        {
-            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenCheckOut">
-                <i class="bi bi-box-arrow-right text-secondary"></i>
-                <span>@CheckOutLabel</span>
-            </button>
-        }
-        @if (ShowCheckIn)
-        {
-            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenCheckIn">
-                <i class="bi bi-box-arrow-in-right text-secondary"></i>
-                <span>@CheckInLabel</span>
-            </button>
-        }
-        @if (ShowNoShow)
-        {
-            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="OpenNoShow">
-                <i class="bi bi-person-x text-secondary"></i>
-                <span>@NoShowLabel</span>
-            </button>
-        }
-        @if (ShowCancellation)
-        {
-            <button type="button" class="rt-toolbar-btn" disabled="@(selected == null)" @onclick="RequestCancelConfirm">
-                <i class="bi bi-x-octagon text-secondary"></i>
-                <span>@CancellationLabel</span>
-            </button>
-        }
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">
         @if (Registrations.Count == 0)
         {
             <div class="rt-placeholder">
-                <i class="bi bi-check-circle-fill" style="color:#198754; font-size:1.4rem;"></i>
-                <div style="margin-top:6px;">Nothing pending for @Title. You can proceed to the next step.</div>
+                <i class="bi bi-check-circle-fill" style="color:gray; font-size:1.4rem;"></i>
+                <div style="margin-top:6px;">You can proceed to the next step.</div>
             </div>
         }
         else
@@ -58,28 +70,27 @@
             <DxGrid @ref="grid" Data="@Registrations" KeyFieldName="Id" CssClass="rt-grid" RowClick="@OnRowClick"
                     CustomizeElement="@OnCustomizeElement">
                 <Columns>
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RegNo)" Caption="Reg. No" Width="10%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RegNo)" Caption="Registration No" Width="10%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Room)" Caption="Room" Width="7%" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RoomType)" Caption="Room Type"
+                                      Width="10%" />
                     <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Guest)" Caption="Guest" Width="16%" />
                     <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Company)" Caption="Company" Width="14%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Room)" Caption="Room" Width="7%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RoomType)" Caption="Room Type" Width="10%" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.ArrivalDate)" Caption="Arrival" Width="9%"
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.ArrivalDate)" Caption="Arrival Date" Width="14%"
                                       DisplayFormat="dd-MMM-yyyy" />
-                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.DepartureDate)" Caption="Departure" Width="9%"
-                                      DisplayFormat="dd-MMM-yyyy" />
+                    <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.DepartureDate)" Caption="Departure Date"
+                                      Width="14%" DisplayFormat="dd-MMM-yyyy" />
                     @if (ColumnMode == RegistrationColumnMode.Financial)
                     {
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%" />
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.TotalBill)" Caption="Total Bill" Width="8%"
-                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Remaining)" Caption="Remaining" Width="8%"
-                                          DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.PaymentType)" Caption="Payment" Width="9%" />
+                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Market)" Caption="Market" Width="9%" />
                     }
                     else
                     {
                         <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Adults)" Caption="Adults" Width="6%"
                                           TextAlignment="GridTextAlignment.Center" />
-                        <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%" />
+                        @* <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.RateCode)" Caption="Rate Code" Width="9%"
+                /> *@
                         <DxGridDataColumn FieldName="@nameof(NightAuditRegistration.Amount)" Caption="Amount" Width="9%"
                                           DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
                     }
@@ -96,27 +107,37 @@
     }
 </div>
 
-<DateAmendmentDialog Visible="@isAmendVisible" Title="@AmendDialogTitle" Draft="@amendDraft" AllowArrivalEdit="@AmendAllowArrivalEdit"
-                      Error="@amendError" OnSave="SaveAmend" OnClose="CloseAmend" />
+<DateAmendmentDialog Visible="@isAmendVisible" Title="@AmendDialogTitle" Draft="@amendDraft"
+                     AllowArrivalEdit="@AmendAllowArrivalEdit" Error="@amendError" OnSave="SaveAmend" OnClose="CloseAmend" />
 
-<CheckOutDialog Visible="@isCheckOutVisible" Registration="@selected" OnCheckOut="ConfirmCheckOut" OnViewFolio="OpenFolio"
-                OnClose="() => isCheckOutVisible = false" />
+<InfoDialog Visible="@isAmendSuccessVisible" Title="Information" Message="Date amendment successful!!!"
+            OnOk="() => isAmendSuccessVisible = false" />
 
-<FolioViewDialog Visible="@isFolioVisible" Registration="@selected" Charges="@folioCharges" OnClose="() => isFolioVisible = false" />
+<CheckOutDialog Visible="@isCheckOutVisible" Registration="@selected" OnCheckOut="ConfirmCheckOut"
+                OnViewFolio="OpenFolio" OnClose="() => isCheckOutVisible = false" />
 
-<CheckInDialog Visible="@isCheckInVisible" Registration="@selected" OnCheckIn="ConfirmCheckIn" OnClose="() => isCheckInVisible = false" />
+<FolioViewDialog Visible="@isFolioVisible" Registration="@selected" Charges="@folioCharges"
+                 OnClose="() => isFolioVisible = false" />
 
-<NoShowDialog Visible="@isNoShowVisible" Registration="@selected" OnNoShow="ConfirmNoShow" OnClose="() => isNoShowVisible = false" />
+<InfoDialog Visible="@isCheckInConfirmVisible" Title="Information"
+            Message="@CheckInConfirmMessage" OnOk="ConfirmCheckInRequest" />
+
+<CheckInDialog Visible="@isCheckInVisible" Registration="@selected" OnCheckIn="ConfirmCheckIn"
+               OnClose="() => isCheckInVisible = false" />
+
+<NoShowDialog Visible="@isNoShowVisible" Registration="@selected" OnNoShow="ConfirmNoShow"
+              OnClose="() => isNoShowVisible = false" />
 
 <ConfirmDialog Visible="@isCancelConfirmVisible" Title="Cancellation"
-               Message="@($"Are you sure you want to cancel reservation {selected?.RegNo} for {selected?.Guest}?")"
-               Danger="true" ConfirmText="Yes" CancelText="No" OnConfirm="ProceedToAuthorization"
+               Message="@($"Are you sure you want to cancel reservation {selected?.RegNo} for {selected?.Guest}?")" Danger="true"
+               ConfirmText="Yes" CancelText="No" OnConfirm="ProceedToAuthorization"
                OnCancel="() => isCancelConfirmVisible = false" />
 
-<AuthorizationDialog Visible="@isAuthVisible" OnAuthorized="OpenCancellationReason" OnCancel="() => isAuthVisible = false" />
+<AuthorizationDialog Visible="@isAuthVisible" OnAuthorized="OpenCancellationReason"
+                     OnCancel="() => isAuthVisible = false" />
 
-<CancellationDialog Visible="@isCancelReasonVisible" Registration="@selected" Reasons="@Reasons" OnCancelReservation="ConfirmCancellation"
-                     OnClose="() => isCancelReasonVisible = false" />
+<CancellationDialog Visible="@isCancelReasonVisible" Registration="@selected" Reasons="@Reasons"
+                    OnCancelReservation="ConfirmCancellation" OnClose="() => isCancelReasonVisible = false" />
 
 @code {
     public enum RegistrationColumnMode { Financial, Arrival }
@@ -136,6 +157,7 @@
 
     [Parameter] public bool ShowCheckIn { get; set; }
     [Parameter] public string CheckInLabel { get; set; } = "Check In";
+    [Parameter] public string CheckInConfirmMessage { get; set; } = "Do you want to check in this guest?";
 
     [Parameter] public bool ShowNoShow { get; set; }
     [Parameter] public string NoShowLabel { get; set; } = "No Show";
@@ -144,12 +166,14 @@
     [Parameter] public string CancellationLabel { get; set; } = "Cancellation";
 
     [Parameter] public EventCallback OnChanged { get; set; }
+    [Parameter] public Func<List<NightAuditRegistration>>? ReloadSample { get; set; }
 
     private IGrid? grid;
     private NightAuditRegistration? selected;
     private string? statusMessage;
 
     private bool isAmendVisible;
+    private bool isAmendSuccessVisible;
     private NightAuditRegistration? amendDraft;
     private string? amendError;
     private string AmendDialogTitle => ShowAmend ? $"{AmendLabel} - {selected?.RegNo}" : AmendLabel;
@@ -159,6 +183,7 @@
     private List<FolioChargeRow> folioCharges = new();
 
     private bool isCheckInVisible;
+    private bool isCheckInConfirmVisible;
     private bool isNoShowVisible;
 
     private bool isCancelConfirmVisible;
@@ -185,6 +210,24 @@
     private async Task Notify()
     {
         selected = null;
+        await OnChanged.InvokeAsync();
+    }
+
+    // ---- Print / Refresh ----
+    private async Task Print()
+    {
+        // will be implemented in the future
+    }
+
+    private async Task Refresh()
+    {
+        selected = null;
+        statusMessage = null;
+        if (ReloadSample != null)
+        {
+            Registrations.Clear();
+            Registrations.AddRange(ReloadSample());
+        }
         await OnChanged.InvokeAsync();
     }
 
@@ -215,6 +258,7 @@
         statusMessage = $"{amendDraft.RegNo}: dates amended. Arrival {amendDraft.ArrivalDate:dd-MMM-yyyy}, Departure {amendDraft.DepartureDate:dd-MMM-yyyy}.";
         Registrations.Remove(selected);
         amendDraft = null;
+        isAmendSuccessVisible = true;
         await Notify();
     }
 
@@ -263,21 +307,16 @@
         {
             charges.Add(new FolioChargeRow
             {
+                Sn = i + 1,
                 Date = reg.ArrivalDate.AddDays(i),
                 Description = $"Room Charge - {reg.RoomType}",
                 Reference = reg.RegNo,
+                RoomNo = reg.Room,
+                RoomType = reg.RoomType,
+                RoomRate = reg.RateCode,
+                Adults = reg.Adults,
+                Children = reg.Children,
                 Charge = reg.Amount,
-            });
-        }
-
-        if (reg.Paid > 0)
-        {
-            charges.Add(new FolioChargeRow
-            {
-                Date = reg.ArrivalDate,
-                Description = $"Payment - {reg.PaymentType}",
-                Reference = reg.RegNo,
-                Payment = reg.Paid,
             });
         }
 
@@ -285,6 +324,20 @@
     }
 
     // ---- Check In ----
+    private void RequestCheckInConfirm()
+    {
+        if (selected == null)
+            return;
+
+        isCheckInConfirmVisible = true;
+    }
+
+    private void ConfirmCheckInRequest()
+    {
+        isCheckInConfirmVisible = false;
+        OpenCheckIn();
+    }
+
     private void OpenCheckIn()
     {
         if (selected == null)

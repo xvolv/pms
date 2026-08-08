@@ -1,0 +1,333 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible"
+         HeaderText="@($"CHECK-IN (Share) - {RegistrationNo}")"
+         Width="1000px"  
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar" style="flex-wrap:wrap;">
+            <button type="button" class="ci-btn" @onclick="HandleNew">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-file-earmark-plus"></i></div>
+                <div class="ci-text">New</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleCheckIn">
+                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check2-square"></i></div>
+                <div class="ci-text">Check In</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-calendar"></i></div>
+                <div class="ci-text">Daily<br/>Detail</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleTravelDetail">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-briefcase"></i></div>
+                <div class="ci-text">Travel<br/>Detail</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-chat-square"></i></div>
+                <div class="ci-text">Comments</div>
+            </button>
+            <button type="button" class="ci-btn" disabled style="opacity:.45;">
+                <div class="ci-icon"><i class="bi bi-list-ul"></i></div>
+                <div class="ci-text">Reservation<br/>Detail</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-pencil"></i></div>
+                <div class="ci-text">Issue Card</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print Card</div>
+            </button>
+            <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <fieldset style="flex:1; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
+                <legend style="font-size:12.5px; font-weight:600; color:#1565c0; padding:0 4px;">Basic Info</legend>
+                <div class="amend-form">
+                    <div class="amend-row"><label>Guest Name</label>
+                        <div class="input-with-btn">
+                            <DxComboBox Data="@GuestNames" Value="@GuestName"
+                                        ValueChanged="@((string v) => GuestNameChanged.InvokeAsync(v))"
+                                        SizeMode="SizeMode.Small" />
+                            <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                                      RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="@(() => {})" />
+                        </div>
+                    </div>
+                    <div class="amend-row"><label>Nationality</label>
+                        <DxTextBox Text="@Nationality" TextChanged="@((string v) => NationalityChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Passport</label>
+                        <DxTextBox Text="@Passport" TextChanged="@((string v) => PassportChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Title</label>
+                        <DxTextBox Text="@Title" TextChanged="@((string v) => TitleChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Address</label>
+                        <DxTextBox Text="@Address" TextChanged="@((string v) => AddressChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="flex:1; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
+                <legend style="font-size:12.5px; font-weight:600; color:#1565c0; padding:0 4px;">Consignee</legend>
+                <div class="amend-form">
+                    <div class="amend-row"><label>Company</label>
+                        <DxTextBox Text="@Company" TextChanged="@((string v) => CompanyChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Agent</label>
+                        <DxTextBox Text="@Agent" TextChanged="@((string v) => AgentChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Contact</label>
+                        <DxTextBox Text="@Contact" TextChanged="@((string v) => ContactChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Group</label>
+                        <DxTextBox Text="@Group" TextChanged="@((string v) => GroupChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Source</label>
+                        <DxTextBox Text="@ConsigneeSource" TextChanged="@((string v) => ConsigneeSourceChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Member Type</label>
+                        <DxComboBox Data="@MemberTypes" Value="@MemberType"
+                                    ValueChanged="@((string? v) => MemberTypeChanged.InvokeAsync(v))"
+                                    SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+            <fieldset style="flex:1.2; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
+                <div class="amend-form">
+                    <div class="amend-row"><label>Arrival</label>
+                        <DxDateEdit Date="@Arrival" DateChanged="@((DateTime? v) => ArrivalChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>ETA</label>
+                        <DxTextBox Text="@Eta.ToString(@"hh\:mm\:ss")" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Nights</label>
+                        <DxSpinEdit Value="@Nights" ValueChanged="@((int v) => NightsChanged.InvokeAsync(v))" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Departure</label>
+                        <DxDateEdit Date="@Departure" DateChanged="@((DateTime? v) => DepartureChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Adults</label>
+                        <DxSpinEdit Value="@Adults" ValueChanged="@((int v) => AdultsChanged.InvokeAsync(v))" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Child</label>
+                        <DxSpinEdit Value="@Children" ValueChanged="@((int v) => ChildrenChanged.InvokeAsync(v))" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>No. of Rooms</label>
+                        <DxSpinEdit Value="@NoOfRooms" ValueChanged="@((int v) => NoOfRoomsChanged.InvokeAsync(v))" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Room Type</label>
+                        <DxComboBox Data="@RoomTypes" Value="@RoomType"
+                                    ValueChanged="@((string? v) => RoomTypeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>RTC</label>
+                        <DxComboBox Data="@RtcList" Value="@Rtc"
+                                    ValueChanged="@((string? v) => RtcChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Room</label>
+                        <div class="input-with-btn">
+                            <DxTextBox Text="@Room" TextChanged="@((string v) => RoomChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                            <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                                      RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                                      Click="HandleRoomSearch" />
+                        </div>
+                    </div>
+                    <div class="amend-row"><label></label>
+                        <DxCheckBox Checked="@FixedRate" CheckedChanged="@((bool v) => FixedRateChanged.InvokeAsync(v))">Fixed Rate</DxCheckBox>
+                    </div>
+                    <div class="amend-row"><label>Rate Code</label>
+                        <DxComboBox Data="@RateCodes" Value="@RateCode"
+                                    ValueChanged="@((string? v) => RateCodeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Packages</label>
+                        <DxComboBox Data="@Packages" Value="@Package"
+                                    ValueChanged="@((string? v) => PackageChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Rate</label>
+                        <DxTextBox Text="@Rate" TextChanged="@((string v) => RateChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="width:200px; flex-shrink:0; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
+                <div class="amend-form">
+                    <div class="amend-row"><label>Res. Type</label>
+                        <DxComboBox Data="@ResTypes" Value="@ResType"
+                                    ValueChanged="@((string? v) => ResTypeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Market</label>
+                        <DxComboBox Data="@Markets" Value="@Market"
+                                    ValueChanged="@((string? v) => MarketChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Source</label>
+                        <DxComboBox Data="@Sources" Value="@Source"
+                                    ValueChanged="@((string? v) => SourceChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Origin</label>
+                        <DxComboBox Data="@Origins" Value="@Origin"
+                                    ValueChanged="@((string? v) => OriginChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Payment</label>
+                        <DxComboBox Data="@Payments" Value="@Payment"
+                                    ValueChanged="@((string? v) => PaymentChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset style="flex:1; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
+                <legend style="font-size:12.5px; font-weight:600; color:#1565c0; padding:0 4px;">Rate Adjustment</legend>
+                <div style="display:flex; gap:12px; margin-bottom:8px;">
+                    <div style="display:flex; flex-direction:column; gap:8px; border:1px solid #c8cdd4; padding:10px; border-radius:3px;">
+                        <label style="font-size:12px;">
+                            <input type="radio" name="shareRateAdj@GetHashCode()" checked="@(RateAdjType == "Amount")"
+                                   @onchange="@(() => RateAdjTypeChanged.InvokeAsync("Amount"))" /> Amount
+                        </label>
+                        <label style="font-size:12px;">
+                            <input type="radio" name="shareRateAdj@GetHashCode()" checked="@(RateAdjType == "Percent")"
+                                   @onchange="@(() => RateAdjTypeChanged.InvokeAsync("Percent"))" /> Percent
+                        </label>
+                    </div>
+                    <div class="amend-form" style="flex:1;">
+                        <div class="amend-row"><label>Amount</label>
+                            <DxTextBox Text="@AdjAmount" TextChanged="@((string v) => AdjAmountChanged.InvokeAsync(v))"
+                                       Enabled="@(RateAdjType == "Amount")" SizeMode="SizeMode.Small" />
+                        </div>
+                        <div class="amend-row"><label>Percent</label>
+                            <DxTextBox Text="@AdjPercent" TextChanged="@((string v) => AdjPercentChanged.InvokeAsync(v))"
+                                       Enabled="@(RateAdjType == "Percent")" SizeMode="SizeMode.Small" />
+                        </div>
+                    </div>
+                </div>
+                <div class="amend-form">
+                    <div class="amend-row"><label>Reason</label>
+                        <DxComboBox Data="@Reasons" Value="@Reason"
+                                    ValueChanged="@((string? v) => ReasonChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Specials</label>
+                        <DxComboBox Data="@Specials" Value="@Special"
+                                    ValueChanged="@((string? v) => SpecialChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Voucher #</label>
+                        <DxTextBox Text="@Voucher" TextChanged="@((string v) => VoucherChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string? RegistrationNo { get; set; }
+
+    // Basic Info
+    [Parameter] public string GuestName { get; set; } = "";
+    [Parameter] public EventCallback<string> GuestNameChanged { get; set; }
+    [Parameter] public string Nationality { get; set; } = "";
+    [Parameter] public EventCallback<string> NationalityChanged { get; set; }
+    [Parameter] public string Passport { get; set; } = "";
+    [Parameter] public EventCallback<string> PassportChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public EventCallback<string> TitleChanged { get; set; }
+    [Parameter] public string Address { get; set; } = "";
+    [Parameter] public EventCallback<string> AddressChanged { get; set; }
+    // Consignee
+    [Parameter] public string Company { get; set; } = "";
+    [Parameter] public EventCallback<string> CompanyChanged { get; set; }
+    [Parameter] public string Agent { get; set; } = "";
+    [Parameter] public EventCallback<string> AgentChanged { get; set; }
+    [Parameter] public string Contact { get; set; } = "";
+    [Parameter] public EventCallback<string> ContactChanged { get; set; }
+    [Parameter] public string Group { get; set; } = "";
+    [Parameter] public EventCallback<string> GroupChanged { get; set; }
+    [Parameter] public string ConsigneeSource { get; set; } = "";
+    [Parameter] public EventCallback<string> ConsigneeSourceChanged { get; set; }
+    [Parameter] public string? MemberType { get; set; }
+    [Parameter] public EventCallback<string?> MemberTypeChanged { get; set; }
+    // Stay
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public EventCallback<DateTime?> ArrivalChanged { get; set; }
+    [Parameter] public TimeSpan Eta { get; set; }
+    [Parameter] public int Nights { get; set; } = 1;
+    [Parameter] public EventCallback<int> NightsChanged { get; set; }
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public EventCallback<DateTime?> DepartureChanged { get; set; }
+    [Parameter] public int Adults { get; set; } = 1;
+    [Parameter] public EventCallback<int> AdultsChanged { get; set; }
+    [Parameter] public int Children { get; set; }
+    [Parameter] public EventCallback<int> ChildrenChanged { get; set; }
+    [Parameter] public int NoOfRooms { get; set; } = 1;
+    [Parameter] public EventCallback<int> NoOfRoomsChanged { get; set; }
+    [Parameter] public string? RoomType { get; set; }
+    [Parameter] public EventCallback<string?> RoomTypeChanged { get; set; }
+    [Parameter] public string? Rtc { get; set; }
+    [Parameter] public EventCallback<string?> RtcChanged { get; set; }
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public EventCallback<string> RoomChanged { get; set; }
+    [Parameter] public bool FixedRate { get; set; }
+    [Parameter] public EventCallback<bool> FixedRateChanged { get; set; }
+    [Parameter] public string? RateCode { get; set; }
+    [Parameter] public EventCallback<string?> RateCodeChanged { get; set; }
+    [Parameter] public string? Package { get; set; }
+    [Parameter] public EventCallback<string?> PackageChanged { get; set; }
+    [Parameter] public string Rate { get; set; } = "";
+    [Parameter] public EventCallback<string> RateChanged { get; set; }
+    // Classification
+    [Parameter] public string? ResType { get; set; }
+    [Parameter] public EventCallback<string?> ResTypeChanged { get; set; }
+    [Parameter] public string? Market { get; set; }
+    [Parameter] public EventCallback<string?> MarketChanged { get; set; }
+    [Parameter] public string? Source { get; set; }
+    [Parameter] public EventCallback<string?> SourceChanged { get; set; }
+    [Parameter] public string? Origin { get; set; }
+    [Parameter] public EventCallback<string?> OriginChanged { get; set; }
+    [Parameter] public string? Payment { get; set; }
+    [Parameter] public EventCallback<string?> PaymentChanged { get; set; }
+    // Rate Adjustment
+    [Parameter] public string RateAdjType { get; set; } = "Amount";
+    [Parameter] public EventCallback<string> RateAdjTypeChanged { get; set; }
+    [Parameter] public string AdjAmount { get; set; } = "";
+    [Parameter] public EventCallback<string> AdjAmountChanged { get; set; }
+    [Parameter] public string AdjPercent { get; set; } = "";
+    [Parameter] public EventCallback<string> AdjPercentChanged { get; set; }
+    [Parameter] public string? Reason { get; set; }
+    [Parameter] public EventCallback<string?> ReasonChanged { get; set; }
+    [Parameter] public string? Special { get; set; }
+    [Parameter] public EventCallback<string?> SpecialChanged { get; set; }
+    [Parameter] public string Voucher { get; set; } = "";
+    [Parameter] public EventCallback<string> VoucherChanged { get; set; }
+    // Lookup lists
+    [Parameter] public List<string> GuestNames { get; set; } = new();
+    [Parameter] public List<string> MemberTypes { get; set; } = new();
+    [Parameter] public List<string> RoomTypes { get; set; } = new();
+    [Parameter] public List<string> RtcList { get; set; } = new();
+    [Parameter] public List<string> Packages { get; set; } = new();
+    [Parameter] public List<string> RateCodes { get; set; } = new();
+    [Parameter] public List<string> ResTypes { get; set; } = new();
+    [Parameter] public List<string> Markets { get; set; } = new();
+    [Parameter] public List<string> Sources { get; set; } = new();
+    [Parameter] public List<string> Origins { get; set; } = new();
+    [Parameter] public List<string> Payments { get; set; } = new();
+    [Parameter] public List<string> Reasons { get; set; } = new();
+    [Parameter] public List<string> Specials { get; set; } = new();
+    // Actions
+    [Parameter] public EventCallback OnCheckIn { get; set; }
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnRoomSearch { get; set; }
+    [Parameter] public EventCallback OnTravelDetail { get; set; }
+
+    async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
+    async Task HandleNew() => await OnNew.InvokeAsync();
+    async Task HandleRoomSearch() => await OnRoomSearch.InvokeAsync();
+    async Task HandleTravelDetail() => await OnTravelDetail.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

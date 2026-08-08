@@ -1,0 +1,79 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Rate Adjustment" Width="440px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Registration No.</label>
+                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Rate Code</label>
+                <DxTextBox @bind-Text="RateCode" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Amount</label>
+                <DxSpinEdit @bind-Value="Amount" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Start Date</label>
+                <DxDateEdit @bind-Date="StartDate" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>End Date</label>
+                <DxDateEdit @bind-Date="EndDate" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label></label>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    @foreach (var t in AdjTypes)
+                    {
+                        <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+                            <input type="radio" name="adjType" value="@t" checked="@(AdjType == t)"
+                                   @onchange="@(() => AdjType = t)" />
+                            @t
+                        </label>
+                    }
+                </div>
+            </div>
+            <div class="amend-row"><label>Factor</label>
+                <DxTextBox @bind-Text="Factor" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Value</label>
+                <DxSpinEdit @bind-Value="Value" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Reason</label>
+                <DxComboBox Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string RateCode { get; set; } = "";
+    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public DateTime? StartDate { get; set; }
+    [Parameter] public DateTime? EndDate { get; set; }
+    [Parameter] public string AdjType { get; set; } = "Amount";
+    [Parameter] public string Factor { get; set; } = "";
+    [Parameter] public decimal Value { get; set; }
+    [Parameter] public string? Reason { get; set; }
+
+    [Parameter] public List<string> AdjTypes { get; set; } = new();
+    [Parameter] public List<string> Reasons { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

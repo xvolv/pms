@@ -1,0 +1,170 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal hk-task-details-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Task Sheet Details</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Generate">
+                    <i class="bi bi-file-earmark-gear text-secondary"></i>
+                    <span>Generate</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+                <div class="hk-toolbar-sep"></div>
+                <div class="hk-toolbar-filters">
+                    <span class="tb-label">Task Date</span>
+                    <DxDateEdit @bind-Date="taskDate" CssClass="rt-detail-input" style="width:140px;" />
+                </div>
+            </div>
+
+            <div class="rt-modal-body">
+                @if (!string.IsNullOrEmpty(validationMessage))
+                {
+                    <div class="rt-validation-summary" style="margin-bottom:10px;">@validationMessage</div>
+                }
+
+                <fieldset class="rt-form-fieldset" style="margin-bottom:12px;">
+                    <legend>Room Status</legend>
+                    <div class="hk-chk-row">
+                        <DxCheckBox @bind-Checked="occupied">Occupied</DxCheckBox>
+                        <DxCheckBox @bind-Checked="vacant">Vacant</DxCheckBox>
+                        <DxCheckBox @bind-Checked="clean">Clean</DxCheckBox>
+                        <DxCheckBox @bind-Checked="dirty">Dirty</DxCheckBox>
+                        <DxCheckBox @bind-Checked="outOfOrder">Out Of Order</DxCheckBox>
+                        <DxCheckBox @bind-Checked="outOfService">Out Of Service</DxCheckBox>
+                        <DxCheckBox @bind-Checked="inspected">Inspected</DxCheckBox>
+                        <DxCheckBox @bind-Checked="pickup">Pickup</DxCheckBox>
+                    </div>
+                </fieldset>
+
+                <fieldset class="rt-form-fieldset" style="position:relative;">
+                    <legend>Task Assignment Values</legend>
+                    <div class="rt-detail-row">
+                        <label>Attendants</label>
+                        <div class="hk-attendant-field">
+                            <input type="text" class="form-control" value="@selectedAttendantText" readonly />
+                            <button class="btn btn-outline-secondary" style="border-radius:0;"
+                                    @onclick="() => showAttendantDropdown = !showAttendantDropdown">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @if (showAttendantDropdown)
+                    {
+                        <div class="hk-attendant-dropdown">
+                            <div class="hk-attendant-dropdown-header">
+                                <DxCheckBox @bind-Checked="selectAllAttendants" TextCssClass="text-white">(Select All)</DxCheckBox>
+                            </div>
+                            @foreach (var a in Attendants)
+                            {
+                                <div class="hk-attendant-dropdown-item">
+                                    <DxCheckBox @bind-Checked="a.Selected">@a.FullName</DxCheckBox>
+                                </div>
+                            }
+                            <div class="hk-attendant-dropdown-footer">
+                                <DxButton Text="OK" Click="ConfirmAttendants" RenderStyle="ButtonRenderStyle.Primary" />
+                                <DxButton Text="Cancel" Click="() => showAttendantDropdown = false" />
+                            </div>
+                        </div>
+                    }
+                </fieldset>
+            </div>
+        </div>
+    </div>
+}
+
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="@infoMessage"
+            OnOk="() => showInfoPopup = false" />
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public List<AttendantRow> Attendants { get; set; } = new();
+    [Parameter] public List<RoomTaskRow> DemoRooms { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<TaskAssignmentRow> OnGenerated { get; set; }
+
+    private DateTime taskDate = DateTime.Today;
+    private bool occupied, vacant, clean, dirty, outOfOrder, outOfService, inspected, pickup;
+    private bool showAttendantDropdown;
+    private bool selectAllAttendants;
+    private string selectedAttendantText = "";
+    private string validationMessage = "";
+    private bool showInfoPopup;
+    private string infoMessage = "";
+
+    private async Task Close()
+    {
+        validationMessage = "";
+        await OnClose.InvokeAsync();
+    }
+
+    private void ConfirmAttendants()
+    {
+        selectedAttendantText = string.Join(", ", Attendants.Where(a => a.Selected).Select(a => a.FullName));
+        showAttendantDropdown = false;
+    }
+
+    private async Task Generate()
+    {
+        validationMessage = "";
+
+        if (!occupied && !vacant)
+        {
+            infoMessage = "Please Select Fo Status First!";
+            showInfoPopup = true;
+            return;
+        }
+        if (!clean && !dirty && !outOfOrder && !outOfService && !inspected && !pickup)
+        {
+            infoMessage = "Please Select House Keeping Status!";
+            showInfoPopup = true;
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(selectedAttendantText))
+        {
+            validationMessage = "Please select at least one attendant.";
+            return;
+        }
+
+        var selectedAttendants = Attendants.Where(a => a.Selected).ToList();
+        var roomGroups = HouseKeepingState.DivideRooms(DemoRooms, selectedAttendants.Count);
+
+        var newAssignment = new TaskAssignmentRow
+        {
+            TaskDate = taskDate,
+            Auto = true,
+            TotalSheets = selectedAttendants.Count,
+            Details = selectedAttendants.Select((a, i) =>
+            {
+                var rooms = roomGroups.ElementAtOrDefault(i) ?? new List<RoomTaskRow>();
+                return new TaskDetailRow
+                {
+                    AttendantCode = a.Code,
+                    AttendantName = a.FullName,
+                    TotalRooms = rooms.Count,
+                    TotalCredit = rooms.Sum(r => r.Credit),
+                    Rooms = rooms,
+                };
+            }).ToList(),
+        };
+        newAssignment.TotalCredits = newAssignment.Details.Sum(d => d.TotalCredit);
+
+        occupied = vacant = clean = dirty = outOfOrder = outOfService = inspected = pickup = false;
+        selectAllAttendants = false;
+        foreach (var a in Attendants)
+            a.Selected = false;
+        selectedAttendantText = "";
+
+        await OnGenerated.InvokeAsync(newAssignment);
+    }
+}

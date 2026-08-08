@@ -1,0 +1,730 @@
+﻿@page "/revenue"
+@rendermode InteractiveServer
+
+@inject NavigationManager Navigation
+@using DevExpress.Blazor
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Rate</PageTitle>
+<div class="dashboard-wrapper">
+
+    <div class="">
+
+        <!-- Ribbon -->
+        <DxTabs @bind-ActiveTabIndex="ribbonActiveTab" CssClass="custom-ribbon-tabs">
+
+            <DxTabPage Text="Rate" />
+
+        </DxTabs>
+
+        <div class="sub-section">
+            <!-- Toolbar -->
+            <RateToolbar OnRefresh="Refresh" OnSave="Save" OnNew="New" OnEdit="Edit" OnDelete="Delete"
+                         OnPrint="Print" />
+
+  
+
+
+            <!-- Work Area -->
+            <div class="erp-content">
+
+                <DxTabs @bind-ActiveTabIndex="@ActiveOuterTabIndex" CssClass="custom-content-tabs">
+
+                    @* ---------------- Rate Category ---------------- *@
+                    <DxTabPage Text="Rate Category">
+                        <div class="rate-category-content">
+                            <DxGrid @ref="CategoryGridRef" Data="@RootCategories" CssClass="rc-grid"
+                                    AutoCollapseDetailRow="false" RowClick="OnCategoryRowClick"
+                                    CustomizeElement="OnCategoryCustomizeElement">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="Description" Width="34%" />
+                                    <DxGridDataColumn FieldName="StartDate" Caption="Start Date" DisplayFormat="d"
+                                                      Width="22%" />
+                                    <DxGridDataColumn FieldName="EndDate" Caption="End Date" DisplayFormat="d"
+                                                      Width="22%" />
+                                    <DxGridDataColumn FieldName="Type" Width="22%" />
+                                </Columns>
+                                <DetailRowTemplate Context="masterContext">
+                                    @{
+                                        var parent = (RateCategoryRow)masterContext.DataItem; var children =
+                                                GetChildren(parent.Id);
+                                    }
+                                    @if (children.Count > 0)
+                                    {
+                                        <DxGrid Data="@children" CssClass="rc-grid rc-grid-nested"
+                                                RowClick="OnCategoryRowClick" CustomizeElement="OnCategoryCustomizeElement">
+                                            <Columns>
+                                                <DxGridDataColumn FieldName="Description" Width="34%" />
+                                                <DxGridDataColumn FieldName="StartDate" Caption="Start Date"
+                                                                  DisplayFormat="d" Width="22%" />
+                                                <DxGridDataColumn FieldName="EndDate" Caption="End Date" DisplayFormat="d"
+                                                                  Width="22%" />
+                                                <DxGridDataColumn FieldName="Type" Width="22%" />
+                                            </Columns>
+                                        </DxGrid>
+                                    }
+                                    else
+                                    {
+                                        <div class="rc-no-children">No child rate categories.</div>
+                                    }
+                                </DetailRowTemplate>
+                            </DxGrid>
+                        </div>
+                    </DxTabPage>
+
+                    @* ---------------- Rate Header ---------------- *@
+                    <DxTabPage Text="Rate Header">
+                        <RateHeader @ref="rateHeader" OnDeleteRequest="ShowDeleteConfirmation" />
+                    </DxTabPage>
+
+                    @* ---------------- Rate Detail ---------------- *@
+                    <DxTabPage Text="Rate Detail">
+                        <RateDetail @ref="rateDetail" OnDeleteRequest="ShowDeleteConfirmation" />
+                    </DxTabPage>
+
+                    @* ---------------- Rate Availability ---------------- *@
+                    <DxTabPage Text="Rate Availability">
+                        <RateAvailability @ref="rateAvailability" OnDeleteRequest="ShowDeleteConfirmation" />
+                    </DxTabPage>
+
+                </DxTabs>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@* ===================== RATE CATEGORY EDIT POPUP ===================== *@
+<DxPopup @bind-Visible="@IsPopupVisible" Width="480px" ShowFooter="false" ShowCloseButton="true"
+         CloseOnOutsideClick="false">
+
+    <HeaderTemplate>
+        <div class="popup-header">
+            <svg class="popup-header-icon" viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#c0392b" d="M12 2l1.9 6.3L20 10l-6.1 1.7L12 18l-1.9-6.3L4 10l6.1-1.7z" />
+            </svg>
+            <span class="popup-header-title">Rate Category</span>
+        </div>
+    </HeaderTemplate>
+
+    <BodyContentTemplate Context="popupContext">
+        <RateToolbar OnNew="OnNewClick" OnSave="OnSaveClick" OnClose="OnCloseClick" />
+
+        <EditForm EditContext="@EditContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="detail-form">
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Code</div>
+                    <DxTextBox @bind-Text="@EditModel.Code" ReadOnly="true" CssClass="code-box" Width="100%" />
+                    <ValidationMessage For="@(() => EditModel.Code)" />
+                </div>
+
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Description</div>
+                    <DxComboBox Data="@DescriptionOptions" @bind-Value="@EditModel.Description" CssClass="erp-combobox"
+                                Width="100%" AllowUserInput="true" />
+                    <ValidationMessage For="@(() => EditModel.Description)" />
+                </div>
+
+                <div class="detail-form-row two-col">
+                    <div class="col">
+                        <div class="detail-form-label">Start Date</div>
+                        <DxDateEdit @bind-Date="@EditModel.StartDate" Width="100%" />
+                        <ValidationMessage For="@(() => EditModel.StartDate)" />
+                    </div>
+                    <div class="col">
+                        <div class="detail-form-label">End Date</div>
+                        <DxDateEdit @bind-Date="@EditModel.EndDate" Width="100%" />
+                        <ValidationMessage For="@(() => EditModel.EndDate)" />
+                    </div>
+                </div>
+
+                <div class="detail-form-row two-col">
+                    <div class="col">
+                        <div class="detail-form-label">Parent</div>
+                        <DxComboBox Data="@ParentOptions" @bind-Value="@EditModel.Parent" CssClass="erp-combobox"
+                                    Width="100%" AllowUserInput="true" />
+                    </div>
+                    <div class="col">
+                        <div class="detail-form-label">Type</div>
+                        <DxComboBox Data="@TypeOptions" @bind-Value="@EditModel.Type" CssClass="erp-combobox"
+                                    Width="100%" />
+                        <ValidationMessage For="@(() => EditModel.Type)" />
+                    </div>
+                </div>
+
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Remark</div>
+                    <DxMemo @bind-Text="@EditModel.Remark" Rows="3" Width="100%" />
+                </div>
+
+                <div class="detail-form-row">
+                    <div class="detail-form-label">Rate Policy</div>
+                    <DxMemo @bind-Text="@EditModel.RatePolicy" Rows="5" Width="100%" />
+                </div>
+            </div>
+        </EditForm>
+    </BodyContentTemplate>
+</DxPopup>
+
+@* ===================== CONFIRMATION DIALOG ===================== *@
+<DxConfirmDialog @ref="confirmDialog"
+               Visible="@showConfirmDialog"
+               Title="Confirm Delete"
+               Message="@confirmMessage"
+               OnConfirm="OnConfirmDelete"
+               OnCancel="OnCancelDelete" />
+
+<style>
+    /* =====================================================
+       ERP MAIN PAGE
+    ===================================================== */
+
+    .erp-page {
+        min-height: 100%;
+        padding: 8px;
+    }
+
+    .custom-content-tabs .nav-link:not(.active),
+    .rooms-tabs .nav-link:not(.active) {
+        color: #6c757d !important;
+    }
+
+    /* =====================================================
+       RIBBON HEADER TABS
+    ===================================================== */
+
+    .custom-ribbon-tabs {
+        padding-left: 6px;
+    }
+
+    .custom-ribbon-tabs ::deep .dxbl-tabs {
+        min-height: 42px;
+    }
+
+    .custom-ribbon-tabs ::deep .dxbl-tabs-item {
+        height: 42px;
+        padding: 0 22px !important;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #495057;
+        background: #f8f9fa;
+        border-right: 1px solid #e1e5ea !important;
+        border-top: 3px solid transparent !important;
+        border-bottom: none !important;
+        transition: .15s ease;
+    }
+
+    .custom-ribbon-tabs ::deep .dxbl-tabs-item:hover {
+        background: #eef4fb !important;
+        color: #1d73d4;
+    }
+
+    .custom-ribbon-tabs ::deep .dxbl-tabs-item-active {
+        background: #ffffff !important;
+        color: #1d73d4 !important;
+        border-top: 3px solid #1d73d4 !important;
+    }
+
+    .custom-ribbon-tabs ::deep .dxbl-tabs-item-active .dxbl-tabs-item-text {
+        color: #1d73d4 !important;
+    }
+
+    /* =====================================================
+       MAIN WORK AREA
+    ===================================================== */
+    .sub-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .erp-content {
+        margin-top: 8px;
+        background: white;
+        border: 1px solid #d8dde5;
+        border-radius: 5px;
+        min-height: 500px;
+    }
+
+    /* =====================================================
+       INNER CONTENT TABS
+    ===================================================== */
+
+    .custom-content-tabs {}
+
+    .custom-content-tabs ::deep .dxbl-tabs {
+        padding-left: 8px;
+    }
+
+    .custom-content-tabs ::deep .dxbl-tabs-item {
+        padding: 10px 24px !important;
+        font-size: 14px;
+        font-weight: 600;
+        color: #6c757d;
+        border: none !important;
+        border-bottom: 3px solid transparent !important;
+        transition: .15s ease;
+    }
+
+    .custom-content-tabs ::deep .dxbl-tabs-item:hover {
+        background: #f6f9fc;
+        color: #1d73d4;
+    }
+
+    .custom-content-tabs ::deep .dxbl-tabs-item-active {
+        color: #1d73d4 !important;
+        background: white !important;
+        border-bottom: 3px solid #1d73d4 !important;
+    }
+
+    .custom-content-tabs ::deep .dxbl-tabs-item-active .dxbl-tabs-item-text {
+        color: #1d73d4 !important;
+    }
+
+    /* =====================================================
+       TAB CLOSE BUTTON
+    ===================================================== */
+
+    .tab-close {
+        border: none;
+        background: transparent;
+        color: #8b95a5;
+        font-size: 16px;
+        cursor: pointer;
+        margin-left: 8px;
+        padding: 0;
+    }
+
+    .tab-close:hover {
+        color: #dc3545;
+    }
+
+    /* =====================================================
+       TAB CONTENT PADDING
+    ===================================================== */
+
+    .erp-content ::deep .dxbl-tabs-content {
+        padding: 12px;
+    }
+
+    /* =====================================================
+       RATE PAGE SPECIFIC STYLES
+    ===================================================== */
+
+    .rate-category-content,
+    .rate-detail-content {
+        padding: 12px;
+    }
+
+    .rc-grid {
+        width: 100%;
+    }
+
+    .rc-grid-nested {
+        margin-left: 5px;
+        width: 100%;
+    }
+
+    .rc-no-children {
+        padding: 8px 24px;
+        color: #888;
+        font-size: 13px;
+    }
+
+    .rc-placeholder {
+        padding: 20px;
+        color: #888;
+        font-size: 13px;
+    }
+
+    /* DxComboBox theme override, consistent with prior ERP styling */
+    .erp-combobox * {
+        background-color: #fff;
+    }
+
+    /* Selected row highlighting.
+       DxGrid paints each cell's background via the --dxbl-grid-cell-back
+       CSS variable, which normally overrides a plain background-color on
+       the row/class. Overriding that variable (plus !important) makes sure
+       this wins regardless of DevExpress's own row styling. */
+    .rc-row-selected,
+    .rc-row-selected td,
+    .rc-row-selected .dxbl-grid-cell {
+        --dxbl-grid-cell-back: #0078d4 !important;
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
+
+    .rc-grid .dxbl-grid-data-row {
+        cursor: pointer;
+    }
+
+    /* =====================================================
+       POPUP STYLING (from Package page)
+    ===================================================== */
+
+    .popup-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .popup-header-icon {
+        flex-shrink: 0;
+    }
+
+    .popup-header-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-form {
+        padding: 16px;
+    }
+
+    .detail-form-row {
+        margin-bottom: 12px;
+    }
+
+    .detail-form-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .detail-form-row.two-col {
+        display: flex;
+        gap: 12px;
+    }
+
+    .detail-form-row.two-col .col {
+        flex: 1;
+    }
+
+    .code-box {
+        background-color: #f0f0f0;
+    }
+</style>
+
+@code {
+    // ---------- Component References ----------
+    RateHeader? rateHeader;
+    RateDetail? rateDetail;
+    RateAvailability? rateAvailability;
+
+    // ---------- Ribbon Tabs ----------
+    private int ribbonActiveTab = 0;
+
+    // ---------- Outer DxTabs ----------
+    private int ActiveOuterTabIndex = 0;
+
+    // ---------- Rate Category tab : DxGrid master-detail (tree-like via DetailRowTemplate) ----------
+    private DxGrid? CategoryGridRef;
+    private RateCategoryRow? SelectedCategoryRow;
+
+    // Flat hardcoded demo data; ParentId null = root row, otherwise nested under that Id.
+    private List<RateCategoryRow> AllCategories = new()
+    {
+        new RateCategoryRow { Id = 1, ParentId = null, Description = "Standard Rate", StartDate = new DateTime(2017,1,1),
+EndDate = new DateTime(2018,12,31), Type = "Rate Class", Remark = "", RatePolicy = "" },
+        new RateCategoryRow { Id = 2, ParentId = null, Description = "Special Rate", StartDate = new DateTime(2017,1,1), EndDate
+= new DateTime(2018,12,31), Type = "Rate Class", Remark = "", RatePolicy = "" },
+        new RateCategoryRow { Id = 3, ParentId = 2, Description = "Weekend Special", StartDate = new DateTime(2017,5,18),
+EndDate = new DateTime(2017,5,31), Type = "Rate Class", Remark = "", RatePolicy = "" },
+        new RateCategoryRow { Id = 4, ParentId = null, Description = "Group Room Rate", StartDate = new DateTime(2017,3,1),
+EndDate = new DateTime(2018,4,7), Type = "Rate Class", Remark = "", RatePolicy = "" },
+    };
+
+    private List<RateCategoryRow> RootCategories => AllCategories.Where(c => c.ParentId == null).ToList();
+
+    private List<RateCategoryRow> GetChildren(int parentId) => AllCategories.Where(c => c.ParentId == parentId).ToList();
+
+    private void OnCategoryRowClick(GridRowClickEventArgs e)
+    {
+        SelectedCategoryRow = e.Grid?.GetDataItem(e.VisibleIndex) as RateCategoryRow;
+    }
+
+    private void OnCategoryCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateCategoryRow;
+            if (item != null && SelectedCategoryRow != null && item.Id == SelectedCategoryRow.Id)
+            {
+                e.CssClass = "rc-row-selected";
+            }
+        }
+    }
+
+    // ---------- Popup / EditForm (Rate Category add/edit) ----------
+    private bool IsPopupVisible = false;
+    private RateCategoryEditModel EditModel = new();
+    private EditContext? EditContext;
+    private bool IsEditMode = false;
+
+    // ---------- Confirmation Dialog ----------
+    private bool showConfirmDialog = false;
+    private DxConfirmDialog? confirmDialog;
+    private string confirmMessage = "Are you sure you want to delete this item?";
+    private Action? pendingDeleteAction;
+
+    private readonly List<string> DescriptionOptions = new() { "Standard Rate", "Special Rate", "Weekend Special", "Group Room Rate" };
+    private readonly List<string> TypeOptions = new() { "Rate Class", "Rate Header", "Rate Package" };
+
+    private List<string> ParentOptions => AllCategories.Where(c => c.Id != EditModel.Id).Select(c =>
+c.Description).ToList();
+
+    // ---------- Toolbar Actions (delegated to child components) ----------
+    void New()
+    {
+        if (ActiveOuterTabIndex == 0)
+            OnNewClick();
+        else if (ActiveOuterTabIndex == 1)
+            rateHeader?.New();
+        else if (ActiveOuterTabIndex == 2)
+            rateDetail?.New();
+        else if (ActiveOuterTabIndex == 3)
+            rateAvailability?.New();
+    }
+
+    void Edit()
+    {
+        if (ActiveOuterTabIndex == 0)
+            OnEditClick();
+        else if (ActiveOuterTabIndex == 1)
+            rateHeader?.Edit();
+        else if (ActiveOuterTabIndex == 2)
+            rateDetail?.Edit();
+    }
+
+    void Delete()
+    {
+        if (ActiveOuterTabIndex == 0)
+            OnDeleteCategoryClick();
+        else if (ActiveOuterTabIndex == 1)
+            rateHeader?.Delete();
+        else if (ActiveOuterTabIndex == 2)
+            rateDetail?.Delete();
+    }
+
+    void Print()
+    {
+        if (ActiveOuterTabIndex == 0)
+            OnPrintClick();
+    }
+
+    // ---------- Rate Category Toolbar Actions ----------
+    void OnNewClick()
+    {
+        IsEditMode = false;
+        EditModel = new RateCategoryEditModel();
+        EditContext = new EditContext(EditModel);
+        IsPopupVisible = true;
+    }
+
+    void OnEditClick()
+    {
+        if (SelectedCategoryRow == null)
+        {
+            return;
+        }
+
+        IsEditMode = true;
+        EditModel = new RateCategoryEditModel
+        {
+            Id = SelectedCategoryRow.Id,
+            Code = SelectedCategoryRow.Id.ToString(),
+            Description = SelectedCategoryRow.Description,
+            StartDate = SelectedCategoryRow.StartDate,
+            EndDate = SelectedCategoryRow.EndDate,
+            Parent = SelectedCategoryRow.ParentId.HasValue ? AllCategories.FirstOrDefault(c => c.Id ==
+SelectedCategoryRow.ParentId)?.Description : "",
+            Type = SelectedCategoryRow.Type,
+            Remark = SelectedCategoryRow.Remark,
+            RatePolicy = SelectedCategoryRow.RatePolicy
+        };
+        EditContext = new EditContext(EditModel);
+        IsPopupVisible = true;
+    }
+
+    void OnDeleteCategoryClick()
+    {
+        if (SelectedCategoryRow == null)
+        {
+            return;
+        }
+
+        // Check if has children
+        var children = GetChildren(SelectedCategoryRow.Id);
+        if (children.Count > 0)
+        {
+            return; // Cannot delete parent with children
+        }
+
+        confirmMessage = "Are you sure you want to delete this rate category?";
+        pendingDeleteAction = () =>
+        {
+            AllCategories.Remove(SelectedCategoryRow);
+            SelectedCategoryRow = null;
+        };
+        showConfirmDialog = true;
+    }
+
+    void ShowDeleteConfirmation(string message, Action deleteAction)
+    {
+        confirmMessage = message;
+        pendingDeleteAction = deleteAction;
+        showConfirmDialog = true;
+    }
+
+    void OnConfirmDelete()
+    {
+        pendingDeleteAction?.Invoke();
+        showConfirmDialog = false;
+        pendingDeleteAction = null;
+    }
+
+    void OnCancelDelete()
+    {
+        showConfirmDialog = false;
+        pendingDeleteAction = null;
+    }
+
+    void OnPrintClick()
+    {
+        // Hook up print/report logic here.
+    }
+
+    void OnSaveClick()
+    {
+        if (!EditContext?.Validate() ?? false)
+        {
+            return;
+        }
+
+        int? parentId = null;
+        if (!string.IsNullOrEmpty(EditModel.Parent))
+        {
+            var parent = AllCategories.FirstOrDefault(c => c.Description == EditModel.Parent);
+            parentId = parent?.Id;
+        }
+
+        if (IsEditMode)
+        {
+            var existing = AllCategories.FirstOrDefault(c => c.Id == EditModel.Id);
+            if (existing != null)
+            {
+                existing.ParentId = parentId;
+                existing.Description = EditModel.Description;
+                existing.StartDate = EditModel.StartDate ?? DateTime.Today;
+                existing.EndDate = EditModel.EndDate ?? DateTime.Today;
+                existing.Type = EditModel.Type;
+                existing.Remark = EditModel.Remark ?? "";
+                existing.RatePolicy = EditModel.RatePolicy ?? "";
+            }
+        }
+        else
+        {
+            int _codeSeed = AllCategories.Count > 0 ? AllCategories.Max(c => c.Id) + 1 : 1;
+
+            var newCategory = new RateCategoryRow
+            {
+                Id = _codeSeed,
+                ParentId = parentId,
+                Description = EditModel.Description,
+                StartDate = EditModel.StartDate ?? DateTime.Today,
+                EndDate = EditModel.EndDate ?? DateTime.Today,
+                Type = EditModel.Type,
+                Remark = EditModel.Remark ?? "",
+                RatePolicy = EditModel.RatePolicy ?? ""
+            };
+            AllCategories.Add(newCategory);
+        }
+
+        IsPopupVisible = false;
+        SelectedCategoryRow = null;
+    }
+
+    void Save()
+    {
+
+    }
+
+    void Refresh()
+    {
+
+    }
+
+    void OnCloseClick()
+    {
+        IsPopupVisible = false;
+        SelectedCategoryRow = null;
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void OnRefreshClick()
+    {
+        // Reload data from service/database
+        SelectedCategoryRow = null;
+    }
+
+    private int _codeSeed = 5;
+    private string GenerateNextCode() => $"RCA{(++_codeSeed):D9}";
+
+    // ---------- Models ----------
+    public class RateCategoryRow
+    {
+        public int Id { get; set; }
+        public int? ParentId { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public string Remark { get; set; } = string.Empty;
+        public string RatePolicy { get; set; } = string.Empty;
+    }
+
+    public class RateDetailRow
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Type { get; set; } = string.Empty;
+    }
+
+    public class RateCategoryEditModel
+    {
+        public int Id { get; set; }
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Description is required.")]
+        public string Description { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Start Date is required.")]
+        public DateTime? StartDate { get; set; }
+
+        [Required(ErrorMessage = "End Date is required.")]
+        public DateTime? EndDate { get; set; }
+
+        public string? Parent { get; set; }
+
+        [Required(ErrorMessage = "Type is required.")]
+        public string Type { get; set; } = string.Empty;
+
+        public string? Remark { get; set; }
+        public string? RatePolicy { get; set; }
+    }
+}

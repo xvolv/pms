@@ -1,0 +1,1339 @@
+@page "/reservation"
+@rendermode InteractiveServer
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration
+
+<PageTitle>Reservation - CNET ERP</PageTitle>
+
+<div class="reservation-page">
+
+    <!-- ===================== TITLE BAR ===================== -->
+    <div class="window-title">
+        <img src="/cnet logo.jpg" class="title-icon" alt="CNET Logo" />
+        <span class="title-text">RESERVATION - @ReservationNo</span>
+        <!-- <button class="btn-close-win" @onclick="CloseWindow">×</button> -->
+    </div>
+
+    <!-- ===================== COMMAND PANEL ===================== -->
+    <RegistrationToolbar ToolbarContext="ToolbarContextType.CommandPanel"
+                        OnNew="NewReservation"
+                        OnSave="SaveReservation"
+                        OnTravelDetail="OpenTravelDetail"
+                        OnComments="OpenComments"
+                        OnClose="CloseWindow">
+        <StateContent>
+            <DxComboBox Data="@reservationStates" @bind-Value="selectedState" Width="110px" SizeMode="SizeMode.Small" />
+        </StateContent>
+    </RegistrationToolbar>
+
+    <!-- ===================== MAIN FORM + RED COMMENT BAR ===================== -->
+    <div class="main-area">
+
+       
+
+        <div class="form-body">
+
+            <!-- TOP ROW: Basic Info + Consignee -->
+            <div class="top-row">
+                <!-- LEFT: Basic Info -->
+                <div class="left-middle">
+                    <!-- Basic Info -->
+                    <fieldset class="section">
+                        <legend>Basic Info</legend>
+                        <div class="basic-grid">
+                            <label>Guest Name</label>
+                            <div class="input-with-btn wide">
+                                <DxComboBox Data="@guestList"
+                                            TextFieldName="FullName"
+                                            ValueFieldName="Id"
+                                            @bind-Value="selectedGuestId"
+                                            SearchMode="ListSearchMode.AutoSearch"
+                                            SearchFilterCondition="ListSearchFilterCondition.Contains"
+                                            NullText=""
+                                            Width="100%"
+                                            SizeMode="SizeMode.Small"
+                                            SelectedItemChanged="OnGuestSelected" />
+                                <DxButton IconCssClass="bi bi-plus-lg"
+                                          CssClass="circle-btn"
+                                          RenderStyle="ButtonRenderStyle.Secondary"
+                                          SizeMode="SizeMode.Small"
+                                          Click="OpenGuestSearch" />
+                            </div>
+
+                            <label>Nationality</label>
+                            <DxTextBox @bind-Text="nationality" SizeMode="SizeMode.Small" />
+                            <label>Passport</label>
+                            <DxTextBox @bind-Text="passport" SizeMode="SizeMode.Small" />
+
+                            <label>Title</label>
+                            <DxTextBox @bind-Text="title" SizeMode="SizeMode.Small" />
+                            <label>Address</label>
+                            <div class="input-with-btn">
+                                <DxTextBox @bind-Text="address" SizeMode="SizeMode.Small" />
+                                <DxButton Text="A" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- RIGHT: Consignee -->
+                <div class="right-col">
+                <fieldset class="section consignee-section">
+                    <legend>Consignee</legend>
+                    <div class="consignee-grid">
+                        <label>Company</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="company" SizeMode="SizeMode.Small" ReadOnly="true" />
+                            <DxButton IconCssClass="bi bi-caret-down-fill"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="@(() => OpenLookup("Company"))" />
+                        </div>
+                        <label>Agent</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="agent" SizeMode="SizeMode.Small" ReadOnly="true" />
+                            <DxButton IconCssClass="bi bi-caret-down-fill"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="@(() => OpenLookup("Agent"))" />
+                        </div>
+
+                        <label>Contact</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="contact" SizeMode="SizeMode.Small" ReadOnly="true" />
+                            <DxButton IconCssClass="bi bi-caret-down-fill"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="@(() => OpenLookup("Contact"))" />
+                        </div>
+                        <label>Group</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="group" SizeMode="SizeMode.Small" ReadOnly="true" />
+                            <DxButton IconCssClass="bi bi-caret-down-fill"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="@(() => OpenLookup("Group"))" />
+                        </div>
+
+                        <label>Source</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="consigneeSource" SizeMode="SizeMode.Small" ReadOnly="true" />
+                            <DxButton IconCssClass="bi bi-caret-down-fill"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="@(() => OpenLookup("Source"))" />
+                        </div>
+                        <label>Member Type</label>
+                        <DxComboBox Data="@memberTypes" @bind-Value="memberType" SizeMode="SizeMode.Small" />
+                    </div>
+                </fieldset>
+                </div>
+            </div>
+
+            <!-- Stay + Classification + Rate Adjustment -->
+            <div class="bottom-row">
+
+                <!-- Stay Info -->
+                <fieldset class="section stay-section">
+                    <div class="stay-grid">
+                        <label>Arrival</label>
+                        <DxDateEdit @bind-Date="arrivalDate" SizeMode="SizeMode.Small" />
+                        <label>ETA</label>
+                        <DxTimeEdit @bind-Time="eta" SizeMode="SizeMode.Small" />
+
+                        <label>Nights</label>
+                        <DxSpinEdit @bind-Value="nights" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
+                        <label></label><span></span>
+
+                        <label>Departure</label>
+                        <DxDateEdit @bind-Date="departureDate" SizeMode="SizeMode.Small" />
+                        <label></label><span></span>
+
+                        <label>Adults</label>
+                        <DxSpinEdit @bind-Value="adults" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
+                        <label>Child</label>
+                        <DxSpinEdit @bind-Value="children" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
+
+                        <label>No . of. Rooms</label>
+                        <DxSpinEdit @bind-Value="noOfRooms" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
+                        <label></label><span></span>
+
+                        <label>Room Type</label>
+                        <DxComboBox Data="@roomTypes" @bind-Value="roomType" SizeMode="SizeMode.Small" />
+                        <label>RTC.</label>
+                        <DxComboBox Data="@rtcList" @bind-Value="rtc" SizeMode="SizeMode.Small" />
+
+                        <label>Room</label>
+                        <div class="input-with-btn">
+                            <DxTextBox @bind-Text="room" SizeMode="SizeMode.Small" />
+                            <DxButton IconCssClass="bi bi-plus-lg"
+                                      CssClass="circle-btn"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="OpenRoomSearch" />
+                        </div>
+                        <label></label>
+                        <div class="checkbox-wrapper">
+                            <span>Fixed Rate</span>
+                            <DxCheckBox @bind-Checked="fixedRate" SizeMode="SizeMode.Small" />
+                        </div>
+
+                        <label>Rate Code</label>
+                        <div class="input-with-btn">
+                            <DxComboBox Data="@rateCodes" @bind-Value="rateCode" SizeMode="SizeMode.Small" />
+                            <DxButton IconCssClass="bi bi-plus-lg"
+                                      CssClass="circle-btn"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      SizeMode="SizeMode.Small"
+                                      Click="OpenRateSearch" />
+                        </div>
+                        <label>Packages</label>
+                        <DxComboBox Data="@packages" @bind-Value="package" SizeMode="SizeMode.Small" />
+
+                        <label>Rate</label>
+                        <DxTextBox @bind-Text="rate" SizeMode="SizeMode.Small" />
+                        <label>Total</label>
+                        <DxTextBox @bind-Text="total" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                </fieldset>
+
+                <!-- Classification -->
+                <fieldset class="section class-section">
+                    <div class="class-grid">
+                        <label>Res. Type</label>
+                        <DxComboBox Data="@resTypes" @bind-Value="resType" SizeMode="SizeMode.Small" />
+                        <label>Market</label>
+                        <DxComboBox Data="@markets" @bind-Value="market" SizeMode="SizeMode.Small" />
+                        <label>Source</label>
+                        <DxComboBox Data="@sources" @bind-Value="source" SizeMode="SizeMode.Small" />
+                        <label>Origin</label>
+                        <DxComboBox Data="@origins" @bind-Value="origin" SizeMode="SizeMode.Small" />
+                        <label>Payment</label>
+                        <DxComboBox Data="@payments" @bind-Value="payment" SizeMode="SizeMode.Small" />
+                    </div>
+                </fieldset>
+
+                <!-- Rate Adjustment -->
+                <fieldset class="section rate-section">
+                    <legend>Rate Adjustment</legend>
+                    
+                    <div class="rate-adj-content">
+                        <div class="radio-col">
+                            <label>
+                                <input type="radio" name="rateAdjType" value="Amount"
+                                       checked="@(rateAdjType == "Amount")"
+                                       @onchange="@(() => rateAdjType = "Amount")" /> Amount
+                            </label>
+                            <label>
+                                <input type="radio" name="rateAdjType" value="Percent"
+                                       checked="@(rateAdjType == "Percent")"
+                                       @onchange="@(() => rateAdjType = "Percent")" /> Percent
+                            </label>
+                        </div>
+                        <div class="rate-fields">
+                            <label>Amount</label>
+                            <div class="input-box">
+                                <DxTextBox @bind-Text="adjAmount" Enabled="@(rateAdjType == "Amount")" SizeMode="SizeMode.Small" />
+                            </div>
+                            <label>Percent</label>
+                            <div class="input-box">
+                                <DxTextBox @bind-Text="adjPercent" Enabled="@(rateAdjType == "Percent")" SizeMode="SizeMode.Small" />
+                            </div>
+                            <label>Value</label>
+                            <DxTextBox @bind-Text="adjValue" SizeMode="SizeMode.Small" />
+                        </div>
+                    </div>
+                    <div class="rate-adj-top">
+                        <label>Reason</label>
+                        <DxComboBox Data="@reasons" @bind-Value="reason" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="rate-bottom">
+                        <label>Specials</label>
+                        <DxComboBox Data="@specials" @bind-Value="special" SizeMode="SizeMode.Small" />
+                        <label>Voucher #</label>
+                        <DxTextBox @bind-Text="voucher" SizeMode="SizeMode.Small" />
+                    </div>
+                </fieldset>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(commentText))
+        {
+            <div class="comment-bar" @onclick="OpenComments" title="Click to view/edit comment">
+                <span>Comment</span>
+            </div>
+        }
+        </div>
+
+
+         
+    </div>
+    
+</div>
+
+<!-- ===================== ROOM SEARCH POPUP ===================== -->
+<DxPopup @bind-Visible="showRoomSearch"
+         HeaderText="@($"Room Search-{SelectedGuestName}")"
+         Width="900px" Height="550px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.RoomSearch"
+                            OnSelect="SelectRoom"
+                            OnClose="() => showRoomSearch = false">
+            <CustomContent>
+                <span style="margin-left:12px;">Feature</span>
+                <DxComboBox Data="@roomFeatures" @bind-Value="selectedFeature" Width="140px" SizeMode="SizeMode.Small" />
+                <span style="margin-left:8px;">Room</span>
+                <DxTextBox @bind-Text="roomFilter" Width="100px" SizeMode="SizeMode.Small" />
+            </CustomContent>
+        </RegistrationToolbar>
+
+        <DxTabs @bind-ActiveTabIndex="roomTab">
+            <DxTabPage Text="Rooms">
+                <DxGrid Data="@roomList" KeyFieldName="SN" PageSize="15" ShowPager="false"
+                        SizeMode="SizeMode.Small" Height="390px"
+                        RowClick="OnRoomRowClick"
+                        CustomizeElement="OnRoomCustomizeElement">
+                    <Columns>
+                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                        <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
+                        <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
+                        <DxGridDataColumn FieldName="HKStatus" Caption="HK Status" Width="90px" />
+                        <DxGridDataColumn FieldName="FOStatus" Caption="FO Status" Width="90px" />
+                        <DxGridDataColumn FieldName="Floor" Caption="Floor" Width="90px" />
+                        <DxGridDataColumn FieldName="Feature" Caption="Feature" />
+                        <DxGridDataColumn FieldName="Remark" Caption="Remark" />
+                    </Columns>
+                </DxGrid>
+            </DxTabPage>
+            <DxTabPage Text="Pseudo Rooms">
+                <div style="padding:40px; text-align:center; color:#999;">Pseudo Rooms content</div>
+            </DxTabPage>
+        </DxTabs>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== RATE SEARCH POPUP ===================== -->
+<DxPopup @bind-Visible="showRateSearch"
+         HeaderText="@($"Rate Search {rateStartDate:M/d/yyyy} - {rateEndDate:M/d/yyyy}")"
+         Width="920px" Height="480px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.RateSearch"
+                            OnSelect="SelectRate"
+                            OnSearch="SearchRates"
+                            OnRateInfo="ShowRateInfo"
+                            OnClose="() => showRateSearch = false">
+            <CustomContent>
+                <div class="rate-dates">
+                    <label>Start Date</label>
+                    <DxDateEdit @bind-Date="rateStartDate" Width="110px" SizeMode="SizeMode.Small" />
+                    <label>End Date</label>
+                    <DxDateEdit @bind-Date="rateEndDate" Width="110px" SizeMode="SizeMode.Small" />
+                </div>
+
+                <div class="rate-type">
+                    <label>
+                        <input type="radio" name="rateType" checked="@(rateSearchType == "Average")"
+                               @onchange="@(() => rateSearchType = "Average")" /> Average Rate
+                    </label>
+                    <label>
+                        <input type="radio" name="rateType" checked="@(rateSearchType == "Total")"
+                               @onchange="@(() => rateSearchType = "Total")" /> Total Rate
+                    </label>
+                </div>
+
+                <div>
+                    <label>Rate Code</label>
+                    <DxTextBox @bind-Text="rateSearchCode" Width="100px" SizeMode="SizeMode.Small" />
+                </div>
+
+                <div class="rate-status">
+                    <label>
+                        <input type="radio" name="rateStatus" checked="@(rateStatus == "Closed")"
+                               @onchange="@(() => rateStatus = "Closed")" /> Closed
+                    </label>
+                    <label>
+                        <input type="radio" name="rateStatus" checked="@(rateStatus == "Negotiated")"
+                               @onchange="@(() => rateStatus = "Negotiated")" /> Negotiated
+                    </label>
+                    <label>
+                        <input type="radio" name="rateStatus" checked="@(rateStatus == "DayUse")"
+                               @onchange="@(() => rateStatus = "DayUse")" /> Day Use
+                    </label>
+                </div>
+            </CustomContent>
+        </RegistrationToolbar>
+
+        <DxGrid Data="@rateSearchRows" KeyFieldName="Name" PageSize="10" ShowPager="false"
+                SizeMode="SizeMode.Small" Height="340px"
+                RowClick="OnRateRowClick"
+                CustomizeElement="OnRateCustomizeElement">
+            <Columns>
+                <DxGridDataColumn FieldName="Name" Caption="Name" Width="160px" />
+                <DxGridDataColumn FieldName="StandardRoom" Caption="Standard Room" />
+                <DxGridDataColumn FieldName="Executive" Caption="Executive" />
+                <DxGridDataColumn FieldName="PseudoRooms" Caption="Pseudo Rooms" />
+            </Columns>
+        </DxGrid>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== LOOKUP POPUP ===================== -->
+<DxPopup @bind-Visible="showLookup"
+         HeaderText="@lookupTitle"
+         Width="620px" Height="450px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.Lookup">
+            <CustomContent>
+                <DxTextBox @bind-Text="lookupSearchText" NullText="" Width="260px" SizeMode="SizeMode.Small"
+                           BindValueMode="BindValueMode.OnInput" />
+                <DxButton Text="Find" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="FilterLookup" />
+            </CustomContent>
+        </RegistrationToolbar>
+
+        <DxGrid Data="@filteredLookupItems" KeyFieldName="Code" PageSize="10" ShowPager="true"
+                SizeMode="SizeMode.Small" RowClick="OnLookupRowClick" Height="310px">
+            <Columns>
+                <DxGridDataColumn FieldName="Code" Caption="code" Width="120px" />
+                <DxGridDataColumn FieldName="Name" Caption="name" />
+                <DxGridDataColumn FieldName="IdNumber" Caption="id Number" Width="130px" />
+            </Columns>
+        </DxGrid>
+
+        <div class="lookup-footer">
+            <DxButton Text="New" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
+            <DxButton Text="Clear" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="ClearLookupSelection" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== TRAVEL DETAIL POPUP ===================== -->
+<DxPopup @bind-Visible="showTravelDetail"
+         HeaderText="Travel Detail"
+         Width="550px" Height="500px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.TravelDetail"
+                            OnReset="ResetTravelDetail"
+                            OnSave="SaveTravelDetail"
+                            OnClose="() => showTravelDetail = false" />
+
+        <DxTabs @bind-ActiveTabIndex="travelTab">
+            <DxTabPage Text="Arrival">
+                <div class="travel-form">
+                    <label>Pick Up Required</label>
+                    <DxComboBox Data="@yesNo" @bind-Value="pickupRequired" SizeMode="SizeMode.Small" />
+                    <label>Transportation Type</label>
+                    <DxComboBox Data="@transportTypes" @bind-Value="arrivalTransportType" SizeMode="SizeMode.Small" />
+                    <label>Station Code</label>
+                    <DxTextBox @bind-Text="arrivalStationCode" SizeMode="SizeMode.Small" />
+                    <label>Carrier Code</label>
+                    <DxComboBox Data="@carrierCodes" @bind-Value="arrivalCarrierCode" SizeMode="SizeMode.Small" />
+                    <label>Transportation #</label>
+                    <DxTextBox @bind-Text="arrivalTransportNo" SizeMode="SizeMode.Small" />
+                    <label>Arrival Date</label>
+                    <DxDateEdit @bind-Date="arrivalTravelDate" SizeMode="SizeMode.Small" />
+                    <label>Pick Up Time</label>
+                    <DxTimeEdit @bind-Time="pickupTime" SizeMode="SizeMode.Small" />
+                </div>
+            </DxTabPage>
+            <DxTabPage Text="Departure">
+                <div class="travel-form">
+                    <label>Drop Off Required</label>
+                    <DxComboBox Data="@yesNo" @bind-Value="dropoffRequired" SizeMode="SizeMode.Small" />
+                    <label>Transportation Type</label>
+                    <DxComboBox Data="@transportTypes" @bind-Value="departureTransportType" SizeMode="SizeMode.Small" />
+                    <label>Station Code</label>
+                    <DxTextBox @bind-Text="departureStationCode" SizeMode="SizeMode.Small" />
+                    <label>Carrier Code</label>
+                    <DxComboBox Data="@carrierCodes" @bind-Value="departureCarrierCode" SizeMode="SizeMode.Small" />
+                    <label>Departure Date</label>
+                    <DxDateEdit @bind-Date="departureTravelDate" SizeMode="SizeMode.Small" />
+                    <label>Transportation #</label>
+                    <DxTextBox @bind-Text="departureTransportNo" SizeMode="SizeMode.Small" />
+                    <label>Drop Off Time</label>
+                    <DxTimeEdit @bind-Time="dropoffTime" SizeMode="SizeMode.Small" />
+                </div>
+            </DxTabPage>
+        </DxTabs>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== COMMENTS POPUP ===================== -->
+<DxPopup @bind-Visible="showComments"
+         HeaderText="Comments"
+         Width="600px" Height="500px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.Comments"
+                            OnClear="() => commentText = string.Empty"
+                            OnSave="SaveComment"
+                            OnClose="() => showComments = false" />
+        <div style="padding: 10px;">
+            <DxMemo @bind-Text="commentText" Rows="14" Width="100%" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== GUEST SEARCH POPUP ===================== -->
+<DxPopup @bind-Visible="showGuestSearch"
+         HeaderText="Guest Search"
+         Width="720px" Height="500px"
+         CloseOnOutsideClick="false" ShowCloseButton="true">
+    <BodyContentTemplate>
+        <RegistrationToolbar ToolbarContext="ToolbarContextType.GuestSearch">
+            <CustomContent>
+                <DxTextBox @bind-Text="guestSearchText" Width="280px" SizeMode="SizeMode.Small"
+                           BindValueMode="BindValueMode.OnInput" />
+                <DxButton Text="Find" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="FilterGuests" />
+                <DxButton Text="Clear" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="ClearGuestFilter" />
+            </CustomContent>
+        </RegistrationToolbar>
+        <DxGrid Data="@filteredGuests" KeyFieldName="Id" PageSize="12" ShowPager="true"
+                SizeMode="SizeMode.Small" RowClick="OnGuestRowClick" Height="360px">
+            <Columns>
+                <DxGridDataColumn FieldName="Title" Caption="Title" Width="70px" />
+                <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
+                <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
+                <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
+                <DxGridDataColumn FieldName="Identification" Caption="Identification" Width="120px" />
+            </Columns>
+        </DxGrid>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .reservation-page {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        min-height: 100vh;
+        font-size: 12.5px;
+        padding: 0 20px;
+    }
+
+    .window-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        background: #fff;
+        border-bottom: 1px solid #d0d5dd;
+    }
+
+    .title-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+
+    .title-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: #1565c0;
+    }
+
+    .btn-close-win {
+        margin-left: auto;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .command-panel {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 10px;
+        background: #fff;
+        border-bottom: 1px solid #d0d5dd;
+        flex-wrap: wrap;
+    }
+
+    .cmd-group {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+    }
+
+    .state-group {
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding: 0 10px;
+    }
+
+    .state-label {
+        font-size: 12px;
+        color: #555;
+        margin-right: 5px;
+    }
+
+    .main-area {
+        display: flex;
+        min-height: 520px;
+    }
+
+    .comment-bar {
+        width: 100px;
+        height: 150px;
+        background: red;
+        color: black;
+        text-orientation: mixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-size: 17px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        user-select: none;
+        flex-shrink: 0;
+    }
+
+    .comment-bar:hover {
+        background: #c62828;
+    }
+
+    .form-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .top-row {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .left-middle {
+        flex: 1;
+    }
+
+    .right-col {
+        width: 50%;
+        flex-shrink: 0;
+    }
+
+    .section {
+        background: #fff;
+        border: 1px solid #c8cdd4;
+        border-radius: 2px;
+        padding: 8px 10px 10px;
+        margin: 0;
+    }
+
+    .section legend {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #1565c0;
+        padding: 0 4px;
+    }
+
+    .basic-grid {
+        display: grid;
+        grid-template-columns: 90px 1fr 80px 1fr;
+        gap: 5px 8px;
+        align-items: center;
+    }
+
+    .basic-grid label {
+        text-align: right;
+        color: #555;
+    }
+
+    .basic-grid .wide {
+        grid-column: span 3;
+    }
+
+    .bottom-row {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .stay-section {
+        width: 50%;
+    }
+
+    .class-section {
+        width: 295px;
+        flex-shrink: 0;
+    }
+
+    .rate-section {
+        flex: 1;
+    }
+
+    .stay-grid {
+        display: grid;
+        grid-template-columns: 95px 1fr 70px 1fr;
+        gap: 4px 6px;
+        align-items: center;
+    }
+
+    .stay-grid label {
+        text-align: right;
+        color: #555;
+        white-space: nowrap;
+    }
+
+    .class-grid {
+        display: grid;
+        grid-template-columns: 75px 1fr;
+        gap: 5px 6px;
+        align-items: center;
+    }
+
+    .class-grid label {
+        text-align: right;
+        color: #555;
+    }
+
+    .rate-adj-top {
+        display: flex;
+
+        gap: 15px;
+        align-items: center;
+        justify-content: end;
+        margin-bottom: 8px;
+    }
+
+    .rate-adj-top label {
+        text-align: right;
+        color: #555;
+        white-space: nowrap;
+    }
+
+    .rate-adj-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+      
+    }
+
+    .bordered-input {
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        padding: 1px;
+    }
+
+    .input-box {
+      
+        background: #fff;
+    }
+
+    .radio-col {
+    
+        display: flex;
+        flex-direction: column;
+        justify-centent: center;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid #c8cdd4;
+        border-radius: 3px;
+        padding: 60px;
+    }
+
+    .rate-fields {
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        gap: 4px 6px;
+        align-items: center;
+        flex: 1;
+        
+    }
+
+    .rate-fields label {
+        text-align: right;
+        color: #555;
+    }
+
+    .rate-bottom {
+        display: grid;
+        grid-template-columns: 70px 1fr;
+        gap: 4px 6px;
+        align-items: center;
+        border-top: 1px solid #eee;
+        padding-top: 8px;
+    }
+
+    .rate-bottom label {
+        text-align: right;
+        color: #555;
+    }
+
+    .consignee-grid {
+        display: grid;
+        grid-template-columns: 90px 1fr 80px 1fr;
+        gap: 6px 8px;
+        align-items: center;
+    }
+
+    .consignee-grid label {
+        text-align: right;
+        color: #555;
+        white-space: nowrap;
+    }
+
+    .input-with-btn {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+    }
+
+    .input-with-btn > :first-child {
+        flex: 1;
+    }
+
+    .circle-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .popup-toolbar {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .rate-dates,
+    .rate-type,
+    .rate-status {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin: 0 6px;
+        flex-wrap: wrap;
+    }
+
+    .rate-search-toolbar label {
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .lookup-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+        align-items: center;
+    }
+
+    .lookup-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 8px;
+        padding-top: 6px;
+        border-top: 1px solid #eee;
+    }
+
+    .guest-search-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+        align-items: center;
+    }
+
+    .travel-form {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 7px 10px;
+        align-items: center;
+        padding: 6px 0;
+    }
+
+    .travel-form label {
+        text-align: right;
+        color: #555;
+    }
+
+    .hk-dirty {
+        background-color: #e53935 !important;
+        color: white !important;
+    }
+
+    .fo-vacant {
+        background-color: #1e88e5 !important;
+        color: white !important;
+    }
+
+    .room-row-selected,
+    .room-row-selected td {
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
+
+    .rate-row-selected,
+    .rate-row-selected td {
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
+
+      .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 6px;
+    }
+ 
+    .checkbox-wrapper span {
+        color: #555;
+    }
+</style>
+
+@code {
+    string ReservationNo = "REG-00040-17";
+    string selectedState = "GPM";
+    string[] reservationStates = { "GPM", "Confirmed", "Tentative", "Cancelled", "No Show", "Checked In", "Checked Out" };
+
+    // Basic Info
+    int? selectedGuestId = 7;
+    string nationality = "Ethiopian";
+    string passport = "EP155353";
+    string title = "Ato";
+    string address = "";
+
+    // Stay
+    DateTime? arrivalDate = new DateTime(2017, 8, 9);
+    TimeSpan? eta = new TimeSpan(2, 0, 0);
+    int nights = 1;
+    DateTime? departureDate = new DateTime(2017, 8, 10);
+    int adults = 1;
+    int children = 0;
+    int noOfRooms = 1;
+    string? roomType = "Standard Room";
+    string? rtc;
+    string room = "";
+    bool fixedRate = true;
+    string? rateCode;
+    string? package;
+    string rate = "";
+    string total = "";
+
+    // Classification
+    string? resType = "Phone Reser";
+    string? market = "Corporate Bl";
+    string? source = "Company Dir";
+    string? origin = "Central Rese";
+    string? payment = "Cash";
+
+    // Consignee
+    string company = "";
+    string agent = "";
+    string contact = "";
+    string group = "";
+    string consigneeSource = "";
+    string? memberType;
+
+    // Rate Adjustment
+    string rateAdjType = "Amount";
+    string adjAmount = "";
+    string adjPercent = "";
+    string adjValue = "";
+    string? reason = "Requested Room type not availa";
+    string? special;
+    string voucher = "";
+
+    // Lists
+    List<string> roomTypes = new() { "Standard Room", "Deluxe", "Suite", "Executive", "Family" };
+    List<string> rtcList = new() { "BAR", "CORP", "DISC", "PROMO" };
+    List<string> rateCodes = new() { "RACK", "CORP10", "GOV15", "PROMO20" };
+    List<string> packages = new() { "None", "Breakfast", "Half Board", "Full Board" };
+    List<string> resTypes = new() { "Phone Reser", "Walk-in", "Online", "Travel Agent", "Corporate" };
+    List<string> markets = new() { "Corporate Bl", "Leisure", "Government", "Airline", "Group" };
+    List<string> sources = new() { "Company Dir", "Website", "OTA", "Travel Agent", "Walk-in" };
+    List<string> origins = new() { "Central Rese", "Addis", "Direct", "GDS" };
+    List<string> payments = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
+    List<string> memberTypes = new() { "Diamond", "Gold", "Silver", "Sheba Miles" };
+    List<string> reasons = new() { "Requested Room type not availa", "Long Stay Discount", "Corporate Rate", "Promotional Offer" };
+    List<string> specials = new() { "None", "Late Checkout", "Early Check-in", "Airport Transfer" };
+
+    // Travel
+    bool showTravelDetail = false;
+    int travelTab = 0;
+    string? pickupRequired = "YES";
+    string? dropoffRequired = "YES";
+    string? arrivalTransportType;
+    string? departureTransportType;
+    string arrivalStationCode = "Bus Station";
+    string departureStationCode = "Bus Station";
+    string? arrivalCarrierCode = "Carrier One";
+    string? departureCarrierCode = "Carrier One";
+    string arrivalTransportNo = "";
+    string departureTransportNo = "";
+    DateTime? arrivalTravelDate = new DateTime(2017, 8, 9);
+    DateTime? departureTravelDate = new DateTime(2017, 8, 10);
+    TimeSpan? pickupTime = TimeSpan.Zero;
+    TimeSpan? dropoffTime = TimeSpan.Zero;
+    List<string> yesNo = new() { "YES", "NO" };
+    List<string> transportTypes = new() { "Flight", "Bus", "Train", "Private Car", "Taxi" };
+    List<string> carrierCodes = new() { "ET", "AI", "WN", "F9", "Carrier One", "Carrier Two" };
+
+    // Comments
+    bool showComments = false;
+    string commentText = "";
+
+    // Guest Search
+    bool showGuestSearch = false;
+    string guestSearchText = "";
+    List<Guest> guestList = new();
+    List<Guest> filteredGuests = new();
+
+    // Lookup
+    bool showLookup = false;
+    string lookupTitle = "";
+    string lookupType = "";
+    string lookupSearchText = "";
+    List<LookupItem> currentLookupData = new();
+    List<LookupItem> filteredLookupItems = new();
+
+    List<LookupItem> companyData = new()
+    {
+        new("111334666", "MAMO", "111111111-11"),
+        new("11133uuu", "Mamo", "123888888"),
+        new("27116", "ZERHUN GIRMA W/GIORGIS", ""),
+        new("OCU-00031-17", "MELAKE LTD", "888888888-87"),
+        new("OCU-00032-17", "ABENEZER LTD", "777777777-77"),
+        new("OCU-00033-17", "MISIKIR LTD", "666666666-66"),
+        new("OCU-00034-17", "ERMIAS LTD", "555555555-55"),
+        new("OCU-00035-17", "Christopher Columbus", "0123654454-7"),
+        new("OCU-00036-17", "Debebe Sefu", "2365512362"),
+        new("OCU-00037-17", "MELKAMU GEBRE EGZIABHER", "0923652145-09"),
+        new("OCU-00038-17", "GHJXHJXH", "0123456789-1"),
+        new("OCU-00039-17", "NEW USER", "1234567890-1"),
+        new("OCU-00040-17", "Fish", "1234567891-0"),
+        new("OCU-00041-17", "Simegnew Gashaw", "0213211213-3"),
+        new("OCU-00042-17", "Derby El Classico", "3233333333-33"),
+        new("OCU-00043-17", "SAMPLE TRADE", "1000056238"),
+    };
+
+    List<LookupItem> contactData = new()
+    {
+        new("PCU-00002", "KEBEDE ZELEKE ABEBE", "5565556456"),
+        new("PCU-00003", "BROWN CHRIS", "3423343"),
+        new("PCU-00009", "NAGUIB ALI TAHER", "D02018"),
+        new("PCU-00010", "GIRMA BIRHANU ASSEFA", "423432"),
+        new("PCU-00011", "GIRMA SOFOIANA BELIHU", "43241"),
+        new("PCU-00012", "GIRMA DEFAR BEGENA", "342342"),
+    };
+
+    List<LookupItem> agentData = new()
+    {
+        new("OA-00001", "RIHANN'S AGENT", "343422234-34"),
+        new("OA-00002", "MY AGENT", "566632222-22"),
+    };
+
+    List<LookupItem> groupData = new()
+    {
+        new("OG-00001", "Musical Group", "3434223434-34"),
+        new("OG-00002", "Girls Group", "3342333434"),
+    };
+
+    List<LookupItem> sourceData = new()
+    {
+        new("SRC-001", "Company Directory", ""),
+        new("SRC-002", "Website", ""),
+        new("SRC-003", "Travel Agent", ""),
+        new("SRC-004", "Walk-in", ""),
+    };
+
+    // Room Search
+    bool showRoomSearch = false;
+    int roomTab = 0;
+    string? selectedFeature;
+    string roomFilter = "";
+    RoomItem? selectedRoom;
+    List<string> roomFeatures = new() { "Select feature", "Sea View", "City View", "Balcony", "Connecting" };
+    List<RoomItem> roomList = new()
+    {
+        new() { SN = 1, Room = "4001", RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Abay Block", Feature = "", Remark = "" },
+        new() { SN = 2, Room = "103",  RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Abay Block", Feature = "", Remark = "" },
+        new() { SN = 3, Room = "101",  RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 4, Room = "102",  RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+    };
+
+    // Rate Search
+    bool showRateSearch = false;
+    DateTime? rateStartDate = new DateTime(2017, 8, 10);
+    DateTime? rateEndDate = new DateTime(2017, 8, 12);
+    string rateSearchType = "Average";
+    string rateSearchCode = "";
+    string rateStatus = "Closed";
+    RateRow? selectedRateRow;
+    List<RateRow> rateSearchRows = new()
+    {
+        new() { Name = "Physical Inventory", StandardRoom = "16", Executive = "13", PseudoRooms = "5" },
+        new() { Name = "Standard Rate", StandardRoom = "275.00", Executive = "", PseudoRooms = "" },
+        new() { Name = "Special Rate", StandardRoom = "300.00", Executive = "", PseudoRooms = "" },
+        new() { Name = "posting Date Rate", StandardRoom = "200.00", Executive = "", PseudoRooms = "" },
+        new() { Name = "Arriva Date Rate", StandardRoom = "300.00", Executive = "", PseudoRooms = "" },
+    };
+
+    string SelectedGuestName => guestList.FirstOrDefault(g => g.Id == selectedGuestId)?.FullName ?? "Guest";
+
+    protected override void OnInitialized()
+    {
+        guestList = new List<Guest>
+        {
+            new() { Id = 1,  Title = "Ato",  FirstName = "Taddeses", MiddleName = "ARABA",  LastName = "Mola",     Identification = "EP155353" },
+            new() { Id = 2,  Title = "Ato",  FirstName = "teshome",  MiddleName = "",       LastName = "mola",     Identification = "1234667777" },
+            new() { Id = 7,  Title = "W/ro", FirstName = "solomon",  MiddleName = "Bereket",LastName = "mulugeta", Identification = "3342334" },
+            new() { Id = 12, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Fasil",  LastName = "Girma",    Identification = "575777" },
+            new() { Id = 13, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Fikadu", LastName = "Teshome",  Identification = "4353" },
+            new() { Id = 14, Title = "Ato",  FirstName = "Solman",   MiddleName = "Jack",   LastName = "Jemes",    Identification = "86869007764" },
+            new() { Id = 15, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Bereket",LastName = "Tuffa",    Identification = "EP155353" },
+        };
+        filteredGuests = guestList.ToList();
+
+        selectedGuestId = 15;
+        title = "Ato";
+        nationality = "Ethiopian";
+        passport = "EP155353";
+    }
+
+    // ---------- Actions ----------
+    void NewReservation() { }
+    void SaveReservation() { }
+    void CloseWindow() { }
+
+    void OpenTravelDetail() => showTravelDetail = true;
+    void OpenComments() => showComments = true;
+    
+    // Toolbar action handlers
+    void SearchRates() { }
+    void ShowRateInfo() { }
+    void ResetTravelDetail() { }
+    void SaveTravelDetail() => showTravelDetail = false;
+    void OpenGuestSearch()
+    {
+        guestSearchText = "";
+        filteredGuests = guestList.ToList();
+        showGuestSearch = true;
+    }
+    void OpenRoomSearch() => showRoomSearch = true;
+    void OpenRateSearch() => showRateSearch = true;
+
+    void SaveComment()
+    {
+        showComments = false;
+    }
+
+    void FilterGuests()
+    {
+        if (string.IsNullOrWhiteSpace(guestSearchText))
+        {
+            filteredGuests = guestList.ToList();
+            return;
+        }
+        var key = guestSearchText.Trim().ToLower();
+        filteredGuests = guestList
+            .Where(g => (g.FirstName + " " + g.MiddleName + " " + g.LastName).ToLower().Contains(key)
+                     || g.Identification.ToLower().Contains(key))
+            .ToList();
+    }
+
+    void ClearGuestFilter()
+    {
+        guestSearchText = "";
+        filteredGuests = guestList.ToList();
+    }
+
+    void OnGuestRowClick(GridRowClickEventArgs e)
+    {
+        var g = e.Grid?.GetDataItem(e.VisibleIndex) as Guest;
+        if (g != null)
+        {
+            selectedGuestId = g.Id;
+            title = g.Title;
+            showGuestSearch = false;
+        }
+    }
+
+    void OnGuestSelected(Guest? g)
+    {
+        if (g != null) title = g.Title;
+    }
+
+    // Lookup
+    void OpenLookup(string type)
+    {
+        lookupType = type;
+        lookupTitle = type;
+        lookupSearchText = "";
+
+        currentLookupData = type switch
+        {
+            "Company" => companyData,
+            "Contact" => contactData,
+            "Agent"   => agentData,
+            "Group"   => groupData,
+            "Source"  => sourceData,
+            _         => new List<LookupItem>()
+        };
+        filteredLookupItems = currentLookupData.ToList();
+        showLookup = true;
+    }
+
+    void FilterLookup()
+    {
+        if (string.IsNullOrWhiteSpace(lookupSearchText))
+        {
+            filteredLookupItems = currentLookupData.ToList();
+            return;
+        }
+        var key = lookupSearchText.Trim().ToLower();
+        filteredLookupItems = currentLookupData
+            .Where(x => x.Code.ToLower().Contains(key) || x.Name.ToLower().Contains(key) || x.IdNumber.ToLower().Contains(key))
+            .ToList();
+    }
+
+    void OnLookupRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as LookupItem;
+        if (item == null) return;
+
+        switch (lookupType)
+        {
+            case "Company": company = item.Name; break;
+            case "Contact": contact = item.Name; break;
+            case "Agent":   agent = item.Name; break;
+            case "Group":   group = item.Name; break;
+            case "Source":  consigneeSource = item.Name; break;
+        }
+        showLookup = false;
+    }
+
+    void ClearLookupSelection()
+    {
+        switch (lookupType)
+        {
+            case "Company": company = ""; break;
+            case "Contact": contact = ""; break;
+            case "Agent":   agent = ""; break;
+            case "Group":   group = ""; break;
+            case "Source":  consigneeSource = ""; break;
+        }
+        showLookup = false;
+    }
+
+    // Room Search
+    void OnRoomRowClick(GridRowClickEventArgs e)
+    {
+        selectedRoom = e.Grid?.GetDataItem(e.VisibleIndex) as RoomItem;
+    }
+
+    void OnRoomCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataCell)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomItem;
+            if (item == null) return;
+
+            if (e.Column?.Caption == "HK Status" && item.HKStatus == "Dirty")
+                e.CssClass = "hk-dirty";
+            if (e.Column?.Caption == "FO Status" && item.FOStatus == "Vacant")
+                e.CssClass = "fo-vacant";
+        }
+        if (e.ElementType == GridElementType.DataRow && selectedRoom != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomItem;
+            if (item?.SN == selectedRoom.SN)
+                e.CssClass = "room-row-selected";
+        }
+    }
+
+    void SelectRoom()
+    {
+        if (selectedRoom != null)
+        {
+            room = selectedRoom.Room;
+            roomType = selectedRoom.RoomType;
+        }
+        showRoomSearch = false;
+    }
+
+    // Rate Search
+    void OnRateRowClick(GridRowClickEventArgs e)
+    {
+        selectedRateRow = e.Grid?.GetDataItem(e.VisibleIndex) as RateRow;
+    }
+
+    void OnRateCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRateRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateRow;
+            if (item?.Name == selectedRateRow.Name)
+                e.CssClass = "rate-row-selected";
+        }
+    }
+
+    void SelectRate()
+    {
+        if (selectedRateRow != null && selectedRateRow.Name.Contains("Rate"))
+        {
+            rate = selectedRateRow.StandardRoom;
+        }
+        showRateSearch = false;
+    }
+
+    // ---------- Models ----------
+    public class Guest
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string FirstName { get; set; } = "";
+        public string MiddleName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Identification { get; set; } = "";
+        public string FullName => $"{FirstName} {MiddleName} {LastName}".Replace("  ", " ").Trim();
+    }
+
+    public class LookupItem
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string IdNumber { get; set; }
+        public LookupItem(string code, string name, string id)
+        {
+            Code = code;
+            Name = name;
+            IdNumber = id;
+        }
+    }
+
+    public class RoomItem
+    {
+        public int SN { get; set; }
+        public string Room { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string HKStatus { get; set; } = "";
+        public string FOStatus { get; set; } = "";
+        public string Floor { get; set; } = "";
+        public string Feature { get; set; } = "";
+        public string Remark { get; set; } = "";
+    }
+
+    public class RateRow
+    {
+        public string Name { get; set; } = "";
+        public string StandardRoom { get; set; } = "";
+        public string Executive { get; set; } = "";
+        public string PseudoRooms { get; set; } = "";
+    }
+}

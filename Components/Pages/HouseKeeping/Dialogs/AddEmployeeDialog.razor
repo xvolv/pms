@@ -1,0 +1,89 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal hk-add-employee-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Add Employee</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Select">
+                    <i class="bi bi-check-circle text-secondary"></i>
+                    <span>OK</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                @if (!string.IsNullOrEmpty(validationMessage))
+                {
+                    <div class="rt-validation-summary" style="margin-bottom:10px;">@validationMessage</div>
+                }
+
+                <fieldset class="rt-form-fieldset">
+                    <legend>Select Attendant</legend>
+                    <div class="rt-detail-row">
+                        <label>Attendant</label>
+                        <DxComboBox Data="@Attendants" TextFieldName="@nameof(AttendantRow.FullName)"
+                                    ValueFieldName="@nameof(AttendantRow.Code)" @bind-Value="selectedCode"
+                                    CssClass="rt-detail-input" />
+                    </div>
+
+                    <div class="rt-grid-area" style="margin-top:8px; padding:0;">
+                        <DxGrid @ref="grid" Data="@Attendants" CssClass="rt-grid" RowClick="@OnRowClick">
+                            <Columns>
+                                <DxGridDataColumn FieldName="@nameof(AttendantRow.FirstName)" Caption="First Name" Width="50%" />
+                                <DxGridDataColumn FieldName="@nameof(AttendantRow.LastName)" Caption="Last Name" Width="50%" />
+                            </Columns>
+                        </DxGrid>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public List<AttendantRow> Attendants { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<AttendantRow> OnSelected { get; set; }
+
+    private IGrid? grid;
+    private string? selectedCode;
+    private string validationMessage = "";
+
+    private void OnRowClick(GridRowClickEventArgs e)
+    {
+        var row = (AttendantRow)grid!.GetDataItem(e.VisibleIndex);
+        selectedCode = row.Code;
+    }
+
+    private async Task Close()
+    {
+        validationMessage = "";
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task Select()
+    {
+        validationMessage = "";
+        if (string.IsNullOrWhiteSpace(selectedCode))
+        {
+            validationMessage = "Please select an attendant.";
+            return;
+        }
+
+        var attendant = Attendants.FirstOrDefault(a => a.Code == selectedCode);
+        if (attendant != null)
+            await OnSelected.InvokeAsync(attendant);
+    }
+}

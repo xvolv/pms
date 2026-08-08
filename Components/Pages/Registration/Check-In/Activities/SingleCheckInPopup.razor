@@ -1,0 +1,125 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Check In" Width="640px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="ci-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleCheckIn">
+                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check2-square"></i></div>
+                <div class="ci-text">Check In</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                <div class="ci-text">Issue Card</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleRegistrationCard">
+                <div class="ci-icon"><i class="bi bi-card-heading"></i></div>
+                <div class="ci-text">Registration card</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print Card Pocket</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <h3 class="ci-heading">You are checking in the guest below</h3>
+        <div class="ci-form">
+            <div class="ci-left">
+                <div class="ci-row"><label>Reg. No</label>
+                    <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="ci-row"><label>Arrival</label>
+                    <DxDateEdit @bind-Date="Arrival" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Departure</label>
+                    <DxDateEdit @bind-Date="Departure" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Room Type</label>
+                    <DxComboBox Data="@RoomTypes" @bind-Value="RoomType" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row">
+                    <label>Room</label>
+                    <div class="input-with-btn">
+                        <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" />
+                        <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                                  RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                                  Click="HandleRoomSearch" />
+                    </div>
+                </div>
+                <div class="ci-row"><label>Payment Type</label>
+                    <DxComboBox Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Total Bill</label>
+                    <DxTextBox @bind-Text="TotalBill" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Paid</label>
+                    <DxTextBox @bind-Text="Paid" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Remaining</label>
+                    <DxTextBox @bind-Text="Remaining" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+            </div>
+            <fieldset class="ci-profile">
+                <legend>Profile</legend>
+                <div class="ci-row"><label>Guest</label>
+                    <DxComboBox Data="@GuestNames" @bind-Value="Guest" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Company</label>
+                    <DxComboBox Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Agent</label>
+                    <DxComboBox Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Source</label>
+                    <DxComboBox Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Group</label>
+                    <DxComboBox Data="@GroupList" @bind-Value="Group" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Contact</label>
+                    <DxComboBox Data="@ContactList" @bind-Value="Contact" SizeMode="SizeMode.Small" />
+                </div>
+            </fieldset>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public string? RoomType { get; set; }
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public string? Payment { get; set; }
+    [Parameter] public string TotalBill { get; set; } = "";
+    [Parameter] public string Paid { get; set; } = "";
+    [Parameter] public string Remaining { get; set; } = "";
+    [Parameter] public string? Guest { get; set; }
+    [Parameter] public string? Company { get; set; }
+    [Parameter] public string? Agent { get; set; }
+    [Parameter] public string? Source { get; set; }
+    [Parameter] public string? Group { get; set; }
+    [Parameter] public string? Contact { get; set; }
+    [Parameter] public List<string> RoomTypes { get; set; } = new();
+    [Parameter] public List<string> Payments { get; set; } = new();
+    [Parameter] public List<string> GuestNames { get; set; } = new();
+    [Parameter] public List<string> CompanyList { get; set; } = new();
+    [Parameter] public List<string> AgentList { get; set; } = new();
+    [Parameter] public List<string> SourceList { get; set; } = new();
+    [Parameter] public List<string> GroupList { get; set; } = new();
+    [Parameter] public List<string> ContactList { get; set; } = new();
+    [Parameter] public EventCallback OnCheckIn { get; set; }
+    [Parameter] public EventCallback OnRegistrationCard { get; set; }
+    [Parameter] public EventCallback OnRoomSearch { get; set; }
+
+    async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
+    async Task HandleRegistrationCard() => await OnRegistrationCard.InvokeAsync();
+    async Task HandleRoomSearch() => await OnRoomSearch.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

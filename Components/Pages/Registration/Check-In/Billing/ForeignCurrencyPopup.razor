@@ -1,0 +1,58 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Foreign Exchange Transaction" Width="620px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Cancel</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:8px; font-size:12px;">
+            <span>Voucher No. <b>@VoucherNo</b></span>
+            <span>Payment <b>@Payment.ToString("N2")</b></span>
+            <span>Total Amount <b>@TotalAmount.ToString("N2")</b></span>
+            <span>Remaining <b>@Remaining.ToString("N2")</b></span>
+        </div>
+        <table class="multi-table" style="width:100%;">
+            <thead>
+                <tr><th>SN</th><th>Currency</th><th>Amount</th><th>Rate</th><th>Total Amount</th><th>Assign</th><th>Remark</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Rows)
+                {
+                    <tr>
+                        <td>@r.SN</td>
+                        <td><DxComboBox Data="@Currencies" @bind-Value="r.Currency" SizeMode="SizeMode.Small" /></td>
+                        <td>@r.Amount.ToString("N2")</td>
+                        <td>@r.Rate.ToString("N4")</td>
+                        <td>@r.TotalAmount.ToString("N2")</td>
+                        <td><DxCheckBox @bind-Checked="r.Assign" /></td>
+                        <td>@r.Remark</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string VoucherNo { get; set; } = "";
+    [Parameter] public decimal Payment { get; set; }
+    [Parameter] public decimal TotalAmount { get; set; }
+    [Parameter] public decimal Remaining { get; set; }
+    [Parameter] public List<ForeignCurrencyRow> Rows { get; set; } = new();
+    [Parameter] public List<string> Currencies { get; set; } = new();
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

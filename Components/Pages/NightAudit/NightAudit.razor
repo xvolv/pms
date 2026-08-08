@@ -28,34 +28,13 @@
         else
         {
             <div class="na-wizard">
-                <div class="na-steps-sidebar">
-                    <div class="na-steps-subtitle">Business Date: @state.BusinessDate.ToString("dd-MMM-yyyy")</div>
-                    <ul class="na-steps-list">
-                        @for (var i = 0; i < steps.Count; i++)
-                        {
-                            var index = i;
-                            var cssClass = index == currentStepIndex ? "current" : index < currentStepIndex ? "done" : "upcoming";
-                            var clickable = index <= maxReachedIndex;
-                            <li class="na-step-item @cssClass @(clickable ? "clickable" : "")"
-                                @onclick="() => GoTo(index)">
-                                <span class="na-step-index">
-                                    @if (index < currentStepIndex)
-                                    {
-                                        <i class="bi bi-check-lg"></i>
-                                    }
-                                    else
-                                    {
-                                        @(index + 1)
-                                    }
-                                </span>
-                                <span class="na-step-label">@steps[index]</span>
-                            </li>
-                        }
-                    </ul>
-                </div>
-
+             
                 <div class="na-main-panel">
                     <div class="na-main-body">
+                        @if (currentStepIndex < steps.Count - 1)
+                        {
+                            <div class="na-step-progress">Step @(currentStepIndex + 1) of @(steps.Count - 1)</div>
+                        }
                         @switch (currentStepIndex)
                         {
                             case 0:
@@ -63,29 +42,31 @@
                                                        Description="Guests who were expected to check out one or more days ago but have not yet checked out. Amend the departure date or check the guest out to resolve each entry."
                                                        Registrations="@state.OverdueOut" ColumnMode="RegistrationListStep.RegistrationColumnMode.Financial"
                                                        ShowAmend="true" AmendLabel="Amend" AmendAllowArrivalEdit="false"
-                                                       ShowCheckOut="true" OnChanged="Refresh" />
+                                                       ShowCheckOut="true" OnChanged="Refresh" ReloadSample="NightAuditState.CreateOverdueOutSample" />
                                 break;
                             case 1:
                                 <RegistrationListStep Title="Due Out"
                                                        Description="Guests who are still in-house but are expected to check out today. Check the guest out, or extend the departure date if they are staying longer."
                                                        Registrations="@state.DueOut" ColumnMode="RegistrationListStep.RegistrationColumnMode.Financial"
                                                        ShowCheckOut="true" ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="false"
-                                                       OnChanged="Refresh" />
+                                                       OnChanged="Refresh" ReloadSample="NightAuditState.CreateDueOutSample" />
                                 break;
                             case 2:
                                 <RegistrationListStep Title="Waiting List"
                                                        Description="Reservations on the waiting list that are not yet checked in. Check the guest in, amend the arrival date, or cancel the reservation."
                                                        Registrations="@state.WaitingList" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
                                                        ShowCheckIn="true" ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
-                                                       ShowCancellation="true" Reasons="@state.CancellationReasons" OnChanged="Refresh" />
+                                                       ShowCancellation="true" Reasons="@state.CancellationReasons" OnChanged="Refresh"
+                                                       ReloadSample="NightAuditState.CreateWaitingListSample" />
                                 break;
                             case 3:
                                 <RegistrationListStep Title="6 PM Arrival"
                                                        Description="6PM-hold reservations expected to arrive on the business date. Amend the arrival date, check the guest in, or cancel the reservation."
                                                        Registrations="@state.SixPmArrivals" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
                                                        ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
-                                                       ShowCheckIn="true" ShowCancellation="true" Reasons="@state.CancellationReasons"
-                                                       OnChanged="Refresh" />
+                                                       ShowCheckIn="true" CheckInConfirmMessage="Do you want to change 6pm state to Check in?"
+                                                       ShowCancellation="true" Reasons="@state.CancellationReasons"
+                                                       OnChanged="Refresh" ReloadSample="NightAuditState.CreateSixPmArrivalsSample" />
                                 break;
                             case 4:
                                 <RegistrationListStep Title="Guaranteed Arrival"
@@ -93,24 +74,30 @@
                                                        Registrations="@state.GuaranteedArrivals" ColumnMode="RegistrationListStep.RegistrationColumnMode.Arrival"
                                                        ShowAmend="true" AmendLabel="Amend Date" AmendAllowArrivalEdit="true"
                                                        ShowCheckIn="true" ShowNoShow="true" ShowCancellation="true"
-                                                       Reasons="@state.CancellationReasons" OnChanged="Refresh" />
+                                                       Reasons="@state.CancellationReasons" OnChanged="Refresh"
+                                                       ReloadSample="NightAuditState.CreateGuaranteedArrivalsSample" />
                                 break;
                             case 5:
-                                <RoomDiscrepancyStep Discrepancies="@state.RoomDiscrepancies" />
+                                <RoomDiscrepancyStep Discrepancies="@state.RoomDiscrepancies" OnChanged="Refresh"
+                                                      ReloadSample="NightAuditState.CreateRoomDiscrepancySample" />
                                 break;
                             case 6:
-                                <ClearHeldBillsStep HeldBills="@state.HeldBills" OnChanged="Refresh" />
+                                <ClearHeldBillsStep HeldBills="@state.HeldBills" OnChanged="Refresh"
+                                                     ReloadSample="NightAuditState.CreateHeldBillsSample" />
                                 break;
                             case 7:
-                                <BucketCheckStep BucketChecks="@state.BucketChecks" />
+                                <BucketCheckStep BucketChecks="@state.BucketChecks" OnChanged="Refresh"
+                                                  ReloadSample="@(() => NightAuditState.CreateBucketCheckSample(state.DueOut.Concat(state.GuaranteedArrivals)))" />
                                 break;
                             case 8:
                                 <RoomAndTaxPostStep Posts="@state.RoomTaxPosts" Posted="@state.RoomTaxPosted"
-                                                     PostedChanged="@(v => state.RoomTaxPosted = v)" OnChanged="Refresh" />
+                                                     PostedChanged="@(v => state.RoomTaxPosted = v)" OnChanged="Refresh"
+                                                     ReloadSample="@(() => NightAuditState.CreateRoomTaxPostSample(state.DueOut.Concat(state.GuaranteedArrivals)))" />
                                 break;
                             case 9:
                                 <SummarizeTransactionStep Posts="@state.RoomTaxPosts" Summarized="@state.TransactionsSummarized"
-                                                           SummarizedChanged="@(v => state.TransactionsSummarized = v)" />
+                                                           SummarizedChanged="@(v => state.TransactionsSummarized = v)"
+                                                           BusinessDate="@state.BusinessDate" />
                                 break;
                             case 10:
                                 <FnbAuditStep Outlets="@state.FnbOutlets" Reviewed="@state.FnbAuditDone"
@@ -124,7 +111,7 @@
                                 <ReportArchiveStep State="@state" OnChanged="Refresh" />
                                 break;
                             case 13:
-                                <EndOfNightAuditStep State="@state" />
+                                <EndOfNightAuditStep State="@state"  />
                                 break;
                         }
                     </div>

@@ -1,0 +1,101 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Send Message" Width="620px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleReset">
+                <div class="ci-icon"><i class="bi bi-file-earmark"></i></div>
+                <div class="ci-text">New</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-envelope"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px;">
+            <span style="font-size:12px; width:50px; text-align:right;">Users</span>
+            <DxTextBox Text="@MsgUser" TextChanged="@((string v) => MsgUserChanged.InvokeAsync(v))"
+                       SizeMode="SizeMode.Small" Width="200px" Enabled="@(!MsgSendToAll)" />
+            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
+                      Enabled="@(!MsgSendToAll)" Click="HandleOpenUserFind" />
+            <DxCheckBox Checked="@MsgSendToAll" CheckedChanged="@((bool v) => MsgSendToAllChanged.InvokeAsync(v))">Send To All</DxCheckBox>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="amend-form" style="border:1px solid #ddd; padding:8px;">
+                <div class="amend-row"><label>Guest</label>
+                    <DxTextBox Text="@MsgGuest" TextChanged="@((string v) => MsgGuestChanged.InvokeAsync(v))"
+                               SizeMode="SizeMode.Small" ReadOnly="@(MsgType == "Internal Message")" />
+                </div>
+                <div class="amend-row"><label>Room</label>
+                    <DxTextBox Text="@MsgRoom" TextChanged="@((string v) => MsgRoomChanged.InvokeAsync(v))"
+                               SizeMode="SizeMode.Small" ReadOnly="@(MsgType == "Internal Message")" />
+                </div>
+                <div class="amend-row"><label>Message Type</label>
+                    <DxComboBox Data="@MessageTypes" Value="@MsgType"
+                                ValueChanged="@((string? v) => MsgTypeChanged.InvokeAsync(v))"
+                                SizeMode="SizeMode.Small" />
+                </div>
+            </div>
+            <div class="amend-form" style="border:1px solid #ddd; padding:8px;">
+                <div class="amend-row"><label>Message No.</label>
+                    <DxTextBox Text="@MsgNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="amend-row"><label>Registration No.</label>
+                    <DxTextBox Text="@MsgRegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="amend-row"><label>Date</label>
+                    <DxDateEdit @bind-Date="MsgDate" SizeMode="SizeMode.Small" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <label style="font-size:12px;">Message</label>
+            <DxMemo Text="@MsgBody" TextChanged="@((string v) => MsgBodyChanged.InvokeAsync(v))"
+                    Rows="6" SizeMode="SizeMode.Small" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? MsgUser { get; set; }
+    [Parameter] public EventCallback<string> MsgUserChanged { get; set; }
+
+    [Parameter] public bool MsgSendToAll { get; set; }
+    [Parameter] public EventCallback<bool> MsgSendToAllChanged { get; set; }
+
+    [Parameter] public string MsgGuest { get; set; } = "";
+    [Parameter] public EventCallback<string> MsgGuestChanged { get; set; }
+
+    [Parameter] public string MsgRoom { get; set; } = "";
+    [Parameter] public EventCallback<string> MsgRoomChanged { get; set; }
+
+    [Parameter] public string MsgRegNo { get; set; } = "";
+    [Parameter] public string MsgNo { get; set; } = "";
+    [Parameter] public DateTime? MsgDate { get; set; }
+
+    [Parameter] public string? MsgType { get; set; }
+    [Parameter] public EventCallback<string?> MsgTypeChanged { get; set; }
+
+    [Parameter] public string MsgBody { get; set; } = "";
+    [Parameter] public EventCallback<string> MsgBodyChanged { get; set; }
+
+    [Parameter] public List<string> MessageTypes { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnReset { get; set; }
+    [Parameter] public EventCallback OnOpenUserFind { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleReset() => await OnReset.InvokeAsync();
+    async Task HandleOpenUserFind() => await OnOpenUserFind.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

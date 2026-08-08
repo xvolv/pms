@@ -213,6 +213,38 @@
     padding: 6px 12px !important;
 }
 
+/* Guest / Contact / Company profile forms: tighter field height so
+   Personal Information (and the rest of the form) takes up less space. */
+.profile-body-columns .rt-form-input .dxbs-editor-input,
+.profile-body-columns .rt-form-input input[type="text"],
+.profile-body-columns .rt-form-input input[type="password"],
+.profile-body-columns .rt-form-input input:not([type]) {
+    padding: 3px 10px !important;
+}
+
+.profile-body-columns .rt-form-row {
+    margin-bottom: 10px;
+}
+
+/* Nationality lookup dropdown: two-column (Country / Nationality) table row */
+.na-lookup-row {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+}
+
+.na-lookup-col {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.na-lookup-col:first-child {
+    color: #5f6368;
+}
+
 /* ── Arrow Button ── */
 .dxbs-editor-dropdown-button {
     background-color: transparent !important;

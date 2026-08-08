@@ -1,0 +1,77 @@
+@using DevExpress.Blazor
+
+<DxPopup @bind-Visible="@Visible"
+         HeaderText="@Title"
+         Width="400px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true">
+    <BodyContentTemplate>
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 20px; font-size: 14px; color: #333;">
+                @Message
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <DxButton Text="Cancel" Click="HandleCancel" CssClass="btn-secondary" />
+                <DxButton Text="Confirm" Click="HandleConfirm" CssClass="btn-danger" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .btn-danger {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        color: white !important;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333 !important;
+        border-color: #bd2130 !important;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268 !important;
+        border-color: #545b62 !important;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Confirm Delete";
+
+    [Parameter]
+    public string Message { get; set; } = "Are you sure you want to delete this item?";
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task HandleConfirm()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+        await OnConfirm.InvokeAsync();
+    }
+
+    private async Task HandleCancel()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+        await OnCancel.InvokeAsync();
+    }
+}

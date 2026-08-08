@@ -1,0 +1,173 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
+
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="() => showTaskSheetDetails = true">
+        <i class="bi bi-person-plus text-secondary"></i>
+        <span>Assign Task</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OpenTaskSheet">
+        <i class="bi bi-card-list text-secondary"></i>
+        <span>Task Sheet</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="() => showPrintPreview = true">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="ClearAssignment">
+        <i class="bi bi-x-circle text-secondary"></i>
+        <span>Cancel</span>
+    </button>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-toolbar-filters">
+        <span class="tb-label">Task Date</span>
+        <DxDateEdit @bind-Date="taskDateFilter" CssClass="rt-detail-input" style="width:140px;" />
+        <span class="tb-label">Month</span>
+        <DxComboBox Data="@State.Months" @bind-Value="selectedMonth" CssClass="rt-detail-input" style="width:120px;" />
+    </div>
+</div>
+
+<div class="na-step-card">
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (State.TaskAssignments.Count == 0)
+        {
+            <div class="rt-placeholder">No task assignments to display.</div>
+        }
+        else
+        {
+            <table class="hk-task-table">
+                <thead>
+                    <tr>
+                        <th style="width:4%;"></th>
+                        <th>Task Date</th>
+                        <th>Auto</th>
+                        <th>Total Sheets</th>
+                        <th>Total Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ta in State.TaskAssignments)
+                    {
+                        var isSelected = selectedAssignment?.Id == ta.Id;
+                        <tr class="hk-task-row @(isSelected ? "rt-row-selected" : "")" @onclick="() => SelectAssignment(ta)">
+                            <td>
+                                @if (ta.Details.Count > 0)
+                                {
+                                    <i class="bi @(ta.IsExpanded ? "bi-dash-square" : "bi-plus-square") hk-task-toggle"
+                                       @onclick:stopPropagation @onclick="() => ta.IsExpanded = !ta.IsExpanded"></i>
+                                }
+                            </td>
+                            <td>@ta.TaskDate.ToString("M/d/yyyy")</td>
+                            <td>@(ta.Auto ? "Yes" : "No")</td>
+                            <td>@ta.TotalSheets</td>
+                            <td>@ta.TotalCredits</td>
+                        </tr>
+                        @if (ta.IsExpanded && ta.Details.Count > 0)
+                        {
+                            <tr class="hk-task-detail-row">
+                                <td></td>
+                                <td colspan="4">
+                                    <div class="hk-task-detail">
+                                        <div class="hk-task-detail-title">Task Detail</div>
+                                        <table class="hk-task-detail-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attendant Code</th>
+                                                    <th>Attendant Name</th>
+                                                    <th>Total Rooms</th>
+                                                    <th>Total Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var d in ta.Details)
+                                                {
+                                                    <tr>
+                                                        <td>@d.AttendantCode</td>
+                                                        <td>@d.AttendantName</td>
+                                                        <td>@d.TotalRooms</td>
+                                                        <td>@d.TotalCredit</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="rt-footer">
+                Total Sheet = @State.TaskAssignments.Sum(x => x.TotalSheets) ・ Total Credit = @State.TaskAssignments.Sum(x => x.TotalCredits)
+            </div>
+        }
+    </div>
+</div>
+
+<TaskSheetDetailsDialog Visible="@showTaskSheetDetails" Attendants="@State.Attendants" DemoRooms="@State.DemoRooms"
+                         OnClose="() => showTaskSheetDetails = false" OnGenerated="OnTaskGenerated" />
+
+<TaskSheetGridDialog Visible="@showTaskSheetGrid" Assignment="@selectedAssignment" Attendants="@State.Attendants"
+                      OnClose="() => showTaskSheetGrid = false" OnPrint="() => showPrintPreview = true" OnChanged="OnChanged" />
+
+<PrintPreviewDialog Visible="@showPrintPreview" Assignment="@selectedAssignment"
+                     OnClose="() => showPrintPreview = false" />
+
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="@infoMessage" OnOk="() => showInfoPopup = false" />
+
+@code {
+    [Parameter] public HouseKeepingState State { get; set; } = null!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private TaskAssignmentRow? selectedAssignment;
+    private DateTime taskDateFilter = DateTime.Today;
+    private string? selectedMonth;
+    private bool showTaskSheetDetails;
+    private bool showTaskSheetGrid;
+    private bool showPrintPreview;
+    private bool showInfoPopup;
+    private string infoMessage = "";
+
+    protected override void OnInitialized()
+    {
+        selectedMonth = State.Months.ElementAtOrDefault(DateTime.Today.Month - 1);
+        selectedAssignment = State.TaskAssignments.LastOrDefault();
+    }
+
+    private void SelectAssignment(TaskAssignmentRow ta)
+    {
+        selectedAssignment = selectedAssignment?.Id == ta.Id ? null : ta;
+    }
+
+    private void OpenTaskSheet()
+    {
+        if (selectedAssignment == null)
+        {
+            infoMessage = "Please select a task assignment first.";
+            showInfoPopup = true;
+            return;
+        }
+
+        showTaskSheetGrid = true;
+    }
+
+    private async Task ClearAssignment()
+    {
+        selectedAssignment = null;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task OnTaskGenerated(TaskAssignmentRow assignment)
+    {
+        assignment.Id = State.TaskAssignments.Count == 0 ? 1 : State.TaskAssignments.Max(t => t.Id) + 1;
+        State.TaskAssignments.Add(assignment);
+        selectedAssignment = assignment;
+        showTaskSheetDetails = false;
+
+        infoMessage = "Task Assigned. Open Task Sheet Window For Detail!";
+        showInfoPopup = true;
+
+        await OnChanged.InvokeAsync();
+    }
+}

@@ -1,0 +1,51 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Registration" Width="560px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <DxTextBox Width="100%" SizeMode="SizeMode.Small" />
+            <DxButton Text="Find" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" />
+        </div>
+        <table class="multi-table" style="width:100%;">
+            <thead>
+                <tr><th>Registration</th><th>Room Type</th><th>Room</th><th>Guest</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var g in GuestList)
+                {
+                    <tr style="cursor:pointer;"
+                        class="@(SelectedGuest == g ? "row-selected" : "")"
+                        @onclick="() => SelectedGuestChanged.InvokeAsync(g)"
+                        @ondblclick="HandleOk">
+                        <td>@g.Registration</td>
+                        <td>@g.RoomType</td>
+                        <td>@g.Room</td>
+                        <td>@g.Guest</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div style="margin-top:10px; text-align:right;">
+            <DxButton Text="Clear" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleClear" />
+            <DxButton Text="OK" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Primary" Click="HandleOk" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public List<TransferGuestItem> GuestList { get; set; } = new();
+    [Parameter] public TransferGuestItem? SelectedGuest { get; set; }
+    [Parameter] public EventCallback<TransferGuestItem?> SelectedGuestChanged { get; set; }
+    [Parameter] public EventCallback OnOk { get; set; }
+
+    async Task HandleOk() { await OnOk.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
+    async Task HandleClear()
+    {
+        await SelectedGuestChanged.InvokeAsync(null);
+        await VisibleChanged.InvokeAsync(false);
+    }
+}

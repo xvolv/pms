@@ -1,0 +1,74 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Room Charge" Width="780px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandlePost">
+                <div class="toolbar-icon"><i class="bi bi-check2-square"></i></div>
+                <div class="toolbar-text">Post</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleShow">
+                <div class="toolbar-icon"><i class="bi bi-eye"></i></div>
+                <div class="toolbar-text">Show</div>
+            </button>
+            <div class="toolbar-dropdown" style="display:inline-block;">
+                <button type="button" class="toolbar-btn" @onclick="() => showOptions = !showOptions">
+                    <div class="toolbar-icon"><i class="bi bi-gear"></i></div>
+                    <div class="toolbar-text">Options ▾</div>
+                </button>
+                @if (showOptions)
+                {
+                    <ul class="dropdown-menu show" style="position:absolute; z-index:100;">
+                        <li class="dropdown-item" @onclick="@(() => HandleOption("Today"))">Today</li>
+                        <li class="dropdown-item" @onclick="@(() => HandleOption("Entire Stay"))">Entire Stay</li>
+                        <li class="dropdown-item" @onclick="@(() => HandleOption("Nights"))">Nights</li>
+                    </ul>
+                }
+            </div>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+            <span style="margin-left:12px; font-size:12px;">From</span>
+            <DxDateEdit @bind-Date="From" Width="120px" SizeMode="SizeMode.Small" />
+            <span style="font-size:12px;">To</span>
+            <DxDateEdit @bind-Date="To" Width="120px" SizeMode="SizeMode.Small" />
+        </div>
+        <table class="multi-table" style="width:100%; margin-top:8px;">
+            <thead>
+                <tr><th>Registration No</th><th>Date</th><th>Room No</th><th>Consignee</th><th>Amount</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Rows)
+                {
+                    <tr>
+                        <td>@r.RegistrationNo</td>
+                        <td>@r.Date.ToString("M/d/yyyy")</td>
+                        <td>@r.RoomNo</td>
+                        <td>@r.Consignee</td>
+                        <td>@r.Amount.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public DateTime? From { get; set; }
+    [Parameter] public DateTime? To { get; set; }
+    [Parameter] public List<RoomChargeRow> Rows { get; set; } = new();
+    [Parameter] public EventCallback OnPost { get; set; }
+    [Parameter] public EventCallback OnShow { get; set; }
+    [Parameter] public EventCallback<string> OnOption { get; set; }
+
+    bool showOptions = false;
+    async Task HandlePost() => await OnPost.InvokeAsync();
+    async Task HandleShow() => await OnShow.InvokeAsync();
+    async Task HandleOption(string opt) { showOptions = false; await OnOption.InvokeAsync(opt); }
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

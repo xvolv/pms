@@ -1,0 +1,153 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal hk-print-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Preview</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body" style="overflow:auto; background:#e8e8e8;">
+                @if (Assignment != null)
+                {
+                    @foreach (var d in Assignment.Details)
+                    {
+                        <!-- Attendant Task Sheet -->
+                        <div class="hk-print-page">
+                            <div style="display:flex; justify-content:space-between;">
+                                <div>
+                                    <div><b>Attendant Name:</b> @d.AttendantName @d.AttendantCode</div>
+                                    <div><b>Task Date:</b> @Assignment.TaskDate.ToString("M/d/yyyy")</div>
+                                    <div><b>Auto Generated:</b> @(Assignment.Auto ? "Yes" : "No")</div>
+                                    <div><b>Total Rooms:</b> @d.Rooms.Count</div>
+                                    <div><b>Total Credits:</b> @d.Rooms.Sum(r => r.Credit)</div>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div class="hk-print-title">Eden Hotel</div>
+                                </div>
+                                <div style="text-align:right; font-size:10px; color:#555;">
+                                    <div>Ibex College</div>
+                                    <div>Tel:</div>
+                                    <div>Fax:</div>
+                                    <div>Web:</div>
+                                    <div>Email:</div>
+                                    <div>POBox:</div>
+                                    <div>Addis Ababa, Ethiopia</div>
+                                </div>
+                            </div>
+                            <table class="hk-print-table">
+                                <thead>
+                                    <tr>
+                                        <th>Room</th>
+                                        <th>Hk Status</th>
+                                        <th>Fo Status</th>
+                                        <th>Section</th>
+                                        <th>Res Status</th>
+                                        <th>Turn Down</th>
+                                        <th>Name</th>
+                                        <th>Arrival Date</th>
+                                        <th>Departure Date</th>
+                                        <th>Adult</th>
+                                        <th>Child</th>
+                                        <th>Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var r in d.Rooms)
+                                    {
+                                        <tr>
+                                            <td>@r.Room</td>
+                                            <td>AD-000000253</td>
+                                            <td>VAC</td>
+                                            <td></td>
+                                            <td>Not Reserved</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>@r.Credit</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+
+                <!-- HouseKeeping Task Assignment Report -->
+                <div class="hk-print-page">
+                    <div style="display:flex; justify-content:space-between;">
+                        <div class="hk-print-title">Eden Hotel</div>
+                        <div style="text-align:right; font-size:10px;">Addis Ababa, Ethiopia</div>
+                    </div>
+                    <div style="text-align:center; margin:8px 0;"><b>HouseKeeping Task Assignment Report</b></div>
+                    <div style="margin-bottom:6px;"><b>Date</b> @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
+                    <table class="hk-print-table">
+                        <thead>
+                            <tr style="background:#f5e6c8;">
+                                <th>Task Date</th>
+                                <th>Auto</th>
+                                <th>Total Sheets</th>
+                                <th>Total Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Assignment != null)
+                            {
+                                <tr style="background:#ffe4b5;">
+                                    <td>@Assignment.TaskDate.ToString("M/d/yyyy")</td>
+                                    <td>@(Assignment.Auto ? "Yes" : "No")</td>
+                                    <td>@Assignment.TotalSheets</td>
+                                    <td>@Assignment.TotalCredits</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <table class="hk-print-table hk-print-detail-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attendant Code</th>
+                                                    <th>Attendant Name</th>
+                                                    <th>Total Rooms</th>
+                                                    <th>Total Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var d in Assignment.Details)
+                                                {
+                                                    <tr>
+                                                        <td>@d.AttendantCode</td>
+                                                        <td>@d.AttendantName</td>
+                                                        <td>@d.TotalRooms</td>
+                                                        <td>@d.TotalCredit</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:11px;">
+                        <div><b>Prepared By:</b> CNET ADMINISTRATOR</div>
+                        <div>Page 1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public TaskAssignmentRow? Assignment { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

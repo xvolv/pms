@@ -1,0 +1,101 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Date Amendment" Width="440px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Arrival Date</label>
+                <DxDateEdit Date="@Arrival" DateChanged="@((DateTime? v) => ArrivalChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Departure Date</label>
+                <DxDateEdit Date="@Departure" DateChanged="@((DateTime? v) => DepartureChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Adult</label>
+                <DxSpinEdit Value="@Adult" ValueChanged="@((int v) => AdultChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
+            </div>
+            <div class="amend-row"><label>Child</label>
+                <DxSpinEdit Value="@Child" ValueChanged="@((int v) => ChildChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" MinValue="0" MaxValue="10" />
+            </div>
+            <div class="amend-row"><label>Room Type</label>
+                <DxComboBox Data="@RoomTypes" Value="@RoomType"
+                            ValueChanged="@((string? v) => RoomTypeChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Room</label>
+                <div class="input-with-btn">
+                    <DxTextBox Text="@Room" TextChanged="@((string v) => RoomChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                              RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                              Click="@(() => OnRoomSearch.InvokeAsync())" />
+                </div>
+            </div>
+            <div class="amend-row"><label>RateCode</label>
+                <div class="input-with-btn">
+                    <DxTextBox Text="@RateCode" TextChanged="@((string v) => RateCodeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                              RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="@(() => {})" />
+                </div>
+            </div>
+            <div class="amend-row"><label>Amount</label>
+                <DxSpinEdit Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" MinValue="0" />
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox Checked="@Fixed" CheckedChanged="@((bool v) => FixedChanged.InvokeAsync(v))">Fixed</DxCheckBox>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public EventCallback<DateTime?> ArrivalChanged { get; set; }
+
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public EventCallback<DateTime?> DepartureChanged { get; set; }
+
+    [Parameter] public int Adult { get; set; }
+    [Parameter] public EventCallback<int> AdultChanged { get; set; }
+
+    [Parameter] public int Child { get; set; }
+    [Parameter] public EventCallback<int> ChildChanged { get; set; }
+
+    [Parameter] public string? RoomType { get; set; }
+    [Parameter] public EventCallback<string?> RoomTypeChanged { get; set; }
+
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public EventCallback<string> RoomChanged { get; set; }
+
+    [Parameter] public string RateCode { get; set; } = "";
+    [Parameter] public EventCallback<string> RateCodeChanged { get; set; }
+
+    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public EventCallback<decimal> AmountChanged { get; set; }
+
+    [Parameter] public bool Fixed { get; set; }
+    [Parameter] public EventCallback<bool> FixedChanged { get; set; }
+
+    [Parameter] public List<string> RoomTypes { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnRoomSearch { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

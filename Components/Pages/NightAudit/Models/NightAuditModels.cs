@@ -22,6 +22,7 @@ public class NightAuditRegistration
     public decimal Remaining => TotalBill - Paid;
     public string Agent { get; set; } = "";
     public string Source { get; set; } = "";
+    public string Market { get; set; } = "";
 
     public NightAuditRegistration Clone() => new()
     {
@@ -44,6 +45,7 @@ public class NightAuditRegistration
         Paid = Paid,
         Agent = Agent,
         Source = Source,
+        Market = Market,
     };
 
     public void CopyFrom(NightAuditRegistration source)
@@ -56,14 +58,13 @@ public class NightAuditRegistration
 public class HeldBillRow
 {
     public int Id { get; set; }
-    public string RegNo { get; set; } = "";
-    public string Guest { get; set; } = "";
-    public string Room { get; set; } = "";
-    public string BillNo { get; set; } = "";
-    public decimal Amount { get; set; }
+    public int Sn { get; set; }
+    public string VoucherNo { get; set; } = "";
+    public string DeviceName { get; set; } = "";
+    public string WaiterName { get; set; } = "";
     public DateTime HeldDate { get; set; }
+    public decimal Amount { get; set; }
     public string HeldBy { get; set; } = "";
-    public string Reason { get; set; } = "";
 }
 
 public class RoomDiscrepancyRow
@@ -79,33 +80,46 @@ public class RoomDiscrepancyRow
 public class BucketCheckRow
 {
     public int Id { get; set; }
+    public int Sn { get; set; }
     public string RegNo { get; set; } = "";
-    public string Guest { get; set; } = "";
     public string Room { get; set; } = "";
-    public string RoomType { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public DateTime Arrival { get; set; }
     public DateTime Departure { get; set; }
     public int Adults { get; set; }
-    public string RateCode { get; set; } = "";
-    public bool Selected { get; set; } = true;
+    public int Children { get; set; }
+    public string RoomType { get; set; } = "";
+    public string Currency { get; set; } = "USD";
+    public string ActualRtc { get; set; } = "";
+    public decimal RateAmount { get; set; }
+    public decimal UnitRoomRate { get; set; }
+    public decimal Variance => UnitRoomRate - RateAmount;
+    public bool Selected { get; set; }
 }
 
-public class PackagePostLine
+public class RoomTaxPostLineItem
 {
-    public string Description { get; set; } = "";
-    public decimal Amount { get; set; }
+    public string ArticleCode { get; set; } = "";
+    public string Name { get; set; } = "";
+    public decimal UnitAmount { get; set; }
+    public decimal Quantity { get; set; } = 1;
+    public decimal TotalAmount => UnitAmount * Quantity;
 }
 
 public class RoomTaxPostRow
 {
     public int Id { get; set; }
+    public int Sn { get; set; }
     public string RegNo { get; set; } = "";
     public string Guest { get; set; } = "";
     public string Room { get; set; } = "";
     public decimal RoomCharge { get; set; }
     public decimal Tax { get; set; }
+    public decimal Amount => LineItems.Sum(l => l.TotalAmount);
     public bool Selected { get; set; } = true;
     public bool IsExpanded { get; set; }
-    public List<PackagePostLine> Packages { get; set; } = new();
+    public List<RoomTaxPostLineItem> LineItems { get; set; } = new();
 }
 
 public class ReportArchiveRow
@@ -118,11 +132,32 @@ public class ReportArchiveRow
 
 public class FolioChargeRow
 {
+    public int Sn { get; set; }
     public DateTime Date { get; set; }
     public string Description { get; set; } = "";
     public string Reference { get; set; } = "";
+    public string RoomNo { get; set; } = "";
+    public string RoomType { get; set; } = "";
+    public string RoomRate { get; set; } = "";
+    public int Adults { get; set; }
+    public int Children { get; set; }
+    public string Remark { get; set; } = "";
     public decimal Charge { get; set; }
     public decimal Payment { get; set; }
+}
+
+public class FolioExtraBillRow
+{
+    public int Sn { get; set; }
+    public string RoomNo { get; set; } = "";
+    public DateTime Date { get; set; }
+    public string InvoiceId { get; set; } = "";
+    public decimal ServiceCharge { get; set; }
+    public decimal Discount { get; set; }
+    public decimal Vat { get; set; }
+    public decimal SubTotal { get; set; }
+    public string Remark { get; set; } = "";
+    public decimal GrandTotal { get; set; }
 }
 
 public class FnbOutletSummary

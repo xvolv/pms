@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="DevExpress.Blazor" Version="21.2.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
