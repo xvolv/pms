@@ -1,16 +1,16 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="MarkReviewed">
+        <i class="bi bi-clipboard-check text-secondary"></i>
+        <span>Mark Reviewed</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>F&amp;B Audit</h2>
         <p>Review the food and beverage revenue reported by each outlet for the business date.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" @onclick="MarkReviewed">
-            <i class="bi bi-clipboard-check text-secondary"></i>
-            <span>Mark Reviewed</span>
-        </button>
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">

@@ -1,0 +1,27 @@
+@if (Visible)
+{
+    <div class="rt-modal-backdrop confirm-dialog-backdrop">
+        <div class="confirm-dialog">
+            <div class="confirm-dialog-header">
+                <i class="bi bi-info-circle-fill confirm-dialog-icon text-primary"></i>
+                <span class="confirm-dialog-title">@Title</span>
+            </div>
+            <div class="confirm-dialog-body">
+                <p>@Message</p>
+            </div>
+            <div class="confirm-dialog-buttons">
+                <button type="button" class="btn btn-primary" @onclick="HandleOk">@OkText</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "Information";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public string OkText { get; set; } = "OK";
+    [Parameter] public EventCallback OnOk { get; set; }
+
+    private async Task HandleOk() => await OnOk.InvokeAsync();
+}

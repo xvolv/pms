@@ -1,16 +1,16 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@Journalized" @onclick="Journalize">
+        <i class="bi bi-journals text-secondary"></i>
+        <span>Journalize</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Journalize Revenue</h2>
         <p>Posts today's revenue to the general ledger accounts shown below.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" disabled="@Journalized" @onclick="Journalize">
-            <i class="bi bi-journals text-secondary"></i>
-            <span>Journalize</span>
-        </button>
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">

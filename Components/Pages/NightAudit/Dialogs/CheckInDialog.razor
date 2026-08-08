@@ -11,39 +11,99 @@
                 </button>
             </div>
 
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" disabled="@(string.IsNullOrWhiteSpace(Registration.Room) || Registration.Room == "-")"
+                        @onclick="CheckIn">
+                    <i class="bi bi-check2-square text-secondary"></i>
+                    <span>Check In</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="IssueCard">
+                    <i class="bi bi-credit-card text-secondary"></i>
+                    <span>Issue Card</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="ViewRegistrationCard">
+                    <i class="bi bi-file-earmark-text text-secondary"></i>
+                    <span>Registration card</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="PrintCardPocket">
+                    <i class="bi bi-printer text-secondary"></i>
+                    <span>Print Card Pocket</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+
             <div class="rt-modal-body">
-                <div class="rt-detail-rows">
-                    <div class="rt-detail-row">
-                        <label>Reg. No</label>
-                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Arrival</label>
+                            <DxDateEdit @bind-Date="@Registration.ArrivalDate" CssClass="rt-detail-input"
+                                        MaxDate="@Registration.DepartureDate.AddDays(-1)" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Departure</label>
+                            <DxDateEdit @bind-Date="@Registration.DepartureDate" CssClass="rt-detail-input"
+                                        MinDate="@Registration.ArrivalDate.AddDays(1)" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room Type</label>
+                            <DxTextBox Text="@Registration.RoomType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room</label>
+                            <DxTextBox @bind-Text="@Registration.Room" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Payment Type</label>
+                            <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Total Bill</label>
+                            <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Paid</label>
+                            <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Remaining</label>
+                            <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
                     </div>
-                    <div class="rt-detail-row">
-                        <label>Guest</label>
-                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room Type</label>
-                        <DxTextBox Text="@Registration.RoomType" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room</label>
-                        <DxTextBox @bind-Text="@Registration.Room" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Arrival</label>
-                        <DxTextBox Text="@Registration.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Departure</label>
-                        <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Adults / Children</label>
-                        <DxTextBox Text="@($"{Registration.Adults} / {Registration.Children}")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Rate Code</label>
-                        <DxTextBox Text="@Registration.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
+                    <div class="na-checkout-col">
+                        <div class="na-folio-section-title">Profile</div>
+                        <div class="rt-detail-row">
+                            <label>Guest</label>
+                            <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Company</label>
+                            <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Agent</label>
+                            <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Source</label>
+                            <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Group</label>
+                            <DxTextBox Text="" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Contact</label>
+                            <DxTextBox Text="" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
                     </div>
                 </div>
 
@@ -51,29 +111,50 @@
                 {
                     <div class="rt-validation-summary" style="margin-top:14px;">A room number must be assigned before this guest can be checked in.</div>
                 }
-            </div>
 
-            <div class="rt-toolbar na-modal-toolbar">
-                <button type="button" class="rt-toolbar-btn" disabled="@(string.IsNullOrWhiteSpace(Registration.Room) || Registration.Room == "-")"
-                        @onclick="CheckIn">
-                    <i class="bi bi-box-arrow-in-right text-secondary"></i>
-                    <span>Check In</span>
-                </button>
-                <button type="button" class="rt-toolbar-btn" @onclick="Close">
-                    <i class="bi bi-x-circle text-secondary"></i>
-                    <span>Close</span>
-                </button>
+                @if (!string.IsNullOrEmpty(infoMessage))
+                {
+                    <div class="na-info-banner" style="margin-top:14px;">
+                        <i class="bi bi-info-circle"></i>
+                        @infoMessage
+                    </div>
+                }
             </div>
         </div>
     </div>
 }
-
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public NightAuditRegistration? Registration { get; set; }
     [Parameter] public EventCallback OnCheckIn { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
 
+    private string? infoMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (!Visible)
+        {
+            infoMessage = null;
+        }
+    }
+
     private async Task CheckIn() => await OnCheckIn.InvokeAsync();
+
+    private void IssueCard()
+    {
+        infoMessage = "Key card issued.";
+    }
+
+    private void ViewRegistrationCard()
+    {
+        infoMessage = "Registration card sent to printer.";
+    }
+
+    private void PrintCardPocket()
+    {
+        infoMessage = "Card pocket sent to printer.";
+    }
+
     private async Task Close() => await OnClose.InvokeAsync();
 }

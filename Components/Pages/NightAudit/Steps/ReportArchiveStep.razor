@@ -1,17 +1,17 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
-<div class="na-step">
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@(SelectedCount == 0 || State.ArchiveInProgress || State.ReportArchived)"
+            @onclick="ArchiveReports">
+        <i class="bi bi-archive text-secondary"></i>
+        <span>Archive Report</span>
+    </button>
+</div>
+
+<div class="na-step-card">
     <div class="na-step-header">
         <h2>Report Archive</h2>
         <p>Select the reports to generate and archive as PDF for this business date.</p>
-    </div>
-
-    <div class="rt-toolbar">
-        <button type="button" class="rt-toolbar-btn" disabled="@(SelectedCount == 0 || State.ArchiveInProgress || State.ReportArchived)"
-                @onclick="ArchiveReports">
-            <i class="bi bi-archive text-secondary"></i>
-            <span>Archive Report</span>
-        </button>
     </div>
 
     <div class="rt-grid-area" @onclick:stopPropagation="true">

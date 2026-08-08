@@ -11,31 +11,9 @@
                 </button>
             </div>
 
-            <div class="rt-modal-body">
-                <div class="rt-detail-rows">
-                    <div class="rt-detail-row">
-                        <label>Reg. No</label>
-                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Guest</label>
-                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room</label>
-                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Reason</label>
-                        <DxComboBox Data="@Reasons" @bind-Value="@selectedReason" NullText="-- Select Reason --"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
-                    </div>
-                </div>
-            </div>
-
             <div class="rt-toolbar na-modal-toolbar">
-                <button type="button" class="rt-toolbar-btn" disabled="@string.IsNullOrEmpty(selectedReason)" @onclick="Cancel">
-                    <i class="bi bi-x-circle-fill text-secondary"></i>
+                <button type="button" class="rt-toolbar-btn" @onclick="Cancel">
+                    <i class="bi bi-x-circle text-secondary"></i>
                     <span>Cancel</span>
                 </button>
                 <button type="button" class="rt-toolbar-btn" @onclick="Close">
@@ -43,11 +21,80 @@
                     <span>Close</span>
                 </button>
             </div>
+
+            <div class="rt-modal-body">
+                <div class="na-cancel-banner">You are cancelling the guest below</div>
+
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Guest</label>
+                            <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Company</label>
+                            <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room</label>
+                            <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Payment Type</label>
+                            <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Total Bill</label>
+                            <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true"
+                                       CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Paid</label>
+                            <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true"
+                                       CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Remaining</label>
+                            <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true"
+                                       CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Departure</label>
+                            <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true"
+                                       CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Agent</label>
+                            <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Source</label>
+                            <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Reason</label>
+                            <DxComboBox Data="@Reasons" @bind-Value="@selectedReason" NullText="-- Select Reason --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 }
 
+<InfoDialog Visible="@isCancellationSuccessVisible" Title="Information"
+            Message="Reservation cancelled successfully!!!" OnOk="() => isCancellationSuccessVisible = false" />
+
 @code {
+    private bool isCancellationSuccessVisible;
+
     [Parameter] public bool Visible { get; set; }
     [Parameter] public NightAuditRegistration? Registration { get; set; }
     [Parameter] public List<string> Reasons { get; set; } = new();
@@ -69,7 +116,10 @@
 
         var reason = selectedReason;
         selectedReason = null;
+
         await OnCancelReservation.InvokeAsync(reason);
+        isCancellationSuccessVisible = true;
+
     }
 
     private async Task Close() => await OnClose.InvokeAsync();

@@ -11,31 +11,66 @@
                 </button>
             </div>
 
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="RequestAuthorization">
+                    <i class="bi bi-person-x text-secondary"></i>
+                    <span>No Show</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+
             <div class="rt-modal-body">
-                <div class="rt-detail-rows">
-                    <div class="rt-detail-row">
-                        <label>Reg. No</label>
-                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Guest</label>
+                            <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Company</label>
+                            <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room</label>
+                            <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Payment Type</label>
+                            <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Total Bill</label>
+                            <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Paid</label>
+                            <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Remaining</label>
+                            <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
                     </div>
-                    <div class="rt-detail-row">
-                        <label>Guest</label>
-                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Company</label>
-                        <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room</label>
-                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Arrival</label>
-                        <DxTextBox Text="@Registration.ArrivalDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Rate Code</label>
-                        <DxTextBox Text="@Registration.RateCode" ReadOnly="true" CssClass="rt-detail-input" />
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Departure</label>
+                            <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Agent</label>
+                            <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Source</label>
+                            <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
                     </div>
                 </div>
 
@@ -44,20 +79,11 @@
                     business date. This action cannot be undone from this screen.
                 </div>
             </div>
-
-            <div class="rt-toolbar na-modal-toolbar">
-                <button type="button" class="rt-toolbar-btn" @onclick="MarkNoShow">
-                    <i class="bi bi-person-x-fill text-secondary"></i>
-                    <span>No Show</span>
-                </button>
-                <button type="button" class="rt-toolbar-btn" @onclick="Close">
-                    <i class="bi bi-x-circle text-secondary"></i>
-                    <span>Close</span>
-                </button>
-            </div>
         </div>
     </div>
 }
+
+<AuthorizationDialog Visible="@isAuthVisible" OnAuthorized="ConfirmNoShow" OnCancel="() => isAuthVisible = false" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
@@ -65,6 +91,21 @@
     [Parameter] public EventCallback OnNoShow { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
 
-    private async Task MarkNoShow() => await OnNoShow.InvokeAsync();
+    private bool isAuthVisible;
+
+    protected override void OnParametersSet()
+    {
+        if (!Visible)
+            isAuthVisible = false;
+    }
+
+    private void RequestAuthorization() => isAuthVisible = true;
+
+    private async Task ConfirmNoShow()
+    {
+        isAuthVisible = false;
+        await OnNoShow.InvokeAsync();
+    }
+
     private async Task Close() => await OnClose.InvokeAsync();
 }

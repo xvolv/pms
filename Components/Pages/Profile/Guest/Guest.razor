@@ -1,6 +1,7 @@
 @page "/guest"
 @rendermode InteractiveServer
 @using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @inject NavigationManager NavigationManager
 
 <PageTitle>Profile - Guest</PageTitle>
@@ -110,9 +111,19 @@
                             <div class="rt-form-field rt-form-field-wide">
                                 <label>Nationality</label>
                                 <DxComboBox Data="@nationalities" @bind-Value="@guest.Nationality"
+                                            TextFieldName="@nameof(CountryNationality.Nationality)"
+                                            ValueFieldName="@nameof(CountryNationality.Nationality)"
                                             NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            CssClass="rt-form-input" />
+                                            CssClass="rt-form-input">
+                                    <ItemTemplate Context="item">
+                                        @{ var row = (CountryNationality)item; }
+                                        <div class="na-lookup-row">
+                                            <span class="na-lookup-col">@row.Country</span>
+                                            <span class="na-lookup-col">@row.Nationality</span>
+                                        </div>
+                                    </ItemTemplate>
+                                </DxComboBox>
                             </div>
                         </div>
 
@@ -295,10 +306,10 @@
                 (g.MiddleName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (g.LastName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    private List<string> titles = new() { "Mr", "Mrs", "Ms", "Dr", "Prof" };
+    private List<string> titles = new() { "Ato", "W/ro", "Captain", "Sheikh", "Lowret","Professor" };
     private List<string> genders = new() { "Male", "Female" };
     private List<string> languages = new() { "English", "Amharic", "French", "Arabic" };
-    private List<string> nationalities = new() { "Ethiopian", "American", "British", "Kenyan", "Other" };
+    private List<CountryNationality> nationalities = NationalityLookup.Items;
     private List<string> idTypes = new() { "Passport", "National ID", "Driving License", "Kebele ID" };
 
     private List<string> categories = new() { "Business", "Leisure", "Group", "Corporate", "Government", "Travel Agent",

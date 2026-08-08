@@ -11,79 +11,6 @@
                 </button>
             </div>
 
-            <div class="rt-modal-body">
-                <div class="rt-detail-rows">
-                    <div class="rt-detail-row">
-                        <label>Reg. No</label>
-                        <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Guest</label>
-                        <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Company</label>
-                        <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Room</label>
-                        <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Payment Type</label>
-                        <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Total Bill</label>
-                        <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Paid</label>
-                        <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Remaining</label>
-                        <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Departure</label>
-                        <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Agent</label>
-                        <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                    <div class="rt-detail-row">
-                        <label>Source</label>
-                        <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
-                    </div>
-                </div>
-
-                @if (Registration.Remaining > 0)
-                {
-                    <div class="rt-validation-summary" style="margin-top:14px;">
-                        This registration has an outstanding remaining balance of @Registration.Remaining.ToString("N2"). It can still be checked out, but the balance will transfer to the city ledger.
-                    </div>
-                }
-
-                @if (showPrinterNotice)
-                {
-                    <div class="na-info-banner" style="margin-top:14px;">
-                        <i class="bi bi-printer"></i>
-                        Fiscal printer is not set. The last invoice could not be printed automatically. Click Continue to
-                        finish the checkout without printing.
-                    </div>
-                }
-
-                @if (!string.IsNullOrEmpty(infoMessage))
-                {
-                    <div class="na-info-banner" style="margin-top:14px;">
-                        <i class="bi bi-info-circle"></i>
-                        @infoMessage
-                    </div>
-                }
-            </div>
-
             <div class="rt-toolbar na-modal-toolbar">
                 @if (showPrinterNotice)
                 {
@@ -118,6 +45,83 @@
                         <i class="bi bi-x-circle text-secondary"></i>
                         <span>Close</span>
                     </button>
+                }
+            </div>
+
+            <div class="rt-modal-body">
+                <div class="na-checkout-columns">
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Reg. No</label>
+                            <DxTextBox Text="@Registration.RegNo" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Guest</label>
+                            <DxTextBox Text="@Registration.Guest" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Company</label>
+                            <DxTextBox Text="@Registration.Company" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Room</label>
+                            <DxTextBox Text="@Registration.Room" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Payment Type</label>
+                            <DxTextBox Text="@Registration.PaymentType" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Total Bill</label>
+                            <DxTextBox Text="@Registration.TotalBill.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Paid</label>
+                            <DxTextBox Text="@Registration.Paid.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Remaining</label>
+                            <DxTextBox Text="@Registration.Remaining.ToString("N2")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                    <div class="na-checkout-col">
+                        <div class="rt-detail-row">
+                            <label>Departure</label>
+                            <DxTextBox Text="@Registration.DepartureDate.ToString("dd-MMM-yyyy")" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Agent</label>
+                            <DxTextBox Text="@Registration.Agent" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                        <div class="rt-detail-row">
+                            <label>Source</label>
+                            <DxTextBox Text="@Registration.Source" ReadOnly="true" CssClass="rt-detail-input" />
+                        </div>
+                    </div>
+                </div>
+
+                @if (Registration.Remaining > 0)
+                {
+                    <div class="rt-validation-summary" style="margin-top:14px;">
+                        This registration has an outstanding remaining balance of @Registration.Remaining.ToString("N2"). It can still be checked out, but the balance will transfer to the city ledger.
+                    </div>
+                }
+
+                @if (showPrinterNotice)
+                {
+                    <div class="na-info-banner" style="margin-top:14px;">
+                        <i class="bi bi-printer"></i>
+                        Fiscal printer is not set. The last invoice could not be printed automatically. Click Continue to
+                        finish the checkout without printing.
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(infoMessage))
+                {
+                    <div class="na-info-banner" style="margin-top:14px;">
+                        <i class="bi bi-info-circle"></i>
+                        @infoMessage
+                    </div>
                 }
             </div>
         </div>
