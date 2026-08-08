@@ -1,0 +1,86 @@
+@* Shared state-review popup used by Confirmation, Cancellation, Reinstate, CheckOut *@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="@Title" Width="640px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="ci-toolbar">
+            @ToolbarContent
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <h3 class="ci-heading">@Heading</h3>
+        <div class="ci-form">
+            <div class="ci-left">
+                <div class="ci-row"><label>Reg. No</label>
+                    <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="ci-row"><label>Guest</label>
+                    <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="ci-row"><label>Company</label>
+                    <DxComboBox Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Room</label>
+                    <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="@RoomReadOnly" />
+                </div>
+                <div class="ci-row"><label>Payment Type</label>
+                    <DxComboBox Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Total Bill</label>
+                    <DxTextBox @bind-Text="TotalBill" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Paid</label>
+                    <DxTextBox @bind-Text="Paid" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Remaining</label>
+                    <DxTextBox @bind-Text="Remaining" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+            </div>
+            <div class="ci-left">
+                <div class="ci-row"><label>Departure</label>
+                    <DxDateEdit @bind-Date="Departure" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Agent</label>
+                    <DxComboBox Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="ci-row"><label>Source</label>
+                    <DxComboBox Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
+                </div>
+                @ExtraFields
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Heading { get; set; } = "";
+    [Parameter] public bool RoomReadOnly { get; set; } = false;
+    [Parameter] public RenderFragment? ToolbarContent { get; set; }
+    [Parameter] public RenderFragment? ExtraFields { get; set; }
+
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Guest { get; set; } = "";
+    [Parameter] public string? Company { get; set; }
+    [Parameter] public string? Room { get; set; }
+    [Parameter] public string? Payment { get; set; }
+    [Parameter] public string TotalBill { get; set; } = "";
+    [Parameter] public string Paid { get; set; } = "";
+    [Parameter] public string Remaining { get; set; } = "";
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public string? Agent { get; set; }
+    [Parameter] public string? Source { get; set; }
+
+    [Parameter] public List<string> CompanyList { get; set; } = new();
+    [Parameter] public List<string> Payments { get; set; } = new();
+    [Parameter] public List<string> AgentList { get; set; } = new();
+    [Parameter] public List<string> SourceList { get; set; } = new();
+
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

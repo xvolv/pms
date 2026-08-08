@@ -1,0 +1,59 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Registration Privileges" Width="420px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Registration No</label>
+                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox @bind-Checked="NoPost">No Post</DxCheckBox>
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox @bind-Checked="AuthorizeDirectBill">Authorize Direct Bill</DxCheckBox>
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox @bind-Checked="PreStayCharging">Pre Stay Charging</DxCheckBox>
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox @bind-Checked="PostStayCheckout">Post Stay Checkout</DxCheckBox>
+            </div>
+            <div class="amend-row"><label></label>
+                <DxCheckBox @bind-Checked="AllowLateCheckout">Allow Late Checkout</DxCheckBox>
+            </div>
+            <div class="amend-row"><label>Remark</label>
+                <DxTextBox @bind-Text="Remark" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public bool NoPost { get; set; }
+    [Parameter] public bool AuthorizeDirectBill { get; set; }
+    [Parameter] public bool PreStayCharging { get; set; }
+    [Parameter] public bool PostStayCheckout { get; set; }
+    [Parameter] public bool AllowLateCheckout { get; set; }
+    [Parameter] public string Remark { get; set; } = "";
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

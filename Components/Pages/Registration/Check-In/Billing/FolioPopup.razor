@@ -1,0 +1,112 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Folio" Width="920px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleRefresh">
+                <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="toolbar-text">Refresh</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
+                <div class="toolbar-icon"><i class="bi bi-file-earmark-excel"></i></div>
+                <div class="toolbar-text">Excel</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
+                <div class="toolbar-icon"><i class="bi bi-filetype-pdf"></i></div>
+                <div class="toolbar-text">PDF</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
+                <div class="toolbar-icon"><i class="bi bi-printer"></i></div>
+                <div class="toolbar-text">Print</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+            <span style="margin-left:12px; font-size:12px;">Window</span>
+            <DxComboBox Data="@WindowList" @bind-Value="Window" Width="120px" SizeMode="SizeMode.Small" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:8px; font-size:12px; border:1px solid #c8cdd4; padding:8px;">
+            <div><label style="color:#555;">Guest Name</label> <DxTextBox @bind-Text="GuestName" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
+            <div><label style="color:#555;">Arrival Date</label> <DxTextBox Text="@(Arrival?.ToString("dddd, MMMM dd, yyyy") ?? "")" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
+            <div><label style="color:#555;">Reg. No</label> <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
+            <div><label style="color:#555;">Departure Date</label> <DxTextBox Text="@(Departure?.ToString("dddd, MMMM dd, yyyy") ?? "")" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
+            <div><label style="color:#555;">Company</label> <DxTextBox @bind-Text="Company" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
+            <div><label style="color:#555;">TIN</label> <DxTextBox @bind-Text="Tin" SizeMode="SizeMode.Small" /></div>
+            <div><label style="color:#555;">FS Num.</label> <DxTextBox @bind-Text="FsNum" SizeMode="SizeMode.Small" /></div>
+        </div>
+        <div style="font-size:12px; font-weight:600; color:#1565c0;">Guest Ledger</div>
+        <div style="font-size:12px; font-weight:600;">Room Charges</div>
+        <table class="multi-table" style="width:100%;">
+            <thead><tr><th>SN</th><th>Date</th><th>Room No.</th><th>Room Type</th><th>Room Rate</th><th>No. Of Adult</th><th>No. Of Child</th><th>Remark</th><th>Amount</th></tr></thead>
+            <tbody>
+                @foreach (var r in RoomCharges)
+                {
+                    <tr><td>@r.SN</td><td>@r.Date.ToString("M/d/yyyy")</td><td>@r.RoomNo</td><td>@r.RoomType</td>
+                        <td>@r.RoomRate</td><td>@r.Adults</td><td>@r.Child</td><td>@r.Remark</td><td>@r.Amount.ToString("N2")</td></tr>
+                }
+            </tbody>
+        </table>
+        <div style="text-align:right; font-size:12px; margin:4px 0;">
+            <div>Subtotal <b>@RoomSubtotal.ToString("N2")</b></div>
+            <div>Discount <b>0</b></div>
+            <div>Service Charge <b>@RoomService.ToString("N2")</b></div>
+            <div>VAT <b>@RoomVat.ToString("N2")</b></div>
+            <div>Grand Total <b>@RoomGrand.ToString("N2")</b></div>
+        </div>
+        <div style="font-size:12px; font-weight:600;">Extra Bills <DxCheckBox @bind-Checked="expandAll">Expand All</DxCheckBox></div>
+        <table class="multi-table" style="width:100%;">
+            <thead><tr><th>SN</th><th>Room No.</th><th>Date</th><th>Invoice ID</th><th>Ser. Charge</th><th>Discount</th><th>VAT</th><th>Sub Total</th><th>Remark</th><th>Grand Total</th></tr></thead>
+            <tbody>
+                @foreach (var e in ExtraBills)
+                {
+                    <tr><td>@e.SN</td><td>@e.RoomNo</td><td>@e.Date.ToString("M/d/yyyy")</td><td>@e.InvoiceId</td>
+                        <td>@e.SerCharge.ToString("N2")</td><td>@e.Discount.ToString("N2")</td><td>@e.Vat.ToString("N2")</td>
+                        <td>@e.SubTotal.ToString("N2")</td><td>@e.Remark</td><td>@e.GrandTotal.ToString("N2")</td></tr>
+                }
+            </tbody>
+        </table>
+        <div style="text-align:right; font-size:12px;">Total Extra Bill <b>@TotalExtra.ToString("N2")</b></div>
+        <div style="font-size:12px; font-weight:600; margin-top:6px;">Payment History</div>
+        <table class="multi-table" style="width:100%;">
+            <thead><tr><th>SN</th><th>Date</th><th>Receipt No.</th><th>Voucher Type</th><th>Received By</th><th>Remark</th><th>Amount</th></tr></thead>
+            <tbody>
+                @foreach (var p in Payments)
+                {
+                    <tr><td>@p.SN</td><td>@p.Date.ToString("M/d/yyyy")</td><td>@p.ReceiptNo</td>
+                        <td>@p.VoucherType</td><td>@p.ReceivedBy</td><td>@p.Remark</td><td>@p.Amount.ToString("N2")</td></tr>
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string? Window { get; set; }
+    [Parameter] public List<string> WindowList { get; set; } = new();
+    [Parameter] public string GuestName { get; set; } = "";
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Company { get; set; } = "";
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public string FsNum { get; set; } = "";
+    [Parameter] public string Tin { get; set; } = "";
+    [Parameter] public List<TransferChargeRow> RoomCharges { get; set; } = new();
+    [Parameter] public List<ExtraBillRow> ExtraBills { get; set; } = new();
+    [Parameter] public List<PaymentHistoryRow> Payments { get; set; } = new();
+    [Parameter] public EventCallback OnRefresh { get; set; }
+
+    bool expandAll = false;
+    decimal RoomSubtotal => RoomCharges.Sum(x => x.Amount);
+    decimal RoomService => Math.Round(RoomSubtotal * 0.10m, 2);
+    decimal RoomVat => Math.Round((RoomSubtotal + RoomService) * 0.15m, 2);
+    decimal RoomGrand => RoomSubtotal + RoomService + RoomVat;
+    decimal TotalExtra => ExtraBills.Sum(x => x.GrandTotal);
+
+    async Task HandleRefresh() => await OnRefresh.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

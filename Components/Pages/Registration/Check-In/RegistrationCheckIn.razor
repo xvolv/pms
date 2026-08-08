@@ -1,100 +1,195 @@
-@page "/registration-browser"
+@page "/registration-document"
 @rendermode InteractiveServer
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 @inject NavigationManager Navigation
 
 <PageTitle>Registration Browser - CNET ERP</PageTitle>
 
 <div class="reg-browser-page" @onclick="CloseMenus">
 
+    <!-- Toolbar -->
     <div class="erp-toolbar" @onclick:stopPropagation="true">
         <div class="toolbar-group">
             <button type="button" class="toolbar-btn" @onclick="NoOp">
                 <div class="toolbar-icon"><i class="bi bi-eye"></i></div>
                 <div class="toolbar-text">Show</div>
             </button>
-            <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-gear"></i></div>
-                <div class="toolbar-text">Options ▾</div>
-            </button>
+            <div class="toolbar-dropdown">
+                <button type="button" class="toolbar-btn @(showOptionsMenu ? "active" : "")"
+                        @onclick="ToggleOptions">
+                    <div class="toolbar-icon"><i class="bi bi-gear-fill"></i></div>
+                    <div class="toolbar-text">Options ▾</div>
+                </button>
+                @if (showOptionsMenu)
+                {
+                    <ul class="dropdown-menu show">
+                        <li class="dropdown-item" @onclick="@(() => OnOption("AccompanyGuest"))">Accompany Guest</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Replicate"))">Replicate(Add on)</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Attachment"))">Attachment</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("History"))">History</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("HouseKeeping"))">House Keeping</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("WakeupCall"))">Wakeup Calls</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Messages"))">Messages</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Routing"))">Routing</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Shares"))">Shares</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Privilege"))">Privilege</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("ScheduledActivity"))">Scheduled Activity</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("TravelDetail"))">Travel Detail</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("IssueCard"))">Issue Card</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("RoomAssignment"))">Room Assignment</li>
+                    </ul>
+                }
+            </div>
 
             <div class="toolbar-dropdown">
-                <button type="button" class="toolbar-btn @(showActivitiesMenu ? "active" : "")" @onclick="ToggleActivities">
-                    <div class="toolbar-icon" style="color:#1565c0;"><i class="bi bi-type"></i></div>
+                <button type="button" class="toolbar-btn @(showActivitiesMenu ? "active" : "")"
+                        @onclick="ToggleActivities">
+                    <div class="toolbar-icon"><i class="bi bi-type"></i></div>
                     <div class="toolbar-text">Activities ▾</div>
                 </button>
                 @if (showActivitiesMenu)
                 {
                     <ul class="dropdown-menu show">
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("Waitinglist"))">Waitinglist</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("6PM"))">6PM</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("Confirmation"))">Confirmation</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("Cancel"))">Cancel</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("CheckIn"))">Check In</li>
-                        <li class="dropdown-item disabled">Check out</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("Reinstate"))">Reinstate</li>
-                        <li class="dropdown-item" @onclick="@(() => OnActivity("PostMaster"))">Post Master (PM)</li>
+                        <li class="dropdown-item @(IsActivityEnabled("Waitinglist") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("Waitinglist"))">Waitinglist</li>
+                        <li class="dropdown-item @(IsActivityEnabled("6PM") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("6PM"))">6PM</li>
+                        <li class="dropdown-item @(IsActivityEnabled("Confirmation") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("Confirmation"))">Confirmation</li>
+                        <li class="dropdown-item @(IsActivityEnabled("Cancel") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("Cancel"))">Cancel</li>
+                        <li class="dropdown-item @(IsActivityEnabled("CheckIn") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("CheckIn"))">Check In</li>
+                        <li class="dropdown-item @(IsActivityEnabled("CheckOut") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("CheckOut"))">Check out</li>
+                        <li class="dropdown-item @(IsActivityEnabled("Reinstate") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("Reinstate"))">Reinstate</li>
+                        <li class="dropdown-item @(IsActivityEnabled("PostMaster") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("PostMaster"))">Post Master (PM)</li>
                     </ul>
                 }
             </div>
 
-            <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-cash-coin"></i></div>
-                <div class="toolbar-text">Billing ▾</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-pencil-square"></i></div>
-                <div class="toolbar-text">Amendment ▾</div>
-            </button>
+            <div class="toolbar-dropdown">
+                <button type="button" class="toolbar-btn @(showBillingMenu ? "active" : "")"
+                        @onclick="ToggleBilling">
+                    <div class="toolbar-icon"><i class="bi bi-cash-coin"></i></div>
+                    <div class="toolbar-text">Billing ▾</div>
+                </button>
+                @if (showBillingMenu)
+                {
+                    <ul class="dropdown-menu show">
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("ManualCharge"))">Manual Charge</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("RoomCharges"))">Room Charges</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("BillSplit"))">Bill Split</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("BillTransfer"))">Bill Transfer</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("CashReceipt"))">Cash Receipt</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("Rebate"))">Rebate</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("PaidOut"))">Paid Out</li>
+                        <li class="dropdown-item" @onclick="@(() => OnBilling("Refund"))">Refund</li>
+                    </ul>
+                }
+            </div>
+
+            <div class="toolbar-dropdown">
+                <button type="button" class="toolbar-btn @(showAmendmentMenu ? "active" : "")"
+                        @onclick="ToggleAmendment">
+                    <div class="toolbar-icon"><i class="bi bi-pencil-square"></i></div>
+                    <div class="toolbar-text">Amendment ▾</div>
+                </button>
+                @if (showAmendmentMenu)
+                {
+                    <ul class="dropdown-menu show">
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Profiles"))">Profiles</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Date"))">Date Amendment</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Detail"))">Registration Detail</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Rate"))">Rate Adjustment</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("RoomMove"))">Room Move</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Payment"))">Payment Options</li>
+                        <li class="dropdown-item" @onclick="@(() => OnAmendment("Other"))">Other Fields</li>
+                    </ul>
+                }
+            </div>
+
             <button type="button" class="toolbar-btn" @onclick="NoOp">
                 <div class="toolbar-icon"><i class="bi bi-file-earmark-text"></i></div>
                 <div class="toolbar-text">Preview ▾</div>
             </button>
         </div>
 
-        <div class="toolbar-group filter-group">
-            <span class="filter-icon"><i class="bi bi-door-closed"></i></span>
-            <span class="filter-label">Room</span>
-            <DxTextBox @bind-Text="filterRoom" Width="100px" SizeMode="SizeMode.Small" />
-            <span class="filter-icon"><i class="bi bi-person"></i></span>
-            <span class="filter-label">Guest</span>
-            <DxComboBox Data="@guestFilterList" @bind-Value="filterGuest" Width="140px" SizeMode="SizeMode.Small" />
-            <span class="filter-icon"><i class="bi bi-star"></i></span>
-            <span class="filter-label">State</span>
-            <DxComboBox Data="@stateList" @bind-Value="filterState" Width="100px" SizeMode="SizeMode.Small" />
+        <div class="filter-columns">
+            <div class="filter-col">
+                <div class="filter-row">
+                    <span class="filter-icon text-secondary" ><i class="bi bi-house-door-fill"></i></span>
+                    <span class="filter-label">Room</span>
+                    <DxTextBox @bind-Text="filterRoom" Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-icon text-secondary"><i class="bi bi-person-fill"></i></span>
+                    <span class="filter-label">Guest</span>
+                    <DxComboBox Data="@guestFilterList" @bind-Value="filterGuest" Width="100%"
+                                SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-icon text-secondary"><i class="bi bi-star-fill text-secondary"></i></span>
+                    <span class="filter-label">State</span>
+                    <DxComboBox Data="@stateFilterList" 
+                                Value="filterState" 
+                                ValueChanged="@((string s) => { filterState = s; ApplyFilters(); })" 
+                                Width="100%" 
+                                SizeMode="SizeMode.Small">
+                        <ItemTemplate>
+                            <div class="state-item">
+                                <span>@context</span>
+                                @if (stateColors.TryGetValue(context, out var col) && !string.IsNullOrEmpty(col))
+                                {
+                                    <span class="state-color-label" style="color:@col;">@col</span>
+                                }
+                            </div>
+                        </ItemTemplate>
+                    </DxComboBox>
+                </div>
+            </div>
+
+            <div class="filter-col">
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">Arrival</span>
+                    <DxDateEdit @bind-Date="filterArrival" Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">Departure</span>
+                    <DxDateEdit @bind-Date="filterDeparture" Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">Company</span>
+                    <DxComboBox Data="@companyFilterList" @bind-Value="filterCompany" Width="100%"
+                                SizeMode="SizeMode.Small" />
+                </div>
+            </div>
         </div>
 
-        <div class="toolbar-group filter-group">
-            <span class="filter-label">Arrival</span>
-            <DxDateEdit @bind-Date="filterArrival" Width="110px" SizeMode="SizeMode.Small" />
-            <span class="filter-label">Departure</span>
-            <DxDateEdit @bind-Date="filterDeparture" Width="110px" SizeMode="SizeMode.Small" />
-            <span class="filter-label">Company</span>
-            <DxComboBox Data="@companyFilterList" @bind-Value="filterCompany" Width="120px" SizeMode="SizeMode.Small" />
-        </div>
-
-        <div class="toolbar-group">
+        <div class="toolbar-group" style="margin-left:auto;">
+            <div class="search-criteria">@GetSearchCriteria()</div>
             <button type="button" class="toolbar-btn" @onclick="ApplyFilters">
                 <div class="toolbar-icon"><i class="bi bi-search"></i></div>
-                <div class="toolbar-text">Advanced Search ▾</div>
+                <div class="toolbar-text">Advanced<br />Search ▾</div>
             </button>
             <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-printer"></i></div>
+                <div class="toolbar-icon"><i class="bi bi-printer-fill"></i></div>
                 <div class="toolbar-text">Print ▾</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="ClearFilters" title="Clear Filter">
+                <div class="toolbar-icon"><i class="bi bi-x-lg"></i></div>
+                <div class="toolbar-text">Clear<br />Filter</div>
             </button>
         </div>
     </div>
 
-    <DxGrid Data="@filteredRegistrations"
-            KeyFieldName="SN"
-            PageSize="20"
-            ShowPager="false"
-            SizeMode="SizeMode.Small"
-            Height="480px"
-            FocusedRowEnabled="true"
-            FocusedRowKey="@(selectedReg?.SN)"
-            FocusedRowKeyChanged="OnFocusedRowKeyChanged"
-            RowClick="OnGridRowClick"
+    <!-- Grid -->
+    <DxGrid Data="@filteredRegistrations" KeyFieldName="SN" PageSize="20" ShowPager="false" SizeMode="SizeMode.Small"
+            Width="100%" Height="480px" FocusedRowEnabled="true" FocusedRowKey="@(selectedReg?.SN)"
+            FocusedRowKeyChanged="OnFocusedRowKeyChanged" RowClick="OnGridRowClick" CustomizeElement="OnRegCustomize"
             CssClass="reg-grid">
         <Columns>
             <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
@@ -106,38 +201,486 @@
             <DxGridDataColumn FieldName="Arrival" Caption="Arrival" Width="100px" DisplayFormat="M/d/yyyy" />
             <DxGridDataColumn FieldName="Departure" Caption="Departure" Width="100px" DisplayFormat="M/d/yyyy" />
             <DxGridDataColumn FieldName="Nights" Caption="# of Night" Width="80px" />
-            <DxGridDataColumn FieldName="Payment" Caption="Payment" Width="80px" />
+            <DxGridDataColumn FieldName="Payment" Caption="Payment" />
         </Columns>
     </DxGrid>
 
     <div class="record-bar">
-        @if (selectedReg != null)
-        {
-            <span>Selected: <strong>@selectedReg.Registration</strong> — @selectedReg.Guest</span>
-        }
-        else
-        {
-            <span>Click a row to select a registration</span>
-        }
-        <span class="record-count">Record @(selectedReg?.SN ?? 0) of @filteredRegistrations.Count</span>
+        <button type="button" class="nav-btn" @onclick="GoFirst" title="First"><i class="bi bi-chevron-bar-left"></i></button>
+        <button type="button" class="nav-btn" @onclick="GoPrev" title="Previous"><i class="bi bi-chevron-left"></i></button>
+        <span class="record-text">Record @(GetRecordIndex()) of @filteredRegistrations.Count</span>
+        <button type="button" class="nav-btn" @onclick="GoNext" title="Next"><i class="bi bi-chevron-right"></i></button>
+        <button type="button" class="nav-btn" @onclick="GoLast" title="Last"><i class="bi bi-chevron-bar-right"></i></button>
     </div>
 </div>
+<!-- ========== AMENDMENT POPUPS ========== -->
 
-<DxPopup @bind-Visible="showStateConfirm" HeaderText="State Change Confirmation" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="true">
+<!-- 1. Profile Amendment -->
+<ProfileAmendmentPopup
+    @bind-Visible="showProfileAmendment"
+    Guest="@amendGuest" GuestChanged="@((string? v) => amendGuest = v)"
+    Contact="@amendContact" ContactChanged="@((string? v) => amendContact = v)"
+    Company="@amendCompany" CompanyChanged="@((string? v) => amendCompany = v)"
+    Agent="@amendAgent" AgentChanged="@((string? v) => amendAgent = v)"
+    Group="@amendGroup" GroupChanged="@((string? v) => amendGroup = v)"
+    Source="@amendSource" SourceChanged="@((string? v) => amendSource = v)"
+    GuestNames="@guestNames" ContactList="@contactList" CompanyList="@companyFilterList"
+    AgentList="@agentList" GroupList="@groupList" SourceList="@sourceList"
+    OnSave="SaveProfileAmendment" />
+
+<!-- 2. Date Amendment -->
+<DateAmendmentPopup
+    @bind-Visible="showDateAmendment"
+    Arrival="@amendArrival" ArrivalChanged="@((DateTime? v) => amendArrival = v)"
+    Departure="@amendDeparture" DepartureChanged="@((DateTime? v) => amendDeparture = v)"
+    Adult="@amendAdult" AdultChanged="@((int v) => amendAdult = v)"
+    Child="@amendChild" ChildChanged="@((int v) => amendChild = v)"
+    RoomType="@amendRoomType" RoomTypeChanged="@((string? v) => amendRoomType = v)"
+    Room="@amendRoom" RoomChanged="@((string v) => amendRoom = v)"
+    RateCode="@amendRateCode" RateCodeChanged="@((string v) => amendRateCode = v)"
+    Amount="@amendAmount" AmountChanged="@((decimal v) => amendAmount = v)"
+    Fixed="@amendFixed" FixedChanged="@((bool v) => amendFixed = v)"
+    RoomTypes="@roomTypes"
+    OnSave="SaveDateAmendment"
+    OnRoomSearch="OpenRoomSearchForAmendment" />
+
+<!-- 3. Registration Detail -->
+<RegistrationDetailPopup
+    @bind-Visible="showRegistrationDetail"
+    RegistrationNo="@selectedReg?.Registration"
+    Rows="@dailyDetailRows"
+    SelectedRow="@selectedDetailRow"
+    SelectedRowChanged="@((DailyDetailRow? r) => selectedDetailRow = r)"
+    OnRefresh="RefreshRegistrationDetail"
+    OnEdit="EditDailyDetail" />
+
+<!-- 3b. Edit Daily Registration Detail -->
+<DailyDetailEditPopup
+    @bind-Visible="showEditDailyDetail"
+    Model="@editDetail"
+    RoomTypes="@roomTypes"
+    SourceList="@sourceList"
+    MarketList="@marketList"
+    OnSave="SaveDailyDetailEdit" />
+
+<!-- 4. Rate Adjustment -->
+<RateAdjustmentPopup
+    @bind-Visible="showRateAdjustment"
+    RegNo="@rateAdjRegNo"
+    RateCode="@rateAdjRateCode"
+    Amount="@rateAdjAmount"
+    StartDate="@rateAdjStartDate"
+    EndDate="@rateAdjEndDate"
+    AdjType="@rateAdjType"
+    Factor="@rateAdjFactor"
+    Value="@rateAdjValue"
+    Reason="@rateAdjReason"
+    AdjTypes="@rateAdjTypes"
+    Reasons="@rateAdjustmentReasons"
+    OnSave="SaveRateAdjustment" />
+
+<!-- 5. Room Move -->
+<RoomMovePopup
+    @bind-Visible="showRoomMove"
+    RegNo="@roomMoveRegNo"
+    Guest="@roomMoveGuest"
+    CurrentRoomType="@roomMoveCurrentRoomType"
+    CurrentRoom="@roomMoveCurrentRoom"
+    NewRoomType="@roomMoveNewRoomType" NewRoomTypeChanged="@((string? v) => roomMoveNewRoomType = v)"
+    NewRoom="@roomMoveNewRoom" NewRoomChanged="@((string v) => roomMoveNewRoom = v)"
+    Start="@roomMoveStart"
+    End="@roomMoveEnd"
+    Reason="@roomMoveReason"
+    RoomTypes="@roomTypes"
+    Reasons="@roomMoveReasons"
+    OnSave="SaveRoomMove"
+    OnRoomSearch="OpenRoomSearchForRoomMove" />
+
+<!-- 6. Payment Options -->
+<PaymentOptionsPopup
+    @bind-Visible="showPaymentOptions"
+    Guest="@payGuest" RegNo="@payRegNo" Room="@payRoom"
+    PayMethod="@payMethod" PayMethodChanged="@((string? v) => payMethod = v)"
+    CreditCard="@payCreditCard" CreditCardChanged="@((string? v) => payCreditCard = v)"
+    CreditCardNo="@payCreditCardNo" CreditCardNoChanged="@((string v) => payCreditCardNo = v)"
+    Currency="@payCurrency" CurrencyChanged="@((string? v) => payCurrency = v)"
+    ExpDate="@payExpDate"
+    CrsNo="@payCrsNo" CrsNoChanged="@((string v) => payCrsNo = v)"
+    ApprovalCode="@payApprovalCode" ApprovalCodeChanged="@((string v) => payApprovalCode = v)"
+    ApprovalAmt="@payApprovalAmt" ApprovalAmtChanged="@((decimal v) => payApprovalAmt = v)"
+    Payments="@payments" CreditCardTypes="@creditCardTypes" Currencies="@currencies"
+    OnSave="SavePaymentOptions" OnReset="ResetPaymentOptions" />
+
+<!-- 7. Other Fields -->
+<OtherFieldsPopup
+    @bind-Visible="showOtherFields"
+    ResType="@otherResType"
+    Market="@otherMarket"
+    Source="@otherSource"
+    Origin="@otherOrigin"
+    MemberType="@otherMemberType"
+    Specials="@otherSpecials"
+    ReservationTypes="@reservationTypes"
+    MarketList="@marketList"
+    SourceList="@sourceList"
+    OriginList="@originList"
+    MemberTypes="@memberTypes"
+    SpecialsList="@specialsList"
+    OnSave="SaveOtherFields" />
+
+<!-- ========== OPTIONS POPUPS ========== -->
+
+<!-- Accompany Guest -->
+<AccompanyGuestPopup
+    @bind-Visible="showAccompanyGuest"
+    RegistrationNo="@selectedReg?.Registration"
+    Room="@selectedReg?.Room"
+    Guests="@accompanyGuests"
+    SelectedGuest="@selectedAccompanyGuest"
+    SelectedGuestChanged="@((AccompanyGuestRow? g) => selectedAccompanyGuest = g)"
+    OnNew="AddAccompanyGuest"
+    OnSave="SaveAccompanyGuest"
+    OnRemove="RemoveAccompanyGuest" />
+
+<!-- Guest Find -->
+<GuestFindPopup
+    @bind-Visible="showGuestFind"
+    GuestNames="@guestNames"
+    OnSelect="SelectAccompanyGuest"
+    OnAddNew="OpenNewGuestFromAccompany" />
+
+<!-- Attachment -->
+<AttachmentPopup
+    @bind-Visible="showAttachment"
+    RegistrationNo="@selectedReg?.Registration"
+    OnNew="@(() => showNewAttachment = true)" />
+
+<!-- New Attachment -->
+<NewAttachmentPopup
+    @bind-Visible="showNewAttachment"
+    OnSave="SaveNewAttachment" />
+
+<!-- Wakeup Call -->
+<WakeupCallPopup
+    @bind-Visible="showWakeupCall"
+    Room="@wuRoom" RegNo="@wuRegNo" Guest="@wuGuest"
+    DateFrom="@wuDateFrom" NoDays="@wuNoDays" DateTo="@wuDateTo"
+    Time="@wuTime" Note="@wuNote"
+    Schedules="@wakeupSchedules"
+    SelectedSchedule="@selectedWakeup"
+    SelectedScheduleChanged="@((WakeupScheduleRow? s) => selectedWakeup = s)"
+    OnSave="SaveWakeupCall"
+    OnRemove="RemoveWakeupCall" />
+
+<!-- Send Message -->
+<SendMessagePopup
+    @bind-Visible="showSendMessage"
+    MsgUser="@msgUser" MsgUserChanged="@((string v) => msgUser = v)"
+    MsgSendToAll="@msgSendToAll" MsgSendToAllChanged="@((bool v) => msgSendToAll = v)"
+    MsgGuest="@msgGuest" MsgGuestChanged="@((string v) => msgGuest = v)"
+    MsgRoom="@msgRoom" MsgRoomChanged="@((string v) => msgRoom = v)"
+    MsgRegNo="@msgRegNo" MsgNo="@msgNo" MsgDate="@msgDate"
+    MsgType="@msgType" MsgTypeChanged="@((string? v) => msgType = v)"
+    MsgBody="@msgBody" MsgBodyChanged="@((string v) => msgBody = v)"
+    MessageTypes="@messageTypes"
+    OnSave="SaveMessage" OnReset="ResetMessage"
+    OnOpenUserFind="@(() => showUserFind = true)" />
+
+<!-- User Find -->
+<UserFindPopup
+    @bind-Visible="showUserFind"
+    Users="@systemUsers"
+    SelectedUser="@selectedUserItem"
+    SelectedUserChanged="@((UserItem? u) => selectedUserItem = u)"
+    OnOk="SelectUser"
+    OnClear="@(() => { selectedUserItem = null; msgUser = null; })" />
+
+<!-- Privilege -->
+<PrivilegePopup
+    @bind-Visible="showPrivilege"
+    RegNo="@privRegNo"
+    NoPost="@privNoPost"
+    AuthorizeDirectBill="@privAuthorizeDirectBill"
+    PreStayCharging="@privPreStayCharging"
+    PostStayCheckout="@privPostStayCheckout"
+    AllowLateCheckout="@privAllowLateCheckout"
+    Remark="@privRemark"
+    OnSave="SavePrivilege" />
+
+<!-- Travel Detail -->
+<TravelDetailPopup
+    @bind-Visible="showTravelDetail"
+    RegistrationNo="@selectedReg?.Registration"
+    PickupRequired="@travelPickupRequired"
+    TransportType="@travelTransportType"
+    CarrierCode="@travelCarrierCode"
+    TransportNo="@travelTransportNo"
+    ArrivalDate="@travelArrivalDate"
+    PickupTime="@travelPickupTime"
+    YesNoList="@yesNoList"
+    TransportTypes="@transportTypes"
+    CarrierCodes="@carrierCodes"
+    OnSave="SaveTravelDetail"
+    OnReset="ResetTravelDetail" />
+
+<!-- ========== BILLING POPUPS ========== -->
+
+<!-- Manual Charge -->
+<ManualChargePopup
+    @bind-Visible="showManualCharge"
+    Article="@mcArticle" ArticleChanged="@((string? v) => mcArticle = v)"
+    Qty="@mcQty" QtyChanged="@((int v) => mcQty = v)"
+    Amount="@mcAmount" AmountChanged="@((decimal v) => mcAmount = v)"
+    Remark="@mcRemark" RemarkChanged="@((string v) => mcRemark = v)"
+    Date="@mcDate" No="@mcNo"
+    ChargeType="@mcChargeType" TransactionType="@mcTransactionType"
+    Currency="@mcCurrency" Registration="@mcRegistration" Room="@mcRoom"
+    Reference="@mcReference" Window="@mcWindow"
+    Subtotal="@mcSubtotal" Discount="@mcDiscount"
+    AdditionalCharge="@mcAdditionalCharge" Vat="@mcVat" GrandTotal="@mcGrandTotal"
+    Lines="@mcLines" SelectedLine="@selectedMcLine"
+    SelectedLineChanged="@((ManualChargeLine? l) => selectedMcLine = l)"
+    Articles="@articles" ChargeTypes="@chargeTypes"
+    Currencies="@currencies" WindowList="@windowList"
+    OnNew="OpenManualCharge" OnSave="SaveManualCharge"
+    OnAddLine="AddManualChargeLine" OnRemoveLine="RemoveManualChargeLine"
+    OnOpenArticleFind="@(() => showArticleFind = true)" />
+
+<!-- Article Find -->
+<ArticleFindPopup
+    @bind-Visible="showArticleFind"
+    Articles="@articles"
+    OnSelect="@((string? v) => mcArticle = v)" />
+
+<!-- Confirm User -->
+<ConfirmUserPopup
+    @bind-Visible="showConfirmUser"
+    Password="@confirmUserPassword"
+    PasswordChanged="@((string v) => confirmUserPassword = v)"
+    OnConfirm="ConfirmBillingUser" />
+
+<!-- Overdue error -->
+<OverdueErrorPopup @bind-Visible="showOverdueError" />
+
+<!-- Room Charge -->
+<RoomChargePopup
+    @bind-Visible="showRoomCharge"
+    From="@rcFrom" To="@rcTo"
+    Rows="@roomChargeRows"
+    OnPost="PostRoomCharge"
+    OnShow="OpenRoomCharge"
+    OnOption="SetRoomChargeOption" />
+
+<!-- Cash Receipt -->
+<CashReceiptPopup
+    @bind-Visible="showCashReceipt"
+    Title="Cash Receipt"
+    ShowForeignCurrency="true" ShowNetOff="false" ShowCustomerFind="true"
+    Customer="@crCustomer" PaymentType="@crPaymentType" Currency="@crCurrency"
+    ExRate="@crExRate" Amount="@crAmount" TotalAmount="@crTotalAmount"
+    VoucherNo="@crVoucherNo" Date="@crDate" RegNo="@crRegNo"
+    Window="@crWindow" Reference="@crReference" Purpose="@crPurpose" Remark="@crRemark"
+    Customers="@crCustomers" PaymentMethods="@paymentMethods"
+    Currencies="@currencies" WindowList="@windowList"
+    OnSave="SaveCashReceipt"
+    OnForeignCurrency="OpenForeignCurrency"
+    OnOpenCustomerFind="OpenCrCustomerFind" />
+
+<!-- Cash Receipt Customer Find -->
+<CrCustomerFindPopup
+    @bind-Visible="showCrCustomerFind"
+    Customers="@crCustomers"
+    SelectedCustomer="@selectedCrCustomer"
+    SelectedCustomerChanged="@((CustomerFindItem? c) => selectedCrCustomer = c)"
+    OnOk="SelectCrCustomer" />
+
+<!-- Foreign Currency -->
+<ForeignCurrencyPopup
+    @bind-Visible="showForeignCurrency"
+    VoucherNo="@crVoucherNo" Payment="@fxPayment"
+    TotalAmount="@fxTotalAmount" Remaining="@fxRemaining"
+    Rows="@fxRows" Currencies="@currencies"
+    OnSave="SaveForeignCurrency" />
+
+<!-- Rebate -->
+<CashReceiptPopup
+    @bind-Visible="showRebate"
+    Title="Rebate"
+    ShowForeignCurrency="false" ShowNetOff="true" ShowCustomerFind="false"
+    Customer="@crCustomer" PaymentType="@crPaymentType" Currency="@crCurrency"
+    ExRate="@crExRate" Amount="@crAmount" TotalAmount="@crTotalAmount"
+    VoucherNo="@crVoucherNo" Date="@crDate" RegNo="@crRegNo"
+    Window="@crWindow" Reference="@crReference" Purpose="@crPurpose" Remark="@crRemark"
+    NetOff="@rebateNetOff"
+    Customers="@crCustomers" PaymentMethods="@paymentMethods"
+    Currencies="@currencies" WindowList="@windowList"
+    OnSave="SaveRebate" />
+
+<!-- Paid Out -->
+<CashReceiptPopup
+    @bind-Visible="showPaidOut"
+    Title="Paid Out"
+    ShowForeignCurrency="false" ShowNetOff="false" ShowCustomerFind="false"
+    Customer="@crCustomer" PaymentType="@crPaymentType" Currency="@crCurrency"
+    ExRate="@crExRate" Amount="@crAmount" TotalAmount="@crTotalAmount"
+    VoucherNo="@crVoucherNo" Date="@crDate" RegNo="@crRegNo"
+    Window="@crWindow" Reference="@crReference" Purpose="@crPurpose" Remark="@crRemark"
+    Customers="@crCustomers" PaymentMethods="@paymentMethods"
+    Currencies="@currencies" WindowList="@windowList"
+    OnSave="SavePaidOut" />
+
+<!-- Bill Split -->
+<BillSplitPopup
+    @bind-Visible="showBillSplit"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    WindowCount="@billSplitWindowCount"
+    Window1="@billSplitWindow1" Window2="@billSplitWindow2" Window3="@billSplitWindow3"
+    SelectedItem="@selectedBillSplitItem"
+    SelectedItemChanged="@((BillSplitItem? b) => selectedBillSplitItem = b)"
+    ActiveWindowChanged="@((int w) => activeBillSplitWindow = w)"
+    OnAddWindow="AddBillSplitWindow"
+    OnSave="@(() => ShowInfo("Windows saved."))"
+    OnBreak="BreakSelectedBillItem"
+    OnViewFolio="OpenFolio"
+    OnCheckOut="@(() => OnActivity("CheckOut"))"
+    OnOpenSplitVoucher="OpenSplitVoucher" />
+
+<!-- Split Voucher -->
+<SplitVoucherPopup
+    @bind-Visible="showSplitVoucher"
+    VoucherNo="@svVoucherNo" Customer="@(selectedReg?.Guest ?? "")"
+    BusinessDate="@businessDate" GrandTotal="@svGrandTotal"
+    SplitBy="@svSplitBy" NoOfSplit="@svNoOfSplit"
+    FactorPercent="@svFactorPercent" FactorPercentChanged="@((bool v) => { svFactorPercent = v; StateHasChanged(); })"
+    PercentValue="@svPercentValue" AmountValue="@svAmountValue"
+    Pieces="@svPieces"
+    SelectedPiece="@selectedSplitPiece"
+    SelectedPieceChanged="@((SplitPiece? p) => selectedSplitPiece = p)"
+    OnSave="SaveSplitVoucher" OnSplit="DoSplitVoucher" OnClear="ClearSplitVoucher" />
+
+<!-- Bill Transfer -->
+<BillTransferPopup
+    @bind-Visible="showBillTransfer"
+    GuestName="@btGuestName" RegNo="@btRegNo" Company="@btCompany"
+    FsNum="@btFsNum" Tin="@btTin" Arrival="@btArrival" Departure="@btDeparture"
+    ToGuest="@btToGuest" ToGuestChanged="@((string? v) => btToGuest = v)"
+    Window="@btWindow" SelectAll="@btSelectAll"
+    RoomCharges="@btRoomCharges" ExtraBills="@btExtraBills" PaymentHistory="@btPayments"
+    WindowOptions="@(new List<string> { "All" }.Concat(windowList).ToList())"
+    OnRefresh="OpenBillTransfer"
+    OnOpenGuestFind="OpenBtGuestFind"
+    OnSelectAll="@((bool v) => { btSelectAll = v; foreach (var r in btRoomCharges) r.Selected = v; foreach (var e in btExtraBills) e.Selected = v; foreach (var p in btPayments) p.Selected = v; })"
+    OnTransfer="TransferBills"
+    OnReturn="ReturnBills" />
+
+<!-- Bill Transfer To Guest Find -->
+<BtGuestFindPopup
+    @bind-Visible="showBtGuestFind"
+    GuestList="@btGuestFindList"
+    SelectedGuest="@selectedBtGuest"
+    SelectedGuestChanged="@((TransferGuestItem? g) => selectedBtGuest = g)"
+    OnOk="SelectBtGuest" />
+
+<!-- Folio -->
+<FolioPopup
+    @bind-Visible="showFolio"
+    GuestName="@folioGuestName" RegNo="@folioRegNo" Company="@folioCompany"
+    Arrival="@folioArrival" Departure="@folioDeparture"
+    FsNum="@folioFsNum" Tin="@folioTin"
+    Window="@folioWindow" WindowList="@windowList"
+    RoomCharges="@folioRoomCharges"
+    ExtraBills="@folioExtraBills"
+    Payments="@folioPayments"
+    OnRefresh="OpenFolio" />
+<!-- Share Check-In -->
+<ShareCheckInPopup
+    @bind-Visible="showShareCheckIn"
+    RegistrationNo="@selectedReg?.Registration"
+    GuestName="@shareGuestName" GuestNameChanged="@((string v) => shareGuestName = v)"
+    Nationality="@shareNationality" NationalityChanged="@((string v) => shareNationality = v)"
+    Passport="@sharePassport" PassportChanged="@((string v) => sharePassport = v)"
+    Title="@shareTitle" TitleChanged="@((string v) => shareTitle = v)"
+    Address="@shareAddress" AddressChanged="@((string v) => shareAddress = v)"
+    Company="@shareCompany" CompanyChanged="@((string v) => shareCompany = v)"
+    Agent="@shareAgent" AgentChanged="@((string v) => shareAgent = v)"
+    Contact="@shareContact" ContactChanged="@((string v) => shareContact = v)"
+    Group="@shareGroup" GroupChanged="@((string v) => shareGroup = v)"
+    ConsigneeSource="@shareConsigneeSource" ConsigneeSourceChanged="@((string v) => shareConsigneeSource = v)"
+    MemberType="@shareMemberType" MemberTypeChanged="@((string? v) => shareMemberType = v)"
+    Arrival="@shareArrival" ArrivalChanged="@((DateTime? v) => shareArrival = v)"
+    Eta="@shareEta" Nights="@shareNights" NightsChanged="@((int v) => shareNights = v)"
+    Departure="@shareDeparture" DepartureChanged="@((DateTime? v) => shareDeparture = v)"
+    Adults="@shareAdults" AdultsChanged="@((int v) => shareAdults = v)"
+    Children="@shareChildren" ChildrenChanged="@((int v) => shareChildren = v)"
+    NoOfRooms="@shareNoOfRooms" NoOfRoomsChanged="@((int v) => shareNoOfRooms = v)"
+    RoomType="@shareRoomType" RoomTypeChanged="@((string? v) => shareRoomType = v)"
+    Rtc="@shareRtc" RtcChanged="@((string? v) => shareRtc = v)"
+    Room="@shareRoom" RoomChanged="@((string v) => shareRoom = v)"
+    FixedRate="@shareFixedRate" FixedRateChanged="@((bool v) => shareFixedRate = v)"
+    RateCode="@shareRateCode" RateCodeChanged="@((string? v) => shareRateCode = v)"
+    Package="@sharePackage" PackageChanged="@((string? v) => sharePackage = v)"
+    Rate="@shareRate" RateChanged="@((string v) => shareRate = v)"
+    ResType="@shareResType" ResTypeChanged="@((string? v) => shareResType = v)"
+    Market="@shareMarket" MarketChanged="@((string? v) => shareMarket = v)"
+    Source="@shareSource" SourceChanged="@((string? v) => shareSource = v)"
+    Origin="@shareOrigin" OriginChanged="@((string? v) => shareOrigin = v)"
+    Payment="@sharePayment" PaymentChanged="@((string? v) => sharePayment = v)"
+    RateAdjType="@shareRateAdjType" RateAdjTypeChanged="@((string v) => shareRateAdjType = v)"
+    AdjAmount="@shareAdjAmount" AdjAmountChanged="@((string v) => shareAdjAmount = v)"
+    AdjPercent="@shareAdjPercent" AdjPercentChanged="@((string v) => shareAdjPercent = v)"
+    Reason="@shareReason" ReasonChanged="@((string? v) => shareReason = v)"
+    Special="@shareSpecial" SpecialChanged="@((string? v) => shareSpecial = v)"
+    Voucher="@shareVoucher" VoucherChanged="@((string v) => shareVoucher = v)"
+    GuestNames="@shareGuestNames" Packages="@sharePackages"
+    ResTypes="@shareResTypes" Markets="@shareMarkets"
+    Sources="@shareSources" Origins="@shareOrigins"
+    RtcList="@shareRtcList" RateCodes="@shareRateCodes"
+    Reasons="@shareReasons" Specials="@shareSpecials"
+    RoomTypes="@roomTypes" MemberTypes="@memberTypes" Payments="@payments"
+    OnCheckIn="PerformShareCheckIn"
+    OnNew="NewShareCheckIn"
+    OnRoomSearch="OpenShareRoomSearch"
+    OnTravelDetail="@(() => showTravelDetail = true)" />
+
+<!-- Room Assignment Confirm -->
+<DxPopup @bind-Visible="showRoomAssignConfirm" HeaderText="Room Assignment" Width="380px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-info-circle" style="font-size:32px; color:#1565c0;"></i>
-            <p>Do you want to change @(selectedReg?.State ?? "") state to Check In ?</p>
+            <p>Do you want to assign a room to this guest?</p>
         </div>
         <div class="confirm-buttons">
-            <DxButton Text="Yes" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="ConfirmCheckIn" />
+            <DxButton Text="Yes" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small"
+                      Click="ConfirmRoomAssignment" />
+            <DxButton Text="No" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                      Click="() => showRoomAssignConfirm = false" />
+            <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                      Click="() => showRoomAssignConfirm = false" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ========== EXISTING ACTIVITY POPUPS ========== -->
+
+<!-- State Change Confirmation -->
+<DxPopup @bind-Visible="showStateConfirm" HeaderText="State Change Confirmation" Width="420px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="confirm-body">
+            <i class="bi bi-info-circle" style="font-size:32px; color:#1565c0;"></i>
+            <p>@stateConfirmMessage</p>
+        </div>
+        <div class="confirm-buttons">
+            <DxButton Text="Yes" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="ConfirmStateChange" />
             <DxButton Text="No" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="CloseStateConfirm" />
             <DxButton Text="Cancel" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="CloseStateConfirm" />
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showArrivalError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="true">
+<!-- Error: Arrival not today -->
+<DxPopup @bind-Visible="showArrivalError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-x-circle" style="font-size:32px; color:#c62828;"></i>
@@ -149,7 +692,34 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showNoSelection" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="true">
+<!-- Error: Validation -->
+<DxPopup @bind-Visible="showValidationError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="confirm-body">
+            <i class="bi bi-x-circle" style="font-size:32px; color:#c62828;"></i>
+            <p>@validationErrorMessage</p>
+        </div>
+        <div class="confirm-buttons">
+            <DxButton Text="OK" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="() => showValidationError = false" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- Error: Passed date edit -->
+<DxPopup @bind-Visible="showPassedDateError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="confirm-body">
+            <i class="bi bi-x-circle" style="font-size:32px; color:#c62828;"></i>
+            <p>You can not edit the passed registration!</p>
+        </div>
+        <div class="confirm-buttons">
+            <DxButton Text="OK" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="() => showPassedDateError = false" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- No selection warning -->
+<DxPopup @bind-Visible="showNoSelection" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-info-circle" style="font-size:28px; color:#1565c0;"></i>
@@ -161,245 +731,370 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showSingleCheckIn" HeaderText="Check In" Width="640px" Height="500px" CloseOnOutsideClick="false" ShowCloseButton="true">
+<!-- Success / Info -->
+<DxPopup @bind-Visible="showSuccessInfo" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false">
     <BodyContentTemplate>
-        <div class="ci-toolbar">
-            <button type="button" class="ci-btn" @onclick="DoCheckInSingle">
-                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check2-square"></i></div>
-                <div class="ci-text">Check In</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="NoOp">
-                <div class="ci-icon"><i class="bi bi-grid-3x3-gap"></i></div>
-                <div class="ci-text">Issue Card</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="OpenRegistrationCard">
-                <div class="ci-icon"><i class="bi bi-card-heading"></i></div>
-                <div class="ci-text">Registration card</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="NoOp">
-                <div class="ci-icon"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Print Card Pocket</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="CloseSingleCheckIn">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
+        <div class="confirm-body">
+            <i class="bi bi-info-circle" style="font-size:28px; color:#1565c0;"></i>
+            <p>@infoMessage</p>
         </div>
-        <h3 class="ci-heading">You are checking in the guest below</h3>
-        <div class="ci-form">
-            <div class="ci-left">
-                <div class="ci-row"><label>Reg. No</label><DxTextBox @bind-Text="ciRegNo" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-                <div class="ci-row"><label>Arrival</label><DxDateEdit @bind-Date="ciArrival" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Departure</label><DxDateEdit @bind-Date="ciDeparture" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Room Type</label><DxComboBox Data="@roomTypes" @bind-Value="ciRoomType" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row">
-                    <label>Room</label>
-                    <div class="input-with-btn">
-                        <DxTextBox @bind-Text="ciRoom" SizeMode="SizeMode.Small" />
-                        <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="OpenRoomSearchForSingle" />
-                    </div>
-                </div>
-                <div class="ci-row"><label>Payment Type</label><DxComboBox Data="@payments" @bind-Value="ciPayment" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Total Bill</label><DxTextBox @bind-Text="ciTotalBill" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Paid</label><DxTextBox @bind-Text="ciPaid" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Remaining</label><DxTextBox @bind-Text="ciRemaining" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            </div>
-            <fieldset class="ci-profile">
-                <legend>Profile</legend>
-                <div class="ci-row"><label>Guest</label><DxComboBox Data="@guestNames" @bind-Value="ciGuest" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Company</label><DxComboBox Data="@companyFilterList" @bind-Value="ciCompany" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Agent</label><DxComboBox Data="@agentList" @bind-Value="ciAgent" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Source</label><DxComboBox Data="@sourceList" @bind-Value="ciSource" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Group</label><DxComboBox Data="@groupList" @bind-Value="ciGroup" SizeMode="SizeMode.Small" /></div>
-                <div class="ci-row"><label>Contact</label><DxComboBox Data="@contactList" @bind-Value="ciContact" SizeMode="SizeMode.Small" /></div>
-            </fieldset>
+        <div class="confirm-buttons">
+            <DxButton Text="OK" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="() => showSuccessInfo = false" />
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showMultiCheckIn" HeaderText="@MultiCheckInTitle" Width="860px" Height="440px" CloseOnOutsideClick="false" ShowCloseButton="true">
-    <BodyContentTemplate>
-        <div class="ci-toolbar">
-            <button type="button" class="ci-btn" @onclick="DoCheckInMulti">
-                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check2-square"></i></div>
-                <div class="ci-text">Check In</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="NoOp">
-                <div class="ci-icon"><i class="bi bi-grid-3x3-gap"></i></div>
-                <div class="ci-text">Issue Card</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="OpenRegistrationCard">
-                <div class="ci-icon"><i class="bi bi-card-heading"></i></div>
-                <div class="ci-text">Registration card</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="NoOp">
-                <div class="ci-icon"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Print Card Pocket</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="CloseMultiCheckIn">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
-        </div>
-        <h3 class="ci-heading">You are checking in the guest(s) below</h3>
-        <table class="multi-table">
-            <thead>
-                <tr>
-                    <th style="width:36px;"></th>
-                    <th style="width:40px;">SN</th>
-                    <th>Company</th>
-                    <th style="width:180px;">Guest</th>
-                    <th style="width:70px;">Guest No</th>
-                    <th style="width:120px;">Room</th>
-                    <th style="width:100px;">Arrival</th>
-                    <th style="width:100px;">Departure</th>
-                    <th style="width:60px;">Key</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var row in multiRoomRows)
-                {
-                    <tr class="@(row.Selected ? "row-selected" : "")">
-                        <td><input type="checkbox" checked="@row.Selected" @onchange="@(e => row.Selected = (bool)(e.Value ?? false))" /></td>
-                        <td>@row.SN</td>
-                        <td>@row.Company</td>
-                        <td><DxComboBox Data="@guestNames" @bind-Value="row.Guest" SizeMode="SizeMode.Small" Width="100%" /></td>
-                        <td>@row.GuestNo</td>
-                        <td>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="row.Room" SizeMode="SizeMode.Small" />
-                                <DxButton IconCssClass="bi bi-plus-circle" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="@(() => OpenRoomSearchForMulti(row))" />
-                            </div>
-                        </td>
-                        <td>@row.Arrival.ToString("M/d/yyyy")</td>
-                        <td>@row.Departure.ToString("M/d/yyyy")</td>
-                        <td>@row.Key</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </BodyContentTemplate>
-</DxPopup>
+<!-- Single Check In -->
+<SingleCheckInPopup
+    @bind-Visible="showSingleCheckIn"
+    RegNo="@ciRegNo" Arrival="@ciArrival" Departure="@ciDeparture"
+    RoomType="@ciRoomType" Room="@ciRoom" Payment="@ciPayment"
+    TotalBill="@ciTotalBill" Paid="@ciPaid" Remaining="@ciRemaining"
+    Guest="@ciGuest" Company="@ciCompany" Agent="@ciAgent"
+    Source="@ciSource" Group="@ciGroup" Contact="@ciContact"
+    RoomTypes="@roomTypes" Payments="@payments"
+    GuestNames="@guestNames" CompanyList="@companyFilterList"
+    AgentList="@agentList" SourceList="@sourceList"
+    GroupList="@groupList" ContactList="@contactList"
+    OnCheckIn="DoCheckInSingle"
+    OnRegistrationCard="OpenRegistrationCard"
+    OnRoomSearch="OpenRoomSearchForSingle" />
 
-<DxPopup @bind-Visible="showRoomSearch" HeaderText="Room Search" Width="780px" Height="420px" CloseOnOutsideClick="false" ShowCloseButton="true">
-    <BodyContentTemplate>
-        <div class="ci-toolbar">
-            <button type="button" class="ci-btn" @onclick="SelectRoom">
-                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-check-lg"></i></div>
-                <div class="ci-text">Select</div>
-            </button>
-            <span style="margin-left:12px;">Feature</span>
-            <DxComboBox Data="@roomFeatures" @bind-Value="selectedFeature" Width="130px" SizeMode="SizeMode.Small" />
-            <span style="margin-left:8px;">Room</span>
-            <DxTextBox @bind-Text="roomFilterText" Width="90px" SizeMode="SizeMode.Small" />
-            <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="CloseRoomSearch">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
-        </div>
-        <DxTabs>
-            <DxTabPage Text="Rooms">
-                <DxGrid Data="@availableRooms" KeyFieldName="SN" PageSize="10" ShowPager="false" SizeMode="SizeMode.Small" Height="280px"
-                        FocusedRowEnabled="true" FocusedRowKey="@(selectedRoomItem?.SN)" FocusedRowKeyChanged="OnRoomFocusedKeyChanged"
-                        RowClick="OnRoomRowClick" CustomizeElement="OnRoomCustomize">
-                    <Columns>
-                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
-                        <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
-                        <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="110px" />
-                        <DxGridDataColumn FieldName="HKStatus" Caption="HK Status" Width="90px" />
-                        <DxGridDataColumn FieldName="FOStatus" Caption="FO Status" Width="90px" />
-                        <DxGridDataColumn FieldName="Floor" Caption="Floor" Width="90px" />
-                        <DxGridDataColumn FieldName="Feature" Caption="Feature" />
-                        <DxGridDataColumn FieldName="Remark" Caption="Remark" />
-                    </Columns>
-                </DxGrid>
-            </DxTabPage>
-            <DxTabPage Text="Pseudo Rooms">
-                <div style="padding:30px; text-align:center; color:#999;">Pseudo Rooms</div>
-            </DxTabPage>
-        </DxTabs>
-    </BodyContentTemplate>
-</DxPopup>
+<!-- Multiple Check In -->
+<MultiCheckInPopup
+    @bind-Visible="showMultiCheckIn"
+    Title="@MultiCheckInTitle"
+    Rows="@multiRoomRows"
+    GuestNames="@guestNames"
+    OnCheckIn="DoCheckInMulti"
+    OnRegistrationCard="OpenRegistrationCard"
+    OnRoomSearchForRow="OpenRoomSearchForMulti" />
 
-<style>
-    .reg-browser-page { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; font-size: 12.5px; padding: 8px 12px; }
-    .erp-toolbar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; min-height: 64px; background: white; border: 1px solid #d6d6d6; border-radius: 4px; margin-bottom: 8px; flex-wrap: wrap; position: relative; z-index: 20; overflow: visible; }
-    .toolbar-group { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; overflow: visible; }
-    .filter-group { border-left: 1px solid #ddd; padding-left: 8px; margin-left: 4px; gap: 4px; }
-    .filter-label { font-size: 11px; color: #555; white-space: nowrap; }
-    .filter-icon { font-size: 14px; color: #666; }
-    .toolbar-btn { background: transparent !important; border: none !important; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 56px; padding: 3px 8px; cursor: pointer; border-radius: 4px; height: 48px; }
-    .toolbar-btn:hover, .toolbar-btn.active { background: #e3f2fd !important; }
-    .toolbar-icon { font-size: 22px; line-height: 22px; color: #555; }
-    .toolbar-icon i { font-size: 22px; }
-    .toolbar-text { margin-top: 2px; font-size: 10px; color: #444; font-weight: 500; }
-    .toolbar-dropdown { position: relative; overflow: visible; }
-    .dropdown-menu { position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #bbb; box-shadow: 0 6px 16px rgba(0,0,0,.18); z-index: 9999; min-width: 170px; padding: 4px 0; margin: 0; list-style: none; display: block; }
-    .dropdown-item { padding: 7px 18px; cursor: pointer; font-size: 12.5px; color: #222; white-space: nowrap; }
-    .dropdown-item:hover { background: #0078d4; color: #fff; }
-    .dropdown-item.disabled { color: #aaa; cursor: default; pointer-events: none; }
-    .reg-grid { background: #fff; }
-    .record-bar { padding: 6px 10px; font-size: 12px; color: #333; background: #f5f5f5; border: 1px solid #ddd; border-top: none; display: flex; justify-content: space-between; align-items: center; }
-    .record-count { color: #666; font-size: 11px; }
-    .confirm-body { display: flex; gap: 14px; align-items: flex-start; padding: 16px; }
-    .confirm-body p { margin: 4px 0 0; font-size: 13px; }
-    .confirm-buttons { display: flex; justify-content: center; gap: 10px; padding: 0 16px 16px; }
-    .ci-toolbar { display: flex; gap: 4px; padding: 6px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
-    .ci-btn { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; min-width: 64px; padding: 4px 8px; cursor: pointer; border-radius: 4px; }
-    .ci-btn:hover { background: #f0f4f8; }
-    .ci-icon { font-size: 24px; }
-    .ci-icon i { font-size: 24px; }
-    .ci-text { font-size: 10px; color: #444; margin-top: 2px; }
-    .ci-heading { color: #c62828; font-size: 15px; font-weight: 600; margin: 8px 0 12px; }
-    .ci-form { display: flex; gap: 16px; }
-    .ci-left { flex: 1; }
-    .ci-profile { flex: 1; border: 1px solid #c8cdd4; border-radius: 3px; padding: 8px 12px; margin: 0; }
-    .ci-profile legend { font-size: 12px; font-weight: 600; color: #1565c0; padding: 0 4px; }
-    .ci-row { display: grid; grid-template-columns: 100px 1fr; gap: 6px; align-items: center; margin-bottom: 6px; }
-    .ci-row label { text-align: right; font-size: 12px; color: #555; }
-    .input-with-btn { display: flex; gap: 3px; align-items: center; }
-    .input-with-btn > :first-child { flex: 1; }
-    .circle-btn { width: 26px; height: 26px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; }
-    .multi-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .multi-table th { background: #f0f0f0; border: 1px solid #ccc; padding: 5px 6px; text-align: left; font-weight: 600; }
-    .multi-table td { border: 1px solid #ddd; padding: 3px 5px; vertical-align: middle; }
-    .multi-table tr.row-selected { background: #cce5ff; }
-    .hk-clean { background-color: #fdd835 !important; color: #000 !important; }
-    .fo-vacant { background-color: #1e88e5 !important; color: white !important; }
-    .hk-dirty { background-color: #e53935 !important; color: white !important; }
-</style>
+<!-- Confirmation Review -->
+<StateReviewPopup
+    @bind-Visible="showConfirmationReview"
+    Title="Confirmation" Heading="You are conforming the guest below"
+    RegNo="@ciRegNo" Guest="@ciGuest" Company="@ciCompany" Room="@ciRoom"
+    Payment="@ciPayment" TotalBill="@ciTotalBill" Paid="@ciPaid" Remaining="@ciRemaining"
+    Departure="@ciDeparture" Agent="@ciAgent" Source="@ciSource"
+    CompanyList="@companyFilterList" Payments="@payments"
+    AgentList="@agentList" SourceList="@sourceList">
+    <ToolbarContent>
+        <button type="button" class="toolbar-btn" @onclick="DoConfirmReservation">
+            <div class="toolbar-icon"><i class="bi bi-check-square"></i></div>
+            <div class="toolbar-text">Conform</div>
+        </button>
+        <button type="button" class="toolbar-btn" @onclick="NoOp">
+            <div class="toolbar-icon"><i class="bi bi-arrow-right-circle"></i></div>
+            <div class="toolbar-text">Payment</div>
+        </button>
+        <button type="button" class="toolbar-btn" @onclick="NoOp">
+            <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
+            <div class="toolbar-text">Conformation Slip</div>
+        </button>
+    </ToolbarContent>
+</StateReviewPopup>
+
+<!-- Cancellation Review -->
+<StateReviewPopup
+    @bind-Visible="showCancellationReview"
+    Title="Cancellation" Heading="You are cancelling the guest below"
+    RegNo="@ciRegNo" Guest="@ciGuest" Company="@ciCompany" Room="@ciRoom"
+    Payment="@ciPayment" TotalBill="@ciTotalBill" Paid="@ciPaid" Remaining="@ciRemaining"
+    Departure="@ciDeparture" Agent="@ciAgent" Source="@ciSource"
+    CompanyList="@companyFilterList" Payments="@payments"
+    AgentList="@agentList" SourceList="@sourceList">
+    <ToolbarContent>
+        <button type="button" class="toolbar-btn" @onclick="DoCancelReservation">
+            <div class="toolbar-icon"><i class="bi bi-file-earmark-x"></i></div>
+            <div class="toolbar-text">Cancel</div>
+        </button>
+    </ToolbarContent>
+    <ExtraFields>
+        <div class="ci-row"><label>Reason</label>
+            <DxComboBox Data="@cancelReasons" @bind-Value="ciCancelReason" SizeMode="SizeMode.Small" />
+        </div>
+    </ExtraFields>
+</StateReviewPopup>
+
+<!-- Reinstate Review -->
+<StateReviewPopup
+    @bind-Visible="showReinstateReview"
+    Title="Re InState" Heading="You are reinstating the Canceled guest."
+    RegNo="@ciRegNo" Guest="@ciGuest" Company="@ciCompany" Room="@ciRoom"
+    Payment="@ciPayment" TotalBill="@ciTotalBill" Paid="@ciPaid" Remaining="@ciRemaining"
+    Departure="@ciDeparture" Agent="@ciAgent" Source="@ciSource"
+    CompanyList="@companyFilterList" Payments="@payments"
+    AgentList="@agentList" SourceList="@sourceList">
+    <ToolbarContent>
+        <button type="button" class="toolbar-btn" @onclick="DoReinstateReservation">
+            <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
+            <div class="toolbar-text">Reinstate</div>
+        </button>
+    </ToolbarContent>
+    <ExtraFields>
+        <div class="ci-row"><label>Action</label>
+            <DxComboBox Data="@reinstateActions" @bind-Value="ciReinstateAction" SizeMode="SizeMode.Small" />
+        </div>
+    </ExtraFields>
+</StateReviewPopup>
+
+<!-- Check Out Review -->
+<StateReviewPopup
+    @bind-Visible="showCheckOutReview"
+    Title="Check Out" Heading="You are checking out the guest below"
+    RoomReadOnly="true"
+    RegNo="@ciRegNo" Guest="@ciGuest" Company="@ciCompany" Room="@ciRoom"
+    Payment="@ciPayment" TotalBill="@ciTotalBill" Paid="@ciPaid" Remaining="@ciRemaining"
+    Departure="@ciDeparture" Agent="@ciAgent" Source="@ciSource"
+    CompanyList="@companyFilterList" Payments="@payments"
+    AgentList="@agentList" SourceList="@sourceList">
+    <ToolbarContent>
+        <button type="button" class="toolbar-btn" @onclick="DoCheckOut">
+            <div class="toolbar-icon"><i class="bi bi-box-arrow-right"></i></div>
+            <div class="toolbar-text">Check Out</div>
+        </button>
+    </ToolbarContent>
+</StateReviewPopup>
+
+<!-- Room Search -->
+<RoomSearchPopup
+    @bind-Visible="showRoomSearch"
+    Rooms="@availableRooms"
+    SelectedRoom="@selectedRoomItem"
+    SelectedRoomChanged="@((RoomSearchItem? r) => selectedRoomItem = r)"
+    Features="@roomFeatures" FilterText="@roomFilterText"
+    OnSelect="SelectRoom" />
 
 @code {
     string filterRoom = "";
     string? filterGuest;
-    string filterState = "All";
-    DateTime? filterArrival = new DateTime(2017, 8, 19);
+    string filterState = "Inhouse";
+    DateTime? filterArrival;
     DateTime? filterDeparture;
     string? filterCompany;
 
-    List<string> stateList = new() { "All", "6PM", "Confirmed", "Tentative", "Checked In", "Cancelled" };
-    List<string> guestFilterList = new() { "", "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes" };
-    List<string> companyFilterList = new() { "", "Fish", "MISIKIR LTD" };
-    List<string> roomTypes = new() { "Standard Room", "Executive", "Deluxe", "Suite" };
+    List<string> stateFilterList = new() { "All", "Waiting List", "6PM", "Guaranteed", "Cancelled", "Checked In", "Checked Out", "Inhouse", "No show" };
+    List<string> guestFilterList = new() { "", "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun" };
+    List<string> companyFilterList = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
+    List<string> roomTypes = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
     List<string> payments = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
-    List<string> guestNames = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola" };
-    List<string> agentList = new() { "", "MY AGENT", "RIHANN'S AGENT" };
+    List<string> guestNames = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun", "abel kaleab", "Dog Snoop", "bayu abenezer", "Selase bonjour Bete" };
+    List<string> agentList = new() { "", "MY AGENT", "RIHANN\'S AGENT" };
     List<string> sourceList = new() { "", "Company Directory", "Website", "Walk-in" };
     List<string> groupList = new() { "", "Musical Group", "Girls Group" };
     List<string> contactList = new() { "", "KEBEDE ZELEKE ABEBE", "BROWN CHRIS" };
     List<string> roomFeatures = new() { "Select feature", "Sea View", "City View", "Balcony" };
+    List<string> cancelReasons = new() { "No Reason Given", "Guest Plan Changed", "Trip/Meeting Cancelled", "Trip/Meeting Postponed", "Competitor Hotel", "Overbooking", "Flight Cancelled" };
+    List<string> reinstateActions = new() { "With receipt reprint", "Without receipt reprint" };
+    List<string> reservationTypes = new() { "Phone Reservation", "Online Reservation", "Walk-in", "Corporate" };
+    List<string> marketList = new() { "Corporate Business", "Leisure", "Group", "Airline" };
+    List<string> originList = new() { "Central Reservation", "Website", "Travel Agent", "Direct" };
+    List<string> memberTypes = new() { "", "Gold", "Silver", "Bronze" };
+    List<string> specialsList = new() { "", "Honeymoon", "Birthday", "Anniversary" };
+    List<string> creditCardTypes = new() { "JCB Card", "Master Card", "Visa Card", "Dinners Club", "American Express" };
+    List<string> roomMoveReasons = new() { "Room Upgrade", "Ceiling Does not work", "No Hot Water", "Transfer to PM Account", "Electric Problem", "Problem on the Door", "Toilet does not Work" };
+    List<string> rateAdjustmentReasons = new() { "Complimentary", "Discount", "Rate Change", "Package Adjustment" };
+    List<string> rateAdjTypes = new() { "Amount", "Percent" };
+
+    Dictionary<string, string> stateColors = new()
+    {
+        ["All"] = "",
+        ["Waiting List"] = "192, 192, 0",
+        ["6PM"] = "Orange",
+        ["Guaranteed"] = "Green",
+        ["Cancelled"] = "Red",
+        ["Checked In"] = "Blue",
+        ["Checked Out"] = "DimGray",
+        ["Inhouse"] = "Blue",
+        ["No show"] = "Olive",
+        ["PM"] = "Salmon"
+    };
 
     List<RegistrationRow> allRegistrations = new();
     List<RegistrationRow> filteredRegistrations = new();
     RegistrationRow? selectedReg;
 
     bool showActivitiesMenu = false;
+    bool showAmendmentMenu = false;
+    bool showOptionsMenu = false;
+    bool showBillingMenu = false;
     bool showStateConfirm = false;
     bool showArrivalError = false;
+    bool showValidationError = false;
     bool showNoSelection = false;
+    bool showSuccessInfo = false;
+    string infoMessage = "State changed successfully!";
     bool showSingleCheckIn = false;
     bool showMultiCheckIn = false;
+    bool showConfirmationReview = false;
+    bool showCancellationReview = false;
+    bool showReinstateReview = false;
+    bool showCheckOutReview = false;
     bool showRoomSearch = false;
+    bool showPassedDateError = false;
+
+    // Amendment popup flags
+    bool showProfileAmendment = false;
+    bool showDateAmendment = false;
+    bool showRegistrationDetail = false;
+    bool showEditDailyDetail = false;
+    bool showRateAdjustment = false;
+    bool showRoomMove = false;
+    bool showPaymentOptions = false;
+    bool showOtherFields = false;
+
+    // Options popups
+    bool showAccompanyGuest = false;
+    bool showAttachment = false;
+    bool showWakeupCall = false;
+    bool showSendMessage = false;
+    bool showPrivilege = false;
+    bool showTravelDetail = false;
+    bool showRoomAssignConfirm = false;
+    bool showUserFind = false;
+    bool showGuestFind = false;
+    bool showNewAttachment = false;
+    bool showShareCheckIn = false;
+
+    // Billing popups
+    bool showManualCharge = false;
+    bool showRoomCharge = false;
+    bool showBillSplit = false;
+    bool showBillTransfer = false;
+    bool showCashReceipt = false;
+    bool showRebate = false;
+    bool showPaidOut = false;
+    bool showConfirmUser = false;
+    bool showArticleFind = false;
+    bool showForeignCurrency = false;
+    bool showSplitVoucher = false;
+    bool showFolio = false;
+    bool showOverdueError = false;
+    string confirmUserPassword = "";
+    string pendingBillingAction = "";
+
+    // Manual Charge
+    string? mcArticle;
+    int mcQty = 1;
+    decimal mcAmount = 0;
+    string mcRemark = "";
+    DateTime? mcDate;
+    string mcNo = "";
+    string? mcChargeType = "Room Charge";
+    string mcTransactionType = "Credit Sales";
+    string? mcCurrency = "Birr";
+    string mcRegistration = "";
+    string mcRoom = "";
+    string mcReference = "";
+    string? mcWindow = "Window 1";
+    decimal mcSubtotal = 0;
+    decimal mcDiscount = 0;
+    decimal mcAdditionalCharge = 0;
+    decimal mcVat = 0;
+    decimal mcGrandTotal = 0;
+    List<ManualChargeLine> mcLines = new();
+    ManualChargeLine? selectedMcLine;
+    List<string> chargeTypes = new() { "Room Charge", "Package Charge", "Extra Charge" };
+    List<string> currencies = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
+    List<string> windowList = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
+    List<ArticleItem> articles = new()
+    {
+        new() { Code = "SE-00001", Name = "ROOM CHARGE" },
+        new() { Code = "SE-00002", Name = "BREAKFAST" },
+        new() { Code = "SE-00003", Name = "LAUNDRY" },
+        new() { Code = "SE-00004", Name = "MINIBAR" },
+        new() { Code = "R-0001", Name = "BED AND BREAKFAST" }
+    };
+
+    // Room Charge
+    DateTime? rcFrom;
+    DateTime? rcTo;
+    List<RoomChargeRow> roomChargeRows = new();
+    string showRoomChargeOptions = false.ToString(); // unused marker
+
+    // Cash Receipt / Rebate / Paid Out shared-ish
+    string crCustomer = "";
+    string? crPaymentType = "Cash";
+    string? crCurrency = "Birr";
+    decimal crExRate = 1;
+    decimal crAmount = 0;
+    decimal crTotalAmount = 0;
+    string crVoucherNo = "";
+    DateTime? crDate;
+    string crRegNo = "";
+    string? crWindow = "Window 1";
+    string crReference = "";
+    string crPurpose = "";
+    string crRemark = "";
+    bool rebateNetOff = true;
+    List<string> paymentMethods = new() { "Cash", "Check", "CPO", "Credit Card", "Debit Card", "Gift Card", "Entertainment" };
+
+    // Foreign currency
+    List<ForeignCurrencyRow> fxRows = new();
+    decimal fxPayment = 0;
+    decimal fxTotalAmount = 0;
+    decimal fxRemaining = 0;
+
+    // Bill Split
+    List<BillSplitItem> billSplitWindow1 = new();
+    List<BillSplitItem> billSplitWindow2 = new();
+    List<BillSplitItem> billSplitWindow3 = new();
+    int billSplitWindowCount = 2;
+    BillSplitItem? selectedBillSplitItem;
+    int activeBillSplitWindow = 1;
+
+    // Split Voucher
+    string svVoucherNo = "";
+    string svCustomer = "";
+    string? svSplitBy = "Amount";
+    bool svFactorPercent = true;
+    int svNoOfSplit = 2;
+    decimal svGrandTotal = 0;
+    decimal svPercentValue = 30;
+    decimal svAmountValue = 0;
+    List<SplitPiece> svPieces = new();
+    SplitPiece? selectedSplitPiece;
+
+    // Folio
+    string? folioWindow = "Window 1";
+    string folioGuestName = "";
+    string folioRegNo = "";
+    string folioCompany = "";
+    DateTime? folioArrival;
+    DateTime? folioDeparture;
+    string folioFsNum = "";
+    string folioTin = "";
+    List<TransferChargeRow> folioRoomCharges = new();
+    List<ExtraBillRow> folioExtraBills = new();
+    List<PaymentHistoryRow> folioPayments = new();
+
+    // Bill Transfer
+    string btGuestName = "";
+    string btRegNo = "";
+    string btCompany = "";
+    string btFsNum = "";
+    string btTin = "";
+    DateTime? btArrival;
+    DateTime? btDeparture;
+    string? btToGuest;
+    string? btWindow = "All";
+    bool btSelectAll = false;
+    List<TransferChargeRow> btRoomCharges = new();
+    List<ExtraBillRow> btExtraBills = new();
+    List<PaymentHistoryRow> btPayments = new();
+    List<TransferGuestItem> btGuestFindList = new();
+    bool showBtGuestFind = false;
+    TransferGuestItem? selectedBtGuest;
+
+    // Cash Receipt customer find
+    bool showCrCustomerFind = false;
+    List<CustomerFindItem> crCustomers = new();
+    CustomerFindItem? selectedCrCustomer;
+
+    string stateConfirmMessage = "";
+    string validationErrorMessage = "";
+    string pendingActivity = "";
 
     string ciRegNo = "";
     DateTime? ciArrival;
@@ -416,50 +1111,1498 @@
     string? ciSource;
     string? ciGroup;
     string? ciContact;
+    string? ciCancelReason = "No Reason Given";
+    string? ciReinstateAction = "With receipt reprint";
 
     List<MultiRoomRow> multiRoomRows = new();
     MultiRoomRow? currentMultiRowForRoom;
     string MultiCheckInTitle => $"Multiple Room Check In - {(selectedReg?.Registration ?? "")}";
 
-    string? selectedFeature;
     string roomFilterText = "";
-    RoomItem? selectedRoomItem;
+    RoomSearchItem? selectedRoomItem;
     bool roomSearchForSingle = true;
+    string roomSearchContext = ""; // "CheckIn", "DateAmendment", "RoomMove"
 
-    List<RoomItem> availableRooms = new()
+    List<RoomSearchItem> availableRooms = new()
     {
         new() { SN = 1, Room = "103", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
         new() { SN = 2, Room = "101", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
         new() { SN = 3, Room = "102", RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 4, Room = "105", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 5, Room = "106", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 6, Room = "110", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 7, Room = "202", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 8, Room = "203", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 9, Room = "208", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 10, Room = "212", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 11, Room = "301", RoomType = "Pseudo Rooms", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature = "", Remark = "" },
+        new() { SN = 12, Room = "302", RoomType = "Pseudo Rooms", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature = "", Remark = "" },
     };
 
     DateTime businessDate = new DateTime(2017, 8, 19);
+
+    // Amendment state variables
+    string? amendGuest;
+    string? amendContact;
+    string? amendCompany;
+    string? amendAgent;
+    string? amendGroup;
+    string? amendSource;
+
+    DateTime? amendArrival;
+    DateTime? amendDeparture;
+    int amendAdult = 1;
+    int amendChild = 0;
+    string? amendRoomType;
+    string amendRoom = "";
+    string amendRateCode = "";
+    decimal amendAmount = 200;
+    bool amendFixed = false;
+
+    List<DailyDetailRow> dailyDetailRows = new();
+    DailyDetailRow? selectedDetailRow;
+    EditDetailModel editDetail = new();
+
+    string rateAdjRegNo = "";
+    string rateAdjRateCode = "Standard Rate";
+    decimal rateAdjAmount = 50;
+    DateTime? rateAdjStartDate;
+    DateTime? rateAdjEndDate;
+    string rateAdjType = "Amount";
+    string rateAdjFactor = "";
+    decimal rateAdjValue = 0;
+    string? rateAdjReason;
+
+    string roomMoveRegNo = "";
+    string roomMoveGuest = "";
+    string roomMoveCurrentRoomType = "";
+    string roomMoveCurrentRoom = "";
+    string? roomMoveNewRoomType;
+    string roomMoveNewRoom = "";
+    DateTime? roomMoveStart;
+    DateTime? roomMoveEnd;
+    string? roomMoveReason;
+
+    string payGuest = "";
+    string payRegNo = "";
+    string payRoom = "";
+    string? payMethod = "Cash";
+    string? payCreditCard;
+    string payCreditCardNo = "";
+    string? payCurrency = "Birr";
+    DateTime? payExpDate;
+    string payCrsNo = "";
+    string payApprovalCode = "";
+    decimal payApprovalAmt = 0;
+
+    string? otherResType = "Phone Reservation";
+    string? otherMarket = "Corporate Business";
+    string? otherSource = "Company Direct";
+    string? otherOrigin = "Central Reservation";
+    string? otherMemberType;
+    string? otherSpecials;
+
+    // Accompany Guest
+    List<AccompanyGuestRow> accompanyGuests = new();
+    AccompanyGuestRow? selectedAccompanyGuest;
+
+    // Wakeup Call
+    string wuRoom = "";
+    string wuRegNo = "";
+    string wuGuest = "";
+    DateTime? wuDateFrom;
+    int wuNoDays = 0;
+    DateTime? wuDateTo;
+    TimeSpan wuTime = TimeSpan.Zero;
+    string wuNote = "Wake-up call";
+    List<WakeupScheduleRow> wakeupSchedules = new();
+    WakeupScheduleRow? selectedWakeup;
+
+    // Send Message
+    string? msgUser;
+    bool msgSendToAll = false;
+    string msgGuest = "";
+    string msgRoom = "";
+    string msgRegNo = "";
+    string msgNo = "";
+    DateTime? msgDate;
+    string? msgType = "Internal Message";
+    string msgBody = "";
+    List<string> messageTypes = new() { "Internal Message", "Guest Message", "Welcome Message", "Trace" };
+    List<UserItem> systemUsers = new()
+    {
+        new() { Code = "EMP-00026", UserName = "MASERSHA" },
+        new() { Code = "PE_0006_16", UserName = "CNET ADMIN" },
+        new() { Code = "EMP-00016", UserName = "USER" },
+        new() { Code = "EMP-00009", UserName = "BerhanuA" },
+        new() { Code = "EMP-00027", UserName = "DAVE" }
+    };
+    UserItem? selectedUserItem;
+
+    // Privilege
+    string privRegNo = "";
+    bool privNoPost = false;
+    bool privAuthorizeDirectBill = false;
+    bool privPreStayCharging = false;
+    bool privPostStayCheckout = false;
+    bool privAllowLateCheckout = false;
+    string privRemark = "";
+
+    // Travel Detail
+    string? travelPickupRequired = "YES";
+    string? travelTransportType = "Bus Station";
+    string? travelCarrierCode = "Carrier One";
+    string travelTransportNo = "";
+    DateTime? travelArrivalDate;
+    TimeSpan travelPickupTime = new TimeSpan(12, 0, 0);
+    List<string> yesNoList = new() { "YES", "NO" };
+    List<string> transportTypes = new() { "Bus Station", "Airport", "Train Station", "Other" };
+    List<string> carrierCodes = new() { "Carrier One", "Carrier Two", "Ethiopian Airlines" };
+
+    // Share Check-In form fields
+    string shareGuestName = "";
+    string shareNationality = "";
+    string sharePassport = "";
+    string shareTitle = "";
+    string shareAddress = "";
+    string shareCompany = "";
+    string shareAgent = "";
+    string shareContact = "";
+    string shareGroup = "";
+    string shareConsigneeSource = "";
+    string? shareMemberType;
+    DateTime? shareArrival;
+    TimeSpan shareEta = TimeSpan.Zero;
+    int shareNights = 1;
+    DateTime? shareDeparture;
+    int shareAdults = 1;
+    int shareChildren = 0;
+    int shareNoOfRooms = 1;
+    string? shareRoomType;
+    string? shareRtc;
+    string shareRoom = "";
+    bool shareFixedRate = false;
+    string? shareRateCode;
+    string? sharePackage;
+    string shareRate = "";
+    string? shareResType = "Phone Reser";
+    string? shareMarket = "Corporate Bl";
+    string? shareSource = "Company Dir";
+    string? shareOrigin = "Central Rese";
+    string? sharePayment = "Cash";
+    string shareRateAdjType = "Amount";
+    string shareAdjAmount = "";
+    string shareAdjPercent = "";
+    string? shareReason = "Requested Room type not availa";
+    string? shareSpecial;
+    string shareVoucher = "";
+    List<string> shareGuestNames = new()
+    {
+        "Taddeses ARABA Mola", "teshome mola", "solomon Bereket mulugeta",
+        "Solomon Fasil Girma", "Solman Jack Jemes", "Leo Rojas",
+        "nathan w/mickael", "muse zemedkun", "abel kaleab", "bayu abenezer"
+    };
+    List<string> sharePackages = new() { "None", "Breakfast", "Half Board", "Full Board" };
+    List<string> shareResTypes = new() { "Phone Reser", "Walk-in", "Online", "Travel Agent", "Corporate" };
+    List<string> shareMarkets = new() { "Corporate Bl", "Leisure", "Government", "Airline", "Group" };
+    List<string> shareSources = new() { "Company Dir", "Website", "OTA", "Travel Agent", "Walk-in" };
+    List<string> shareOrigins = new() { "Central Rese", "Addis", "Direct", "GDS" };
+    List<string> shareRtcList = new() { "BAR", "CORP", "DISC", "PROMO", "Executive" };
+    List<string> shareRateCodes = new() { "RACK", "CORP10", "GOV15", "PROMO20", "Standard Rate" };
+    List<string> shareReasons = new() { "Requested Room type not availa", "Long Stay Discount", "Corporate Rate", "Promotional Offer" };
+    List<string> shareSpecials = new() { "None", "Late Checkout", "Early Check-in", "Airport Transfer" };
 
     protected override void OnInitialized()
     {
         allRegistrations = new List<RegistrationRow>
         {
-            new() { SN = 1, Registration = "REG-00156-17", Room = "#2", RoomType = "Executive", Guest = "Solomon Tuffa Bereket", Company = "Fish", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 23), Nights = 4, Payment = "Cash", State = "6PM", RoomCount = 2 },
-            new() { SN = 2, Registration = "REG-00113-17", Room = "", RoomType = "Standard Room", Guest = "miskir engida engida", Company = "MISIKIR LTD", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "6PM", RoomCount = 1 },
-            new() { SN = 3, Registration = "REG-00040-17", Room = "103", RoomType = "Standard Room", Guest = "Solman Jack Jemes", Company = "", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "6PM", RoomCount = 1 },
+            new() { SN = 1, Registration = "REG-00157-17", Room = "102", RoomType = "Standard Room", Guest = "Leo Rojas", Company = "", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "Inhouse" },
+            new() { SN = 2, Registration = "REG-00155-17", Room = "301", RoomType = "Pseudo Rooms", Guest = "teshome mola", Company = "", Arrival = new DateTime(2017, 7, 12), Departure = new DateTime(2017, 7, 24), Nights = 12, Payment = "Cash", State = "Inhouse" },
+            new() { SN = 3, Registration = "REG-00156-17", Room = "#2", RoomType = "Executive", Guest = "Solomon Tuffa Bereket", Company = "Fish", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 23), Nights = 4, Payment = "Cash", State = "6PM", RoomCount = 2 },
+            new() { SN = 4, Registration = "REG-00113-17", Room = "", RoomType = "Standard Room", Guest = "miskir engida engida", Company = "MISIKIR LTD", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "6PM", RoomCount = 1 },
+            new() { SN = 5, Registration = "REG-00158-17", Room = "", RoomType = "Standard Room", Guest = "Taddeses ARABA Mola", Company = "", Arrival = new DateTime(2017, 8, 22), Departure = new DateTime(2017, 8, 23), Nights = 1, Payment = "Cash", State = "Guaranteed", RoomCount = 1 },
+            new() { SN = 6, Registration = "REG-00040-17", Room = "103", RoomType = "Standard Room", Guest = "Solman Jack Jemes", Company = "", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "Guaranteed", RoomCount = 1 },
+            new() { SN = 7, Registration = "REG-00052-17", Room = "#2", RoomType = "Executive", Guest = "Taddeses ARABA Mola", Company = "", Arrival = new DateTime(2017, 8, 20), Departure = new DateTime(2017, 8, 23), Nights = 3, Payment = "Cash", State = "Cancelled", RoomCount = 1 },
+            new() { SN = 8, Registration = "REG-00053-17", Room = "105", RoomType = "Standard Room", Guest = "nathan w/mickael", Company = "", Arrival = new DateTime(2017, 8, 15), Departure = new DateTime(2017, 8, 20), Nights = 5, Payment = "Credit Card", State = "Cancelled", RoomCount = 1 },
+            new() { SN = 9, Registration = "REG-00055-17", Room = "105", RoomType = "Standard Room", Guest = "nathan w/mickael", Company = "", Arrival = new DateTime(2017, 8, 15), Departure = new DateTime(2017, 8, 20), Nights = 5, Payment = "Credit Card", State = "Checked Out", RoomCount = 1 },
+            new() { SN = 10, Registration = "REG-00056-17", Room = "203", RoomType = "Executive", Guest = "abel kaleab", Company = "", Arrival = new DateTime(2017, 8, 18), Departure = new DateTime(2017, 8, 25), Nights = 7, Payment = "Cash", State = "Checked Out", RoomCount = 1 },
+            new() { SN = 11, Registration = "REG-00060-17", Room = "203", RoomType = "Executive", Guest = "abel kaleab", Company = "", Arrival = new DateTime(2017, 8, 18), Departure = new DateTime(2017, 8, 25), Nights = 7, Payment = "Cash", State = "No show", RoomCount = 1 },
+            new() { SN = 12, Registration = "REG-00061-17", Room = "110", RoomType = "Standard Room", Guest = "muse zemedkun", Company = "ABENEZER LTD", Arrival = new DateTime(2017, 8, 20), Departure = new DateTime(2017, 8, 22), Nights = 2, Payment = "Cash", State = "No show", RoomCount = 1 },
+            new() { SN = 13, Registration = "REG-00062-17", Room = "110", RoomType = "Standard Room", Guest = "muse zemedkun", Company = "ABENEZER LTD", Arrival = new DateTime(2017, 8, 20), Departure = new DateTime(2017, 8, 22), Nights = 2, Payment = "Cash", State = "Waiting List", RoomCount = 1 },
+            new() { SN = 14, Registration = "REG-00063-17", Room = "102", RoomType = "Standard Room", Guest = "Leo Rojas", Company = "", Arrival = new DateTime(2017, 8, 19), Departure = new DateTime(2017, 8, 20), Nights = 1, Payment = "Cash", State = "Waiting List", RoomCount = 1 },
         };
-        filteredRegistrations = allRegistrations.ToList();
+        ApplyFilters();
         selectedReg = filteredRegistrations.FirstOrDefault();
     }
 
     void NoOp() { }
-    void CloseMenus() => showActivitiesMenu = false;
-    void ToggleActivities() => showActivitiesMenu = !showActivitiesMenu;
+    void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
+    void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
+    void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; }
+    void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; }
+    void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; }
+
+    string GetSearchCriteria()
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
+        if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
+        if (parts.Count == 0) return "";
+        return "Search Criteria: " + string.Join(", ", parts);
+    }
+
+    bool IsActivityEnabled(string activity)
+    {
+        if (selectedReg == null) return false;
+        var s = selectedReg.State;
+
+        switch (activity)
+        {
+            case "Waitinglist":
+                return s != "Checked In" && s != "Inhouse" && s != "Checked Out";
+            case "6PM":
+                return s != "Checked In" && s != "Inhouse" && s != "Cancelled" && s != "Checked Out" && s != "6PM" && s != "No show";
+            case "Confirmation":
+                return s == "Waiting List" || s == "6PM" || s == "No show";
+            case "Cancel":
+                return s != "Checked In" && s != "Inhouse" && s != "Cancelled" && s != "Checked Out";
+            case "CheckIn":
+                return s != "Checked In" && s != "Inhouse" && s != "Cancelled" && s != "Checked Out";
+            case "CheckOut":
+                return s == "Checked In" || s == "Inhouse";
+            case "Reinstate":
+                return (s == "Cancelled" || s == "Checked Out" || s == "No show") && selectedReg.Departure.Date >= businessDate.Date;
+            case "PostMaster":
+                return s == "Checked In" || s == "Inhouse";
+            default:
+                return true;
+        }
+    }
 
     void OnActivity(string action)
     {
         showActivitiesMenu = false;
         if (selectedReg == null) { showNoSelection = true; return; }
-        if (action == "CheckIn")
+
+        if (!IsActivityEnabled(action))
         {
-            if (selectedReg.Arrival.Date != businessDate.Date) { showArrivalError = true; return; }
-            showStateConfirm = true;
+            validationErrorMessage = $"The \'{action}\' action is not available for a reservation in \'{selectedReg.State}\' state.";
+            showValidationError = true;
+            return;
         }
+
+        pendingActivity = action;
+
+        switch (action)
+        {
+            case "CheckIn":
+                if (selectedReg.Arrival.Date != businessDate.Date) { showArrivalError = true; return; }
+                stateConfirmMessage = $"Do you want to change {selectedReg.State} state to Check In ?";
+                showStateConfirm = true;
+                break;
+
+            case "Confirmation":
+                stateConfirmMessage = $"Do you want to change {selectedReg.State} state to Conformation state?";
+                showStateConfirm = true;
+                break;
+
+            case "Cancel":
+                stateConfirmMessage = "Do you want to cancel this registration?";
+                showStateConfirm = true;
+                break;
+
+            case "CheckOut":
+                stateConfirmMessage = $"Do you want to check out {selectedReg.Guest}?";
+                showStateConfirm = true;
+                break;
+
+            case "Reinstate":
+                stateConfirmMessage = $"Do you want to reinstate {selectedReg.State}?";
+                showStateConfirm = true;
+                break;
+
+            case "6PM":
+                UpdateRegistrationState(selectedReg?.SN, "6PM");
+                ApplyFilters();
+                infoMessage = "State changed successfully!"; showSuccessInfo = true;
+                StateHasChanged();
+                break;
+
+            case "Waitinglist":
+                UpdateRegistrationState(selectedReg?.SN, "Waiting List");
+                ApplyFilters();
+                infoMessage = "State changed successfully!"; showSuccessInfo = true;
+                StateHasChanged();
+                break;
+
+            case "PostMaster":
+                validationErrorMessage = "Post Master functionality is not implemented in this demo.";
+                showValidationError = true;
+                break;
+        }
+    }
+
+    void OnAmendment(string amendment)
+    {
+        showAmendmentMenu = false;
+        if (selectedReg == null) { showNoSelection = true; return; }
+
+        switch (amendment)
+        {
+            case "Profiles":
+                amendGuest = selectedReg.Guest;
+                amendCompany = selectedReg.Company;
+                amendAgent = selectedReg.Company == "MISIKIR LTD" ? "MY AGENT" : "";
+                amendGroup = "";
+                amendContact = "";
+                amendSource = "";
+                showProfileAmendment = true;
+                break;
+
+            case "Date":
+                amendArrival = selectedReg.Arrival;
+                amendDeparture = selectedReg.Departure;
+                amendAdult = 1;
+                amendChild = 0;
+                amendRoomType = selectedReg.RoomType;
+                amendRoom = selectedReg.Room ?? "";
+                amendRateCode = "posting Date Rate";
+                amendAmount = 200;
+                amendFixed = false;
+                showDateAmendment = true;
+                break;
+
+            case "Detail":
+                GenerateDailyDetailRows();
+                selectedDetailRow = null;
+                showRegistrationDetail = true;
+                break;
+
+            case "Rate":
+                rateAdjRegNo = selectedReg.Registration;
+                rateAdjRateCode = "Standard Rate";
+                rateAdjAmount = 50;
+                rateAdjStartDate = businessDate;
+                rateAdjEndDate = selectedReg.Departure;
+                rateAdjType = "Amount";
+                rateAdjFactor = "";
+                rateAdjValue = 0;
+                rateAdjReason = null;
+                showRateAdjustment = true;
+                break;
+
+            case "RoomMove":
+                roomMoveRegNo = selectedReg.Registration;
+                roomMoveGuest = selectedReg.Guest;
+                roomMoveCurrentRoomType = selectedReg.RoomType;
+                roomMoveCurrentRoom = selectedReg.Room ?? "";
+                roomMoveNewRoomType = selectedReg.RoomType;
+                roomMoveNewRoom = selectedReg.Room ?? "";
+                roomMoveStart = businessDate;
+                roomMoveEnd = selectedReg.Departure;
+                roomMoveReason = null;
+                showRoomMove = true;
+                break;
+
+            case "Payment":
+                payGuest = selectedReg.Guest;
+                payRegNo = selectedReg.Registration;
+                payRoom = selectedReg.Room ?? "";
+                payMethod = selectedReg.Payment;
+                payCreditCard = null;
+                payCreditCardNo = "";
+                payCurrency = "Birr";
+                payExpDate = null;
+                payCrsNo = "";
+                payApprovalCode = "";
+                payApprovalAmt = 0;
+                showPaymentOptions = true;
+                break;
+
+            case "Other":
+                otherResType = "Phone Reservation";
+                otherMarket = "Corporate Business";
+                otherSource = "Company Direct";
+                otherOrigin = "Central Reservation";
+                otherMemberType = "";
+                otherSpecials = "";
+                showOtherFields = true;
+                break;
+        }
+    }
+
+    void OnBilling(string action)
+    {
+        showBillingMenu = false;
+        if (selectedReg == null) { showNoSelection = true; return; }
+
+        // Overdue out cannot manual charge
+        if (action == "ManualCharge" && selectedReg.State == "Checked Out" && selectedReg.Departure.Date < businessDate.Date)
+        {
+            showOverdueError = true;
+            return;
+        }
+
+        switch (action)
+        {
+            case "ManualCharge":
+                OpenManualCharge();
+                break;
+            case "RoomCharges":
+                OpenRoomCharge();
+                break;
+            case "BillSplit":
+                OpenBillSplit();
+                break;
+            case "BillTransfer":
+                OpenBillTransfer();
+                break;
+            case "CashReceipt":
+                OpenCashReceipt();
+                break;
+            case "Rebate":
+                OpenRebate();
+                break;
+            case "PaidOut":
+                OpenPaidOut();
+                break;
+            case "Refund":
+                if (selectedReg.State != "Checked Out")
+                {
+                    ShowInfo("Refund is only allowed for checked-out guests.");
+                    return;
+                }
+                ShowInfo("This feature is not yet implemented.");
+                break;
+        }
+    }
+
+    void OpenManualCharge()
+    {
+        if (selectedReg == null) return;
+        mcArticle = null;
+        mcQty = 1;
+        mcAmount = 0;
+        mcRemark = "";
+        mcDate = businessDate;
+        mcNo = $"WDRC-{Random.Shared.Next(1000, 9999)}-17";
+        mcChargeType = "Room Charge";
+        mcTransactionType = "Credit Sales";
+        mcCurrency = "Birr";
+        mcRegistration = selectedReg.Registration;
+        mcRoom = selectedReg.Room?.Replace("#", "") ?? "";
+        mcReference = "";
+        mcWindow = "Window 1";
+        mcLines = new List<ManualChargeLine>();
+        selectedMcLine = null;
+        RecalcManualChargeTotals();
+        showManualCharge = true;
+    }
+
+    void RecalcManualChargeTotals()
+    {
+        mcSubtotal = mcLines.Sum(l => l.TotalPrice);
+        mcDiscount = 0;
+        mcAdditionalCharge = Math.Round(mcSubtotal * 0.10m, 2);
+        mcVat = Math.Round((mcSubtotal + mcAdditionalCharge - mcDiscount) * 0.15m, 2);
+        mcGrandTotal = mcSubtotal + mcAdditionalCharge - mcDiscount + mcVat;
+    }
+
+    void AddManualChargeLine()
+    {
+        if (string.IsNullOrWhiteSpace(mcArticle)) return;
+        var art = articles.FirstOrDefault(a => a.Name == mcArticle || a.Code == mcArticle);
+        var desc = art?.Name ?? mcArticle;
+        var unit = mcAmount > 0 ? mcAmount : 948.62m;
+        var tax = Math.Round(unit * mcQty * 0.15m, 2);
+        mcLines.Add(new ManualChargeLine
+        {
+            SN = mcLines.Count + 1,
+            Description = desc,
+            UnitPrice = unit,
+            Qty = mcQty,
+            Tax = tax,
+            TotalPrice = unit * mcQty
+        });
+        RecalcManualChargeTotals();
+        StateHasChanged();
+    }
+
+    void RemoveManualChargeLine()
+    {
+        if (selectedMcLine == null) return;
+        mcLines.Remove(selectedMcLine);
+        selectedMcLine = null;
+        int i = 1;
+        foreach (var l in mcLines) l.SN = i++;
+        RecalcManualChargeTotals();
+        StateHasChanged();
+    }
+
+    void SaveManualCharge()
+    {
+        if (!mcLines.Any())
+        {
+            ShowInfo("Please add at least one charge line.");
+            return;
+        }
+        pendingBillingAction = "ManualCharge";
+        confirmUserPassword = "";
+        showConfirmUser = true;
+    }
+
+    void ConfirmBillingUser()
+    {
+        showConfirmUser = false;
+        if (pendingBillingAction == "ManualCharge")
+        {
+            showManualCharge = false;
+            ShowInfo("Manual charge is saved!");
+        }
+        else if (pendingBillingAction == "RoomCharge")
+        {
+            ShowInfo("Saved successfully!!!");
+        }
+        else
+        {
+            ShowInfo("Saved successfully.");
+        }
+        pendingBillingAction = "";
+    }
+
+    void OpenRoomCharge()
+    {
+        if (selectedReg == null) return;
+        rcFrom = businessDate;
+        rcTo = selectedReg.Departure;
+        roomChargeRows = new List<RoomChargeRow>();
+        var d = businessDate.Date;
+        var end = selectedReg.Departure.Date;
+        if (end < d) end = d;
+        int sn = 1;
+        for (var day = d; day < end; day = day.AddDays(1))
+        {
+            roomChargeRows.Add(new RoomChargeRow
+            {
+                SN = sn++,
+                RegistrationNo = selectedReg.Registration,
+                Date = day,
+                RoomNo = selectedReg.Room?.Replace("#", "") ?? "",
+                Consignee = selectedReg.Guest,
+                Amount = 1755.01m
+            });
+        }
+        if (!roomChargeRows.Any())
+        {
+            roomChargeRows.Add(new RoomChargeRow
+            {
+                SN = 1,
+                RegistrationNo = selectedReg.Registration,
+                Date = businessDate,
+                RoomNo = selectedReg.Room?.Replace("#", "") ?? "",
+                Consignee = selectedReg.Guest,
+                Amount = 1755.01m
+            });
+        }
+        showRoomCharge = true;
+    }
+
+    void PostRoomCharge()
+    {
+        pendingBillingAction = "RoomCharge";
+        confirmUserPassword = "";
+        showConfirmUser = true;
+    }
+
+    void SetRoomChargeOption(string opt)
+    {
+        if (selectedReg == null) return;
+        if (opt == "Today")
+        {
+            rcFrom = businessDate;
+            rcTo = businessDate.AddDays(1);
+        }
+        else if (opt == "Entire Stay")
+        {
+            rcFrom = selectedReg.Arrival;
+            rcTo = selectedReg.Departure;
+        }
+        OpenRoomCharge();
+    }
+
+    void OpenCashReceipt()
+    {
+        if (selectedReg == null) return;
+        crCustomer = selectedReg.Guest;
+        crPaymentType = "Cash";
+        crCurrency = "Birr";
+        crExRate = 1;
+        crAmount = 3744.03m;
+        crTotalAmount = 3744.03m;
+        crVoucherNo = $"CRV-{Random.Shared.Next(50000, 99999)}";
+        crDate = businessDate;
+        crRegNo = selectedReg.Registration;
+        crWindow = "Window 1";
+        crReference = "";
+        crPurpose = $"Payment for {selectedReg.Registration} Room = {selectedReg.Room}";
+        crRemark = "";
+        crCustomers = new List<CustomerFindItem>
+        {
+            new() { Code = "PCU-00001", Name = "TIGIST ASMAMAW", IdNumber = "" },
+            new() { Code = "WPGU-00001-17", Name = "TEST GUEST WASA", IdNumber = "123456" },
+            new() { Code = "WPGU-00002-17", Name = "TAHER NAGUIB ALI", IdNumber = "D02018" },
+            new() { Code = "WPGU-00003-17", Name = "OUDINE FATHIA DJAMA", IdNumber = "D02020" },
+            new() { Code = "WPGU-00004-17", Name = "DJAMA MOHAMED ALI", IdNumber = "D02362" },
+            new() { Code = "WPGU-00005-17", Name = "DOUALEH DOUALEH AHMED", IdNumber = "D01950" },
+            new() { Code = "WPGU-00007-17", Name = "ONEN TONNYYY", IdNumber = "263805" },
+            new() { Code = "WPGU-00008-17", Name = "DAVID NIJIRI WAWERU", IdNumber = "C042628" },
+            new() { Code = "WPGU-00010-17", Name = "SINGH KUNWAR SURENDRA", IdNumber = "J8124701" },
+            new() { Code = selectedReg.Registration, Name = selectedReg.Guest, IdNumber = "" }
+        };
+        showCashReceipt = true;
+    }
+
+    void OpenCrCustomerFind() => showCrCustomerFind = true;
+
+    void SelectCrCustomer()
+    {
+        if (selectedCrCustomer != null)
+            crCustomer = selectedCrCustomer.Name;
+        showCrCustomerFind = false;
+        StateHasChanged();
+    }
+
+    void OpenRebate()
+    {
+        if (selectedReg == null) return;
+        crCustomer = selectedReg.Guest;
+        crPaymentType = "Cash";
+        crCurrency = "Birr";
+        crExRate = 1;
+        crAmount = 0;
+        crTotalAmount = 0;
+        crVoucherNo = $"WCNO-{Random.Shared.Next(100, 999)}-17";
+        crDate = businessDate;
+        crRegNo = selectedReg.Registration;
+        crWindow = "Window 1";
+        crReference = "";
+        crPurpose = "";
+        crRemark = "";
+        rebateNetOff = true;
+        showRebate = true;
+    }
+
+    void OpenPaidOut()
+    {
+        if (selectedReg == null) return;
+        crCustomer = selectedReg.Guest;
+        crPaymentType = "Cash";
+        crCurrency = "Birr";
+        crExRate = 1;
+        crAmount = 0;
+        crTotalAmount = 0;
+        crVoucherNo = $"POV-{Random.Shared.Next(100, 999)}-17";
+        crDate = businessDate;
+        crRegNo = selectedReg.Registration;
+        crWindow = "Window 1";
+        crReference = "";
+        crPurpose = "";
+        crRemark = "";
+        showPaidOut = true;
+    }
+
+    void SaveCashReceipt()
+    {
+        showCashReceipt = false;
+        ShowInfo("Cash receipt saved successfully.");
+    }
+
+    void SaveRebate()
+    {
+        showRebate = false;
+        ShowInfo("Rebate saved successfully.");
+    }
+
+    void SavePaidOut()
+    {
+        showPaidOut = false;
+        ShowInfo("Paid out saved successfully.");
+    }
+
+    void SaveForeignCurrency()
+    {
+        showForeignCurrency = false;
+        ShowInfo("Foreign currency saved.");
+    }
+
+    void BreakFirstBillItem()
+    {
+        if (billSplitWindow1.Any()) OpenSplitVoucher(billSplitWindow1[0]);
+    }
+
+    void OpenForeignCurrency()
+    {
+        fxPayment = crAmount;
+        fxTotalAmount = 0;
+        fxRemaining = fxPayment;
+        fxRows = new List<ForeignCurrencyRow>
+        {
+            new() { SN = 1, Currency = "US Dollar", Amount = 50, Rate = 23.4m },
+            new() { SN = 2, Currency = "Euro", Amount = 143, Rate = 26m },
+            new() { SN = 3, Currency = null, Amount = 0, Rate = 0 }
+        };
+        foreach (var r in fxRows) r.TotalAmount = r.Amount * r.Rate;
+        fxTotalAmount = fxRows.Sum(r => r.TotalAmount);
+        fxRemaining = fxPayment - fxTotalAmount;
+        showForeignCurrency = true;
+    }
+
+    void OpenBillSplit()
+    {
+        if (selectedReg == null) return;
+        billSplitWindow1 = new List<BillSplitItem>
+        {
+            new() { SN = 1, VoucherNo = "WDRC-01550-17", Purpose = "BUSINESS RATE", Date = selectedReg.Arrival, Amount = 1872.02m },
+            new() { SN = 2, VoucherNo = "WDRC-01551-17", Purpose = "BUSINESS RATE", Date = selectedReg.Arrival.AddDays(1), Amount = 1872.02m }
+        };
+        billSplitWindow2 = new List<BillSplitItem>();
+        billSplitWindow3 = new List<BillSplitItem>();
+        billSplitWindowCount = 2;
+        selectedBillSplitItem = null;
+        activeBillSplitWindow = 1;
+        showBillSplit = true;
+    }
+
+    void AddBillSplitWindow()
+    {
+        if (billSplitWindowCount < 8)
+            billSplitWindowCount++;
+        StateHasChanged();
+    }
+
+    void SaveBillSplitWindows() => ShowInfo("Windows saved.");
+
+    void SelectBillSplitItem(BillSplitItem item, int window)
+    {
+        selectedBillSplitItem = item;
+        activeBillSplitWindow = window;
+        StateHasChanged();
+    }
+
+    void BreakSelectedBillItem()
+    {
+        if (selectedBillSplitItem != null)
+            OpenSplitVoucher(selectedBillSplitItem);
+        else if (billSplitWindow1.Any())
+            OpenSplitVoucher(billSplitWindow1[0]);
+    }
+
+    void OpenSplitVoucher(BillSplitItem item)
+    {
+        svVoucherNo = item.VoucherNo;
+        svCustomer = selectedReg?.Guest ?? "";
+        svSplitBy = "Amount";
+        svFactorPercent = true;
+        svNoOfSplit = 2;
+        svGrandTotal = item.Amount;
+        svPercentValue = 30;
+        svAmountValue = Math.Round(item.Amount * 0.3m, 2);
+        svPieces = new List<SplitPiece>();
+        selectedSplitPiece = null;
+        showSplitVoucher = true;
+    }
+
+    void DoSplitVoucher()
+    {
+        svPieces = new List<SplitPiece>();
+        decimal a1, a2;
+        if (svFactorPercent)
+        {
+            a1 = Math.Round(svGrandTotal * (100 - svPercentValue) / 100m, 2);
+            a2 = svGrandTotal - a1;
+        }
+        else
+        {
+            a2 = svAmountValue;
+            a1 = svGrandTotal - a2;
+        }
+        // Build sample line items proportional to split amounts (matches screenshot expand)
+        var roomUnit = Math.Round(svGrandTotal * 0.53m, 2);
+        var bedUnit = Math.Round(svGrandTotal - roomUnit, 2);
+        var ratio1 = svGrandTotal > 0 ? a1 / svGrandTotal : 0.5m;
+        var ratio2 = 1 - ratio1;
+
+        svPieces.Add(new SplitPiece
+        {
+            SN = 1,
+            VoucherNo = svVoucherNo,
+            Date = businessDate,
+            Amount = a1,
+            Expanded = false,
+            LineItems = new List<SplitLineItem>
+            {
+                new() { ArticleCode = "B-0001", Name = "BED AND BREA...", UnitAmount = Math.Round(bedUnit * ratio1, 2), Quantity = 1, TotalAmount = Math.Round(bedUnit * ratio1, 2) },
+                new() { ArticleCode = "SE-00001", Name = "ROOM CHARGE", UnitAmount = Math.Round(roomUnit * ratio1, 2), Quantity = 1, TotalAmount = Math.Round(roomUnit * ratio1, 2) }
+            }
+        });
+        svPieces.Add(new SplitPiece
+        {
+            SN = 2,
+            VoucherNo = $"WDRC-{Random.Shared.Next(1500, 1999)}-17",
+            Date = businessDate,
+            Amount = a2,
+            Expanded = false,
+            LineItems = new List<SplitLineItem>
+            {
+                new() { ArticleCode = "B-0001", Name = "BED AND BREA...", UnitAmount = Math.Round(bedUnit * ratio2, 2), Quantity = 1, TotalAmount = Math.Round(bedUnit * ratio2, 2) },
+                new() { ArticleCode = "SE-00001", Name = "ROOM CHARGE", UnitAmount = Math.Round(roomUnit * ratio2, 2), Quantity = 1, TotalAmount = Math.Round(roomUnit * ratio2, 2) }
+            }
+        });
+        StateHasChanged();
+    }
+
+    void ToggleSplitPieceExpand(SplitPiece p)
+    {
+        p.Expanded = !p.Expanded;
+        StateHasChanged();
+    }
+
+    void SaveSplitVoucher()
+    {
+        if (!svPieces.Any())
+        {
+            ShowInfo("Please run Split first.");
+            return;
+        }
+        // Keep first piece in same window; add remaining pieces to window 2
+        if (selectedBillSplitItem != null)
+        {
+            selectedBillSplitItem.Amount = svPieces[0].Amount;
+            for (int i = 1; i < svPieces.Count; i++)
+            {
+                billSplitWindow2.Add(new BillSplitItem
+                {
+                    SN = billSplitWindow2.Count + 1,
+                    VoucherNo = svPieces[i].VoucherNo,
+                    Purpose = selectedBillSplitItem.Purpose,
+                    Date = svPieces[i].Date,
+                    Amount = svPieces[i].Amount
+                });
+            }
+        }
+        showSplitVoucher = false;
+        ShowInfo("Voucher Split is Successful!");
+    }
+
+    void ClearSplitVoucher()
+    {
+        svPieces.Clear();
+        StateHasChanged();
+    }
+
+    void OpenFolio()
+    {
+        if (selectedReg == null) return;
+        folioWindow = "Window 1";
+        folioGuestName = selectedReg.Guest;
+        folioRegNo = selectedReg.Registration;
+        folioCompany = selectedReg.Company ?? "";
+        folioArrival = selectedReg.Arrival;
+        folioDeparture = selectedReg.Departure;
+        folioFsNum = "00004045, 00004046";
+        folioTin = "";
+        var room = selectedReg.Room?.Replace("#", "") ?? "";
+        folioRoomCharges = new List<TransferChargeRow>
+        {
+            new() { SN = 1, Date = selectedReg.Arrival, RoomNo = room, RoomType = selectedReg.RoomType, RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m },
+            new() { SN = 2, Date = selectedReg.Arrival.AddDays(1), RoomNo = room, RoomType = selectedReg.RoomType, RoomRate = "Manual Charge", Adults = 1, Child = 0, Amount = 79.05m },
+            new() { SN = 3, Date = selectedReg.Arrival.AddDays(2), RoomNo = room, RoomType = selectedReg.RoomType, RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m }
+        };
+        folioExtraBills = new List<ExtraBillRow>
+        {
+            new() { SN = 1, RoomNo = room, Date = selectedReg.Arrival, InvoiceId = "BCRS-00708-17", SerCharge = 14, Discount = 0, Vat = 23.10m, SubTotal = 140, GrandTotal = 177.10m },
+            new() { SN = 2, RoomNo = room, Date = selectedReg.Arrival, InvoiceId = "BCRS-00712-17", SerCharge = 20, Discount = 0, Vat = 33, SubTotal = 200, GrandTotal = 253 }
+        };
+        folioPayments = new List<PaymentHistoryRow>
+        {
+            new() { SN = 1, Date = selectedReg.Arrival, ReceiptNo = "CRV-56553", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 2549.12m },
+            new() { SN = 2, Date = selectedReg.Arrival.AddDays(3), ReceiptNo = "CRV-56558", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 253 }
+        };
+        showFolio = true;
+    }
+
+    void OpenBillTransfer()
+    {
+        if (selectedReg == null) return;
+        btGuestName = selectedReg.Guest;
+        btRegNo = selectedReg.Registration;
+        btCompany = selectedReg.Company ?? "";
+        btFsNum = "";
+        btTin = "";
+        btArrival = selectedReg.Arrival;
+        btDeparture = selectedReg.Departure;
+        btToGuest = null;
+        btWindow = "All";
+        btSelectAll = false;
+        var room = selectedReg.Room?.Replace("#", "") ?? "";
+        btRoomCharges = new List<TransferChargeRow>
+        {
+            new() { SN = 1, Date = selectedReg.Arrival, RoomNo = room, RoomType = selectedReg.RoomType, RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false },
+            new() { SN = 2, Date = selectedReg.Arrival.AddDays(1), RoomNo = room, RoomType = selectedReg.RoomType, RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false }
+        };
+        btExtraBills = new List<ExtraBillRow>();
+        btPayments = new List<PaymentHistoryRow>
+        {
+            new() { SN = 1, Date = selectedReg.Arrival.AddDays(-7), ReceiptNo = "WCNO-00029-17", VoucherType = "Rebate", ReceivedBy = "CNET ADMIN", Amount = -1000m, Selected = false },
+            new() { SN = 2, Date = selectedReg.Arrival.AddDays(-7), ReceiptNo = "CRV-56534", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 605.02m, Selected = false }
+        };
+        btGuestFindList = allRegistrations.Select(r => new TransferGuestItem
+        {
+            Registration = r.Registration,
+            RoomType = r.RoomType,
+            Room = r.Room?.Replace("#", "") ?? "",
+            Guest = r.Guest
+        }).ToList();
+        showBillTransfer = true;
+    }
+
+    void OpenBtGuestFind() => showBtGuestFind = true;
+
+    void SelectBtGuest()
+    {
+        if (selectedBtGuest != null)
+            btToGuest = $"{selectedBtGuest.Registration} - {selectedBtGuest.Guest}";
+        showBtGuestFind = false;
+        StateHasChanged();
+    }
+
+    void ToggleBtSelectAll()
+    {
+        btSelectAll = !btSelectAll;
+        foreach (var r in btRoomCharges) r.Selected = btSelectAll;
+        foreach (var e in btExtraBills) e.Selected = btSelectAll;
+        foreach (var p in btPayments) p.Selected = btSelectAll;
+        StateHasChanged();
+    }
+
+    void TransferBills()
+    {
+        if (string.IsNullOrWhiteSpace(btToGuest))
+        {
+            ShowInfo("Please select a destination guest (To).");
+            return;
+        }
+        var any = btRoomCharges.Any(x => x.Selected) || btExtraBills.Any(x => x.Selected) || btPayments.Any(x => x.Selected);
+        if (!any)
+        {
+            ShowInfo("Please select at least one bill to transfer.");
+            return;
+        }
+        showBillTransfer = false;
+        ShowInfo("Bill transfer completed successfully.");
+    }
+
+    void ReturnBills()
+    {
+        ShowInfo("Return bill completed.");
+    }
+
+    decimal BtRoomSubtotal => btRoomCharges.Sum(x => x.Amount);
+    decimal BtRoomService => Math.Round(BtRoomSubtotal * 0.10m, 2);
+    decimal BtRoomVat => Math.Round((BtRoomSubtotal + BtRoomService) * 0.15m, 2);
+    decimal BtRoomGrand => BtRoomSubtotal + BtRoomService + BtRoomVat;
+    decimal BtTotalExtra => btExtraBills.Sum(x => x.GrandTotal);
+    decimal BtTotalCredit => btPayments.Where(p => p.Amount > 0).Sum(p => p.Amount) + Math.Abs(btPayments.Where(p => p.Amount < 0).Sum(p => p.Amount));
+    decimal BtTotalPaid => btPayments.Where(p => p.Amount > 0).Sum(p => p.Amount);
+    decimal BtTotalSelected => btRoomCharges.Where(x => x.Selected).Sum(x => x.Amount)
+                             + btExtraBills.Where(x => x.Selected).Sum(x => x.GrandTotal)
+                             + btPayments.Where(x => x.Selected).Sum(x => Math.Abs(x.Amount));
+
+    decimal FolioRoomSubtotal => folioRoomCharges.Sum(x => x.Amount);
+    decimal FolioRoomService => Math.Round(FolioRoomSubtotal * 0.10m, 2);
+    decimal FolioRoomVat => Math.Round((FolioRoomSubtotal + FolioRoomService) * 0.15m, 2);
+    decimal FolioRoomGrand => FolioRoomSubtotal + FolioRoomService + FolioRoomVat;
+    decimal FolioTotalExtra => folioExtraBills.Sum(x => x.GrandTotal);
+
+    void OnOption(string option)
+    {
+        showOptionsMenu = false;
+        if (selectedReg == null) { showNoSelection = true; return; }
+
+        switch (option)
+        {
+            case "AccompanyGuest":
+                accompanyGuests = new List<AccompanyGuestRow>
+                {
+                    new() { Guest = "muse zemedkun", Address = "[Email: ed@gamil.com]" },
+                    new() { Guest = "MESELE ARABA ABIYE", Address = "" }
+                };
+                showAccompanyGuest = true;
+                break;
+            case "Replicate":
+            case "History":
+            case "HouseKeeping":
+            case "Routing":
+            case "ScheduledActivity":
+            case "IssueCard":
+                ShowInfo("This feature is not yet implemented.");
+                break;
+            case "Shares":
+                OpenShareCheckIn();
+                break;
+            case "Attachment":
+                showAttachment = true;
+                break;
+            case "WakeupCall":
+                wuRoom = selectedReg.Room?.Replace("#", "") ?? "";
+                wuRegNo = selectedReg.Registration;
+                wuGuest = selectedReg.Guest;
+                wuDateFrom = selectedReg.Arrival;
+                wuNoDays = 0;
+                wuDateTo = selectedReg.Arrival;
+                wuTime = TimeSpan.Zero;
+                wuNote = "Wake-up call";
+                wakeupSchedules = new List<WakeupScheduleRow>
+                {
+                    new() { SN = 1, StartDate = new DateTime(2017, 8, 24), EndDate = new DateTime(2017, 8, 25), Note = "Wake-up Schedule" }
+                };
+                showWakeupCall = true;
+                break;
+            case "Messages":
+                msgGuest = selectedReg.Guest;
+                msgRoom = selectedReg.Room?.Replace("#", "") ?? "";
+                msgRegNo = selectedReg.Registration;
+                msgNo = "MSG-00043-17";
+                msgDate = businessDate;
+                msgType = "Internal Message";
+                msgBody = "";
+                msgUser = null;
+                msgSendToAll = false;
+                showSendMessage = true;
+                break;
+            case "Privilege":
+                privRegNo = selectedReg.Registration;
+                privNoPost = false;
+                privAuthorizeDirectBill = false;
+                privPreStayCharging = false;
+                privPostStayCheckout = false;
+                privAllowLateCheckout = false;
+                privRemark = "";
+                showPrivilege = true;
+                break;
+            case "TravelDetail":
+                travelPickupRequired = "YES";
+                travelTransportType = "Bus Station";
+                travelCarrierCode = "Carrier One";
+                travelTransportNo = "";
+                travelArrivalDate = selectedReg.Arrival;
+                travelPickupTime = new TimeSpan(12, 0, 0);
+                showTravelDetail = true;
+                break;
+            case "RoomAssignment":
+                showRoomAssignConfirm = true;
+                break;
+        }
+    }
+
+    void AddAccompanyGuest() => showGuestFind = true;
+
+    void SelectAccompanyGuest(string name)
+    {
+        accompanyGuests.Add(new AccompanyGuestRow { Guest = name, Address = "" });
+        showGuestFind = false;
+        StateHasChanged();
+    }
+
+    void ShowInfo(string message)
+    {
+        infoMessage = message;
+        showSuccessInfo = true;
+        StateHasChanged();
+    }
+
+    void OpenNewGuestFromAccompany()
+    {
+        showGuestFind = false;
+        ShowInfo("Guest registration opened.");
+    }
+
+    void SaveNewAttachment()
+    {
+        showNewAttachment = false;
+        ShowInfo("Attachment saved successfully.");
+    }
+
+    void SaveAccompanyGuest()
+    {
+        showAccompanyGuest = false;
+        ShowInfo("Accompanying guest saved successfully.");
+    }
+
+    void RemoveAccompanyGuest()
+    {
+        if (selectedAccompanyGuest != null)
+        {
+            accompanyGuests.Remove(selectedAccompanyGuest);
+            selectedAccompanyGuest = null;
+            StateHasChanged();
+        }
+    }
+
+    void SaveWakeupCall()
+    {
+        if (wuDateFrom.HasValue)
+        {
+            wakeupSchedules.Add(new WakeupScheduleRow
+            {
+                SN = wakeupSchedules.Count + 1,
+                StartDate = wuDateFrom.Value,
+                EndDate = wuDateTo ?? wuDateFrom.Value,
+                Note = wuNote
+            });
+        }
+        StateHasChanged();
+    }
+
+    void RemoveWakeupCall()
+    {
+        if (selectedWakeup != null)
+        {
+            wakeupSchedules.Remove(selectedWakeup);
+            selectedWakeup = null;
+            StateHasChanged();
+        }
+    }
+
+    void ResetMessage()
+    {
+        msgBody = "";
+        msgType = "Internal Message";
+        StateHasChanged();
+    }
+
+    void SaveMessage()
+    {
+        showSendMessage = false;
+        ShowInfo("Message saved successfully.");
+    }
+
+    void SelectUser()
+    {
+        if (selectedUserItem != null)
+            msgUser = selectedUserItem.UserName;
+        showUserFind = false;
+        StateHasChanged();
+    }
+
+    void SavePrivilege()
+    {
+        showPrivilege = false;
+        ShowInfo("Privileges saved successfully.");
+    }
+
+    void ResetTravelDetail()
+    {
+        travelPickupRequired = "YES";
+        travelTransportType = "Bus Station";
+        travelCarrierCode = "Carrier One";
+        travelTransportNo = "";
+        travelArrivalDate = selectedReg?.Arrival;
+        travelPickupTime = new TimeSpan(12, 0, 0);
+        StateHasChanged();
+    }
+
+    void SaveTravelDetail()
+    {
+        showTravelDetail = false;
+        ShowInfo("Travel detail saved successfully.");
+    }
+
+    void ConfirmRoomAssignment()
+    {
+        showRoomAssignConfirm = false;
+        if (selectedReg == null) return;
+        if (selectedReg.RoomCount > 1)
+        {
+            OpenCheckInReview();
+        }
+        else
+        {
+            roomSearchContext = "CheckIn";
+            roomSearchForSingle = true;
+            currentMultiRowForRoom = null;
+            selectedRoomItem = null;
+            showRoomSearch = true;
+        }
+        StateHasChanged();
+    }
+
+    void OpenShareCheckIn()
+    {
+        if (selectedReg == null) return;
+        shareGuestName = "";
+        shareNationality = "";
+        sharePassport = "";
+        shareTitle = "";
+        shareAddress = "";
+        shareCompany = selectedReg.Company ?? "";
+        shareAgent = "";
+        shareContact = "";
+        shareGroup = "";
+        shareConsigneeSource = "";
+        shareMemberType = null;
+        shareArrival = selectedReg.Arrival;
+        shareEta = TimeSpan.Zero;
+        shareNights = selectedReg.Nights > 0 ? selectedReg.Nights : 1;
+        shareDeparture = selectedReg.Departure;
+        shareAdults = 1;
+        shareChildren = 0;
+        shareNoOfRooms = 1;
+        shareRoomType = selectedReg.RoomType;
+        shareRtc = selectedReg.RoomType;
+        shareRoom = selectedReg.Room?.Replace("#", "") ?? "";
+        shareFixedRate = false;
+        shareRateCode = null;
+        sharePackage = null;
+        shareRate = "";
+        shareResType = "Phone Reser";
+        shareMarket = "Corporate Bl";
+        shareSource = "Company Dir";
+        shareOrigin = "Central Rese";
+        sharePayment = selectedReg.Payment ?? "Cash";
+        shareRateAdjType = "Amount";
+        shareAdjAmount = "";
+        shareAdjPercent = "";
+        shareReason = "Requested Room type not availa";
+        shareSpecial = null;
+        shareVoucher = "";
+        showShareCheckIn = true;
+    }
+
+    void PerformShareCheckIn()
+    {
+        if (string.IsNullOrWhiteSpace(shareGuestName))
+        {
+            ShowInfo("Please select a guest to share the room.");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(shareRoom))
+        {
+            ShowInfo("Please assign a room for the sharing guest.");
+            return;
+        }
+        showShareCheckIn = false;
+        ShowInfo($"Share check-in completed for {shareGuestName} in room {shareRoom}.");
+    }
+
+    void NewShareCheckIn()
+    {
+        shareGuestName = "";
+        shareNationality = "";
+        sharePassport = "";
+        shareTitle = "";
+        shareAddress = "";
+        shareRateCode = null;
+        shareRate = "";
+        StateHasChanged();
+    }
+
+    void OpenShareRoomSearch()
+    {
+        roomSearchContext = "ShareCheckIn";
+        roomSearchForSingle = true;
+        currentMultiRowForRoom = null;
+        selectedRoomItem = null;
+        showRoomSearch = true;
+    }
+
+    void SaveProfileAmendment()
+    {
+        if (selectedReg != null)
+        {
+            selectedReg.Guest = amendGuest ?? selectedReg.Guest;
+            selectedReg.Company = amendCompany ?? selectedReg.Company;
+        }
+        showProfileAmendment = false;
+        ApplyFilters();
+        StateHasChanged();
+    }
+
+    void SaveDateAmendment()
+    {
+        if (selectedReg != null && amendArrival.HasValue && amendDeparture.HasValue)
+        {
+            selectedReg.Arrival = amendArrival.Value;
+            selectedReg.Departure = amendDeparture.Value;
+            selectedReg.Nights = (amendDeparture.Value - amendArrival.Value).Days;
+            selectedReg.RoomType = amendRoomType ?? selectedReg.RoomType;
+            selectedReg.Room = amendRoom;
+        }
+        showDateAmendment = false;
+        ApplyFilters();
+        StateHasChanged();
+    }
+
+    void GenerateDailyDetailRows()
+    {
+        dailyDetailRows = new List<DailyDetailRow>();
+        if (selectedReg == null) return;
+        int sn = 1;
+        for (var d = selectedReg.Arrival; d < selectedReg.Departure; d = d.AddDays(1))
+        {
+            bool isPast = d.Date < businessDate.Date;
+            var row = new DailyDetailRow
+            {
+                SN = sn++,
+                Date = d,
+                Adult = 1,
+                Child = 0,
+                RoomCount = selectedReg.RoomCount,
+                RoomType = selectedReg.RoomType,
+                ActualRTC = selectedReg.RoomType,
+                Room = selectedReg.Room ?? "",
+                Rate = "Standard Rate",
+                RateAmount = isPast ? 50 : (d.DayOfWeek == DayOfWeek.Friday || d.DayOfWeek == DayOfWeek.Saturday ? 500 : 50),
+                Market = "Corporate Business",
+                Source = "Company Direct",
+                IsFixed = true,
+                Packages = new List<PackageRow>
+                {
+                    new() { Package = "Lunch", Amount = 60, Remark = "" }
+                }
+            };
+            dailyDetailRows.Add(row);
+        }
+    }
+
+    void RefreshRegistrationDetail()
+    {
+        GenerateDailyDetailRows();
+        StateHasChanged();
+    }
+
+    void SelectDetailRow(DailyDetailRow row)
+    {
+        selectedDetailRow = row;
+        StateHasChanged();
+    }
+
+    void EditDailyDetail()
+    {
+        if (selectedDetailRow == null) return;
+        if (selectedDetailRow.Date.Date < businessDate.Date)
+        {
+            showPassedDateError = true;
+            return;
+        }
+        editDetail = new EditDetailModel
+        {
+            Date = selectedDetailRow.Date,
+            ThroughDate = selectedDetailRow.Date,
+            Adult = selectedDetailRow.Adult,
+            Child = selectedDetailRow.Child,
+            RoomType = selectedDetailRow.RoomType,
+            RTC = selectedDetailRow.ActualRTC,
+            Room = selectedDetailRow.Room,
+            RateCode = selectedDetailRow.Rate,
+            Amount = selectedDetailRow.RateAmount,
+            FixedRate = selectedDetailRow.IsFixed,
+            NoOfRooms = selectedDetailRow.RoomCount,
+            Adjustment = 0,
+            Source = selectedDetailRow.Source,
+            Market = selectedDetailRow.Market
+        };
+        showEditDailyDetail = true;
+    }
+
+    void SaveDailyDetailEdit()
+    {
+        if (selectedDetailRow != null)
+        {
+            selectedDetailRow.Adult = editDetail.Adult;
+            selectedDetailRow.Child = editDetail.Child;
+            selectedDetailRow.RoomType = editDetail.RoomType ?? selectedDetailRow.RoomType;
+            selectedDetailRow.ActualRTC = editDetail.RTC ?? selectedDetailRow.ActualRTC;
+            selectedDetailRow.Room = editDetail.Room;
+            selectedDetailRow.Rate = editDetail.RateCode;
+            selectedDetailRow.RateAmount = editDetail.Amount;
+            selectedDetailRow.IsFixed = editDetail.FixedRate;
+            selectedDetailRow.RoomCount = editDetail.NoOfRooms;
+            selectedDetailRow.Source = editDetail.Source ?? selectedDetailRow.Source;
+            selectedDetailRow.Market = editDetail.Market ?? selectedDetailRow.Market;
+        }
+        showEditDailyDetail = false;
+        StateHasChanged();
+    }
+
+    void SaveRateAdjustment()
+    {
+        showRateAdjustment = false;
+        ShowInfo("Rate adjustment saved successfully.");
+    }
+
+    void SaveRoomMove()
+    {
+        if (selectedReg != null && !string.IsNullOrWhiteSpace(roomMoveNewRoom))
+        {
+            selectedReg.Room = roomMoveNewRoom;
+            selectedReg.RoomType = roomMoveNewRoomType ?? selectedReg.RoomType;
+        }
+        showRoomMove = false;
+        ApplyFilters();
+        StateHasChanged();
+    }
+
+    void ResetPaymentOptions()
+    {
+        payMethod = "Cash";
+        payCreditCard = null;
+        payCreditCardNo = "";
+        payCurrency = "Birr";
+        payExpDate = null;
+        payCrsNo = "";
+        payApprovalCode = "";
+        payApprovalAmt = 0;
+        StateHasChanged();
+    }
+
+    void SavePaymentOptions()
+    {
+        if (selectedReg != null)
+        {
+            selectedReg.Payment = payMethod ?? selectedReg.Payment;
+        }
+        showPaymentOptions = false;
+        ApplyFilters();
+        StateHasChanged();
+    }
+
+    void OnPaymentMethodChanged(string? value)
+    {
+        payMethod = value;
+        StateHasChanged();
+    }
+
+    void SaveOtherFields()
+    {
+        showOtherFields = false;
+        ShowInfo("Other fields saved successfully.");
+    }
+
+    void OpenRoomSearchForAmendment()
+    {
+        roomSearchContext = "DateAmendment";
+        currentMultiRowForRoom = null;
+        selectedRoomItem = null;
+        showRoomSearch = true;
+    }
+
+    void OpenRoomSearchForRoomMove()
+    {
+        roomSearchContext = "RoomMove";
+        currentMultiRowForRoom = null;
+        selectedRoomItem = null;
+        showRoomSearch = true;
     }
 
     void CloseStateConfirm() => showStateConfirm = false;
@@ -467,10 +2610,38 @@
     void CloseSingleCheckIn() => showSingleCheckIn = false;
     void CloseMultiCheckIn() => showMultiCheckIn = false;
     void CloseRoomSearch() => showRoomSearch = false;
+    void CloseConfirmationReview() => showConfirmationReview = false;
+    void CloseCancellationReview() => showCancellationReview = false;
+    void CloseReinstateReview() => showReinstateReview = false;
+    void CloseCheckOutReview() => showCheckOutReview = false;
 
-    void ConfirmCheckIn()
+    void ConfirmStateChange()
     {
         showStateConfirm = false;
+        if (selectedReg == null) return;
+
+        switch (pendingActivity)
+        {
+            case "CheckIn":
+                OpenCheckInReview();
+                break;
+            case "Confirmation":
+                OpenConfirmationReview();
+                break;
+            case "Cancel":
+                OpenCancellationReview();
+                break;
+            case "CheckOut":
+                OpenCheckOutReview();
+                break;
+            case "Reinstate":
+                OpenReinstateReview();
+                break;
+        }
+    }
+
+    void OpenCheckInReview()
+    {
         if (selectedReg == null) return;
         if (selectedReg.RoomCount > 1)
         {
@@ -479,8 +2650,15 @@
             {
                 multiRoomRows.Add(new MultiRoomRow
                 {
-                    SN = i, Company = selectedReg.Company, Guest = i == 1 ? selectedReg.Guest : "", GuestNo = 1,
-                    Room = "", Arrival = selectedReg.Arrival, Departure = selectedReg.Departure, Key = "", Selected = i == 1
+                    SN = i,
+                    Company = selectedReg.Company,
+                    Guest = i == 1 ? selectedReg.Guest : "",
+                    GuestNo = 1,
+                    Room = "",
+                    Arrival = selectedReg.Arrival,
+                    Departure = selectedReg.Departure,
+                    Key = "",
+                    Selected = i == 1
                 });
             }
             showMultiCheckIn = true;
@@ -496,6 +2674,9 @@
             ciGuest = selectedReg.Guest;
             ciCompany = selectedReg.Company;
             ciAgent = selectedReg.Company == "MISIKIR LTD" ? "MY AGENT" : "";
+            ciSource = "";
+            ciGroup = "";
+            ciContact = "";
             ciTotalBill = ""; ciPaid = ""; ciRemaining = "";
             showSingleCheckIn = true;
         }
@@ -504,15 +2685,115 @@
     void DoCheckInSingle()
     {
         if (string.IsNullOrWhiteSpace(ciRoom)) return;
-        if (selectedReg != null) selectedReg.State = "Checked In";
+        if (selectedReg != null)
+        {
+            UpdateRegistrationState(selectedReg.SN, "Checked In");
+            selectedReg.Room = ciRoom;
+        }
         showSingleCheckIn = false;
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
         StateHasChanged();
     }
 
     void DoCheckInMulti()
     {
         showMultiCheckIn = false;
-        if (selectedReg != null) selectedReg.State = "Checked In";
+        if (selectedReg != null) UpdateRegistrationState(selectedReg.SN, "Checked In");
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
+        StateHasChanged();
+    }
+
+    void OpenConfirmationReview()
+    {
+        if (selectedReg == null) return;
+        ciRegNo = selectedReg.Registration;
+        ciGuest = selectedReg.Guest;
+        ciCompany = selectedReg.Company;
+        ciRoom = selectedReg.Room;
+        ciPayment = selectedReg.Payment;
+        ciDeparture = selectedReg.Departure;
+        ciAgent = selectedReg.Company == "MISIKIR LTD" ? "MY AGENT" : "";
+        ciTotalBill = ""; ciPaid = ""; ciRemaining = "";
+        showConfirmationReview = true;
+    }
+
+    void DoConfirmReservation()
+    {
+        if (selectedReg != null) UpdateRegistrationState(selectedReg.SN, "Guaranteed");
+        showConfirmationReview = false;
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
+        StateHasChanged();
+    }
+
+    void OpenCancellationReview()
+    {
+        if (selectedReg == null) return;
+        ciRegNo = selectedReg.Registration;
+        ciGuest = selectedReg.Guest;
+        ciCompany = selectedReg.Company;
+        ciRoom = selectedReg.Room;
+        ciPayment = selectedReg.Payment;
+        ciDeparture = selectedReg.Departure;
+        ciCancelReason = "No Reason Given";
+        ciTotalBill = ""; ciPaid = ""; ciRemaining = "";
+        showCancellationReview = true;
+    }
+
+    void DoCancelReservation()
+    {
+        if (selectedReg != null) UpdateRegistrationState(selectedReg.SN, "Cancelled");
+        showCancellationReview = false;
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
+        StateHasChanged();
+    }
+
+    void OpenReinstateReview()
+    {
+        if (selectedReg == null) return;
+        ciRegNo = selectedReg.Registration;
+        ciGuest = selectedReg.Guest;
+        ciCompany = selectedReg.Company;
+        ciRoom = selectedReg.Room;
+        ciPayment = selectedReg.Payment;
+        ciDeparture = selectedReg.Departure;
+        ciAgent = selectedReg.Company == "MISIKIR LTD" ? "MY AGENT" : "";
+        ciReinstateAction = "With receipt reprint";
+        ciTotalBill = ""; ciPaid = ""; ciRemaining = "";
+        showReinstateReview = true;
+    }
+
+    void DoReinstateReservation()
+    {
+        if (selectedReg != null) UpdateRegistrationState(selectedReg.SN, "Guaranteed");
+        showReinstateReview = false;
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
+        StateHasChanged();
+    }
+
+    void OpenCheckOutReview()
+    {
+        if (selectedReg == null) return;
+        ciRegNo = selectedReg.Registration;
+        ciGuest = selectedReg.Guest;
+        ciCompany = selectedReg.Company;
+        ciRoom = selectedReg.Room;
+        ciPayment = selectedReg.Payment;
+        ciDeparture = selectedReg.Departure;
+        ciTotalBill = ""; ciPaid = ""; ciRemaining = "";
+        showCheckOutReview = true;
+    }
+
+    void DoCheckOut()
+    {
+        if (selectedReg != null) UpdateRegistrationState(selectedReg.SN, "Checked Out");
+        showCheckOutReview = false;
+        ApplyFilters();
+        infoMessage = "State changed successfully!"; showSuccessInfo = true;
         StateHasChanged();
     }
 
@@ -526,6 +2807,7 @@
     void OpenRoomSearchForSingle()
     {
         roomSearchForSingle = true;
+        roomSearchContext = "CheckIn";
         currentMultiRowForRoom = null;
         selectedRoomItem = null;
         showRoomSearch = true;
@@ -534,6 +2816,7 @@
     void OpenRoomSearchForMulti(MultiRoomRow row)
     {
         roomSearchForSingle = false;
+        roomSearchContext = "MultiCheckIn";
         currentMultiRowForRoom = row;
         selectedRoomItem = null;
         showRoomSearch = true;
@@ -543,8 +2826,30 @@
     {
         if (selectedRoomItem == null) return;
         if (selectedRoomItem.HKStatus == "Dirty") return;
-        if (roomSearchForSingle) { ciRoom = selectedRoomItem.Room; ciRoomType = selectedRoomItem.RoomType; }
-        else if (currentMultiRowForRoom != null) currentMultiRowForRoom.Room = selectedRoomItem.Room;
+        if (roomSearchContext == "ShareCheckIn")
+        {
+            shareRoom = selectedRoomItem.Room;
+            shareRoomType = selectedRoomItem.RoomType;
+        }
+        else if (roomSearchContext == "CheckIn" || roomSearchForSingle)
+        {
+            ciRoom = selectedRoomItem.Room;
+            ciRoomType = selectedRoomItem.RoomType;
+        }
+        else if (roomSearchContext == "MultiCheckIn" && currentMultiRowForRoom != null)
+        {
+            currentMultiRowForRoom.Room = selectedRoomItem.Room;
+        }
+        else if (roomSearchContext == "DateAmendment")
+        {
+            amendRoom = selectedRoomItem.Room;
+            amendRoomType = selectedRoomItem.RoomType;
+        }
+        else if (roomSearchContext == "RoomMove")
+        {
+            roomMoveNewRoom = selectedRoomItem.Room;
+            roomMoveNewRoomType = selectedRoomItem.RoomType;
+        }
         showRoomSearch = false;
         StateHasChanged();
     }
@@ -562,9 +2867,66 @@
         StateHasChanged();
     }
 
+    void OnRegCustomize(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType != GridElementType.DataRow) return;
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RegistrationRow;
+        if (item == null) return;
+
+        var classes = new List<string>();
+
+        if (selectedReg != null && item.SN == selectedReg.SN)
+            classes.Add("row-selected");
+
+        classes.Add(item.State switch
+        {
+            "Waiting List" => "state-waiting",
+            "6PM" => "state-6pm",
+            "Cancelled" => "state-cancelled",
+            "Guaranteed" => "state-guaranteed",
+            "Checked Out" => "state-checkout",
+            "PM" => "state-pm",
+            "Inhouse" => "state-inhouse",
+            "No show" => "state-noshow",
+            _ => ""
+        });
+
+        e.CssClass = string.Join(" ", classes).Trim();
+    }
+
+    int GetRecordIndex() => selectedReg == null ? 0 : filteredRegistrations.IndexOf(selectedReg) + 1;
+
+    void GoFirst()
+    {
+        selectedReg = filteredRegistrations.FirstOrDefault();
+        StateHasChanged();
+    }
+
+    void GoPrev()
+    {
+        if (selectedReg == null) return;
+        var idx = filteredRegistrations.IndexOf(selectedReg);
+        if (idx > 0) selectedReg = filteredRegistrations[idx - 1];
+        StateHasChanged();
+    }
+
+    void GoNext()
+    {
+        if (selectedReg == null) return;
+        var idx = filteredRegistrations.IndexOf(selectedReg);
+        if (idx >= 0 && idx < filteredRegistrations.Count - 1) selectedReg = filteredRegistrations[idx + 1];
+        StateHasChanged();
+    }
+
+    void GoLast()
+    {
+        selectedReg = filteredRegistrations.LastOrDefault();
+        StateHasChanged();
+    }
+
     void OnRoomRowClick(GridRowClickEventArgs e)
     {
-        selectedRoomItem = e.Grid.GetDataItem(e.VisibleIndex) as RoomItem;
+        selectedRoomItem = e.Grid.GetDataItem(e.VisibleIndex) as RoomSearchItem;
         StateHasChanged();
     }
 
@@ -577,7 +2939,7 @@
     void OnRoomCustomize(GridCustomizeElementEventArgs e)
     {
         if (e.ElementType != GridElementType.DataCell) return;
-        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomItem;
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomSearchItem;
         if (item == null) return;
         if (e.Column?.Caption == "HK Status")
         {
@@ -590,7 +2952,7 @@
     void ApplyFilters()
     {
         filteredRegistrations = allRegistrations.Where(r =>
-            (string.IsNullOrWhiteSpace(filterRoom) || r.Room.Contains(filterRoom, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(filterRoom) || (!string.IsNullOrEmpty(r.Room) && r.Room.Contains(filterRoom, StringComparison.OrdinalIgnoreCase))) &&
             (string.IsNullOrWhiteSpace(filterGuest) || r.Guest == filterGuest) &&
             (filterState == "All" || r.State == filterState) &&
             (filterArrival == null || r.Arrival.Date == filterArrival.Value.Date) &&
@@ -601,44 +2963,25 @@
         StateHasChanged();
     }
 
-    public class RegistrationRow
+    void ClearFilters()
     {
-        public int SN { get; set; }
-        public string Registration { get; set; } = "";
-        public string Room { get; set; } = "";
-        public string RoomType { get; set; } = "";
-        public string Guest { get; set; } = "";
-        public string Company { get; set; } = "";
-        public DateTime Arrival { get; set; }
-        public DateTime Departure { get; set; }
-        public int Nights { get; set; }
-        public string Payment { get; set; } = "";
-        public string State { get; set; } = "6PM";
-        public int RoomCount { get; set; } = 1;
+        filterRoom = "";
+        filterGuest = null;
+        filterState = "Inhouse";
+        filterArrival = null;
+        filterDeparture = null;
+        filterCompany = null;
+        ApplyFilters();
     }
 
-    public class MultiRoomRow
+    void UpdateRegistrationState(int? sn, string newState)
     {
-        public int SN { get; set; }
-        public string Company { get; set; } = "";
-        public string Guest { get; set; } = "";
-        public int GuestNo { get; set; } = 1;
-        public string Room { get; set; } = "";
-        public DateTime Arrival { get; set; }
-        public DateTime Departure { get; set; }
-        public string Key { get; set; } = "";
-        public bool Selected { get; set; }
+        if (!sn.HasValue) return;
+        var reg = allRegistrations.FirstOrDefault(r => r.SN == sn.Value);
+        if (reg != null)
+        {
+            reg.State = newState;
+        }
     }
 
-    public class RoomItem
-    {
-        public int SN { get; set; }
-        public string Room { get; set; } = "";
-        public string RoomType { get; set; } = "";
-        public string HKStatus { get; set; } = "";
-        public string FOStatus { get; set; } = "";
-        public string Floor { get; set; } = "";
-        public string Feature { get; set; } = "";
-        public string Remark { get; set; } = "";
-    }
 }

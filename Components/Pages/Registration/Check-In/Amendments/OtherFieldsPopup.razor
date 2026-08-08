@@ -1,0 +1,62 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Other Fields" Width="440px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Reservation Type</label>
+                <DxComboBox Data="@ReservationTypes" @bind-Value="ResType" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Market</label>
+                <DxComboBox Data="@MarketList" @bind-Value="Market" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Source</label>
+                <DxComboBox Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Origin</label>
+                <DxComboBox Data="@OriginList" @bind-Value="Origin" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Member Type</label>
+                <DxComboBox Data="@MemberTypes" @bind-Value="MemberType" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Specials</label>
+                <DxComboBox Data="@SpecialsList" @bind-Value="Specials" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? ResType { get; set; }
+    [Parameter] public string? Market { get; set; }
+    [Parameter] public string? Source { get; set; }
+    [Parameter] public string? Origin { get; set; }
+    [Parameter] public string? MemberType { get; set; }
+    [Parameter] public string? Specials { get; set; }
+
+    [Parameter] public List<string> ReservationTypes { get; set; } = new();
+    [Parameter] public List<string> MarketList { get; set; } = new();
+    [Parameter] public List<string> SourceList { get; set; } = new();
+    [Parameter] public List<string> OriginList { get; set; } = new();
+    [Parameter] public List<string> MemberTypes { get; set; } = new();
+    [Parameter] public List<string> SpecialsList { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

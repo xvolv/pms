@@ -1,0 +1,48 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Users" Width="400px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <DxTextBox Width="100%" SizeMode="SizeMode.Small" />
+            <DxButton Text="Find" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" />
+        </div>
+        <table class="multi-table" style="width:100%;">
+            <thead>
+                <tr><th>Code</th><th>User Name</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Users)
+                {
+                    <tr style="cursor:pointer;"
+                        class="@(SelectedUser == u ? "row-selected" : "")"
+                        @onclick="() => SelectedUserChanged.InvokeAsync(u)">
+                        <td>@u.Code</td>
+                        <td>@u.UserName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end;">
+            <DxButton Text="OK" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Primary" Click="HandleOk" />
+            <DxButton Text="Clear" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
+                      Click="HandleClear" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public List<UserItem> Users { get; set; } = new();
+    [Parameter] public UserItem? SelectedUser { get; set; }
+    [Parameter] public EventCallback<UserItem?> SelectedUserChanged { get; set; }
+
+    [Parameter] public EventCallback OnOk { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    async Task HandleOk() { await OnOk.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
+    async Task HandleClear() { await OnClear.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
+}

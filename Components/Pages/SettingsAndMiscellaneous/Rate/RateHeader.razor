@@ -482,18 +482,15 @@
 
 @code {
     private int ActiveBottomTabIndex = 0;
-    private bool IsEditMode = false;
 
     // ---------- Public methods for toolbar delegation ----------
     public void New()
     {
-        IsEditMode = false;
         EditModel = new RateHeaderEditModel();
     }
 
     public void Edit()
     {
-        IsEditMode = true;
         // Load selected item into EditModel
     }
 
@@ -613,12 +610,11 @@
     private void OnNewClick()
     {
         EditModel = new RateHeaderEditModel();
-        IsEditMode = false;
     }
 
     private void OnEditClick()
     {
-        IsEditMode = true;
+        // Load selected item into EditModel
     }
 
     private void OnSaveClick()

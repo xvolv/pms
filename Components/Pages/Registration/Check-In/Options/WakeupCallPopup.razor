@@ -1,0 +1,94 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Wake Up Call" Width="560px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon"><i class="bi bi-alarm"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon"><i class="bi bi-pencil"></i></div>
+                <div class="ci-text">Edit<br/>Schedule</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleRemove">
+                <div class="ci-icon"><i class="bi bi-dash-circle"></i></div>
+                <div class="ci-text">Remove</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Room</label>
+                <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Registration No.</label>
+                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Guest</label>
+                <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Date From</label>
+                <DxDateEdit @bind-Date="DateFrom" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>No. Days</label>
+                <DxSpinEdit @bind-Value="NoDays" SizeMode="SizeMode.Small" MinValue="0" />
+            </div>
+            <div class="amend-row"><label>To</label>
+                <DxDateEdit @bind-Date="DateTo" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Time</label>
+                <DxTextBox Text="@Time.ToString(@"hh\:mm\:ss")" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Note</label>
+                <DxTextBox @bind-Text="Note" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+        <table class="multi-table" style="width:100%; margin-top:10px;">
+            <thead>
+                <tr><th style="width:40px;">SN</th><th>Start Date</th><th>End Date</th><th>Note</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Schedules)
+                {
+                    <tr class="@(SelectedSchedule == s ? "row-selected" : "")"
+                        @onclick="() => SelectedScheduleChanged.InvokeAsync(s)">
+                        <td>@s.SN</td>
+                        <td>@s.StartDate.ToString("M/d/yyyy")</td>
+                        <td>@s.EndDate.ToString("M/d/yyyy")</td>
+                        <td>@s.Note</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Guest { get; set; } = "";
+    [Parameter] public DateTime? DateFrom { get; set; }
+    [Parameter] public int NoDays { get; set; }
+    [Parameter] public DateTime? DateTo { get; set; }
+    [Parameter] public TimeSpan Time { get; set; }
+    [Parameter] public string Note { get; set; } = "";
+
+    [Parameter] public List<WakeupScheduleRow> Schedules { get; set; } = new();
+    [Parameter] public WakeupScheduleRow? SelectedSchedule { get; set; }
+    [Parameter] public EventCallback<WakeupScheduleRow?> SelectedScheduleChanged { get; set; }
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleRemove() => await OnRemove.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

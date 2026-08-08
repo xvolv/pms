@@ -1,0 +1,115 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Payment Options" Width="460px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleReset">
+                <div class="toolbar-icon"><i class="bi bi-file-earmark"></i></div>
+                <div class="toolbar-text">Reset</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Guest</label>
+                <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Reg. No.</label>
+                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Room</label>
+                <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Payment Method</label>
+                <DxComboBox Data="@Payments" Value="@PayMethod"
+                            ValueChanged="@((string? v) => PayMethodChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+        @if (PayMethod == "Credit Card")
+        {
+            <fieldset class="cc-fieldset">
+                <legend>Credit Card Detail</legend>
+                <div class="amend-form">
+                    <div class="amend-row"><label>Credit Card</label>
+                        <DxComboBox Data="@CreditCardTypes" Value="@CreditCard"
+                                    ValueChanged="@((string? v) => CreditCardChanged.InvokeAsync(v))"
+                                    SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Credit Card No.</label>
+                        <DxTextBox Text="@CreditCardNo" TextChanged="@((string v) => CreditCardNoChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Currency</label>
+                        <DxComboBox Data="@Currencies" Value="@Currency"
+                                    ValueChanged="@((string? v) => CurrencyChanged.InvokeAsync(v))"
+                                    SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Exp. Date</label>
+                        <DxDateEdit @bind-Date="ExpDate" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>CRS No.</label>
+                        <DxTextBox Text="@CrsNo" TextChanged="@((string v) => CrsNoChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Approval Code</label>
+                        <DxTextBox Text="@ApprovalCode" TextChanged="@((string v) => ApprovalCodeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Approval Amt.</label>
+                        <DxSpinEdit Value="@ApprovalAmt" ValueChanged="@((decimal v) => ApprovalAmtChanged.InvokeAsync(v))"
+                                    SizeMode="SizeMode.Small" MinValue="0" />
+                    </div>
+                </div>
+            </fieldset>
+        }
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string Guest { get; set; } = "";
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Room { get; set; } = "";
+
+    [Parameter] public string? PayMethod { get; set; }
+    [Parameter] public EventCallback<string?> PayMethodChanged { get; set; }
+
+    [Parameter] public string? CreditCard { get; set; }
+    [Parameter] public EventCallback<string?> CreditCardChanged { get; set; }
+
+    [Parameter] public string CreditCardNo { get; set; } = "";
+    [Parameter] public EventCallback<string> CreditCardNoChanged { get; set; }
+
+    [Parameter] public string? Currency { get; set; }
+    [Parameter] public EventCallback<string?> CurrencyChanged { get; set; }
+
+    [Parameter] public DateTime? ExpDate { get; set; }
+
+    [Parameter] public string CrsNo { get; set; } = "";
+    [Parameter] public EventCallback<string> CrsNoChanged { get; set; }
+
+    [Parameter] public string ApprovalCode { get; set; } = "";
+    [Parameter] public EventCallback<string> ApprovalCodeChanged { get; set; }
+
+    [Parameter] public decimal ApprovalAmt { get; set; }
+    [Parameter] public EventCallback<decimal> ApprovalAmtChanged { get; set; }
+
+    [Parameter] public List<string> Payments { get; set; } = new();
+    [Parameter] public List<string> CreditCardTypes { get; set; } = new();
+    [Parameter] public List<string> Currencies { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnReset { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleReset() => await OnReset.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

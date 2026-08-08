@@ -1,0 +1,127 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="@($"Reservation Detail - {RegistrationNo}")"
+         Width="960px"  CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleRefresh">
+                <div class="ci-icon" style="color:#43a047;"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="ci-text">Refresh</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleEdit">
+                <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-pencil-square"></i></div>
+                <div class="ci-text">Edit</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-filetype-pdf"></i></div>
+                <div class="ci-text">To PDF</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-file-earmark-excel"></i></div>
+                <div class="ci-text">To Excel</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print</div>
+            </button>
+            <div style="display:flex; align-items:center; gap:4px; margin-left:8px;">
+                <DxCheckBox @bind-Checked="expandAllPackages">Expand All</DxCheckBox>
+            </div>
+            <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="detail-grid-wrap">
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th style="width:28px;"></th>
+                        <th style="width:90px;">Date</th>
+                        <th style="width:80px;">Week Day</th>
+                        <th style="width:50px;">Adult</th>
+                        <th style="width:50px;">Child</th>
+                        <th style="width:70px;">Room Co...</th>
+                        <th style="width:110px;">Room Type</th>
+                        <th style="width:110px;">Actual RTC</th>
+                        <th style="width:60px;">Room</th>
+                        <th style="width:100px;">Rate</th>
+                        <th style="width:80px;">Rate Amount</th>
+                        <th style="width:110px;">Market</th>
+                        <th style="width:110px;">Source</th>
+                        <th style="width:60px;">Is Fixed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Rows)
+                    {
+                        <tr class="@(SelectedRow?.SN == row.SN ? "detail-selected" : "")"
+                            @onclick="() => SelectRow(row)">
+                            <td>
+                                @if (row.Packages.Any())
+                                {
+                                    <button class="expand-btn" @onclick:stopPropagation="true"
+                                            @onclick="() => row.Expanded = !row.Expanded">
+                                        <i class="bi bi-chevron-@(row.Expanded || expandAllPackages ? "down" : "right")"></i>
+                                    </button>
+                                }
+                            </td>
+                            <td>@row.Date.ToString("M/d/yyyy")</td>
+                            <td>@row.WeekDay</td>
+                            <td>@row.Adult</td>
+                            <td>@row.Child</td>
+                            <td>@row.RoomCount</td>
+                            <td>@row.RoomType</td>
+                            <td>@row.ActualRTC</td>
+                            <td>@row.Room</td>
+                            <td>@row.Rate</td>
+                            <td>@row.RateAmount.ToString("N2")</td>
+                            <td>@row.Market</td>
+                            <td>@row.Source</td>
+                            <td style="text-align:center;"><DxCheckBox @bind-Checked="row.IsFixed" Enabled="false" /></td>
+                        </tr>
+                        @if ((row.Expanded || expandAllPackages) && row.Packages.Any())
+                        {
+                            <tr class="package-row">
+                                <td colspan="14" style="padding:0;">
+                                    <table class="package-table">
+                                        <thead>
+                                            <tr><th style="width:200px;">Package</th><th style="width:120px;">Amount</th><th>Remark</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var pkg in row.Packages)
+                                            {
+                                                <tr><td>@pkg.Package</td><td>@pkg.Amount.ToString("N4")</td><td>@pkg.Remark</td></tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? RegistrationNo { get; set; }
+    [Parameter] public List<DailyDetailRow> Rows { get; set; } = new();
+    [Parameter] public DailyDetailRow? SelectedRow { get; set; }
+    [Parameter] public EventCallback<DailyDetailRow?> SelectedRowChanged { get; set; }
+
+    [Parameter] public EventCallback OnRefresh { get; set; }
+    [Parameter] public EventCallback OnEdit { get; set; }
+
+    bool expandAllPackages = false;
+
+    void SelectRow(DailyDetailRow row) => SelectedRowChanged.InvokeAsync(row);
+    async Task HandleRefresh() => await OnRefresh.InvokeAsync();
+    async Task HandleEdit() => await OnEdit.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

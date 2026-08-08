@@ -32,6 +32,9 @@ a,
         0 0 0 0.25rem #258cfb;
 }
 
+i {
+    color: #6c757d
+}
 .content {
     padding-top: 1.1rem;
 }

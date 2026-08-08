@@ -1,0 +1,70 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible"
+         HeaderText="@($"Accompanying Guest - {RegistrationNo} - {Room}")"
+         Width="520px" Height="380px" CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleNew">
+                <div class="toolbar-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <div class="toolbar-text">New</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleRemove">
+                <div class="toolbar-icon"><i class="bi bi-x-lg"></i></div>
+                <div class="toolbar-text">Remove</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
+                <div class="toolbar-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                <div class="toolbar-text">Issue<br/>Card</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        </div>
+        <table class="multi-table" style="width:100%;">
+            <thead>
+                <tr><th>Guest</th><th>Address</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var g in Guests)
+                {
+                    <tr class="@(SelectedGuest == g ? "row-selected" : "")"
+                        @onclick="() => SelectedGuestChanged.InvokeAsync(g)">
+                        <td>@g.Guest</td>
+                        <td>@g.Address</td>
+                    </tr>
+                }
+                <tr @onclick="HandleNew" style="cursor:pointer;">
+                    <td colspan="2" style="color:#1565c0;">&lt;Add New&gt;</td>
+                </tr>
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? RegistrationNo { get; set; }
+    [Parameter] public string? Room { get; set; }
+
+    [Parameter] public List<AccompanyGuestRow> Guests { get; set; } = new();
+    [Parameter] public AccompanyGuestRow? SelectedGuest { get; set; }
+    [Parameter] public EventCallback<AccompanyGuestRow?> SelectedGuestChanged { get; set; }
+
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    async Task HandleNew() => await OnNew.InvokeAsync();
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleRemove() => await OnRemove.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

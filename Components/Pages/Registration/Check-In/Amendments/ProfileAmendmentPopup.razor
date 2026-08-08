@@ -1,0 +1,85 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Profile Amendment" Width="420px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Guest</label>
+                <DxComboBox Data="@GuestNames" Value="@Guest"
+                            ValueChanged="@((string? v) => GuestChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Contact</label>
+                <DxComboBox Data="@ContactList" Value="@Contact"
+                            ValueChanged="@((string? v) => ContactChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Company</label>
+                <DxComboBox Data="@CompanyList" Value="@Company"
+                            ValueChanged="@((string? v) => CompanyChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Agent</label>
+                <DxComboBox Data="@AgentList" Value="@Agent"
+                            ValueChanged="@((string? v) => AgentChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Group</label>
+                <DxComboBox Data="@GroupList" Value="@Group"
+                            ValueChanged="@((string? v) => GroupChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Source</label>
+                <DxComboBox Data="@SourceList" Value="@Source"
+                            ValueChanged="@((string? v) => SourceChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? Guest { get; set; }
+    [Parameter] public EventCallback<string?> GuestChanged { get; set; }
+
+    [Parameter] public string? Contact { get; set; }
+    [Parameter] public EventCallback<string?> ContactChanged { get; set; }
+
+    [Parameter] public string? Company { get; set; }
+    [Parameter] public EventCallback<string?> CompanyChanged { get; set; }
+
+    [Parameter] public string? Agent { get; set; }
+    [Parameter] public EventCallback<string?> AgentChanged { get; set; }
+
+    [Parameter] public string? Group { get; set; }
+    [Parameter] public EventCallback<string?> GroupChanged { get; set; }
+
+    [Parameter] public string? Source { get; set; }
+    [Parameter] public EventCallback<string?> SourceChanged { get; set; }
+
+    [Parameter] public List<string> GuestNames { get; set; } = new();
+    [Parameter] public List<string> ContactList { get; set; } = new();
+    [Parameter] public List<string> CompanyList { get; set; } = new();
+    [Parameter] public List<string> AgentList { get; set; } = new();
+    [Parameter] public List<string> GroupList { get; set; } = new();
+    [Parameter] public List<string> SourceList { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

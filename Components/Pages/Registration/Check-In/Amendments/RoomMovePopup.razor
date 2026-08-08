@@ -1,0 +1,83 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Room Move" Width="440px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div class="amend-form">
+            <div class="amend-row"><label>Reg. No</label>
+                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Guest</label>
+                <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Current Room Type</label>
+                <DxTextBox @bind-Text="CurrentRoomType" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Current Room</label>
+                <DxTextBox @bind-Text="CurrentRoom" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>New Room Type</label>
+                <DxComboBox Data="@RoomTypes" Value="@NewRoomType"
+                            ValueChanged="@((string? v) => NewRoomTypeChanged.InvokeAsync(v))"
+                            SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Move To Room</label>
+                <div class="input-with-btn">
+                    <DxTextBox Text="@NewRoom" TextChanged="@((string v) => NewRoomChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
+                              RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
+                              Click="@(() => OnRoomSearch.InvokeAsync())" />
+                </div>
+            </div>
+            <div class="amend-row"><label>Start</label>
+                <DxDateEdit @bind-Date="Start" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>End</label>
+                <DxDateEdit @bind-Date="End" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Reason</label>
+                <DxComboBox Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Guest { get; set; } = "";
+    [Parameter] public string CurrentRoomType { get; set; } = "";
+    [Parameter] public string CurrentRoom { get; set; } = "";
+
+    [Parameter] public string? NewRoomType { get; set; }
+    [Parameter] public EventCallback<string?> NewRoomTypeChanged { get; set; }
+
+    [Parameter] public string NewRoom { get; set; } = "";
+    [Parameter] public EventCallback<string> NewRoomChanged { get; set; }
+
+    [Parameter] public DateTime? Start { get; set; }
+    [Parameter] public DateTime? End { get; set; }
+    [Parameter] public string? Reason { get; set; }
+
+    [Parameter] public List<string> RoomTypes { get; set; } = new();
+    [Parameter] public List<string> Reasons { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnRoomSearch { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

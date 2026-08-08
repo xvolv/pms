@@ -1,0 +1,95 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Bill Split" Width="960px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleAddWindow">
+                <div class="toolbar-icon text-secondary"><i class="bi bi-plus-lg"></i></div>
+                <div class="toolbar-text">Add Window</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon text-secondary"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleBreak">
+                <div class="toolbar-icon text-secondary"><i class="bi bi-scissors"></i></div>
+                <div class="toolbar-text">Break Item</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleViewFolio">
+                <div class="toolbar-icon text-secondary"><i class="bi bi-file-text"></i></div>
+                <div class="toolbar-text">View Folio</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleCheckOut">
+                <div class="toolbar-icon text-secondary"><i class="bi bi-box-arrow-right"></i></div>
+                <div class="toolbar-text">Check Out</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:12px;">
+            @for (int w = 1; w <= WindowCount; w++)
+            {
+                var winNum = w;
+                var winItems = winNum == 1 ? Window1 : winNum == 2 ? Window2 : Window3;
+                <div style="flex:1; border:1px solid #c8cdd4; padding:6px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <span style="font-size:12px; font-weight:600; white-space:nowrap;">Window @winNum</span>
+                        <DxComboBox Data="@(new List<string> { GuestName })" Value="@GuestName" Width="100%" SizeMode="SizeMode.Small" />
+                    </div>
+                    <table class="multi-table" style="width:100%;">
+                        <thead><tr><th>SN</th><th>Voucher No.</th><th>Purpose</th><th>Date</th><th>Amount</th></tr></thead>
+                        <tbody>
+                            @foreach (var b in winItems)
+                            {
+                                <tr class="@(SelectedItem == b ? "row-selected" : "")" style="cursor:pointer;"
+                                    @onclick="() => SelectItem(b, winNum)" @ondblclick="() => HandleOpenSplitVoucher(b)">
+                                    <td>@b.SN</td><td>@b.VoucherNo</td><td>@b.Purpose</td>
+                                    <td>@b.Date.ToString("M/d/yyyy")</td><td>@b.Amount.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div style="text-align:right; font-weight:600; margin-top:6px; border-top:1px solid #eee; padding-top:4px;">
+                        @winItems.Sum(x => x.Amount).ToString("N2")
+                    </div>
+                </div>
+            }
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string GuestName { get; set; } = "";
+    [Parameter] public int WindowCount { get; set; } = 2;
+    [Parameter] public List<BillSplitItem> Window1 { get; set; } = new();
+    [Parameter] public List<BillSplitItem> Window2 { get; set; } = new();
+    [Parameter] public List<BillSplitItem> Window3 { get; set; } = new();
+    [Parameter] public BillSplitItem? SelectedItem { get; set; }
+    [Parameter] public EventCallback<BillSplitItem?> SelectedItemChanged { get; set; }
+    [Parameter] public EventCallback<int> ActiveWindowChanged { get; set; }
+    [Parameter] public EventCallback OnAddWindow { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnBreak { get; set; }
+    [Parameter] public EventCallback OnViewFolio { get; set; }
+    [Parameter] public EventCallback OnCheckOut { get; set; }
+    [Parameter] public EventCallback<BillSplitItem> OnOpenSplitVoucher { get; set; }
+
+    void SelectItem(BillSplitItem item, int win)
+    {
+        SelectedItemChanged.InvokeAsync(item);
+        ActiveWindowChanged.InvokeAsync(win);
+    }
+    async Task HandleAddWindow() => await OnAddWindow.InvokeAsync();
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleBreak() => await OnBreak.InvokeAsync();
+    async Task HandleViewFolio() => await OnViewFolio.InvokeAsync();
+    async Task HandleCheckOut() { await OnCheckOut.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
+    async Task HandleOpenSplitVoucher(BillSplitItem b) => await OnOpenSplitVoucher.InvokeAsync(b);
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}
