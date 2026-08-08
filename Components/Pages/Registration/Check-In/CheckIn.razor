@@ -1,7 +1,5 @@
-@page "/checkin"
 @rendermode InteractiveServer
 @using DevExpress.Blazor
-@using ERP.V7.WebPMS.Components.Pages.Registration
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
 
@@ -10,10 +8,13 @@
 <div class="reservation-page">
 
     <!-- ===================== TITLE BAR ===================== -->
-    <div class="window-title">
-        <img src="/cnet logo.jpg" class="title-icon" alt="CNET Logo" />
-        <span class="title-text">CHECK-IN - @ReservationNo</span>
-    </div>
+    @if (!IsShareMode)
+    {
+        <div class="window-title">
+            <img src="/cnet logo.jpg" class="title-icon" alt="CNET Logo" />
+            <span class="title-text">CHECK-IN - @ReservationNo</span>
+        </div>
+    }
 
     <!-- ===================== COMMAND PANEL ===================== -->
     <div class="erp-toolbar">
@@ -986,6 +987,15 @@
 </style>
 
 @code {
+    [Parameter]
+    public bool IsShareMode { get; set; } = false;
+
+    [Parameter]
+    public string? ShareRegistrationNo { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
     string ReservationNo = "REG-00156-17";
 
     // Basic Info
@@ -1164,6 +1174,11 @@
 
     protected override void OnInitialized()
     {
+        if (IsShareMode && !string.IsNullOrEmpty(ShareRegistrationNo))
+        {
+            ReservationNo = ShareRegistrationNo;
+        }
+
         guestList = new List<Guest>
         {
             new() { Id = 1,  Title = "Ato",  FirstName = "Taddeses", MiddleName = "ARABA",  LastName = "Mola",     Identification = "EP155353" },
@@ -1208,7 +1223,17 @@
         Navigation.NavigateTo("/guest-registration");
     }
 
-    void CloseWindow() { }
+    void CloseWindow() 
+    {
+        if (IsShareMode)
+        {
+            OnClose.InvokeAsync();
+        }
+        else
+        {
+            Navigation.NavigateTo("/registration-browser-1");
+        }
+    }
     void OpenDailyDetail() { }
     void IssueCard() { }
     void PrintCard() { }

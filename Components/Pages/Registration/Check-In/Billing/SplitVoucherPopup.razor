@@ -1,0 +1,139 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Split Voucher" Width="580px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleSave" disabled="@(!Pieces.Any())">
+                <div class="ci-icon" style="color:@(Pieces.Any() ? "#1565c0" : "#aaa");"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleSplit">
+                <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-scissors"></i></div>
+                <div class="ci-text">Split</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClear">
+                <div class="ci-icon" style="color:#555;"><i class="bi bi-eraser"></i></div>
+                <div class="ci-text">Clear</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Cancel</div>
+            </button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; margin-bottom:8px;">
+            <div class="amend-row"><label>Voucher No.</label>
+                <DxTextBox @bind-Text="VoucherNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Date</label>
+                <DxTextBox Text="@BusinessDate.ToString("M/d/yyyy")" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Customer</label>
+                <DxTextBox @bind-Text="Customer" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Grand Total</label>
+                <DxTextBox Text="@GrandTotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+            </div>
+            <div class="amend-row"><label>Split By</label>
+                <DxComboBox Data="@(new List<string> { "Amount", "Quantity" })" @bind-Value="SplitBy" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>No. of Split</label>
+                <DxSpinEdit @bind-Value="NoOfSplit" MinValue="2" MaxValue="8" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Factor</label>
+                <div style="display:flex; gap:16px; align-items:center; padding-top:4px;">
+                    <label style="font-size:12px; display:flex; align-items:center; gap:4px;">
+                        <input type="radio" name="svFactor@GetHashCode()" checked="@(!FactorPercent)" @onchange="@(() => FactorPercentChanged.InvokeAsync(false))" /> Value
+                    </label>
+                    <label style="font-size:12px; display:flex; align-items:center; gap:4px;">
+                        <input type="radio" name="svFactor@GetHashCode()" checked="@FactorPercent" @onchange="@(() => FactorPercentChanged.InvokeAsync(true))" /> Percent
+                    </label>
+                </div>
+            </div>
+            @if (FactorPercent)
+            {
+                <div class="amend-row"><label>% Value</label>
+                    <DxSpinEdit @bind-Value="PercentValue" MinValue="1" MaxValue="99" SizeMode="SizeMode.Small" />
+                </div>
+            }
+            else
+            {
+                <div class="amend-row"><label>Amount</label>
+                    <DxSpinEdit @bind-Value="AmountValue" MinValue="0" SizeMode="SizeMode.Small" />
+                </div>
+            }
+        </div>
+        <table class="multi-table" style="width:100%; margin-top:4px;">
+            <thead>
+                <tr><th style="width:28px;"></th><th>SN</th><th>Voucher No.</th><th>Date</th><th>Amount</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Pieces)
+                {
+                    <tr class="@(SelectedPiece == p ? "row-selected" : "")" style="cursor:pointer;"
+                        @onclick="() => SelectedPieceChanged.InvokeAsync(p)">
+                        <td @onclick:stopPropagation="true">
+                            <button type="button" style="border:none; background:transparent; cursor:pointer; padding:0 4px;"
+                                    @onclick="() => ToggleExpand(p)">
+                                <i class="bi @(p.Expanded ? "bi-dash-square" : "bi-plus-square")" style="font-size:12px;"></i>
+                            </button>
+                        </td>
+                        <td>@p.SN</td>
+                        <td>@p.VoucherNo</td>
+                        <td>@p.Date.ToString("M/d/yyyy")</td>
+                        <td>@p.Amount.ToString("N2")</td>
+                    </tr>
+                    @if (p.Expanded && p.LineItems?.Any() == true)
+                    {
+                        <tr>
+                            <td colspan="5" style="padding:0 0 0 28px; background:#f9f9f9;">
+                                <table class="multi-table" style="width:100%; margin-bottom:6px;">
+                                    <thead><tr><th>Article Code</th><th>Name</th><th>unit Amount</th><th>quantity</th><th>total Amount</th></tr></thead>
+                                    <tbody>
+                                        @foreach (var li in p.LineItems)
+                                        {
+                                            <tr>
+                                                <td>@li.ArticleCode</td><td>@li.Name</td>
+                                                <td>@li.UnitAmount.ToString("N2")</td>
+                                                <td>@li.Quantity.ToString("N2")</td>
+                                                <td>@li.TotalAmount.ToString("N2")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string VoucherNo { get; set; } = "";
+    [Parameter] public string Customer { get; set; } = "";
+    [Parameter] public DateTime BusinessDate { get; set; }
+    [Parameter] public decimal GrandTotal { get; set; }
+    [Parameter] public string? SplitBy { get; set; } = "Amount";
+    [Parameter] public bool FactorPercent { get; set; } = true;
+    [Parameter] public EventCallback<bool> FactorPercentChanged { get; set; }
+    [Parameter] public int NoOfSplit { get; set; } = 2;
+    [Parameter] public decimal PercentValue { get; set; } = 30;
+    [Parameter] public decimal AmountValue { get; set; }
+    [Parameter] public List<SplitPiece> Pieces { get; set; } = new();
+    [Parameter] public SplitPiece? SelectedPiece { get; set; }
+    [Parameter] public EventCallback<SplitPiece?> SelectedPieceChanged { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnSplit { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    void ToggleExpand(SplitPiece p) { p.Expanded = !p.Expanded; StateHasChanged(); }
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleSplit() => await OnSplit.InvokeAsync();
+    async Task HandleClear() => await OnClear.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

@@ -1,0 +1,38 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible"
+         HeaderText="@($"Attachments ( {RegistrationNo} )")"
+         Width="560px" CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleNew">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-file-earmark-plus"></i></div>
+                <div class="ci-text">New</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-trash"></i></div>
+                <div class="ci-text">Delete</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:8px; height:260px;">
+            <div style="flex:1; border:1px solid #ccc; background:#fafafa;"></div>
+            <div style="flex:1; border:1px solid #ccc; background:#fafafa;"></div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? RegistrationNo { get; set; }
+    [Parameter] public EventCallback OnNew { get; set; }
+
+    async Task HandleNew() => await OnNew.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

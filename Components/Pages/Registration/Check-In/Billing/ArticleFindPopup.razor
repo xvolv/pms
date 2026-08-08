@@ -1,0 +1,46 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Article" Width="420px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <DxTextBox Width="100%" SizeMode="SizeMode.Small" />
+            <DxButton Text="Find" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" />
+        </div>
+        <table class="multi-table" style="width:100%;">
+            <thead><tr><th>Code</th><th>Name</th></tr></thead>
+            <tbody>
+                @foreach (var a in Articles)
+                {
+                    <tr style="cursor:pointer;" @onclick="() => HandleSelect(a)">
+                        <td>@a.Code</td>
+                        <td>@a.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div style="margin-top:10px; text-align:right;">
+            <DxButton Text="Clear" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
+                      Click="HandleClear" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public List<ArticleItem> Articles { get; set; } = new();
+    [Parameter] public EventCallback<string?> OnSelect { get; set; }
+
+    async Task HandleSelect(ArticleItem a)
+    {
+        await OnSelect.InvokeAsync(a.Name);
+        await VisibleChanged.InvokeAsync(false);
+    }
+    async Task HandleClear()
+    {
+        await OnSelect.InvokeAsync(null);
+        await VisibleChanged.InvokeAsync(false);
+    }
+}

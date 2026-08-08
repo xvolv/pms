@@ -1,0 +1,122 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="@Title" Width="640px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            @if (ShowForeignCurrency)
+            {
+                <button type="button" class="toolbar-btn" @onclick="HandleForeignCurrency">
+                    <div class="toolbar-icon"><i class="bi bi-currency-exchange"></i></div>
+                    <div class="toolbar-text">Foreign<br/>Currency</div>
+                </button>
+            }
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:12px;">
+            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px;">
+                <div class="amend-row"><label>Customer</label>
+                    <div class="input-with-btn">
+                        <DxComboBox Data="@Customers.Select(c => c.Name).ToList()" @bind-Value="Customer" SizeMode="SizeMode.Small" />
+                        @if (ShowCustomerFind)
+                        {
+                            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleOpenCustomerFind" />
+                        }
+                    </div>
+                </div>
+                <div class="amend-row"><label>Payment Type</label>
+                    <DxComboBox Data="@PaymentMethods" @bind-Value="PaymentType" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Currency</label>
+                    <DxComboBox Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Ex. Rate</label>
+                    <DxSpinEdit @bind-Value="ExRate" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Amount</label>
+                    <DxSpinEdit @bind-Value="Amount" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Total Amount</label>
+                    <DxTextBox Text="@TotalAmount.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                @if (ShowNetOff)
+                {
+                    <div class="amend-row"><label></label>
+                        <DxCheckBox @bind-Checked="NetOff">Net Off</DxCheckBox>
+                    </div>
+                }
+            </div>
+            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px;">
+                <div class="amend-row"><label>Voucher No.</label>
+                    <DxTextBox @bind-Text="VoucherNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="amend-row"><label>Date</label>
+                    <DxDateEdit @bind-Date="Date" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Reg. No</label>
+                    <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="amend-row"><label>Window</label>
+                    <DxComboBox Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="amend-row"><label>Reference</label>
+                    <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />
+                </div>
+            </div>
+        </div>
+        <div class="amend-form" style="margin-top:8px;">
+            <div class="amend-row"><label>Purpose</label>
+                <DxMemo @bind-Text="Purpose" Rows="2" SizeMode="SizeMode.Small" />
+            </div>
+            <div class="amend-row"><label>Remark</label>
+                <DxTextBox @bind-Text="Remark" SizeMode="SizeMode.Small" />
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "Cash Receipt";
+    [Parameter] public bool ShowForeignCurrency { get; set; } = true;
+    [Parameter] public bool ShowNetOff { get; set; } = false;
+    [Parameter] public bool ShowCustomerFind { get; set; } = true;
+
+    [Parameter] public string Customer { get; set; } = "";
+    [Parameter] public string? PaymentType { get; set; }
+    [Parameter] public string? Currency { get; set; }
+    [Parameter] public decimal ExRate { get; set; } = 1;
+    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public decimal TotalAmount { get; set; }
+    [Parameter] public string VoucherNo { get; set; } = "";
+    [Parameter] public DateTime? Date { get; set; }
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string? Window { get; set; }
+    [Parameter] public string Reference { get; set; } = "";
+    [Parameter] public string Purpose { get; set; } = "";
+    [Parameter] public string Remark { get; set; } = "";
+    [Parameter] public bool NetOff { get; set; }
+
+    [Parameter] public List<CustomerFindItem> Customers { get; set; } = new();
+    [Parameter] public List<string> PaymentMethods { get; set; } = new();
+    [Parameter] public List<string> Currencies { get; set; } = new();
+    [Parameter] public List<string> WindowList { get; set; } = new();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnForeignCurrency { get; set; }
+    [Parameter] public EventCallback OnOpenCustomerFind { get; set; }
+
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleForeignCurrency() => await OnForeignCurrency.InvokeAsync();
+    async Task HandleOpenCustomerFind() => await OnOpenCustomerFind.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

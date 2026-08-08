@@ -1,0 +1,170 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="Manual Charge" Width="860px"
+         CloseOnOutsideClick="false" ShowCloseButton="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar">
+            <button type="button" class="toolbar-btn" @onclick="HandleNew">
+                <div class="toolbar-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <div class="toolbar-text">New</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleSave">
+                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
+                <div class="toolbar-text">Save</div>
+            </button>
+            <button type="button" class="toolbar-btn" @onclick="HandleClose">
+                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="toolbar-text">Close</div>
+            </button>
+        </div>
+        <div style="display:flex; gap:12px;">
+            <div style="flex:1.2;">
+                <div class="amend-form" style="border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
+                    <div class="amend-row"><label>Article</label>
+                        <div class="input-with-btn">
+                            <DxComboBox Data="@Articles.Select(a => a.Name).ToList()" Value="@Article"
+                                        ValueChanged="@((string? v) => ArticleChanged.InvokeAsync(v))"
+                                        SizeMode="SizeMode.Small" />
+                            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
+                                      Click="HandleOpenArticleFind" />
+                        </div>
+                    </div>
+                    <div class="amend-row"><label>Qty.</label>
+                        <DxSpinEdit Value="@Qty" ValueChanged="@((int v) => QtyChanged.InvokeAsync(v))"
+                                    MinValue="1" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Amount</label>
+                        <DxSpinEdit Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
+                                    MinValue="0" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Total</label>
+                        <DxTextBox Text="@((Qty * (Amount > 0 ? Amount : 0)).ToString("N2"))" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Remark</label>
+                        <DxTextBox Text="@Remark" TextChanged="@((string v) => RemarkChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+                <div style="margin:8px 0; display:flex; gap:6px;">
+                    <DxButton Text="Add" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="HandleAddLine" />
+                    <DxButton Text="Remove" RenderStyle="ButtonRenderStyle.Danger" SizeMode="SizeMode.Small" Click="HandleRemoveLine" />
+                </div>
+                <table class="multi-table" style="width:100%;">
+                    <thead>
+                        <tr><th>SN</th><th>Description</th><th>Unit Price</th><th>Qty</th><th>Tax</th><th>Total Price</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Lines)
+                        {
+                            <tr class="@(SelectedLine == line ? "row-selected" : "")"
+                                @onclick="() => SelectedLineChanged.InvokeAsync(line)">
+                                <td>@line.SN</td>
+                                <td>@line.Description</td>
+                                <td>@line.UnitPrice.ToString("N2")</td>
+                                <td>@line.Qty</td>
+                                <td>@line.Tax.ToString("N2")</td>
+                                <td>@line.TotalPrice.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div style="width:280px; border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
+                <div class="amend-form">
+                    <div class="amend-row"><label>Date</label>
+                        <DxDateEdit @bind-Date="Date" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>No.</label>
+                        <DxTextBox @bind-Text="No" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Charge Type</label>
+                        <DxComboBox Data="@ChargeTypes" @bind-Value="ChargeType" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Transaction Type</label>
+                        <DxTextBox @bind-Text="TransactionType" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Currency</label>
+                        <DxComboBox Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Registration</label>
+                        <DxTextBox @bind-Text="Registration" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Room</label>
+                        <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Reference</label>
+                        <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Window</label>
+                        <DxComboBox Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="amend-row"><label>Subtotal</label>
+                        <DxTextBox Text="@Subtotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Discount</label>
+                        <DxTextBox Text="@Discount.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Additional Charge</label>
+                        <DxTextBox Text="@AdditionalCharge.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>VAT 15%</label>
+                        <DxTextBox Text="@Vat.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="amend-row"><label>Grand Total</label>
+                        <DxTextBox Text="@GrandTotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public string? Article { get; set; }
+    [Parameter] public EventCallback<string?> ArticleChanged { get; set; }
+    [Parameter] public int Qty { get; set; } = 1;
+    [Parameter] public EventCallback<int> QtyChanged { get; set; }
+    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public EventCallback<decimal> AmountChanged { get; set; }
+    [Parameter] public string Remark { get; set; } = "";
+    [Parameter] public EventCallback<string> RemarkChanged { get; set; }
+
+    [Parameter] public DateTime? Date { get; set; }
+    [Parameter] public string No { get; set; } = "";
+    [Parameter] public string? ChargeType { get; set; }
+    [Parameter] public string TransactionType { get; set; } = "";
+    [Parameter] public string? Currency { get; set; }
+    [Parameter] public string Registration { get; set; } = "";
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public string Reference { get; set; } = "";
+    [Parameter] public string? Window { get; set; }
+    [Parameter] public decimal Subtotal { get; set; }
+    [Parameter] public decimal Discount { get; set; }
+    [Parameter] public decimal AdditionalCharge { get; set; }
+    [Parameter] public decimal Vat { get; set; }
+    [Parameter] public decimal GrandTotal { get; set; }
+
+    [Parameter] public List<ManualChargeLine> Lines { get; set; } = new();
+    [Parameter] public ManualChargeLine? SelectedLine { get; set; }
+    [Parameter] public EventCallback<ManualChargeLine?> SelectedLineChanged { get; set; }
+    [Parameter] public List<ArticleItem> Articles { get; set; } = new();
+    [Parameter] public List<string> ChargeTypes { get; set; } = new();
+    [Parameter] public List<string> Currencies { get; set; } = new();
+    [Parameter] public List<string> WindowList { get; set; } = new();
+
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnAddLine { get; set; }
+    [Parameter] public EventCallback OnRemoveLine { get; set; }
+    [Parameter] public EventCallback OnOpenArticleFind { get; set; }
+
+    async Task HandleNew() => await OnNew.InvokeAsync();
+    async Task HandleSave() => await OnSave.InvokeAsync();
+    async Task HandleAddLine() => await OnAddLine.InvokeAsync();
+    async Task HandleRemoveLine() => await OnRemoveLine.InvokeAsync();
+    async Task HandleOpenArticleFind() => await OnOpenArticleFind.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}

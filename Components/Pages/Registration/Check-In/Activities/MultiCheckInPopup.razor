@@ -1,0 +1,79 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup @bind-Visible="Visible" HeaderText="@Title" Width="860px"
+         CloseOnOutsideClick="false"">
+    <BodyContentTemplate>
+        <div class="ci-toolbar">
+            <button type="button" class="ci-btn" @onclick="HandleCheckIn">
+                <div class="ci-icon text-secondary" style="color:#2e7d32;"><i class="bi bi-check2-square"></i></div>
+                <div class="ci-text">Check In</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon text-secondary"><i class="bi bi-grid-3x3-gap"></i></div>
+                <div class="ci-text">Issue Card</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleRegistrationCard">
+                <div class="ci-icon text-secondary"><i class="bi bi-card-heading"></i></div>
+                <div class="ci-text">Registration card</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => {})">
+                <div class="ci-icon text-secondary"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print Card Pocket</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon text-secondary" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+        <h3 class="ci-heading">You are checking in the guest(s) below</h3>
+        <table class="multi-table">
+            <thead>
+                <tr>
+                    <th style="width:36px;"></th><th style="width:40px;">SN</th><th>Company</th>
+                    <th style="width:180px;">Guest</th><th style="width:70px;">Guest No</th>
+                    <th style="width:120px;">Room</th><th style="width:100px;">Arrival</th>
+                    <th style="width:100px;">Departure</th><th style="width:60px;">Key</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Rows)
+                {
+                    <tr class="@(row.Selected ? "row-selected" : "")">
+                        <td><input type="checkbox" checked="@row.Selected"
+                                   @onchange="@(e => row.Selected = (bool)(e.Value ?? false))" /></td>
+                        <td>@row.SN</td>
+                        <td>@row.Company</td>
+                        <td><DxComboBox Data="@GuestNames" @bind-Value="row.Guest" SizeMode="SizeMode.Small" Width="100%" /></td>
+                        <td>@row.GuestNo</td>
+                        <td>
+                            <div class="input-with-btn">
+                                <DxTextBox @bind-Text="row.Room" SizeMode="SizeMode.Small" />
+                                <DxButton IconCssClass="bi bi-plus-circle" RenderStyle="ButtonRenderStyle.Secondary"
+                                          SizeMode="SizeMode.Small" Click="@(() => OnRoomSearchForRow.InvokeAsync(row))" />
+                            </div>
+                        </td>
+                        <td>@row.Arrival.ToString("M/d/yyyy")</td>
+                        <td>@row.Departure.ToString("M/d/yyyy")</td>
+                        <td>@row.Key</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "Multiple Room Check In";
+    [Parameter] public List<MultiRoomRow> Rows { get; set; } = new();
+    [Parameter] public List<string> GuestNames { get; set; } = new();
+    [Parameter] public EventCallback OnCheckIn { get; set; }
+    [Parameter] public EventCallback OnRegistrationCard { get; set; }
+    [Parameter] public EventCallback<MultiRoomRow> OnRoomSearchForRow { get; set; }
+
+    async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
+    async Task HandleRegistrationCard() => await OnRegistrationCard.InvokeAsync();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+}
