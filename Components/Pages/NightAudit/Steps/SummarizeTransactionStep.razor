@@ -1,37 +1,105 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
 <div class="rt-toolbar">
-    <button type="button" class="rt-toolbar-btn" @onclick="Summarize">
-        <i class="bi bi-journal-check text-secondary"></i>
-        <span>Summarize</span>
+    <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" disabled="@Summarized" @onclick="Save">
+        <i class="bi bi-save text-secondary"></i>
+        <span>Save</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Print">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
     </button>
 </div>
 
 <div class="na-step-card">
     <div class="na-step-header">
         <h2>Summarize Transaction</h2>
-        <p>Summarizes all of today's transactions into a single summary voucher.</p>
+        <p>This is the transaction summarizing page. Summarizes all of today's transactions into a single summary
+            voucher.</p>
     </div>
 
     <div class="rt-grid-area">
-        <div class="na-summary-voucher">
-            <div class="na-summary-row">
-                <span>Total Room Charges</span>
-                <strong>@RoomChargeTotal.ToString("N2")</strong>
+        <div class="na-checkout-columns na-summarize-header">
+            <div class="na-checkout-col">
+                <div class="rt-detail-row">
+                    <label>Date</label>
+                    <DxDateEdit Date="@BusinessDate" ReadOnly="true" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>User</label>
+                    <DxComboBox Data="@Users" @bind-Value="@selectedUser" NullText="-- Select User --"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Device</label>
+                    <DxComboBox Data="@Devices" @bind-Value="@selectedDevice" NullText="-- Select Device --"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Org. Unit</label>
+                    <DxComboBox Data="@OrgUnits" @bind-Value="@selectedOrgUnit" NullText="-- Select Org. Unit --"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-detail-input" />
+                </div>
             </div>
-            <div class="na-summary-row">
-                <span>Total Tax</span>
-                <strong>@TaxTotal.ToString("N2")</strong>
-            </div>
-            <div class="na-summary-row na-summary-total">
-                <span>Summary Voucher Total</span>
-                <strong>@((RoomChargeTotal + TaxTotal).ToString("N2"))</strong>
+            <div class="na-checkout-col">
+                <div class="rt-detail-row">
+                    <label>Date</label>
+                    <DxDateEdit Date="@BusinessDate" ReadOnly="true" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Voucher No.</label>
+                    <DxTextBox Text="@VoucherNo" ReadOnly="true" CssClass="rt-detail-input" />
+                </div>
             </div>
         </div>
 
-        <div class="rt-validation-summary" style="margin-top:14px;">
-            This function is not yet fully implemented in the CNET PMS. The voucher above is recorded for the audit
-            trail only; you may continue to the next step at any time.
+        @if (LineItems.Count == 0)
+        {
+            <div class="rt-placeholder">No transactions have been posted for this business date.</div>
+        }
+        else
+        {
+            <DxGrid Data="@LineItems" CssClass="rt-grid">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(RoomTaxPostLineItem.ArticleCode)" Caption="Code" Width="15%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomTaxPostLineItem.Name)" Caption="Article" Width="35%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomTaxPostLineItem.Quantity)" Caption="Qty" Width="15%"
+                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn FieldName="@nameof(RoomTaxPostLineItem.UnitAmount)" Caption="Unit Amount" Width="17%"
+                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn FieldName="@nameof(RoomTaxPostLineItem.TotalAmount)" Caption="Total Amount" Width="18%"
+                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                </Columns>
+            </DxGrid>
+        }
+
+        <div class="na-folio-summary-wrap">
+            <div class="na-summary-voucher">
+                <div class="na-summary-row">
+                    <span>Sub Total</span>
+                    <strong>@SubTotal.ToString("N2")</strong>
+                </div>
+                <div class="na-summary-row">
+                    <span>Ser. Charge</span>
+                    <strong>@ServiceCharge.ToString("N2")</strong>
+                </div>
+                <div class="na-summary-row">
+                    <span>Discount</span>
+                    <strong>@Discount.ToString("N2")</strong>
+                </div>
+                <div class="na-summary-row">
+                    <span>VAT</span>
+                    <strong>@Vat.ToString("N2")</strong>
+                </div>
+                <div class="na-summary-row na-summary-total">
+                    <span>Grand Total</span>
+                    <strong>@GrandTotal.ToString("N2")</strong>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -45,16 +113,43 @@
     [Parameter] public List<RoomTaxPostRow> Posts { get; set; } = new();
     [Parameter] public bool Summarized { get; set; }
     [Parameter] public EventCallback<bool> SummarizedChanged { get; set; }
+    [Parameter] public DateTime BusinessDate { get; set; } = DateTime.Today;
 
+    private static readonly List<string> Users = new() { "Admin", "F. Desta", "S. Girma" };
+    private static readonly List<string> Devices = new() { "FO-01", "NA-01", "POS-01" };
+    private static readonly List<string> OrgUnits = new() { "Front Office", "Restaurant", "Bar" };
+
+    private string? selectedUser;
+    private string? selectedDevice;
+    private string? selectedOrgUnit;
     private string? statusMessage;
 
-    private decimal RoomChargeTotal => Posts.Sum(p => p.RoomCharge);
-    private decimal TaxTotal => Posts.Sum(p => p.Tax);
+    private string VoucherNo => $"CSSV-00002-{BusinessDate:yy}";
 
-    private async Task Summarize()
+    private List<RoomTaxPostLineItem> LineItems => Posts.SelectMany(p => p.LineItems).ToList();
+
+    private decimal Vat => LineItems.Where(l => l.ArticleCode.StartsWith("TX")).Sum(l => l.TotalAmount);
+    private decimal SubTotal => LineItems.Where(l => !l.ArticleCode.StartsWith("TX")).Sum(l => l.TotalAmount);
+    private decimal ServiceCharge => 0m;
+    private decimal Discount => 0m;
+    private decimal GrandTotal => SubTotal - Discount + ServiceCharge + Vat;
+
+    private async Task Save()
     {
         Summarized = true;
         statusMessage = "Transactions summarized into a single summary voucher.";
         await SummarizedChanged.InvokeAsync(Summarized);
+    }
+
+    private Task Refresh()
+    {
+        statusMessage = null;
+        return Task.CompletedTask;
+    }
+
+    private Task Print()
+    {
+        statusMessage = "Summary voucher sent to printer.";
+        return Task.CompletedTask;
     }
 }

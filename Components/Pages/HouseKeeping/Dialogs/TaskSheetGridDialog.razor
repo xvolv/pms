@@ -1,0 +1,147 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal hk-task-grid-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Task Sheet Grid - @Assignment?.TaskDate.ToString("M/d/yyyy")</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="() => showAddEmployee = true">
+                    <i class="bi bi-plus-circle text-secondary"></i>
+                    <span>Add</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Save">
+                    <i class="bi bi-save text-secondary"></i>
+                    <span>Save</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Print">
+                    <i class="bi bi-printer text-secondary"></i>
+                    <span>Print</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+            </div>
+
+            <div class="rt-modal-body">
+                @if (Assignment == null || Assignment.Details.Count == 0)
+                {
+                    <div class="rt-placeholder">No attendants assigned for this task sheet.</div>
+                }
+                else
+                {
+                    <div class="hk-attendant-tabs">
+                        @foreach (var d in Assignment.Details)
+                        {
+                            <button type="button"
+                                    class="hk-attendant-tab @(selectedDetail?.AttendantCode == d.AttendantCode ? "hk-attendant-tab-active" : "")"
+                                    @onclick="() => selectedDetail = d">
+                                @d.AttendantName <span class="hk-attendant-tab-count">(@d.Rooms.Count)</span>
+                            </button>
+                        }
+                    </div>
+
+                    <div style="font-weight:600; font-size:0.95rem; margin:8px 0;">@selectedDetail?.AttendantName</div>
+
+                    <div class="hk-task-grid-scroll">
+                        <DxGrid Data="@(selectedDetail?.Rooms)" CssClass="rt-grid">
+                            <Columns>
+                                <DxGridDataColumn FieldName="@nameof(RoomTaskRow.Room)" Caption="Room" Width="60%" />
+                                <DxGridDataColumn FieldName="@nameof(RoomTaskRow.Credit)" Caption="Credit" Width="40%"
+                                                  TextAlignment="GridTextAlignment.Right" />
+                            </Columns>
+                        </DxGrid>
+                    </div>
+
+                    <div class="hk-task-grid-footer">
+                        <span>@(selectedDetail?.Rooms.Count ?? 0) room(s)</span>
+                        <span>Total: @(selectedDetail?.Rooms.Sum(x => x.Credit) ?? 0)</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<AddEmployeeDialog Visible="@showAddEmployee" Attendants="@AddableAttendants" OnClose="() => showAddEmployee = false"
+                    OnSelected="OnEmployeeSelected" />
+
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="Task Saved Successfully"
+            OnOk="() => showInfoPopup = false" />
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public TaskAssignmentRow? Assignment { get; set; }
+    [Parameter] public List<AttendantRow> Attendants { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private bool showAddEmployee;
+    private bool showInfoPopup;
+    private TaskDetailRow? selectedDetail;
+    private int? loadedAssignmentId;
+
+    private List<AttendantRow> AddableAttendants =>
+        Attendants.Where(a => Assignment == null || Assignment.Details.All(d => d.AttendantCode != a.Code)).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (Assignment?.Id != loadedAssignmentId)
+        {
+            loadedAssignmentId = Assignment?.Id;
+            selectedDetail = Assignment?.Details.FirstOrDefault();
+        }
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+
+    private async Task Print() => await OnPrint.InvokeAsync();
+
+    private async Task Save()
+    {
+        showInfoPopup = true;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task OnEmployeeSelected(AttendantRow attendant)
+    {
+        if (Assignment == null)
+            return;
+
+        var newDetail = new TaskDetailRow { AttendantCode = attendant.Code, AttendantName = attendant.FullName };
+        Assignment.Details.Add(newDetail);
+        RedivideRooms();
+
+        selectedDetail = newDetail;
+        showAddEmployee = false;
+        await OnChanged.InvokeAsync();
+    }
+
+    private void RedivideRooms()
+    {
+        if (Assignment == null)
+            return;
+
+        var allRooms = Assignment.Details.SelectMany(d => d.Rooms).ToList();
+        var groups = HouseKeepingState.DivideRooms(allRooms, Assignment.Details.Count);
+
+        for (var i = 0; i < Assignment.Details.Count; i++)
+        {
+            var rooms = groups.ElementAtOrDefault(i) ?? new List<RoomTaskRow>();
+            Assignment.Details[i].Rooms = rooms;
+            Assignment.Details[i].TotalRooms = rooms.Count;
+            Assignment.Details[i].TotalCredit = rooms.Sum(r => r.Credit);
+        }
+
+        Assignment.TotalSheets = Assignment.Details.Count;
+        Assignment.TotalCredits = Assignment.Details.Sum(d => d.TotalCredit);
+    }
+}

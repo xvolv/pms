@@ -217,6 +217,11 @@
     font-size: 0.82rem;
 }
 
+/* Summarize Transaction: Date/User/Device/Org Unit + Date/Voucher No. fields */
+.na-summarize-header {
+    margin-bottom: 16px;
+}
+
 /* Summary voucher */
 .na-summary-voucher {
     background-color: #ffffff;

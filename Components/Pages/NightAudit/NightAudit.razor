@@ -96,7 +96,8 @@
                                 break;
                             case 9:
                                 <SummarizeTransactionStep Posts="@state.RoomTaxPosts" Summarized="@state.TransactionsSummarized"
-                                                           SummarizedChanged="@(v => state.TransactionsSummarized = v)" />
+                                                           SummarizedChanged="@(v => state.TransactionsSummarized = v)"
+                                                           BusinessDate="@state.BusinessDate" />
                                 break;
                             case 10:
                                 <FnbAuditStep Outlets="@state.FnbOutlets" Reviewed="@state.FnbAuditDone"
@@ -110,7 +111,7 @@
                                 <ReportArchiveStep State="@state" OnChanged="Refresh" />
                                 break;
                             case 13:
-                                <EndOfNightAuditStep State="@state" />
+                                <EndOfNightAuditStep State="@state"  />
                                 break;
                         }
                     </div>

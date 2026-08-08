@@ -1,6 +1,10 @@
 @using ERP.V7.WebPMS.Components.Pages.NightAudit.Models
 
 <div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" disabled="@State.ArchiveInProgress" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
     <button type="button" class="rt-toolbar-btn" disabled="@(SelectedCount == 0 || State.ArchiveInProgress || State.ReportArchived)"
             @onclick="ArchiveReports">
         <i class="bi bi-archive text-secondary"></i>
@@ -59,6 +63,11 @@
     private async Task ToggleSelected(ReportArchiveRow row, ChangeEventArgs e)
     {
         row.Selected = e.Value is bool b && b;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task Refresh()
+    {
         await OnChanged.InvokeAsync();
     }
 

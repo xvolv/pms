@@ -5,6 +5,10 @@
         <i class="bi bi-journals text-secondary"></i>
         <span>Journalize</span>
     </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Print">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
 </div>
 
 <div class="na-step-card">
@@ -49,5 +53,11 @@
         Journalized = true;
         statusMessage = "Revenue journalized to the general ledger.";
         await JournalizedChanged.InvokeAsync(Journalized);
+    }
+
+    private Task Print()
+    {
+        statusMessage = "Revenue journal sent to printer.";
+        return Task.CompletedTask;
     }
 }

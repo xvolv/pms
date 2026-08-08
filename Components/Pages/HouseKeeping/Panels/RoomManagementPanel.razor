@@ -1,0 +1,162 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
+
+<div class="rt-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="Save">
+        <i class="bi bi-save text-secondary"></i>
+        <span>Save</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+        <i class="bi bi-arrow-clockwise text-secondary"></i>
+        <span>Refresh</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="() => showPrintPreview = true">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="ClearFilters">
+        <i class="bi bi-x-circle text-secondary"></i>
+        <span>Cancel</span>
+    </button>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-chk-row">
+        <DxCheckBox @bind-Checked="clean">Clean(@CountByHkStatus("Clean"))</DxCheckBox>
+        <DxCheckBox @bind-Checked="dirty">Dirty(@CountByHkStatus("Dirty"))</DxCheckBox>
+        <DxCheckBox @bind-Checked="outOfService">Out Of Service(@CountByHkStatus("Out Of Service"))</DxCheckBox>
+        <DxCheckBox @bind-Checked="inspected">Inspected(@CountByHkStatus("Inspected"))</DxCheckBox>
+        <DxCheckBox @bind-Checked="pickup">Pickup(@CountByHkStatus("Pickup"))</DxCheckBox>
+        <DxCheckBox @bind-Checked="outOfOrder">Out Of Order(@CountByHkStatus("Out Of Order"))</DxCheckBox>
+    </div>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-chk-row">
+        <DxCheckBox @bind-Checked="vacant">Vacant</DxCheckBox>
+        <DxCheckBox @bind-Checked="occupied">Occupied</DxCheckBox>
+    </div>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-chk-row">
+        <DxCheckBox @bind-Checked="arrivals">Arrivals</DxCheckBox>
+        <DxCheckBox @bind-Checked="dueOut">Due Out</DxCheckBox>
+        <DxCheckBox @bind-Checked="arrived">Arrived</DxCheckBox>
+        <DxCheckBox @bind-Checked="checkedOut">Checked Out</DxCheckBox>
+        <DxCheckBox @bind-Checked="stayOver">Stay Over</DxCheckBox>
+        <DxCheckBox @bind-Checked="notReserved">Not Reserved</DxCheckBox>
+    </div>
+    <div class="hk-toolbar-sep"></div>
+    <div class="hk-toolbar-filters">
+        <span class="tb-label">Room</span>
+        <DxComboBox Data="@State.RoomList" @bind-Value="room" NullText="All" CssClass="rt-detail-input" style="width:90px;" />
+        <span class="tb-label">Room Type</span>
+        <DxComboBox Data="@State.RoomTypes" @bind-Value="roomType" CssClass="rt-detail-input" style="width:120px;" />
+        <span class="tb-label">Floor</span>
+        <DxComboBox Data="@State.Floors" @bind-Value="floor" CssClass="rt-detail-input" style="width:110px;" />
+        <span class="tb-label">Room No</span>
+        <DxComboBox Data="@State.RoomList" @bind-Value="roomNo" CssClass="rt-detail-input" style="width:90px;" />
+    </div>
+</div>
+
+<div class="na-step-card">
+    <div class="rt-grid-area" @onclick:stopPropagation="true">
+        @if (FilteredRooms.Count == 0)
+        {
+            <div class="rt-placeholder">No records to display.</div>
+        }
+        else
+        {
+            <DxGrid Data="@FilteredRooms" KeyFieldName="Id" CssClass="rt-grid">
+                <Columns>
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.Sn)" Caption="SN" Width="6%"
+                                      TextAlignment="GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.Room)" Caption="Room" Width="12%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.RoomType)" Caption="Room Type" Width="16%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.HouseKeepingStatus)" Caption="HouseKeeping Status" Width="20%">
+                        <CellDisplayTemplate>
+                            @{ var row = (RoomStatusRow)context.DataItem; }
+                            <DxComboBox Data="@State.HkStatuses" @bind-Value="row.HouseKeepingStatus" CssClass="rt-detail-input" />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.FoStatus)" Caption="FO Status" Width="14%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.ResStatus)" Caption="Reservation Status" Width="18%" />
+                    <DxGridDataColumn FieldName="@nameof(RoomStatusRow.Floor)" Caption="Floor" Width="14%" />
+                </Columns>
+            </DxGrid>
+
+            <div class="rt-footer">@FilteredRooms.Count record(s)</div>
+        }
+    </div>
+</div>
+
+<PrintPreviewDialog Visible="@showPrintPreview" Assignment="@State.TaskAssignments.LastOrDefault()"
+                     OnClose="() => showPrintPreview = false" />
+
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="Room status saved successfully."
+            OnOk="() => showInfoPopup = false" />
+
+@code {
+    [Parameter] public HouseKeepingState State { get; set; } = null!;
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private bool clean, dirty, outOfService, inspected, pickup, outOfOrder;
+    private bool vacant, occupied;
+    private bool arrivals, dueOut, arrived, checkedOut, stayOver, notReserved;
+    private string? room, roomType, floor, roomNo;
+    private bool showPrintPreview;
+    private bool showInfoPopup;
+
+    private int CountByHkStatus(string status) => State.RoomStatuses.Count(r => r.HouseKeepingStatus == status);
+
+    private List<RoomStatusRow> FilteredRooms
+    {
+        get
+        {
+            var query = State.RoomStatuses.AsEnumerable();
+
+            var hkStatuses = new[]
+            {
+                (clean, "Clean"), (dirty, "Dirty"), (outOfService, "Out Of Service"),
+                (inspected, "Inspected"), (pickup, "Pickup"), (outOfOrder, "Out Of Order"),
+            }.Where(x => x.Item1).Select(x => x.Item2).ToList();
+            if (hkStatuses.Count > 0)
+                query = query.Where(r => hkStatuses.Contains(r.HouseKeepingStatus));
+
+            var foStatuses = new[] { (vacant, "Vacant"), (occupied, "Occupied") }
+                .Where(x => x.Item1).Select(x => x.Item2).ToList();
+            if (foStatuses.Count > 0)
+                query = query.Where(r => foStatuses.Contains(r.FoStatus));
+
+            var resStatuses = new[]
+            {
+                (arrivals, "Arrival"), (dueOut, "Due Out"), (arrived, "Arrived"),
+                (checkedOut, "Checked Out"), (stayOver, "Stay Over"), (notReserved, "Not Reserved"),
+            }.Where(x => x.Item1).Select(x => x.Item2).ToList();
+            if (resStatuses.Count > 0)
+                query = query.Where(r => resStatuses.Contains(r.ResStatus));
+
+            if (!string.IsNullOrWhiteSpace(room))
+                query = query.Where(r => r.Room == room);
+            if (!string.IsNullOrWhiteSpace(roomType))
+                query = query.Where(r => r.RoomType == roomType);
+            if (!string.IsNullOrWhiteSpace(floor))
+                query = query.Where(r => r.Floor == floor);
+            if (!string.IsNullOrWhiteSpace(roomNo))
+                query = query.Where(r => r.Room == roomNo);
+
+            return query.ToList();
+        }
+    }
+
+    private void Save()
+    {
+        showInfoPopup = true;
+    }
+
+    private async Task Refresh() => await OnChanged.InvokeAsync();
+
+    private async Task ClearFilters()
+    {
+        clean = dirty = outOfService = inspected = pickup = outOfOrder = false;
+        vacant = occupied = false;
+        arrivals = dueOut = arrived = checkedOut = stayOver = notReserved = false;
+        room = roomType = floor = roomNo = null;
+        await OnChanged.InvokeAsync();
+    }
+}

@@ -39,16 +39,16 @@
             <DxGrid @ref="grid" Data="@HeldBills" KeyFieldName="Id" CssClass="rt-grid" RowClick="@OnRowClick"
                     CustomizeElement="@OnCustomizeElement">
                 <Columns>
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.RegNo)" Caption="Reg. No" Width="12%" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Guest)" Caption="Guest" Width="18%" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Room)" Caption="Room" Width="8%" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.BillNo)" Caption="Bill No" Width="12%" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Amount)" Caption="Amount" Width="10%"
-                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.HeldDate)" Caption="Held Date" Width="10%"
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Sn)" Caption="SN" Width="6%"
+                                      TextAlignment="GridTextAlignment.Center" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.VoucherNo)" Caption="Voucher Number" Width="20%" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.DeviceName)" Caption="Device Name" Width="18%" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.WaiterName)" Caption="Waiter Name" Width="16%" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.HeldDate)" Caption="Date" Width="12%"
                                       DisplayFormat="dd-MMM-yyyy" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.HeldBy)" Caption="Held By" Width="10%" />
-                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Reason)" Caption="Reason" Width="20%" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.Amount)" Caption="Amount" Width="14%"
+                                      DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn FieldName="@nameof(HeldBillRow.HeldBy)" Caption="Held By" Width="14%" />
                 </Columns>
             </DxGrid>
 
@@ -92,7 +92,7 @@
         if (selected == null)
             return;
 
-        statusMessage = $"Held bill {selected.BillNo} pushed to the guest folio.";
+        statusMessage = $"Held bill {selected.VoucherNo} pushed to the guest folio.";
         HeldBills.Remove(selected);
         selected = null;
         await OnChanged.InvokeAsync();
@@ -103,7 +103,7 @@
         if (selected == null)
             return;
 
-        statusMessage = $"Held bill {selected.BillNo} voided.";
+        statusMessage = $"Held bill {selected.VoucherNo} voided.";
         HeldBills.Remove(selected);
         selected = null;
         await OnChanged.InvokeAsync();
@@ -114,7 +114,7 @@
         if (selected == null)
             return;
 
-        statusMessage = $"Held bill {selected.BillNo} sent to printer.";
+        statusMessage = $"Held bill {selected.VoucherNo} sent to printer.";
     }
 
     private async Task Refresh()

@@ -128,8 +128,8 @@ public class NightAuditState
         var today = DateTime.Today;
         return new List<HeldBillRow>
         {
-            new() { Id = NextId(), RegNo = "REG-10041", Guest = "Samuel Girma", Room = "108", BillNo = "BILL-5581",
-                Amount = 1800m, HeldDate = today.AddDays(-1), HeldBy = "F. Desta", Reason = "Awaiting company approval" },
+            new() { Id = NextId(), Sn = 1, VoucherNo = "VCH-5581", DeviceName = "POS-01", WaiterName = "F. Desta",
+                HeldDate = today.AddDays(-1), Amount = 1800m, HeldBy = "F. Desta" },
         };
     }
 

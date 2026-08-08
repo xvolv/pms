@@ -123,7 +123,7 @@
 }
 
 .rt-row-selected {
-    background-color: #0390fc;
+    background-color: oklch(73.416% 0.13937 244.453);
     color: #ffffff
 }
 

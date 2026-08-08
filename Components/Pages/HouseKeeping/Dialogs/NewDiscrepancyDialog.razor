@@ -1,0 +1,151 @@
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal hk-new-discrepancy-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Discrepancy</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-toolbar na-modal-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="Save">
+                    <i class="bi bi-save text-secondary"></i>
+                    <span>Save</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Cancel</span>
+                </button>
+                <div class="hk-toolbar-sep"></div>
+                <div class="hk-toolbar-filters">
+                    <span class="tb-label">Date</span>
+                    <DxDateEdit @bind-Date="date" CssClass="rt-detail-input" style="width:140px;" />
+                </div>
+            </div>
+
+            <div class="rt-modal-body">
+                @if (!string.IsNullOrEmpty(validationMessage))
+                {
+                    <div class="rt-validation-summary" style="margin-bottom:10px;">@validationMessage</div>
+                }
+
+                <div class="rt-detail-row">
+                    <label>Rooms *</label>
+                    <DxComboBox Data="@State.RoomList" @bind-Value="room" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Room Type</label>
+                    <DxComboBox Data="@State.RoomTypes" @bind-Value="roomType" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Room Status *</label>
+                    <DxComboBox Data="@State.HkStatuses" @bind-Value="roomStatus" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Fo Status *</label>
+                    <DxComboBox Data="@State.FoStatuses" @bind-Value="foStatus" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>HK Status *</label>
+                    <DxComboBox Data="@State.HkStatuses" @bind-Value="hkStatus" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>Reservation Status</label>
+                    <DxComboBox Data="@State.ResStatuses" @bind-Value="resStatus" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>HK Person</label>
+                    <DxSpinEdit @bind-Value="hkPerson" CssClass="rt-detail-input" />
+                </div>
+                <div class="rt-detail-row">
+                    <label>FO Person</label>
+                    <DxComboBox Data="@State.PersonOptions" @bind-Value="foPerson" CssClass="rt-detail-input" />
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <div style="flex:1;">
+                        <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#5f6368;">Remark</label>
+                        <DxMemo @bind-Text="remark" style="width:100%; height:80px;" />
+                    </div>
+                    <div style="flex:1;">
+                        <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:#5f6368;">Discrepancy</label>
+                        <DxMemo @bind-Text="discrepancyText" style="width:100%; height:80px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public HouseKeepingState State { get; set; } = null!;
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<DiscrepancyRow> OnSaved { get; set; }
+
+    private DateTime date = DateTime.Today;
+    private string? room, roomType, roomStatus, foStatus, hkStatus, resStatus, foPerson, remark, discrepancyText;
+    private int hkPerson;
+    private string validationMessage = "";
+
+    private async Task Close()
+    {
+        Reset();
+        await OnClose.InvokeAsync();
+    }
+
+    private void Reset()
+    {
+        validationMessage = "";
+        room = roomType = roomStatus = foStatus = hkStatus = resStatus = foPerson = remark = discrepancyText = null;
+        hkPerson = 0;
+        date = DateTime.Today;
+    }
+
+    private async Task Save()
+    {
+        validationMessage = "";
+
+        if (string.IsNullOrWhiteSpace(room))
+            validationMessage = "Room is required.";
+        else if (string.IsNullOrWhiteSpace(roomStatus))
+            validationMessage = "Room Status is required.";
+        else if (string.IsNullOrWhiteSpace(foStatus))
+            validationMessage = "FO Status is required.";
+        else if (string.IsNullOrWhiteSpace(hkStatus))
+            validationMessage = "HK Status is required.";
+
+        if (!string.IsNullOrEmpty(validationMessage))
+            return;
+
+        var disc = new DiscrepancyRow
+        {
+            RoomNumber = room!,
+            RoomType = roomType ?? "Standard Room",
+            RoomStatus = roomStatus!,
+            HouseKeepingStatus = hkStatus!,
+            FoStatus = foStatus!,
+            ResStatus = resStatus ?? "Not Reserved",
+            FoPerson = int.TryParse(foPerson, out var fp) ? fp : 0,
+            HkPerson = hkPerson,
+            Discrepancy = discrepancyText ?? "",
+        };
+
+        if (string.IsNullOrWhiteSpace(disc.Discrepancy))
+        {
+            if (disc.HouseKeepingStatus == "Occupied" && disc.FoStatus == "Vacant")
+                disc.Discrepancy = "Sleep";
+            else if (disc.HouseKeepingStatus == "Vacant" && disc.FoStatus == "Occupied")
+                disc.Discrepancy = "Skip";
+            else if (disc.FoPerson != disc.HkPerson)
+                disc.Discrepancy = "Person";
+        }
+
+        Reset();
+        await OnSaved.InvokeAsync(disc);
+    }
+}

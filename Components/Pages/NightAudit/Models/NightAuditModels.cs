@@ -58,14 +58,13 @@ public class NightAuditRegistration
 public class HeldBillRow
 {
     public int Id { get; set; }
-    public string RegNo { get; set; } = "";
-    public string Guest { get; set; } = "";
-    public string Room { get; set; } = "";
-    public string BillNo { get; set; } = "";
-    public decimal Amount { get; set; }
+    public int Sn { get; set; }
+    public string VoucherNo { get; set; } = "";
+    public string DeviceName { get; set; } = "";
+    public string WaiterName { get; set; } = "";
     public DateTime HeldDate { get; set; }
+    public decimal Amount { get; set; }
     public string HeldBy { get; set; } = "";
-    public string Reason { get; set; } = "";
 }
 
 public class RoomDiscrepancyRow

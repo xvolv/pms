@@ -1,0 +1,51 @@
+@page "/housekeeping"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
+@using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Panels
+@inject NavigationManager NavigationManager
+
+<PageTitle>House Keeping</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            House Keeping
+            <i class="bi bi-x fs-4" @onclick="ClosePage"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <DxTabs @bind-ActiveTabIndex="activeTabIndex" CssClass="hk-tabs">
+            <DxTabPage Text="Task Assignment" />
+            <DxTabPage Text="Discrepancy" />
+            <DxTabPage Text="Turndown Management" />
+            <DxTabPage Text="Room Management" />
+        </DxTabs>
+
+        @switch (activeTabIndex)
+        {
+            case 0:
+                <TaskAssignmentPanel State="@state" OnChanged="Refresh" />
+                break;
+            case 1:
+                <DiscrepancyPanel State="@state" OnChanged="Refresh" />
+                break;
+            case 2:
+                <TurndownPanel State="@state" OnChanged="Refresh" />
+                break;
+            case 3:
+                <RoomManagementPanel State="@state" OnChanged="Refresh" />
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    private HouseKeepingState state = HouseKeepingState.CreateSample();
+    private int activeTabIndex;
+
+    private void Refresh() => StateHasChanged();
+
+    private void ClosePage() => NavigationManager.NavigateTo("/");
+}
