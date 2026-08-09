@@ -22,6 +22,17 @@
     margin-left: 4px;
 }
 
+/* Housekeeping toolbars: reflow onto multiple rows instead of overflowing
+   when the container narrows (e.g. side nav expanded, small screens) */
+.hk-toolbar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+}
+
+.hk-toolbar .hk-toolbar-sep {
+    min-height: 24px;
+}
+
 .hk-chk-row {
     display: flex;
     align-items: center;
@@ -34,6 +45,83 @@
     align-self: stretch;
     background: #d3d3d3;
     margin: 4px 6px;
+}
+
+/* Inline checkbox group with its own border, aligned to a grid (no separate row needed) */
+.hk-chk-box,
+.hk-filter-box {
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    background-color: #ffffff;
+    padding: 4px 12px;
+}
+.hk-chk-box, .hk-filter-box {
+    margin:2px;
+    border-radius: 0px;
+}
+.hk-chk-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(150px, max-content));
+    column-gap: 22px;
+    row-gap: 2px;
+    align-items: center;
+}
+
+.hk-chk-box-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #4f5d73;
+    margin-bottom: 2px;
+}
+
+/* Room Management: labeled filter groups */
+.hk-filter-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.hk-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+.hk-filter-group-stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 2px 12px;
+}
+
+.hk-filter-subgroup {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 6px 0;
+}
+
+.hk-filter-subgroup + .hk-filter-subgroup {
+    border-top: 1px solid #eef0f2;
+}
+
+.hk-filter-group-label {
+    flex: 0 0 150px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #4f5d73;
 }
 
 /* Task Assignment: master/detail table (mirrors the Room & Tax Post expandable rows) */
