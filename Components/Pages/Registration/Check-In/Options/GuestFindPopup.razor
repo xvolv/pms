@@ -45,6 +45,19 @@
     [Parameter] public EventCallback<string> OnSelect { get; set; }
     [Parameter] public EventCallback OnAddNew { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (!GuestNames.Any())
+        {
+            GuestNames = new List<string>
+            {
+                "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes",
+                "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael",
+                "muse zemedkun", "abel kaleab", "Dog Snoop", "bayu abenezer", "Selase bonjour Bete"
+            };
+        }
+    }
+
     async Task HandleSelect(string name)
     {
         await OnSelect.InvokeAsync(name);

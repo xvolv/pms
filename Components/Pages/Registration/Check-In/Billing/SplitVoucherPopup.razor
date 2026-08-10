@@ -128,12 +128,74 @@
     [Parameter] public SplitPiece? SelectedPiece { get; set; }
     [Parameter] public EventCallback<SplitPiece?> SelectedPieceChanged { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback<List<SplitPiece>> OnSavePieces { get; set; }
     [Parameter] public EventCallback OnSplit { get; set; }
     [Parameter] public EventCallback OnClear { get; set; }
 
     void ToggleExpand(SplitPiece p) { p.Expanded = !p.Expanded; StateHasChanged(); }
-    async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleSplit() => await OnSplit.InvokeAsync();
-    async Task HandleClear() => await OnClear.InvokeAsync();
+    async Task HandleSave()
+    {
+        if (OnSavePieces.HasDelegate) await OnSavePieces.InvokeAsync(Pieces);
+        if (OnSave.HasDelegate) await OnSave.InvokeAsync();
+        await VisibleChanged.InvokeAsync(false);
+    }
+    async Task HandleSplit()
+    {
+        if (OnSplit.HasDelegate)
+        {
+            await OnSplit.InvokeAsync();
+        }
+        else
+        {
+            Pieces.Clear();
+            decimal a1, a2;
+            if (FactorPercent)
+            {
+                a1 = Math.Round(GrandTotal * (100 - PercentValue) / 100m, 2);
+                a2 = GrandTotal - a1;
+            }
+            else
+            {
+                a2 = AmountValue;
+                a1 = GrandTotal - a2;
+            }
+            var roomUnit = Math.Round(GrandTotal * 0.53m, 2);
+            var bedUnit = Math.Round(GrandTotal - roomUnit, 2);
+            var ratio1 = GrandTotal > 0 ? a1 / GrandTotal : 0.5m;
+            var ratio2 = 1 - ratio1;
+
+            Pieces.Add(new SplitPiece
+            {
+                SN = 1,
+                VoucherNo = VoucherNo,
+                Date = BusinessDate,
+                Amount = a1,
+                Expanded = false,
+                LineItems = new List<SplitLineItem>
+                {
+                    new() { ArticleCode = "B-0001", Name = "BED AND BREA...", UnitAmount = Math.Round(bedUnit * ratio1, 2), Quantity = 1, TotalAmount = Math.Round(bedUnit * ratio1, 2) },
+                    new() { ArticleCode = "SE-00001", Name = "ROOM CHARGE", UnitAmount = Math.Round(roomUnit * ratio1, 2), Quantity = 1, TotalAmount = Math.Round(roomUnit * ratio1, 2) }
+                }
+            });
+            Pieces.Add(new SplitPiece
+            {
+                SN = 2,
+                VoucherNo = $"WDRC-{Random.Shared.Next(1500, 1999)}-17",
+                Date = BusinessDate,
+                Amount = a2,
+                Expanded = false,
+                LineItems = new List<SplitLineItem>
+                {
+                    new() { ArticleCode = "B-0001", Name = "BED AND BREA...", UnitAmount = Math.Round(bedUnit * ratio2, 2), Quantity = 1, TotalAmount = Math.Round(bedUnit * ratio2, 2) },
+                    new() { ArticleCode = "SE-00001", Name = "ROOM CHARGE", UnitAmount = Math.Round(roomUnit * ratio2, 2), Quantity = 1, TotalAmount = Math.Round(roomUnit * ratio2, 2) }
+                }
+            });
+        }
+    }
+    async Task HandleClear()
+    {
+        if (OnClear.HasDelegate) await OnClear.InvokeAsync();
+        else Pieces.Clear();
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

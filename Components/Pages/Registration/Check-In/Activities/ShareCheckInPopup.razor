@@ -227,6 +227,7 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? RegistrationNo { get; set; }
 
     // Basic Info
@@ -282,15 +283,15 @@
     [Parameter] public string Rate { get; set; } = "";
     [Parameter] public EventCallback<string> RateChanged { get; set; }
     // Classification
-    [Parameter] public string? ResType { get; set; }
+    [Parameter] public string? ResType { get; set; } = "Phone Reser";
     [Parameter] public EventCallback<string?> ResTypeChanged { get; set; }
-    [Parameter] public string? Market { get; set; }
+    [Parameter] public string? Market { get; set; } = "Corporate Bl";
     [Parameter] public EventCallback<string?> MarketChanged { get; set; }
-    [Parameter] public string? Source { get; set; }
+    [Parameter] public string? Source { get; set; } = "Company Dir";
     [Parameter] public EventCallback<string?> SourceChanged { get; set; }
-    [Parameter] public string? Origin { get; set; }
+    [Parameter] public string? Origin { get; set; } = "Central Rese";
     [Parameter] public EventCallback<string?> OriginChanged { get; set; }
-    [Parameter] public string? Payment { get; set; }
+    [Parameter] public string? Payment { get; set; } = "Cash";
     [Parameter] public EventCallback<string?> PaymentChanged { get; set; }
     // Rate Adjustment
     [Parameter] public string RateAdjType { get; set; } = "Amount";
@@ -299,34 +300,67 @@
     [Parameter] public EventCallback<string> AdjAmountChanged { get; set; }
     [Parameter] public string AdjPercent { get; set; } = "";
     [Parameter] public EventCallback<string> AdjPercentChanged { get; set; }
-    [Parameter] public string? Reason { get; set; }
+    [Parameter] public string? Reason { get; set; } = "Requested Room type not availa";
     [Parameter] public EventCallback<string?> ReasonChanged { get; set; }
     [Parameter] public string? Special { get; set; }
     [Parameter] public EventCallback<string?> SpecialChanged { get; set; }
     [Parameter] public string Voucher { get; set; } = "";
     [Parameter] public EventCallback<string> VoucherChanged { get; set; }
-    // Lookup lists
-    [Parameter] public List<string> GuestNames { get; set; } = new();
-    [Parameter] public List<string> MemberTypes { get; set; } = new();
-    [Parameter] public List<string> RoomTypes { get; set; } = new();
-    [Parameter] public List<string> RtcList { get; set; } = new();
-    [Parameter] public List<string> Packages { get; set; } = new();
-    [Parameter] public List<string> RateCodes { get; set; } = new();
-    [Parameter] public List<string> ResTypes { get; set; } = new();
-    [Parameter] public List<string> Markets { get; set; } = new();
-    [Parameter] public List<string> Sources { get; set; } = new();
-    [Parameter] public List<string> Origins { get; set; } = new();
-    [Parameter] public List<string> Payments { get; set; } = new();
-    [Parameter] public List<string> Reasons { get; set; } = new();
-    [Parameter] public List<string> Specials { get; set; } = new();
+
+    // Lookup lists with defaults
+    [Parameter] public List<string> GuestNames { get; set; } = new()
+    {
+        "Taddeses ARABA Mola", "teshome mola", "solomon Bereket mulugeta",
+        "Solomon Fasil Girma", "Solman Jack Jemes", "Leo Rojas",
+        "nathan w/mickael", "muse zemedkun", "abel kaleab", "bayu abenezer"
+    };
+    [Parameter] public List<string> MemberTypes { get; set; } = new() { "", "Gold", "Silver", "Bronze" };
+    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
+    [Parameter] public List<string> RtcList { get; set; } = new() { "BAR", "CORP", "DISC", "PROMO", "Executive" };
+    [Parameter] public List<string> Packages { get; set; } = new() { "None", "Breakfast", "Half Board", "Full Board" };
+    [Parameter] public List<string> RateCodes { get; set; } = new() { "RACK", "CORP10", "GOV15", "PROMO20", "Standard Rate" };
+    [Parameter] public List<string> ResTypes { get; set; } = new() { "Phone Reser", "Walk-in", "Online", "Travel Agent", "Corporate" };
+    [Parameter] public List<string> Markets { get; set; } = new() { "Corporate Bl", "Leisure", "Government", "Airline", "Group" };
+    [Parameter] public List<string> Sources { get; set; } = new() { "Company Dir", "Website", "OTA", "Travel Agent", "Walk-in" };
+    [Parameter] public List<string> Origins { get; set; } = new() { "Central Rese", "Addis", "Direct", "GDS" };
+    [Parameter] public List<string> Payments { get; set; } = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
+    [Parameter] public List<string> Reasons { get; set; } = new() { "Requested Room type not availa", "Long Stay Discount", "Corporate Rate", "Promotional Offer" };
+    [Parameter] public List<string> Specials { get; set; } = new() { "None", "Late Checkout", "Early Check-in", "Airport Transfer" };
+
     // Actions
     [Parameter] public EventCallback OnCheckIn { get; set; }
     [Parameter] public EventCallback OnNew { get; set; }
     [Parameter] public EventCallback OnRoomSearch { get; set; }
     [Parameter] public EventCallback OnTravelDetail { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            RegistrationNo ??= TargetRegistration.Registration;
+            Company = string.IsNullOrEmpty(Company) ? (TargetRegistration.Company ?? "") : Company;
+            Arrival ??= TargetRegistration.Arrival;
+            Departure ??= TargetRegistration.Departure;
+            Nights = TargetRegistration.Nights > 0 ? TargetRegistration.Nights : 1;
+            RoomType ??= TargetRegistration.RoomType;
+            Rtc ??= TargetRegistration.RoomType;
+            Room = string.IsNullOrEmpty(Room) ? (TargetRegistration.Room?.Replace("#", "") ?? "") : Room;
+            Payment ??= TargetRegistration.Payment ?? "Cash";
+        }
+    }
+
     async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
-    async Task HandleNew() => await OnNew.InvokeAsync();
+    async Task HandleNew()
+    {
+        GuestName = "";
+        Nationality = "";
+        Passport = "";
+        Title = "";
+        Address = "";
+        RateCode = null;
+        Rate = "";
+        await OnNew.InvokeAsync();
+    }
     async Task HandleRoomSearch() => await OnRoomSearch.InvokeAsync();
     async Task HandleTravelDetail() => await OnTravelDetail.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);

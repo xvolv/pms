@@ -81,6 +81,8 @@
     [Parameter] public TimeSpan Time { get; set; }
     [Parameter] public string Note { get; set; } = "";
 
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+
     [Parameter] public List<WakeupScheduleRow> Schedules { get; set; } = new();
     [Parameter] public WakeupScheduleRow? SelectedSchedule { get; set; }
     [Parameter] public EventCallback<WakeupScheduleRow?> SelectedScheduleChanged { get; set; }
@@ -88,7 +90,49 @@
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRemove { get; set; }
 
-    async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleRemove() => await OnRemove.InvokeAsync();
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            Room = string.IsNullOrEmpty(Room) ? (TargetRegistration.Room?.Replace("#", "") ?? "") : Room;
+            RegNo = string.IsNullOrEmpty(RegNo) ? TargetRegistration.Registration : RegNo;
+            Guest = string.IsNullOrEmpty(Guest) ? TargetRegistration.Guest : Guest;
+            DateFrom ??= TargetRegistration.Arrival;
+            DateTo ??= TargetRegistration.Arrival;
+            Note = string.IsNullOrEmpty(Note) ? "Wake-up call" : Note;
+        }
+    }
+
+    async Task HandleSave()
+    {
+        if (OnSave.HasDelegate)
+        {
+            await OnSave.InvokeAsync();
+        }
+        else if (DateFrom.HasValue)
+        {
+            Schedules.Add(new WakeupScheduleRow
+            {
+                SN = Schedules.Count + 1,
+                StartDate = DateFrom.Value,
+                EndDate = DateTo ?? DateFrom.Value,
+                Note = Note
+            });
+        }
+    }
+
+    async Task HandleRemove()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync();
+        }
+        else if (SelectedSchedule != null)
+        {
+            Schedules.Remove(SelectedSchedule);
+            SelectedSchedule = null;
+        }
+    }
+
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

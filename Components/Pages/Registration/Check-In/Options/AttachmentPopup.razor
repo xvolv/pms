@@ -26,13 +26,32 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Embedded New Attachment Popup -->
+<NewAttachmentPopup
+    @bind-Visible="showNewAttachment"
+    OnSave="@(() => showNewAttachment = false)" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? RegistrationNo { get; set; }
     [Parameter] public EventCallback OnNew { get; set; }
 
-    async Task HandleNew() => await OnNew.InvokeAsync();
+    bool showNewAttachment = false;
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null && string.IsNullOrEmpty(RegistrationNo))
+        {
+            RegistrationNo = TargetRegistration.Registration;
+        }
+    }
+
+    async Task HandleNew()
+    {
+        if (OnNew.HasDelegate) await OnNew.InvokeAsync();
+        else showNewAttachment = true;
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

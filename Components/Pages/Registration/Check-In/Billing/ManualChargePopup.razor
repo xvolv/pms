@@ -119,9 +119,15 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<ArticleFindPopup
+    @bind-Visible="showArticleFind"
+    Articles="@Articles"
+    OnSelect="HandleSelectArticle" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
 
     [Parameter] public string? Article { get; set; }
     [Parameter] public EventCallback<string?> ArticleChanged { get; set; }
@@ -132,15 +138,15 @@
     [Parameter] public string Remark { get; set; } = "";
     [Parameter] public EventCallback<string> RemarkChanged { get; set; }
 
-    [Parameter] public DateTime? Date { get; set; }
+    [Parameter] public DateTime? Date { get; set; } = DateTime.Today;
     [Parameter] public string No { get; set; } = "";
-    [Parameter] public string? ChargeType { get; set; }
-    [Parameter] public string TransactionType { get; set; } = "";
-    [Parameter] public string? Currency { get; set; }
+    [Parameter] public string? ChargeType { get; set; } = "Room Charge";
+    [Parameter] public string TransactionType { get; set; } = "Credit Sales";
+    [Parameter] public string? Currency { get; set; } = "Birr";
     [Parameter] public string Registration { get; set; } = "";
     [Parameter] public string Room { get; set; } = "";
     [Parameter] public string Reference { get; set; } = "";
-    [Parameter] public string? Window { get; set; }
+    [Parameter] public string? Window { get; set; } = "Window 1";
     [Parameter] public decimal Subtotal { get; set; }
     [Parameter] public decimal Discount { get; set; }
     [Parameter] public decimal AdditionalCharge { get; set; }
@@ -150,10 +156,18 @@
     [Parameter] public List<ManualChargeLine> Lines { get; set; } = new();
     [Parameter] public ManualChargeLine? SelectedLine { get; set; }
     [Parameter] public EventCallback<ManualChargeLine?> SelectedLineChanged { get; set; }
-    [Parameter] public List<ArticleItem> Articles { get; set; } = new();
-    [Parameter] public List<string> ChargeTypes { get; set; } = new();
-    [Parameter] public List<string> Currencies { get; set; } = new();
-    [Parameter] public List<string> WindowList { get; set; } = new();
+
+    [Parameter] public List<ArticleItem> Articles { get; set; } = new()
+    {
+        new() { Code = "SE-00001", Name = "ROOM CHARGE" },
+        new() { Code = "SE-00002", Name = "BREAKFAST" },
+        new() { Code = "SE-00003", Name = "LAUNDRY" },
+        new() { Code = "SE-00004", Name = "MINIBAR" },
+        new() { Code = "R-0001", Name = "BED AND BREAKFAST" }
+    };
+    [Parameter] public List<string> ChargeTypes { get; set; } = new() { "Room Charge", "Package Charge", "Extra Charge" };
+    [Parameter] public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
+    [Parameter] public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
 
     [Parameter] public EventCallback OnNew { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
@@ -161,10 +175,99 @@
     [Parameter] public EventCallback OnRemoveLine { get; set; }
     [Parameter] public EventCallback OnOpenArticleFind { get; set; }
 
-    async Task HandleNew() => await OnNew.InvokeAsync();
+    bool showArticleFind = false;
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(Registration)) Registration = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Room)) Room = (TargetRegistration.Room ?? "").Replace("#", "");
+        }
+        if (string.IsNullOrEmpty(No))
+        {
+            No = $"WDRC-{Random.Shared.Next(1000, 9999)}-17";
+        }
+    }
+
+    void RecalculateTotals()
+    {
+        Subtotal = Lines.Sum(l => l.TotalPrice);
+        Discount = 0;
+        AdditionalCharge = Math.Round(Subtotal * 0.10m, 2);
+        Vat = Math.Round((Subtotal + AdditionalCharge - Discount) * 0.15m, 2);
+        GrandTotal = Subtotal + AdditionalCharge - Discount + Vat;
+    }
+
+    async Task HandleNew()
+    {
+        Article = null;
+        Qty = 1;
+        Amount = 0;
+        Remark = "";
+        Lines.Clear();
+        SelectedLine = null;
+        RecalculateTotals();
+        await OnNew.InvokeAsync();
+    }
+
+    async Task HandleAddLine()
+    {
+        if (OnAddLine.HasDelegate)
+        {
+            await OnAddLine.InvokeAsync();
+        }
+        else if (!string.IsNullOrWhiteSpace(Article))
+        {
+            var art = Articles.FirstOrDefault(a => a.Name == Article || a.Code == Article);
+            var desc = art?.Name ?? Article;
+            var unit = Amount > 0 ? Amount : 948.62m;
+            var tax = Math.Round(unit * Qty * 0.15m, 2);
+            Lines.Add(new ManualChargeLine
+            {
+                SN = Lines.Count + 1,
+                Description = desc,
+                UnitPrice = unit,
+                Qty = Qty,
+                Tax = tax,
+                TotalPrice = unit * Qty
+            });
+            RecalculateTotals();
+        }
+    }
+
+    async Task HandleRemoveLine()
+    {
+        if (OnRemoveLine.HasDelegate)
+        {
+            await OnRemoveLine.InvokeAsync();
+        }
+        else if (SelectedLine != null)
+        {
+            Lines.Remove(SelectedLine);
+            SelectedLine = null;
+            int i = 1;
+            foreach (var l in Lines) l.SN = i++;
+            RecalculateTotals();
+        }
+    }
+
+    async Task HandleOpenArticleFind()
+    {
+        if (OnOpenArticleFind.HasDelegate) await OnOpenArticleFind.InvokeAsync();
+        else showArticleFind = true;
+    }
+
+    void HandleSelectArticle(string? artName)
+    {
+        if (artName != null)
+        {
+            Article = artName;
+            ArticleChanged.InvokeAsync(Article);
+        }
+        showArticleFind = false;
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleAddLine() => await OnAddLine.InvokeAsync();
-    async Task HandleRemoveLine() => await OnRemoveLine.InvokeAsync();
-    async Task HandleOpenArticleFind() => await OnOpenArticleFind.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

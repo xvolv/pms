@@ -68,10 +68,26 @@
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
     [Parameter] public string Title { get; set; } = "Multiple Room Check In";
     [Parameter] public List<MultiRoomRow> Rows { get; set; } = new();
-    [Parameter] public List<string> GuestNames { get; set; } = new();
+    [Parameter] public List<string> GuestNames { get; set; } = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas" };
     [Parameter] public EventCallback OnCheckIn { get; set; }
     [Parameter] public EventCallback OnRegistrationCard { get; set; }
     [Parameter] public EventCallback<MultiRoomRow> OnRoomSearchForRow { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (!GuestNames.Any())
+        {
+            GuestNames = new List<string> { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas" };
+        }
+        if (Visible && !Rows.Any())
+        {
+            Rows = new List<MultiRoomRow>
+            {
+                new() { SN = 1, Company = "MISIKIR LTD", Guest = "Leo Rojas", GuestNo = 1, Room = "102", Arrival = DateTime.Today, Departure = DateTime.Today.AddDays(2), Key = "0", Selected = true },
+                new() { SN = 2, Company = "MISIKIR LTD", Guest = "Solomon Tuffa Bereket", GuestNo = 1, Room = "202", Arrival = DateTime.Today, Departure = DateTime.Today.AddDays(2), Key = "0", Selected = true }
+            };
+        }
+    }
 
     async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
     async Task HandleRegistrationCard() => await OnRegistrationCard.InvokeAsync();
