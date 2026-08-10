@@ -1,0 +1,60 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Managerial Flash</h2>
+            <p>Overall hotel rooms and room sales status, compared with the previous month and year.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Metric)" Caption="Metric" Width="28%" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Today)" Caption="Today" Width="18%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.MonthToDate)" Caption="Month to Date" Width="18%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorMonth)" Caption="Prior Month" Width="18%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorYear)" Caption="Prior Year" Width="18%"
+                                   TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">Managerial Flash for @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Managerial Flash" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns = { "Metric", "Today", "Month to Date", "Prior Month", "Prior Year" };
+
+    private DateTime date = DateTime.Today;
+    private List<ManagerialFlashRow> rows = ReportsState.CreateManagerialFlashSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+        { r.Metric, r.Today, r.MonthToDate, r.PriorMonth, r.PriorYear }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateManagerialFlashSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

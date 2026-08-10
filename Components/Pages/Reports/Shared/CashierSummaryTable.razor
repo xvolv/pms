@@ -1,0 +1,86 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+
+<table class="hk-print-table rp-cs-table">
+    <thead>
+        <tr>
+            <th>Voucher Type</th>
+            <th class="rp-cs-right">Currency Amount</th>
+            <th class="rp-cs-right">Rate</th>
+            <th class="rp-cs-right">etb Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Users)
+        {
+            <tr><td colspan="4">User: @user.UserName</td></tr>
+            @foreach (var pm in user.PaymentMethods)
+            {
+                <tr><td colspan="4" class="rp-cs-indent-1">Payment Method: @pm.MethodName</td></tr>
+                @foreach (var cur in pm.Currencies)
+                {
+                    <tr><td colspan="4" class="rp-cs-indent-2">Currency: @cur.CurrencyName</td></tr>
+                    @foreach (var line in cur.Lines)
+                    {
+                        <tr>
+                            <td class="rp-cs-indent-3">@line.VoucherType</td>
+                            <td class="rp-cs-right">@FormatAmount(line.CurrencyAmount)</td>
+                            <td class="rp-cs-right">@line.Rate.ToString("N2")</td>
+                            <td class="rp-cs-right">@FormatAmount(line.EtbTotal)</td>
+                        </tr>
+                    }
+                    <tr class="rp-cs-subtotal-currency">
+                        <td></td><td></td><td></td>
+                        <td class="rp-cs-right">@cur.Total.ToString("N2")</td>
+                    </tr>
+                }
+                <tr class="rp-cs-subtotal-method">
+                    <td></td><td></td><td></td>
+                    <td class="rp-cs-right">@pm.Total.ToString("N2")</td>
+                </tr>
+            }
+            <tr class="rp-cs-subtotal-user">
+                <td></td><td></td><td></td>
+                <td class="rp-cs-right"><b>@user.Total.ToString("N2")</b></td>
+            </tr>
+        }
+
+        @foreach (var pm in GrandTotalMethods)
+        {
+            <tr><td colspan="4" class="rp-cs-indent-1">Payment Method: @pm.MethodName</td></tr>
+            @foreach (var cur in pm.Currencies)
+            {
+                <tr><td colspan="4" class="rp-cs-indent-2">Currency: @cur.CurrencyName</td></tr>
+                @foreach (var line in cur.Lines)
+                {
+                    <tr>
+                        <td class="rp-cs-indent-3">@line.VoucherType</td>
+                        <td class="rp-cs-right">@FormatAmount(line.CurrencyAmount)</td>
+                        <td class="rp-cs-right">@line.Rate.ToString("N2")</td>
+                        <td class="rp-cs-right">@FormatAmount(line.EtbTotal)</td>
+                    </tr>
+                }
+                <tr class="rp-cs-subtotal-currency">
+                    <td></td><td></td><td></td>
+                    <td class="rp-cs-right">@cur.Total.ToString("N2")</td>
+                </tr>
+            }
+            <tr class="rp-cs-subtotal-method">
+                <td></td><td></td><td></td>
+                <td class="rp-cs-right">@pm.Total.ToString("N2")</td>
+            </tr>
+        }
+        <tr class="rp-cs-subtotal-grand">
+            <td></td><td></td><td></td>
+            <td class="rp-cs-right"><b>@GrandTotalMethods.Sum(p => p.Total).ToString("N2")</b></td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public List<CashierUserGroup> Users { get; set; } = new();
+
+    private List<CashierPaymentMethodGroup> GrandTotalMethods => Users.SelectMany(u => u.PaymentMethods).ToList();
+
+    private static string FormatAmount(decimal value) =>
+        value < 0 ? $"({Math.Abs(value):N2})" : value.ToString("N2");
+}

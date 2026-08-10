@@ -1,0 +1,68 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Sn)" Caption="#" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Room)" Caption="Room" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Status)" Caption="Status" Width="22%" />
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Attendant)" Caption="Attendant" Width="16%" />
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Date)" Caption="Date" Width="12%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(HousekeepingReportRow.Remark)" Caption="Remark" Width="34%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count row(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns = { "#", "Room", "Status", "Attendant", "Date", "Remark" };
+
+    private DateTime date = DateTime.Today;
+    private List<HousekeepingReportRow> rows = new();
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+        { r.Sn.ToString(), r.Room, r.Status, r.Attendant, r.Date.ToString("dd-MMM-yyyy"), r.Remark }).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            rows = ReportsState.CreateHousekeepingSample(ReportName, date);
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateHousekeepingSample(ReportName, date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

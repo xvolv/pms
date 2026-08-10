@@ -1,0 +1,111 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.PeriodRange" InitialDate="@DateTime.Today" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Sn)" Caption="#" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Date)" Caption="Date" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.VoucherNo)" Caption="Voucher No" Width="12%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.RegNo)" Caption="Reg No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Guest)" Caption="Guest" Width="15%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Room)" Caption="Room" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Description)" Caption="Description" Width="18%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Cashier)" Caption="Cashier" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(TransactionReportRow.Amount)" Caption="Amount" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count transaction(s) - @periodLabel - total @rows.Sum(r => r.Amount).ToString("N2")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+        { "#", "Date", "Voucher No", "Reg No", "Guest", "Room", "Description", "Cashier", "Amount" };
+
+    private List<TransactionReportRow> rows = new();
+    private string periodLabel = "no criteria generated yet";
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.Sn.ToString(), r.Date.ToString("dd-MMM-yyyy"), r.VoucherNo, r.RegNo, r.Guest, r.Room, r.Description,
+        r.Cashier, r.Amount.ToString("N2"),
+    }).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            var today = DateTime.Today;
+            rows = ReportsState.CreateTransactionSample(ReportName, today, today);
+            periodLabel = $"Daily - {today:dd-MMM-yyyy}";
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        DateTime start;
+        DateTime end;
+
+        switch (criteria.PeriodType)
+        {
+            case "Date Range":
+                start = criteria.RangeStart;
+                end = criteria.RangeEnd;
+                break;
+            case "Weekly":
+                start = criteria.RangeStart;
+                end = start.AddDays(6);
+                break;
+            case "Monthly":
+                start = criteria.RangeStart;
+                end = start.AddMonths(1).AddDays(-1);
+                break;
+            case "Annually":
+                start = criteria.RangeStart;
+                end = start.AddYears(1).AddDays(-1);
+                break;
+            case "Show all":
+                end = DateTime.Today;
+                start = end.AddDays(-30);
+                break;
+            default:
+                start = criteria.RangeStart;
+                end = criteria.RangeStart;
+                break;
+        }
+
+        rows = ReportsState.CreateTransactionSample(ReportName, start, end);
+        periodLabel = criteria.PeriodType == "Date Range" || criteria.PeriodType == "Show all"
+            ? $"{criteria.PeriodType} - {start:dd-MMM-yyyy} to {end:dd-MMM-yyyy}"
+            : $"{criteria.PeriodType} - {start:dd-MMM-yyyy}";
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

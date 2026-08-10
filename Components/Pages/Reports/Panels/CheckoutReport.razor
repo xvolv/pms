@@ -1,0 +1,70 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Checkout Report</h2>
+            <p>List of guests checked out on the given date, with registration and payment details.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Sn)" Caption="#" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.RegNo)" Caption="Reg No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Guest)" Caption="Guest" Width="15%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Company)" Caption="Company" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Room)" Caption="Room" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.RoomType)" Caption="Room Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.DepartureDate)" Caption="Departure" Width="9%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.PaymentType)" Caption="Payment" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.TotalBill)" Caption="Total Bill" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Paid)" Caption="Paid" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CheckoutReportRow.Balance)" Caption="Balance" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count checkout(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Checkout Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+        { "#", "Reg No", "Guest", "Company", "Room", "Room Type", "Departure", "Payment", "Total Bill", "Paid", "Balance" };
+
+    private DateTime date = DateTime.Today;
+    private List<CheckoutReportRow> rows = ReportsState.CreateCheckoutReportSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.Sn.ToString(), r.RegNo, r.Guest, r.Company, r.Room, r.RoomType, r.DepartureDate.ToString("dd-MMM-yyyy"),
+        r.PaymentType, r.TotalBill.ToString("N2"), r.Paid.ToString("N2"), r.Balance.ToString("N2"),
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateCheckoutReportSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

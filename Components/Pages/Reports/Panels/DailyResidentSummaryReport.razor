@@ -1,0 +1,129 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Daily Resident Summary</h2>
+            <p>Guest total balance on the given date after deducting payments.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area rp-wide-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid rp-wide-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.RegNo)" Caption="Reg_No" Width="100px" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Guest)" Caption="Guest" Width="130px" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Company)" Caption="Company" Width="120px" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Room)" Caption="Room" Width="70px" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.RateCode)" Caption="Rate Code" Width="90px" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.RoomRevenue)" Caption="Room Revenue" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Package)" Caption="Package" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.ServiceCharge)" Caption="Service Charge" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Vat)" Caption="Vat" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.RoomTotal)" Caption="Room Total" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.PosCharge)" Caption="POS Charge" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.TodayTotal)" Caption="Today Total" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Bbf)" Caption="BBF" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.ToDateTotal)" Caption="To date Total" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Payment)" Caption="Payment" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Discount)" Caption="Discount" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Paidout)" Caption="Paidout" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Bcf)" Caption="BCF" Width="90px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailyResidentSummaryRow.Outstanding)" Caption="Outstanding" Width="100px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.RoomRevenue)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Package)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.ServiceCharge)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Vat)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.RoomTotal)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.PosCharge)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.TodayTotal)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Bbf)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.ToDateTotal)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Payment)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Discount)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Paidout)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Bcf)" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(DailyResidentSummaryRow.Outstanding)" />
+            </TotalSummary>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count resident(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Daily Resident Summary" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Guest", "Company", "Room", "Rate Code", "Room Revenue", "Package", "Service Charge", "Vat",
+        "Room Total", "POS Charge", "Today Total", "BBF", "To date Total", "Payment", "Discount", "Paidout", "BCF", "Outstanding",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<DailyResidentSummaryRow> rows = ReportsState.CreateDailyResidentSummarySample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows
+    {
+        get
+        {
+            var list = rows.Select(r => new[]
+            {
+                r.RegNo, r.Guest, r.Company, r.Room, r.RateCode, r.RoomRevenue.ToString("N2"), r.Package.ToString("N2"),
+                r.ServiceCharge.ToString("N2"), r.Vat.ToString("N2"), r.RoomTotal.ToString("N2"), r.PosCharge.ToString("N2"),
+                r.TodayTotal.ToString("N2"), r.Bbf.ToString("N2"), r.ToDateTotal.ToString("N2"), r.Payment.ToString("N2"),
+                r.Discount.ToString("N2"), r.Paidout.ToString("N2"), r.Bcf.ToString("N2"), r.Outstanding.ToString("N2"),
+            }).ToList();
+
+            list.Add(new[]
+            {
+                "", "", "", "", "Total",
+                rows.Sum(r => r.RoomRevenue).ToString("N2"), rows.Sum(r => r.Package).ToString("N2"),
+                rows.Sum(r => r.ServiceCharge).ToString("N2"), rows.Sum(r => r.Vat).ToString("N2"),
+                rows.Sum(r => r.RoomTotal).ToString("N2"), rows.Sum(r => r.PosCharge).ToString("N2"),
+                rows.Sum(r => r.TodayTotal).ToString("N2"), rows.Sum(r => r.Bbf).ToString("N2"),
+                rows.Sum(r => r.ToDateTotal).ToString("N2"), rows.Sum(r => r.Payment).ToString("N2"),
+                rows.Sum(r => r.Discount).ToString("N2"), rows.Sum(r => r.Paidout).ToString("N2"),
+                rows.Sum(r => r.Bcf).ToString("N2"), rows.Sum(r => r.Outstanding).ToString("N2"),
+            });
+
+            return list;
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateDailyResidentSummarySample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

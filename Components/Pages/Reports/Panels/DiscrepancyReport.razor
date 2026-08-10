@@ -1,0 +1,57 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Discrepancy Report</h2>
+            <p>Discrepancies between front office and housekeeping room status recordings on the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Room)" Caption="Room" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.SystemStatus)" Caption="System Status" Width="20%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.HousekeepingStatus)" Caption="Housekeeping Status" Width="22%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.ReportedDate)" Caption="Reported" Width="12%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Remark)" Caption="Remark" Width="36%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count discrepancy(ies) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Discrepancy Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns = { "Room", "System Status", "Housekeeping Status", "Reported", "Remark" };
+
+    private DateTime date = DateTime.Today;
+    private List<DiscrepancyReportRow> rows = ReportsState.CreateDiscrepancyReportSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+        { r.Room, r.SystemStatus, r.HousekeepingStatus, r.ReportedDate.ToString("dd-MMM-yyyy"), r.Remark }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateDiscrepancyReportSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

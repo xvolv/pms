@@ -1,0 +1,156 @@
+/* Reports module */
+.rp-catalog-grid-area {
+    margin-top: 4px;
+}
+
+.rp-view-btn {
+    padding: 4px 10px;
+}
+
+.rp-coming-soon {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8a8f98;
+    background-color: #f1f3f4;
+    border-radius: 4px;
+    padding: 4px 10px;
+}
+
+.rp-report-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.rp-report-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 0;
+}
+
+.rp-back-btn {
+    flex: 0 0 auto;
+}
+
+.rp-criteria-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 10px 12px;
+}
+
+.rp-criteria-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rp-criteria-field label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #4f5d73;
+}
+
+.rp-generate-btn {
+    margin-left: auto;
+}
+
+.rp-wide-grid-area {
+    overflow-x: auto;
+}
+
+.rp-wide-grid {
+    min-width: 1700px;
+}
+
+/* Report preview dialog: report tables can have far more columns than the
+   fixed-width HK print modal was designed for, so give it its own wide,
+   horizontally-scrollable container instead of clipping past the border. */
+.rp-print-modal {
+    width: min(96vw, 1600px);
+    max-width: 96vw;
+}
+
+.rp-print-page {
+    background: #ffffff;
+    border: 2px solid #00a8e8;
+    padding: 20px;
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    font-size: 11px;
+}
+
+.rp-print-page .hk-print-table th,
+.rp-print-page .hk-print-table td {
+    white-space: nowrap;
+}
+
+/* Trial Balance: grouped description/balance table with per-group subtotals */
+.rp-tb-table {
+    width: 100%;
+}
+
+.rp-tb-balance {
+    text-align: right;
+}
+
+.rp-tb-group-row td {
+    font-weight: 700;
+    text-align: left;
+}
+
+.rp-tb-line {
+    padding-left: 28px !important;
+}
+
+.rp-tb-subtotal-row td {
+    border-top: 1px solid #333 !important;
+}
+
+.rp-tb-grandtotal-row td {
+    border-top: 2px solid #333 !important;
+}
+
+/* Cashier Summary: nested User > Payment Method > Currency > Voucher table */
+.rp-cs-table {
+    width: 100%;
+}
+
+.rp-cs-right {
+    text-align: right;
+}
+
+.rp-cs-indent-1 {
+    padding-left: 20px !important;
+    font-weight: 700;
+}
+
+.rp-cs-indent-2 {
+    padding-left: 40px !important;
+    font-weight: 700;
+}
+
+.rp-cs-indent-3 {
+    padding-left: 60px !important;
+}
+
+.rp-cs-subtotal-currency td,
+.rp-cs-subtotal-method td {
+    border-top: 1px solid #333 !important;
+}
+
+.rp-cs-subtotal-user td,
+.rp-cs-subtotal-grand td {
+    border-top: 2px solid #333 !important;
+    border-bottom: 2px solid #333 !important;
+}

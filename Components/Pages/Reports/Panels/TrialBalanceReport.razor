@@ -1,0 +1,45 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Trial Balance</h2>
+            <p>All transactions posted, broken down by group, with a subtotal per group and a grand total.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <TrialBalanceTable Groups="@groups" />
+        <div class="rt-footer">Trial Balance at the day of @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Trial Balance" OnClose="() => showPreview = false">
+    <CustomBody>
+        <TrialBalanceTable Groups="@groups" />
+    </CustomBody>
+</ReportPreviewDialog>
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private DateTime date = DateTime.Today;
+    private List<TrialBalanceGroup> groups = ReportsState.CreateTrialBalanceSample(DateTime.Today);
+    private bool showPreview;
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        groups = ReportsState.CreateTrialBalanceSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}
