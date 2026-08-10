@@ -1,7 +1,7 @@
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
 
-<div class="rt-toolbar">
+<div class="rt-toolbar hk-toolbar">
     <button type="button" class="rt-toolbar-btn" @onclick="Save">
         <i class="bi bi-save text-secondary"></i>
         <span>Save</span>
@@ -19,38 +19,51 @@
         <span>Cancel</span>
     </button>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-chk-row">
-        <DxCheckBox @bind-Checked="clean">Clean(@CountByHkStatus("Clean"))</DxCheckBox>
-        <DxCheckBox @bind-Checked="dirty">Dirty(@CountByHkStatus("Dirty"))</DxCheckBox>
-        <DxCheckBox @bind-Checked="outOfService">Out Of Service(@CountByHkStatus("Out Of Service"))</DxCheckBox>
-        <DxCheckBox @bind-Checked="inspected">Inspected(@CountByHkStatus("Inspected"))</DxCheckBox>
-        <DxCheckBox @bind-Checked="pickup">Pickup(@CountByHkStatus("Pickup"))</DxCheckBox>
-        <DxCheckBox @bind-Checked="outOfOrder">Out Of Order(@CountByHkStatus("Out Of Order"))</DxCheckBox>
+    <div class="hk-chk-box">
+        <div class="hk-chk-box-title">Housekeeping Status</div>
+        <div class="hk-chk-grid">
+            <DxCheckBox @bind-Checked="clean">Clean(@CountByHkStatus("Clean"))</DxCheckBox>
+            <DxCheckBox @bind-Checked="dirty">Dirty(@CountByHkStatus("Dirty"))</DxCheckBox>
+            <DxCheckBox @bind-Checked="outOfService">Out Of Service(@CountByHkStatus("Out Of Service"))</DxCheckBox>
+            <DxCheckBox @bind-Checked="inspected">Inspected(@CountByHkStatus("Inspected"))</DxCheckBox>
+            <DxCheckBox @bind-Checked="pickup">Pickup(@CountByHkStatus("Pickup"))</DxCheckBox>
+            <DxCheckBox @bind-Checked="outOfOrder">Out Of Order(@CountByHkStatus("Out Of Order"))</DxCheckBox>
+        </div>
     </div>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-chk-row">
-        <DxCheckBox @bind-Checked="vacant">Vacant</DxCheckBox>
-        <DxCheckBox @bind-Checked="occupied">Occupied</DxCheckBox>
+    <div class="hk-chk-box">
+        <div class="hk-chk-box-title">Reservation Status</div>
+        <div class="hk-chk-grid">
+            <DxCheckBox @bind-Checked="arrivals">Arrivals</DxCheckBox>
+            <DxCheckBox @bind-Checked="dueOut">Due Out</DxCheckBox>
+            <DxCheckBox @bind-Checked="arrived">Arrived</DxCheckBox>
+            <DxCheckBox @bind-Checked="checkedOut">Checked Out</DxCheckBox>
+            <DxCheckBox @bind-Checked="stayOver">Stay Over</DxCheckBox>
+            <DxCheckBox @bind-Checked="notReserved">Not Reserved</DxCheckBox>
+        </div>
     </div>
-    <div class="hk-toolbar-sep"></div>
-    <div class="hk-chk-row">
-        <DxCheckBox @bind-Checked="arrivals">Arrivals</DxCheckBox>
-        <DxCheckBox @bind-Checked="dueOut">Due Out</DxCheckBox>
-        <DxCheckBox @bind-Checked="arrived">Arrived</DxCheckBox>
-        <DxCheckBox @bind-Checked="checkedOut">Checked Out</DxCheckBox>
-        <DxCheckBox @bind-Checked="stayOver">Stay Over</DxCheckBox>
-        <DxCheckBox @bind-Checked="notReserved">Not Reserved</DxCheckBox>
+</div>
+
+<div class="hk-filter-panel">
+    <div class="hk-filter-group">
+        <span class="hk-filter-group-label">Occupancy</span>
+        <div class="hk-chk-row">
+            <DxCheckBox @bind-Checked="vacant">Vacant</DxCheckBox>
+            <DxCheckBox @bind-Checked="occupied">Occupied</DxCheckBox>
+        </div>
     </div>
-    <div class="hk-toolbar-sep"></div>
-    <div class="hk-toolbar-filters">
-        <span class="tb-label">Room</span>
-        <DxComboBox Data="@State.RoomList" @bind-Value="room" NullText="All" CssClass="rt-detail-input" style="width:90px;" />
-        <span class="tb-label">Room Type</span>
-        <DxComboBox Data="@State.RoomTypes" @bind-Value="roomType" CssClass="rt-detail-input" style="width:120px;" />
-        <span class="tb-label">Floor</span>
-        <DxComboBox Data="@State.Floors" @bind-Value="floor" CssClass="rt-detail-input" style="width:110px;" />
-        <span class="tb-label">Room No</span>
-        <DxComboBox Data="@State.RoomList" @bind-Value="roomNo" CssClass="rt-detail-input" style="width:90px;" />
+    <div class="hk-filter-group">
+        <span class="hk-filter-group-label">Search</span>
+        <div class="hk-toolbar-filters">
+            <span class="tb-label">Room</span>
+            <DxComboBox Data="@State.RoomList" @bind-Value="room" NullText="All" CssClass="rt-detail-input" style="width:90px;" />
+            <span class="tb-label">Room Type</span>
+            <DxComboBox Data="@State.RoomTypes" @bind-Value="roomType" CssClass="rt-detail-input" style="width:120px;" />
+            <span class="tb-label">Floor</span>
+            <DxComboBox Data="@State.Floors" @bind-Value="floor" CssClass="rt-detail-input" style="width:110px;" />
+            <span class="tb-label">Room No</span>
+            <DxComboBox Data="@State.RoomList" @bind-Value="roomNo" CssClass="rt-detail-input" style="width:90px;" />
+        </div>
     </div>
 </div>
 

@@ -1,7 +1,7 @@
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
 
-<div class="rt-toolbar">
+<div class="rt-toolbar hk-toolbar">
     <button type="button" class="rt-toolbar-btn" @onclick="() => showNewDiscrepancy = true">
         <i class="bi bi-file-earmark text-secondary"></i>
         <span>New</span>
@@ -19,16 +19,19 @@
         <span>Cancel</span>
     </button>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-chk-row">
-        <DxCheckBox @bind-Checked="sleeps">Sleeps</DxCheckBox>
-        <DxCheckBox @bind-Checked="skips">Skips</DxCheckBox>
-        <DxCheckBox @bind-Checked="person">Person Discrepancy</DxCheckBox>
-        <DxCheckBox @bind-Checked="sleepPerson">Sleep/Person</DxCheckBox>
-        <DxCheckBox @bind-Checked="skipPerson">Skip/Person</DxCheckBox>
-        <DxCheckBox @bind-Checked="dueOutOnly">Due Out Only</DxCheckBox>
+    <div class="hk-chk-box">
+                <div class="hk-chk-box-title">Discrepancy Type</div>
+        <div class="hk-chk-grid">
+            <DxCheckBox @bind-Checked="sleeps">Sleeps</DxCheckBox>
+            <DxCheckBox @bind-Checked="skips">Skips</DxCheckBox>
+            <DxCheckBox @bind-Checked="person">Person Discrepancy</DxCheckBox>
+            <DxCheckBox @bind-Checked="sleepPerson">Sleep/Person</DxCheckBox>
+            <DxCheckBox @bind-Checked="skipPerson">Skip/Person</DxCheckBox>
+            <DxCheckBox @bind-Checked="dueOutOnly">Due Out Only</DxCheckBox>
+        </div>
     </div>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-toolbar-filters">
+    <div class="hk-toolbar-filters hk-filter-box">
         <span class="tb-label">Floor</span>
         <DxComboBox Data="@State.Floors" @bind-Value="floor" CssClass="rt-detail-input" style="width:120px;" />
         <span class="tb-label">Room</span>

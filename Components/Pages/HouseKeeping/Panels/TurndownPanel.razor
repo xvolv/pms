@@ -1,7 +1,7 @@
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Models
 @using ERP.V7.WebPMS.Components.Pages.HouseKeeping.Dialogs
 
-<div class="rt-toolbar">
+<div class="rt-toolbar hk-toolbar">
     <button type="button" class="rt-toolbar-btn" @onclick="Save">
         <i class="bi bi-save text-secondary"></i>
         <span>Save</span>
@@ -19,15 +19,21 @@
         <span>Cancel</span>
     </button>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-chk-row">
-        <DxCheckBox @bind-Checked="required">Required</DxCheckBox>
-        <DxCheckBox @bind-Checked="notRequired">Not Required</DxCheckBox>
-        <DxCheckBox @bind-Checked="arrivals">Arrivals</DxCheckBox>
-        <DxCheckBox @bind-Checked="arrived">Arrived</DxCheckBox>
-        <DxCheckBox @bind-Checked="stayOver">Stay Over</DxCheckBox>
+    <div class="hk-chk-box">
+        <div class="hk-chk-box-title">Filter By</div>
+
+        <div class="hk-chk-grid">
+            @* savethis *@
+
+            <DxCheckBox @bind-Checked="required">Required</DxCheckBox>
+            <DxCheckBox @bind-Checked="notRequired">Not Required</DxCheckBox>
+            <DxCheckBox @bind-Checked="arrivals">Arrivals</DxCheckBox>
+            <DxCheckBox @bind-Checked="arrived">Arrived</DxCheckBox>
+            <DxCheckBox @bind-Checked="stayOver">Stay Over</DxCheckBox>
+        </div>
     </div>
     <div class="hk-toolbar-sep"></div>
-    <div class="hk-toolbar-filters">
+    <div class="hk-toolbar-filters hk-filter-box">
         <span class="tb-label">From Room</span>
         <DxComboBox Data="@State.RoomList" @bind-Value="fromRoom" CssClass="rt-detail-input" style="width:90px;" />
         <span class="tb-label">To Room</span>
@@ -51,13 +57,17 @@
                 <Columns>
                     <DxGridDataColumn FieldName="@nameof(TurndownRow.Room)" Caption="Room" Width="12%" />
                     <DxGridDataColumn FieldName="@nameof(TurndownRow.RoomType)" Caption="Room Type" Width="16%" />
-                    <DxGridDataColumn FieldName="@nameof(TurndownRow.HouseKeepingStatus)" Caption="HouseKeeping Status" Width="16%" />
+                    <DxGridDataColumn FieldName="@nameof(TurndownRow.HouseKeepingStatus)" Caption="HouseKeeping Status"
+                                      Width="16%" />
                     <DxGridDataColumn FieldName="@nameof(TurndownRow.Name)" Caption="Name" Width="18%" />
                     <DxGridDataColumn FieldName="@nameof(TurndownRow.ResStatus)" Caption="Res. Status" Width="16%" />
                     <DxGridDataColumn FieldName="@nameof(TurndownRow.TurndownStatus)" Caption="Turndown Status" Width="22%">
                         <CellDisplayTemplate>
-                            @{ var row = (TurndownRow)context.DataItem; }
-                            <DxComboBox Data="@State.TurndownStatuses" @bind-Value="row.TurndownStatus" CssClass="rt-detail-input" />
+                            @{
+                                var row = (TurndownRow)context.DataItem;
+                            }
+                            <DxComboBox Data="@State.TurndownStatuses" @bind-Value="row.TurndownStatus"
+                                        CssClass="rt-detail-input" />
                         </CellDisplayTemplate>
                     </DxGridDataColumn>
                 </Columns>
@@ -69,7 +79,7 @@
 </div>
 
 <PrintPreviewDialog Visible="@showPrintPreview" Assignment="@State.TaskAssignments.LastOrDefault()"
-                     OnClose="() => showPrintPreview = false" />
+                    OnClose="() => showPrintPreview = false" />
 
 <InfoDialog Visible="@showInfoPopup" Title="Information" Message="Turndown data saved successfully."
             OnOk="() => showInfoPopup = false" />
