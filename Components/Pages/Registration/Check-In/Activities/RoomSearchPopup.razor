@@ -21,8 +21,7 @@
         <DxTabs>
             <DxTabPage Text="Rooms">
                 <DxGrid Data="@Rooms" KeyFieldName="SN" PageSize="10" ShowPager="false"
-                        SizeMode="SizeMode.Small" Height="280px" FocusedRowEnabled="true"
-                        FocusedRowKey="@(SelectedRoom?.SN)" FocusedRowKeyChanged="OnRoomFocusedKeyChanged"
+                        SizeMode="SizeMode.Small" Height="280px"
                         RowClick="OnRoomRowClick" CustomizeElement="OnRoomCustomize">
                     <Columns>
                         <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
@@ -43,32 +42,69 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<style>
+    /* Force the highlight to win over DevExpress's own row/cell classes */
+    .room-selected-row td,
+    .room-selected-row.dxbl-grid-data-row td {
+        background-color: #d7ecff !important;
+    }
+
+    .hk-clean { color: #2e7d32; }
+    .hk-dirty { color: #c62828; }
+    .fo-vacant { color: #1565c0; }
+</style>
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-    [Parameter] public List<RoomSearchItem> Rooms { get; set; } = new();
+    [Parameter] public List<RoomSearchItem> Rooms { get; set; } = new()
+    {
+        new() { SN = 1, Room = "103", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 2, Room = "101", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 3, Room = "102", RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 4, Room = "105", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 5, Room = "106", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 6, Room = "110", RoomType = "Standard Room", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1", Feature = "", Remark = "" },
+        new() { SN = 7, Room = "202", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 8, Room = "203", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 9, Room = "208", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 10, Room = "212", RoomType = "Executive", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature = "", Remark = "" },
+        new() { SN = 11, Room = "301", RoomType = "Pseudo Rooms", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature = "", Remark = "" },
+        new() { SN = 12, Room = "302", RoomType = "Pseudo Rooms", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature = "", Remark = "" },
+    };
     [Parameter] public RoomSearchItem? SelectedRoom { get; set; }
     [Parameter] public EventCallback<RoomSearchItem?> SelectedRoomChanged { get; set; }
-    [Parameter] public List<string> Features { get; set; } = new();
+    [Parameter] public List<string> Features { get; set; } = new() { "Select feature", "Sea View", "City View", "Balcony" };
     [Parameter] public string? SelectedFeature { get; set; }
     [Parameter] public string FilterText { get; set; } = "";
     [Parameter] public EventCallback OnSelect { get; set; }
 
-    void OnRoomRowClick(GridRowClickEventArgs e)
+    async Task OnRoomRowClick(GridRowClickEventArgs e)
     {
         var item = e.Grid.GetDataItem(e.VisibleIndex) as RoomSearchItem;
-        SelectedRoomChanged.InvokeAsync(item);
+        SelectedRoom = item;
+        await SelectedRoomChanged.InvokeAsync(item);
+        // Force the grid to re-run CustomizeElement so the new selection is painted immediately.
+        StateHasChanged();
     }
-    void OnRoomFocusedKeyChanged(object newKey)
-    {
-        if (newKey is int sn)
-            SelectedRoomChanged.InvokeAsync(Rooms.FirstOrDefault(r => r.SN == sn));
-    }
+
     void OnRoomCustomize(GridCustomizeElementEventArgs e)
     {
-        if (e.ElementType != GridElementType.DataCell) return;
         var item = e.Grid?.GetDataItem(e.VisibleIndex) as RoomSearchItem;
         if (item == null) return;
+
+        // Highlight the whole selected row.
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            if (SelectedRoom != null && item.SN == SelectedRoom.SN)
+            {
+                e.CssClass = "room-selected-row";
+            }
+            return;
+        }
+
+        if (e.ElementType != GridElementType.DataCell) return;
+
         if (e.Column?.Caption == "HK Status")
         {
             if (item.HKStatus == "Clean") e.CssClass = "hk-clean";
@@ -76,6 +112,7 @@
         }
         if (e.Column?.Caption == "FO Status" && item.FOStatus == "Vacant") e.CssClass = "fo-vacant";
     }
+
     async Task HandleSelect() => await OnSelect.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

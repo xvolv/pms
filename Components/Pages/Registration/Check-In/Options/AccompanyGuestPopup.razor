@@ -48,10 +48,16 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Embedded Guest Find Popup -->
+<GuestFindPopup
+    @bind-Visible="showGuestFind"
+    OnSelect="HandleSelectGuestFromFind"
+    OnAddNew="HandleAddNewGuest" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? RegistrationNo { get; set; }
     [Parameter] public string? Room { get; set; }
 
@@ -63,8 +69,56 @@
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRemove { get; set; }
 
-    async Task HandleNew() => await OnNew.InvokeAsync();
+    bool showGuestFind = false;
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(RegistrationNo)) RegistrationNo = TargetRegistration.Registration;
+            if (string.IsNullOrEmpty(Room)) Room = TargetRegistration.Room;
+        }
+
+        if (Visible && !Guests.Any())
+        {
+            Guests = new List<AccompanyGuestRow>
+            {
+                new() { Guest = "muse zemedkun", Address = "[Email: ed@gamil.com]" },
+                new() { Guest = "MESELE ARABA ABIYE", Address = "" }
+            };
+        }
+    }
+
+    async Task HandleNew()
+    {
+        if (OnNew.HasDelegate) await OnNew.InvokeAsync();
+        else showGuestFind = true;
+    }
+
+    void HandleSelectGuestFromFind(string guestName)
+    {
+        Guests.Add(new AccompanyGuestRow { Guest = guestName, Address = "" });
+        showGuestFind = false;
+    }
+
+    void HandleAddNewGuest()
+    {
+        showGuestFind = false;
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleRemove() => await OnRemove.InvokeAsync();
+    async Task HandleRemove()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync();
+        }
+        else if (SelectedGuest != null)
+        {
+            Guests.Remove(SelectedGuest);
+            SelectedGuest = null;
+            await SelectedGuestChanged.InvokeAsync(null);
+        }
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

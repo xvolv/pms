@@ -102,9 +102,9 @@
     [Parameter] public decimal ApprovalAmt { get; set; }
     [Parameter] public EventCallback<decimal> ApprovalAmtChanged { get; set; }
 
-    [Parameter] public List<string> Payments { get; set; } = new();
-    [Parameter] public List<string> CreditCardTypes { get; set; } = new();
-    [Parameter] public List<string> Currencies { get; set; } = new();
+    [Parameter] public List<string> Payments { get; set; } = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
+    [Parameter] public List<string> CreditCardTypes { get; set; } = new() { "JCB Card", "Master Card", "Visa Card", "Dinners Club", "American Express" };
+    [Parameter] public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnReset { get; set; }

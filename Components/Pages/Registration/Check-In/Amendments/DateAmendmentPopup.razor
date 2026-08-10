@@ -91,10 +91,26 @@
     [Parameter] public bool Fixed { get; set; }
     [Parameter] public EventCallback<bool> FixedChanged { get; set; }
 
-    [Parameter] public List<string> RoomTypes { get; set; } = new();
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+
+    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRoomSearch { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            Arrival ??= TargetRegistration.Arrival;
+            Departure ??= TargetRegistration.Departure;
+            Adult = Adult <= 0 ? 1 : Adult;
+            RoomType ??= TargetRegistration.RoomType;
+            Room = string.IsNullOrEmpty(Room) ? (TargetRegistration.Room ?? "") : Room;
+            RateCode = string.IsNullOrEmpty(RateCode) ? "posting Date Rate" : RateCode;
+            Amount = Amount <= 0 ? 200 : Amount;
+        }
+    }
 
     async Task HandleSave() => await OnSave.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);

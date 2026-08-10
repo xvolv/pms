@@ -30,22 +30,22 @@
                 <div class="toolbar-text">Close</div>
             </button>
         </div>
-        <div style="display:flex; gap:12px;">
-            @for (int w = 1; w <= WindowCount; w++)
+        <div style="display:flex; gap:12px; overflow-x:auto;">
+            @for (int w = 1; w <= windowCount; w++)
             {
                 var winNum = w;
-                var winItems = winNum == 1 ? Window1 : winNum == 2 ? Window2 : Window3;
-                <div style="flex:1; border:1px solid #c8cdd4; padding:6px;">
+                var winItems = winNum == 1 ? window1 : winNum == 2 ? window2 : winNum == 3 ? window3 : GetExtraWindowList(winNum);
+                <div style="flex:1; min-width:260px; border:1px solid #c8cdd4; padding:6px;">
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                         <span style="font-size:12px; font-weight:600; white-space:nowrap;">Window @winNum</span>
-                        <DxComboBox Data="@(new List<string> { GuestName })" Value="@GuestName" Width="100%" SizeMode="SizeMode.Small" />
+                        <DxComboBox Data="@(new List<string> { DisplayGuestName })" Value="@DisplayGuestName" Width="100%" SizeMode="SizeMode.Small" />
                     </div>
                     <table class="multi-table" style="width:100%;">
                         <thead><tr><th>SN</th><th>Voucher No.</th><th>Purpose</th><th>Date</th><th>Amount</th></tr></thead>
                         <tbody>
                             @foreach (var b in winItems)
                             {
-                                <tr class="@(SelectedItem == b ? "row-selected" : "")" style="cursor:pointer;"
+                                <tr class="@(selectedItem == b ? "row-selected" : "")" style="cursor:pointer;"
                                     @onclick="() => SelectItem(b, winNum)" @ondblclick="() => HandleOpenSplitVoucher(b)">
                                     <td>@b.SN</td><td>@b.VoucherNo</td><td>@b.Purpose</td>
                                     <td>@b.Date.ToString("M/d/yyyy")</td><td>@b.Amount.ToString("N2")</td>
@@ -62,34 +62,129 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Nested Split Voucher Popup -->
+<SplitVoucherPopup
+    @bind-Visible="showSplitVoucher"
+    VoucherNo="@splitVoucherNo"
+    Customer="@DisplayGuestName"
+    BusinessDate="@splitBusinessDate"
+    GrandTotal="@splitGrandTotal"
+    OnSavePieces="SaveSplitVoucherPieces" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string GuestName { get; set; } = "";
-    [Parameter] public int WindowCount { get; set; } = 2;
-    [Parameter] public List<BillSplitItem> Window1 { get; set; } = new();
-    [Parameter] public List<BillSplitItem> Window2 { get; set; } = new();
-    [Parameter] public List<BillSplitItem> Window3 { get; set; } = new();
-    [Parameter] public BillSplitItem? SelectedItem { get; set; }
-    [Parameter] public EventCallback<BillSplitItem?> SelectedItemChanged { get; set; }
-    [Parameter] public EventCallback<int> ActiveWindowChanged { get; set; }
-    [Parameter] public EventCallback OnAddWindow { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
-    [Parameter] public EventCallback OnBreak { get; set; }
     [Parameter] public EventCallback OnViewFolio { get; set; }
     [Parameter] public EventCallback OnCheckOut { get; set; }
-    [Parameter] public EventCallback<BillSplitItem> OnOpenSplitVoucher { get; set; }
+
+    int windowCount = 2;
+    List<BillSplitItem> window1 = new();
+    List<BillSplitItem> window2 = new();
+    List<BillSplitItem> window3 = new();
+    Dictionary<int, List<BillSplitItem>> extraWindows = new();
+    BillSplitItem? selectedItem;
+    int activeWindow = 1;
+
+    bool showSplitVoucher = false;
+    string splitVoucherNo = "";
+    DateTime splitBusinessDate = DateTime.Today;
+    decimal splitGrandTotal = 0;
+    BillSplitItem? itemBeingSplit;
+
+    string DisplayGuestName => !string.IsNullOrEmpty(GuestName) ? GuestName : (TargetRegistration?.Guest ?? "");
+
+    protected override void OnParametersSet()
+    {
+        if (Visible && !window1.Any())
+        {
+            InitDefaultWindows();
+        }
+    }
+
+    void InitDefaultWindows()
+    {
+        var arrival = TargetRegistration?.Arrival ?? new DateTime(2017, 8, 19);
+        window1 = new List<BillSplitItem>
+        {
+            new() { SN = 1, VoucherNo = "WDRC-01550-17", Purpose = "BUSINESS RATE", Date = arrival, Amount = 1872.02m },
+            new() { SN = 2, VoucherNo = "WDRC-01551-17", Purpose = "BUSINESS RATE", Date = arrival.AddDays(1), Amount = 1872.02m }
+        };
+        window2 = new List<BillSplitItem>();
+        window3 = new List<BillSplitItem>();
+        extraWindows.Clear();
+        windowCount = 2;
+        selectedItem = null;
+        activeWindow = 1;
+    }
+
+    List<BillSplitItem> GetExtraWindowList(int winNum)
+    {
+        if (!extraWindows.TryGetValue(winNum, out var list))
+        {
+            list = new List<BillSplitItem>();
+            extraWindows[winNum] = list;
+        }
+        return list;
+    }
 
     void SelectItem(BillSplitItem item, int win)
     {
-        SelectedItemChanged.InvokeAsync(item);
-        ActiveWindowChanged.InvokeAsync(win);
+        selectedItem = item;
+        activeWindow = win;
     }
-    async Task HandleAddWindow() => await OnAddWindow.InvokeAsync();
+
+    void HandleAddWindow()
+    {
+        if (windowCount < 8) windowCount++;
+    }
+
+    void HandleBreak()
+    {
+        if (selectedItem != null)
+        {
+            HandleOpenSplitVoucher(selectedItem);
+        }
+        else if (window1.Any())
+        {
+            HandleOpenSplitVoucher(window1[0]);
+        }
+    }
+
+    void HandleOpenSplitVoucher(BillSplitItem item)
+    {
+        itemBeingSplit = item;
+        splitVoucherNo = item.VoucherNo;
+        splitBusinessDate = item.Date;
+        splitGrandTotal = item.Amount;
+        showSplitVoucher = true;
+    }
+
+    void SaveSplitVoucherPieces(List<SplitPiece> pieces)
+    {
+        if (itemBeingSplit != null && pieces.Count >= 2)
+        {
+            itemBeingSplit.Amount = pieces[0].Amount;
+            for (int i = 1; i < pieces.Count; i++)
+            {
+                window2.Add(new BillSplitItem
+                {
+                    SN = window2.Count + 1,
+                    VoucherNo = pieces[i].VoucherNo,
+                    Purpose = itemBeingSplit.Purpose,
+                    Date = pieces[i].Date,
+                    Amount = pieces[i].Amount
+                });
+            }
+        }
+        showSplitVoucher = false;
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleBreak() => await OnBreak.InvokeAsync();
     async Task HandleViewFolio() => await OnViewFolio.InvokeAsync();
     async Task HandleCheckOut() { await OnCheckOut.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
-    async Task HandleOpenSplitVoucher(BillSplitItem b) => await OnOpenSplitVoucher.InvokeAsync(b);
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
+

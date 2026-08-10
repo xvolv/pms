@@ -91,12 +91,13 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string RegNo { get; set; } = "";
     [Parameter] public DateTime? Arrival { get; set; }
     [Parameter] public DateTime? Departure { get; set; }
     [Parameter] public string? RoomType { get; set; }
     [Parameter] public string Room { get; set; } = "";
-    [Parameter] public string? Payment { get; set; }
+    [Parameter] public string? Payment { get; set; } = "Cash";
     [Parameter] public string TotalBill { get; set; } = "";
     [Parameter] public string Paid { get; set; } = "";
     [Parameter] public string Remaining { get; set; } = "";
@@ -106,17 +107,33 @@
     [Parameter] public string? Source { get; set; }
     [Parameter] public string? Group { get; set; }
     [Parameter] public string? Contact { get; set; }
-    [Parameter] public List<string> RoomTypes { get; set; } = new();
-    [Parameter] public List<string> Payments { get; set; } = new();
-    [Parameter] public List<string> GuestNames { get; set; } = new();
-    [Parameter] public List<string> CompanyList { get; set; } = new();
-    [Parameter] public List<string> AgentList { get; set; } = new();
-    [Parameter] public List<string> SourceList { get; set; } = new();
-    [Parameter] public List<string> GroupList { get; set; } = new();
-    [Parameter] public List<string> ContactList { get; set; } = new();
+    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
+    [Parameter] public List<string> Payments { get; set; } = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
+    [Parameter] public List<string> GuestNames { get; set; } = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun", "abel kaleab", "Dog Snoop", "bayu abenezer", "Selase bonjour Bete" };
+    [Parameter] public List<string> CompanyList { get; set; } = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
+    [Parameter] public List<string> AgentList { get; set; } = new() { "", "MY AGENT", "RIHANN'S AGENT" };
+    [Parameter] public List<string> SourceList { get; set; } = new() { "", "Company Directory", "Website", "Walk-in" };
+    [Parameter] public List<string> GroupList { get; set; } = new() { "", "Musical Group", "Girls Group" };
+    [Parameter] public List<string> ContactList { get; set; } = new() { "", "KEBEDE ZELEKE ABEBE", "BROWN CHRIS" };
     [Parameter] public EventCallback OnCheckIn { get; set; }
     [Parameter] public EventCallback OnRegistrationCard { get; set; }
     [Parameter] public EventCallback OnRoomSearch { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Guest)) Guest = TargetRegistration.Guest;
+            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company;
+            if (string.IsNullOrEmpty(Room)) Room = (TargetRegistration.Room ?? "").Replace("#", "");
+            if (string.IsNullOrEmpty(RoomType)) RoomType = TargetRegistration.RoomType;
+            if (string.IsNullOrEmpty(Payment)) Payment = TargetRegistration.Payment ?? "Cash";
+            if (!Arrival.HasValue) Arrival = TargetRegistration.Arrival;
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+            if (Company == "MISIKIR LTD" && string.IsNullOrEmpty(Agent)) Agent = "MY AGENT";
+        }
+    }
 
     async Task HandleCheckIn() => await OnCheckIn.InvokeAsync();
     async Task HandleRegistrationCard() => await OnRegistrationCard.InvokeAsync();

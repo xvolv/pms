@@ -83,40 +83,109 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Embedded Foreign Currency Popup -->
+<ForeignCurrencyPopup
+    @bind-Visible="showForeignCurrency"
+    VoucherNo="@VoucherNo"
+    Payment="@Amount"
+    Currencies="@Currencies"
+    OnSave="@(() => showForeignCurrency = false)" />
+
+<!-- Embedded Customer Find Popup -->
+<CrCustomerFindPopup
+    @bind-Visible="showCustomerFind"
+    Customers="@Customers"
+    @bind-SelectedCustomer="selectedCustomerItem"
+    OnOk="HandleSelectCustomer" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string Title { get; set; } = "Cash Receipt";
     [Parameter] public bool ShowForeignCurrency { get; set; } = true;
     [Parameter] public bool ShowNetOff { get; set; } = false;
     [Parameter] public bool ShowCustomerFind { get; set; } = true;
 
     [Parameter] public string Customer { get; set; } = "";
-    [Parameter] public string? PaymentType { get; set; }
-    [Parameter] public string? Currency { get; set; }
+    [Parameter] public string? PaymentType { get; set; } = "Cash";
+    [Parameter] public string? Currency { get; set; } = "Birr";
     [Parameter] public decimal ExRate { get; set; } = 1;
-    [Parameter] public decimal Amount { get; set; }
-    [Parameter] public decimal TotalAmount { get; set; }
+    [Parameter] public decimal Amount { get; set; } = 3744.03m;
+    [Parameter] public decimal TotalAmount { get; set; } = 3744.03m;
     [Parameter] public string VoucherNo { get; set; } = "";
-    [Parameter] public DateTime? Date { get; set; }
+    [Parameter] public DateTime? Date { get; set; } = DateTime.Today;
     [Parameter] public string RegNo { get; set; } = "";
-    [Parameter] public string? Window { get; set; }
+    [Parameter] public string? Window { get; set; } = "Window 1";
     [Parameter] public string Reference { get; set; } = "";
     [Parameter] public string Purpose { get; set; } = "";
     [Parameter] public string Remark { get; set; } = "";
-    [Parameter] public bool NetOff { get; set; }
+    [Parameter] public bool NetOff { get; set; } = true;
 
     [Parameter] public List<CustomerFindItem> Customers { get; set; } = new();
-    [Parameter] public List<string> PaymentMethods { get; set; } = new();
-    [Parameter] public List<string> Currencies { get; set; } = new();
-    [Parameter] public List<string> WindowList { get; set; } = new();
+    [Parameter] public List<string> PaymentMethods { get; set; } = new() { "Cash", "Check", "CPO", "Credit Card", "Debit Card", "Gift Card", "Entertainment" };
+    [Parameter] public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
+    [Parameter] public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnForeignCurrency { get; set; }
     [Parameter] public EventCallback OnOpenCustomerFind { get; set; }
 
+    bool showForeignCurrency = false;
+    bool showCustomerFind = false;
+    CustomerFindItem? selectedCustomerItem;
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(Customer)) Customer = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+        }
+
+        if (string.IsNullOrEmpty(VoucherNo))
+        {
+            VoucherNo = Title.Contains("Rebate", StringComparison.OrdinalIgnoreCase) ? $"WCNO-{Random.Shared.Next(100, 999)}-17" :
+                        Title.Contains("Paid Out", StringComparison.OrdinalIgnoreCase) ? $"POV-{Random.Shared.Next(100, 999)}-17" :
+                        $"CRV-{Random.Shared.Next(50000, 99999)}";
+        }
+
+        if (!Customers.Any())
+        {
+            Customers = new List<CustomerFindItem>
+            {
+                new() { Code = "PCU-00001", Name = "TIGIST ASMAMAW", IdNumber = "" },
+                new() { Code = "WPGU-00001-17", Name = "TEST GUEST WASA", IdNumber = "123456" },
+                new() { Code = "WPGU-00002-17", Name = "TAHER NAGUIB ALI", IdNumber = "D02018" },
+                new() { Code = "WPGU-00003-17", Name = "OUDINE FATHIA DJAMA", IdNumber = "D02020" },
+                new() { Code = "WPGU-00004-17", Name = "DJAMA MOHAMED ALI", IdNumber = "D02362" },
+                new() { Code = "WPGU-00005-17", Name = "DOUALEH DOUALEH AHMED", IdNumber = "D01950" },
+                new() { Code = "WPGU-00007-17", Name = "ONEN TONNYYY", IdNumber = "263805" },
+                new() { Code = "WPGU-00008-17", Name = "DAVID NIJIRI WAWERU", IdNumber = "C042628" },
+                new() { Code = "WPGU-00010-17", Name = "SINGH KUNWAR SURENDRA", IdNumber = "J8124701" },
+                new() { Code = RegNo, Name = Customer, IdNumber = "" }
+            };
+        }
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleForeignCurrency() => await OnForeignCurrency.InvokeAsync();
-    async Task HandleOpenCustomerFind() => await OnOpenCustomerFind.InvokeAsync();
+    async Task HandleForeignCurrency()
+    {
+        if (OnForeignCurrency.HasDelegate) await OnForeignCurrency.InvokeAsync();
+        else showForeignCurrency = true;
+    }
+    async Task HandleOpenCustomerFind()
+    {
+        if (OnOpenCustomerFind.HasDelegate) await OnOpenCustomerFind.InvokeAsync();
+        else showCustomerFind = true;
+    }
+    void HandleSelectCustomer()
+    {
+        if (selectedCustomerItem != null)
+        {
+            Customer = selectedCustomerItem.Name;
+        }
+        showCustomerFind = false;
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

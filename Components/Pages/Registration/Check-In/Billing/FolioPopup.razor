@@ -86,14 +86,15 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? Window { get; set; }
-    [Parameter] public List<string> WindowList { get; set; } = new();
+    [Parameter] public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
     [Parameter] public string GuestName { get; set; } = "";
     [Parameter] public string RegNo { get; set; } = "";
     [Parameter] public string Company { get; set; } = "";
     [Parameter] public DateTime? Arrival { get; set; }
     [Parameter] public DateTime? Departure { get; set; }
-    [Parameter] public string FsNum { get; set; } = "";
+    [Parameter] public string FsNum { get; set; } = "00004045, 00004046";
     [Parameter] public string Tin { get; set; } = "";
     [Parameter] public List<TransferChargeRow> RoomCharges { get; set; } = new();
     [Parameter] public List<ExtraBillRow> ExtraBills { get; set; } = new();
@@ -106,6 +107,50 @@
     decimal RoomVat => Math.Round((RoomSubtotal + RoomService) * 0.15m, 2);
     decimal RoomGrand => RoomSubtotal + RoomService + RoomVat;
     decimal TotalExtra => ExtraBills.Sum(x => x.GrandTotal);
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue) Arrival = TargetRegistration.Arrival;
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+        }
+
+        if (Visible)
+        {
+            if (!RoomCharges.Any())
+            {
+                var arr = Arrival ?? DateTime.Today;
+                RoomCharges = new List<TransferChargeRow>
+                {
+                    new() { SN = 1, Date = arr, RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m },
+                    new() { SN = 2, Date = arr.AddDays(1), RoomNo = "102", RoomType = "Standard Room", RoomRate = "Manual Charge", Adults = 1, Child = 0, Amount = 79.05m },
+                    new() { SN = 3, Date = arr.AddDays(2), RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m }
+                };
+            }
+            if (!ExtraBills.Any())
+            {
+                var arr = Arrival ?? DateTime.Today;
+                ExtraBills = new List<ExtraBillRow>
+                {
+                    new() { SN = 1, RoomNo = "102", Date = arr, InvoiceId = "BCRS-00708-17", SerCharge = 14, Discount = 0, Vat = 23.10m, SubTotal = 140, GrandTotal = 177.10m },
+                    new() { SN = 2, RoomNo = "102", Date = arr, InvoiceId = "BCRS-00712-17", SerCharge = 20, Discount = 0, Vat = 33, SubTotal = 200, GrandTotal = 253 }
+                };
+            }
+            if (!Payments.Any())
+            {
+                var arr = Arrival ?? DateTime.Today;
+                Payments = new List<PaymentHistoryRow>
+                {
+                    new() { SN = 1, Date = arr, ReceiptNo = "CRV-56553", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 2549.12m },
+                    new() { SN = 2, Date = arr.AddDays(3), ReceiptNo = "CRV-56558", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 253 }
+                };
+            }
+        }
+    }
 
     async Task HandleRefresh() => await OnRefresh.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);

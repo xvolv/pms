@@ -43,6 +43,21 @@
     [Parameter] public EventCallback OnOk { get; set; }
     [Parameter] public EventCallback OnClear { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (!Users.Any())
+        {
+            Users = new List<UserItem>
+            {
+                new() { Code = "EMP-00026", UserName = "MASERSHA" },
+                new() { Code = "PE_0006_16", UserName = "CNET ADMIN" },
+                new() { Code = "EMP-00016", UserName = "USER" },
+                new() { Code = "EMP-00009", UserName = "BerhanuA" },
+                new() { Code = "EMP-00027", UserName = "DAVE" }
+            };
+        }
+    }
+
     async Task HandleOk() { await OnOk.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
     async Task HandleClear() { await OnClear.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
 }

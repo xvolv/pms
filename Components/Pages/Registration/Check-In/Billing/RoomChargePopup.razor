@@ -59,7 +59,8 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-    [Parameter] public DateTime? From { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+    [Parameter] public DateTime? From { get; set; } = DateTime.Today;
     [Parameter] public DateTime? To { get; set; }
     [Parameter] public List<RoomChargeRow> Rows { get; set; } = new();
     [Parameter] public EventCallback OnPost { get; set; }
@@ -67,6 +68,50 @@
     [Parameter] public EventCallback<string> OnOption { get; set; }
 
     bool showOptions = false;
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null && !To.HasValue)
+        {
+            To = TargetRegistration.Departure;
+        }
+        if (Visible && !Rows.Any())
+        {
+            var regNo = TargetRegistration?.Registration ?? "REG-00157-17";
+            var guest = TargetRegistration?.Guest ?? "Guest";
+            var room = (TargetRegistration?.Room ?? "102").Replace("#", "");
+            var start = From ?? DateTime.Today;
+            var end = To ?? start.AddDays(1);
+            if (end < start) end = start;
+
+            int sn = 1;
+            for (var day = start.Date; day < end.Date; day = day.AddDays(1))
+            {
+                Rows.Add(new RoomChargeRow
+                {
+                    SN = sn++,
+                    RegistrationNo = regNo,
+                    Date = day,
+                    RoomNo = room,
+                    Consignee = guest,
+                    Amount = 1755.01m
+                });
+            }
+            if (!Rows.Any())
+            {
+                Rows.Add(new RoomChargeRow
+                {
+                    SN = 1,
+                    RegistrationNo = regNo,
+                    Date = start,
+                    RoomNo = room,
+                    Consignee = guest,
+                    Amount = 1755.01m
+                });
+            }
+        }
+    }
+
     async Task HandlePost() => await OnPost.InvokeAsync();
     async Task HandleShow() => await OnShow.InvokeAsync();
     async Task HandleOption(string opt) { showOptions = false; await OnOption.InvokeAsync(opt); }

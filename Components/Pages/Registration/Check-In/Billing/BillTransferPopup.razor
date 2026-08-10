@@ -104,9 +104,18 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Nested Bt Guest Find Popup -->
+<BtGuestFindPopup
+    @bind-Visible="showBtGuestFind"
+    GuestList="@GuestFindList"
+    SelectedGuest="@selectedBtGuest"
+    SelectedGuestChanged="@(g => selectedBtGuest = g)"
+    OnOk="HandleSelectBtGuest" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string GuestName { get; set; } = "";
     [Parameter] public string RegNo { get; set; } = "";
     [Parameter] public string Company { get; set; } = "";
@@ -116,17 +125,21 @@
     [Parameter] public DateTime? Departure { get; set; }
     [Parameter] public string? ToGuest { get; set; }
     [Parameter] public EventCallback<string?> ToGuestChanged { get; set; }
-    [Parameter] public string? Window { get; set; }
+    [Parameter] public string? Window { get; set; } = "All";
     [Parameter] public bool SelectAll { get; set; }
     [Parameter] public List<TransferChargeRow> RoomCharges { get; set; } = new();
     [Parameter] public List<ExtraBillRow> ExtraBills { get; set; } = new();
     [Parameter] public List<PaymentHistoryRow> PaymentHistory { get; set; } = new();
-    [Parameter] public List<string> WindowOptions { get; set; } = new();
+    [Parameter] public List<string> WindowOptions { get; set; } = new() { "All", "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
+    [Parameter] public List<TransferGuestItem> GuestFindList { get; set; } = new();
     [Parameter] public EventCallback OnRefresh { get; set; }
     [Parameter] public EventCallback OnOpenGuestFind { get; set; }
     [Parameter] public EventCallback<bool> OnSelectAll { get; set; }
     [Parameter] public EventCallback OnTransfer { get; set; }
     [Parameter] public EventCallback OnReturn { get; set; }
+
+    bool showBtGuestFind = false;
+    TransferGuestItem? selectedBtGuest;
 
     decimal RoomSubtotal => RoomCharges.Sum(x => x.Amount);
     decimal RoomService => Math.Round(RoomSubtotal * 0.10m, 2);
@@ -138,8 +151,66 @@
                            + ExtraBills.Where(x => x.Selected).Sum(x => x.GrandTotal)
                            + PaymentHistory.Where(x => x.Selected).Sum(x => Math.Abs(x.Amount));
 
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue) Arrival = TargetRegistration.Arrival;
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+        }
+
+        if (Visible)
+        {
+            if (!RoomCharges.Any())
+            {
+                var arr = Arrival ?? DateTime.Today;
+                RoomCharges = new List<TransferChargeRow>
+                {
+                    new() { SN = 1, Date = arr, RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false },
+                    new() { SN = 2, Date = arr.AddDays(1), RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false }
+                };
+            }
+            if (!PaymentHistory.Any())
+            {
+                var arr = Arrival ?? DateTime.Today;
+                PaymentHistory = new List<PaymentHistoryRow>
+                {
+                    new() { SN = 1, Date = arr.AddDays(-7), ReceiptNo = "WCNO-00029-17", VoucherType = "Rebate", ReceivedBy = "CNET ADMIN", Amount = -1000m, Selected = false },
+                    new() { SN = 2, Date = arr.AddDays(-7), ReceiptNo = "CRV-56534", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 605.02m, Selected = false }
+                };
+            }
+            if (!GuestFindList.Any())
+            {
+                GuestFindList = new List<TransferGuestItem>
+                {
+                    new() { Registration = "REG-00157-17", RoomType = "Standard Room", Room = "102", Guest = "Leo Rojas" },
+                    new() { Registration = "REG-00155-17", RoomType = "Pseudo Rooms", Room = "301", Guest = "teshome mola" },
+                    new() { Registration = "REG-00156-17", RoomType = "Executive", Room = "202", Guest = "Solomon Tuffa Bereket" },
+                    new() { Registration = "REG-00113-17", RoomType = "Standard Room", Room = "103", Guest = "miskir engida engida" }
+                };
+            }
+        }
+    }
+
     async Task HandleRefresh() => await OnRefresh.InvokeAsync();
-    async Task HandleOpenGuestFind() => await OnOpenGuestFind.InvokeAsync();
+    async Task HandleOpenGuestFind()
+    {
+        if (OnOpenGuestFind.HasDelegate) await OnOpenGuestFind.InvokeAsync();
+        else showBtGuestFind = true;
+    }
+    void HandleSelectBtGuest()
+    {
+        var sel = selectedBtGuest ?? GuestFindList.FirstOrDefault();
+        if (sel != null)
+        {
+            ToGuest = $"{sel.Registration} - {sel.Guest}";
+            ToGuestChanged.InvokeAsync(ToGuest);
+        }
+        showBtGuestFind = false;
+    }
     async Task HandleSelectAll(bool v)
     {
         foreach (var r in RoomCharges) r.Selected = v;

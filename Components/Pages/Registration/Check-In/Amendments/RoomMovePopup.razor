@@ -72,8 +72,8 @@
     [Parameter] public DateTime? End { get; set; }
     [Parameter] public string? Reason { get; set; }
 
-    [Parameter] public List<string> RoomTypes { get; set; } = new();
-    [Parameter] public List<string> Reasons { get; set; } = new();
+    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
+    [Parameter] public List<string> Reasons { get; set; } = new() { "Room Upgrade", "Ceiling Does not work", "No Hot Water", "Transfer to PM Account", "Electric Problem", "Problem on the Door", "Toilet does not Work" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRoomSearch { get; set; }

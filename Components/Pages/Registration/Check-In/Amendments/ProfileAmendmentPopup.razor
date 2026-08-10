@@ -71,14 +71,26 @@
     [Parameter] public string? Source { get; set; }
     [Parameter] public EventCallback<string?> SourceChanged { get; set; }
 
-    [Parameter] public List<string> GuestNames { get; set; } = new();
-    [Parameter] public List<string> ContactList { get; set; } = new();
-    [Parameter] public List<string> CompanyList { get; set; } = new();
-    [Parameter] public List<string> AgentList { get; set; } = new();
-    [Parameter] public List<string> GroupList { get; set; } = new();
-    [Parameter] public List<string> SourceList { get; set; } = new();
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+
+    [Parameter] public List<string> GuestNames { get; set; } = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun", "abel kaleab", "Dog Snoop", "bayu abenezer", "Selase bonjour Bete" };
+    [Parameter] public List<string> ContactList { get; set; } = new() { "", "KEBEDE ZELEKE ABEBE", "BROWN CHRIS" };
+    [Parameter] public List<string> CompanyList { get; set; } = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
+    [Parameter] public List<string> AgentList { get; set; } = new() { "", "MY AGENT", "RIHANN\'S AGENT" };
+    [Parameter] public List<string> GroupList { get; set; } = new() { "", "Musical Group", "Girls Group" };
+    [Parameter] public List<string> SourceList { get; set; } = new() { "", "Company Directory", "Website", "Walk-in" };
 
     [Parameter] public EventCallback OnSave { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            Guest ??= TargetRegistration.Guest;
+            Company ??= TargetRegistration.Company;
+            Agent ??= TargetRegistration.Company == "MISIKIR LTD" ? "MY AGENT" : "";
+        }
+    }
 
     async Task HandleSave() => await OnSave.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);

@@ -69,8 +69,8 @@
     [Parameter] public decimal Value { get; set; }
     [Parameter] public string? Reason { get; set; }
 
-    [Parameter] public List<string> AdjTypes { get; set; } = new();
-    [Parameter] public List<string> Reasons { get; set; } = new();
+    [Parameter] public List<string> AdjTypes { get; set; } = new() { "Amount", "Percent" };
+    [Parameter] public List<string> Reasons { get; set; } = new() { "Complimentary", "Discount", "Rate Change", "Package Adjustment" };
 
     [Parameter] public EventCallback OnSave { get; set; }
 

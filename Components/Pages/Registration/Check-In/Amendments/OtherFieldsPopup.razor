@@ -48,12 +48,12 @@
     [Parameter] public string? MemberType { get; set; }
     [Parameter] public string? Specials { get; set; }
 
-    [Parameter] public List<string> ReservationTypes { get; set; } = new();
-    [Parameter] public List<string> MarketList { get; set; } = new();
-    [Parameter] public List<string> SourceList { get; set; } = new();
-    [Parameter] public List<string> OriginList { get; set; } = new();
-    [Parameter] public List<string> MemberTypes { get; set; } = new();
-    [Parameter] public List<string> SpecialsList { get; set; } = new();
+    [Parameter] public List<string> ReservationTypes { get; set; } = new() { "Phone Reservation", "Online Reservation", "Walk-in", "Corporate" };
+    [Parameter] public List<string> MarketList { get; set; } = new() { "Corporate Business", "Leisure", "Group", "Airline" };
+    [Parameter] public List<string> SourceList { get; set; } = new() { "", "Company Directory", "Website", "Walk-in" };
+    [Parameter] public List<string> OriginList { get; set; } = new() { "Central Reservation", "Website", "Travel Agent", "Direct" };
+    [Parameter] public List<string> MemberTypes { get; set; } = new() { "", "Gold", "Silver", "Bronze" };
+    [Parameter] public List<string> SpecialsList { get; set; } = new() { "", "Honeymoon", "Birthday", "Anniversary" };
 
     [Parameter] public EventCallback OnSave { get; set; }
 

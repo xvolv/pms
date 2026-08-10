@@ -52,23 +52,46 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? RegistrationNo { get; set; }
-    [Parameter] public string? PickupRequired { get; set; }
-    [Parameter] public string? TransportType { get; set; }
-    [Parameter] public string? CarrierCode { get; set; }
+    [Parameter] public string? PickupRequired { get; set; } = "YES";
+    [Parameter] public string? TransportType { get; set; } = "Bus Station";
+    [Parameter] public string? CarrierCode { get; set; } = "Carrier One";
     [Parameter] public string TransportNo { get; set; } = "";
-    [Parameter] public DateTime? ArrivalDate { get; set; }
-    [Parameter] public TimeSpan PickupTime { get; set; }
+    [Parameter] public DateTime? ArrivalDate { get; set; } = DateTime.Today;
+    [Parameter] public TimeSpan PickupTime { get; set; } = new TimeSpan(12, 0, 0);
 
-    [Parameter] public List<string> YesNoList { get; set; } = new();
-    [Parameter] public List<string> TransportTypes { get; set; } = new();
-    [Parameter] public List<string> CarrierCodes { get; set; } = new();
+    [Parameter] public List<string> YesNoList { get; set; } = new() { "YES", "NO" };
+    [Parameter] public List<string> TransportTypes { get; set; } = new() { "Bus Station", "Airport", "Train Station", "Other" };
+    [Parameter] public List<string> CarrierCodes { get; set; } = new() { "Carrier One", "Carrier Two", "Ethiopian Airlines" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnReset { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(RegistrationNo)) RegistrationNo = TargetRegistration.Registration;
+            if (!ArrivalDate.HasValue) ArrivalDate = TargetRegistration.Arrival;
+        }
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleReset() => await OnReset.InvokeAsync();
+    async Task HandleReset()
+    {
+        if (OnReset.HasDelegate)
+        {
+            await OnReset.InvokeAsync();
+        }
+        else
+        {
+            PickupRequired = "YES";
+            TransportType = "Bus Station";
+            CarrierCode = "Carrier One";
+            TransportNo = "";
+            PickupTime = new TimeSpan(12, 0, 0);
+        }
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

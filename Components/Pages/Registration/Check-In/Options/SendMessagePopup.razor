@@ -62,9 +62,17 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Embedded User Find Popup -->
+<UserFindPopup
+    @bind-Visible="showUserFind"
+    Users="@systemUsers"
+    @bind-SelectedUser="selectedUserItem"
+    OnOk="HandleSelectUser" />
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
 
     [Parameter] public string? MsgUser { get; set; }
     [Parameter] public EventCallback<string> MsgUserChanged { get; set; }
@@ -80,22 +88,73 @@
 
     [Parameter] public string MsgRegNo { get; set; } = "";
     [Parameter] public string MsgNo { get; set; } = "";
-    [Parameter] public DateTime? MsgDate { get; set; }
+    [Parameter] public DateTime? MsgDate { get; set; } = DateTime.Today;
 
-    [Parameter] public string? MsgType { get; set; }
+    [Parameter] public string? MsgType { get; set; } = "Internal Message";
     [Parameter] public EventCallback<string?> MsgTypeChanged { get; set; }
 
     [Parameter] public string MsgBody { get; set; } = "";
     [Parameter] public EventCallback<string> MsgBodyChanged { get; set; }
 
-    [Parameter] public List<string> MessageTypes { get; set; } = new();
+    [Parameter] public List<string> MessageTypes { get; set; } = new() { "Internal Message", "Guest Message", "Welcome Message", "Trace" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnReset { get; set; }
     [Parameter] public EventCallback OnOpenUserFind { get; set; }
 
+    bool showUserFind = false;
+    UserItem? selectedUserItem;
+    List<UserItem> systemUsers = new()
+    {
+        new() { Code = "EMP-00026", UserName = "MASERSHA" },
+        new() { Code = "PE_0006_16", UserName = "CNET ADMIN" },
+        new() { Code = "EMP-00016", UserName = "USER" },
+        new() { Code = "EMP-00009", UserName = "BerhanuA" },
+        new() { Code = "EMP-00027", UserName = "DAVE" }
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(MsgGuest)) MsgGuest = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(MsgRoom)) MsgRoom = (TargetRegistration.Room ?? "").Replace("#", "");
+            if (string.IsNullOrEmpty(MsgRegNo)) MsgRegNo = TargetRegistration.Registration ?? "";
+        }
+        if (string.IsNullOrEmpty(MsgNo))
+        {
+            MsgNo = "MSG-00043-17";
+        }
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleReset() => await OnReset.InvokeAsync();
-    async Task HandleOpenUserFind() => await OnOpenUserFind.InvokeAsync();
+    async Task HandleReset()
+    {
+        if (OnReset.HasDelegate)
+        {
+            await OnReset.InvokeAsync();
+        }
+        else
+        {
+            MsgBody = "";
+            MsgType = "Internal Message";
+            await MsgBodyChanged.InvokeAsync("");
+            await MsgTypeChanged.InvokeAsync("Internal Message");
+        }
+    }
+    async Task HandleOpenUserFind()
+    {
+        if (OnOpenUserFind.HasDelegate) await OnOpenUserFind.InvokeAsync();
+        else showUserFind = true;
+    }
+    void HandleSelectUser()
+    {
+        if (selectedUserItem != null)
+        {
+            MsgUser = selectedUserItem.UserName;
+            MsgUserChanged.InvokeAsync(MsgUser);
+        }
+        showUserFind = false;
+    }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }

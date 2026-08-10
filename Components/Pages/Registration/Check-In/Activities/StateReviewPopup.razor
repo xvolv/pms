@@ -59,6 +59,7 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public string Heading { get; set; } = "";
     [Parameter] public bool RoomReadOnly { get; set; } = false;
@@ -77,10 +78,23 @@
     [Parameter] public string? Agent { get; set; }
     [Parameter] public string? Source { get; set; }
 
-    [Parameter] public List<string> CompanyList { get; set; } = new();
-    [Parameter] public List<string> Payments { get; set; } = new();
-    [Parameter] public List<string> AgentList { get; set; } = new();
-    [Parameter] public List<string> SourceList { get; set; } = new();
+    [Parameter] public List<string> CompanyList { get; set; } = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
+    [Parameter] public List<string> Payments { get; set; } = new() { "Cash", "Credit Card", "Company Account", "Bank Transfer" };
+    [Parameter] public List<string> AgentList { get; set; } = new() { "", "MY AGENT", "RIHANN'S AGENT" };
+    [Parameter] public List<string> SourceList { get; set; } = new() { "", "Company Directory", "Website", "Walk-in" };
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Guest)) Guest = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company;
+            if (string.IsNullOrEmpty(Room)) Room = (TargetRegistration.Room ?? "").Replace("#", "");
+            if (string.IsNullOrEmpty(Payment)) Payment = TargetRegistration.Payment ?? "Cash";
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+        }
+    }
 
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
