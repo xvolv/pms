@@ -128,15 +128,31 @@ public class ReportsState
     {
         return new List<CheckoutReportRow>
         {
-            new() { Id = NextId(), Sn = 1, RegNo = "REG-10011", Guest = "Betelhem Assefa", Company = "", Room = "201",
-                RoomType = "Standard", ArrivalDate = date.AddDays(-2), DepartureDate = date, PaymentType = "Cash",
-                TotalBill = 3600m, Paid = 3600m },
-            new() { Id = NextId(), Sn = 2, RegNo = "REG-10019", Guest = "Nahom Tesfaye", Company = "Ethio Trading PLC", Room = "305",
-                RoomType = "Deluxe", ArrivalDate = date.AddDays(-3), DepartureDate = date, PaymentType = "Credit Card",
-                TotalBill = 7800m, Paid = 7800m },
-            new() { Id = NextId(), Sn = 3, RegNo = "REG-10027", Guest = "Sara Mekonnen", Company = "", Room = "112",
-                RoomType = "Standard", ArrivalDate = date.AddDays(-1), DepartureDate = date, PaymentType = "City Ledger",
-                TotalBill = 1900m, Paid = 1200m },
+            new() { Id = NextId(), RegNo = "REG-10011", Room = "201", RoomCount = 1, RoomType = "Standard",
+                Company = "", Guest = "Betelhem Assefa", Adult = 1, Child = 0,
+                ArrivalDate = date.AddDays(-2), DepartureDate = date, RateCode = "RACK", PaymentType = "Cash",
+                User = "CNET ADMINISTRATOR", ActualRtc = "Front Desk", MarketCode = "Walk-In", RateAmount = 1800m },
+            new() { Id = NextId(), RegNo = "REG-10019", Room = "305", RoomCount = 1, RoomType = "Deluxe",
+                Company = "Ethio Trading PLC", Guest = "Nahom Tesfaye", Adult = 2, Child = 1,
+                ArrivalDate = date.AddDays(-3), DepartureDate = date, RateCode = "CORP", PaymentType = "Credit Card",
+                User = "CNET ADMINISTRATOR", ActualRtc = "Front Desk", MarketCode = "Corporate", RateAmount = 2600m },
+            new() { Id = NextId(), RegNo = "REG-10027", Room = "112", RoomCount = 1, RoomType = "Standard",
+                Company = "", Guest = "Sara Mekonnen", Adult = 1, Child = 0,
+                ArrivalDate = date.AddDays(-1), DepartureDate = date, RateCode = "OTA", PaymentType = "City Ledger",
+                User = "CNET ADMINISTRATOR", ActualRtc = "Front Desk", MarketCode = "Online Travel Agency", RateAmount = 1900m },
+        };
+    }
+
+    public static List<CityLedgerRow> CreateCityLedgerSample(DateTime start, DateTime end)
+    {
+        return new List<CityLedgerRow>
+        {
+            new() { Id = NextId(), RegNo = "REG-10019", Date = start, Guest = "Nahom Tesfaye",
+                Company = "Ethio Trading PLC", SubTotal = 7800m },
+            new() { Id = NextId(), RegNo = "REG-10041", Date = start.AddDays(1), Guest = "Blen Girma",
+                Company = "Horizon Addis Tours", SubTotal = 4200m },
+            new() { Id = NextId(), RegNo = "REG-10052", Date = end, Guest = "Yonas Abera",
+                Company = "Zemen Bank S.C.", SubTotal = 5600m },
         };
     }
 
@@ -198,7 +214,6 @@ public class ReportsState
         ["Detail Daily Sales Transaction"] = ("DS", new[] { "Room charge + tax", "F&B charge + tax", "Laundry charge + tax" }, 400m, 5500m),
         ["Rate Adjustment Report"] = ("RA", new[] { "Rate adjusted - loyalty discount", "Rate adjusted - manager override", "Rate adjusted - long stay discount" }, 100m, 1500m),
         ["Check Report of the Day"] = ("CK", new[] { "Check received - folio settlement", "Check received - advance deposit" }, 500m, 6000m),
-        ["City Ledger"] = ("CL", new[] { "City ledger - corporate account", "City ledger - travel agent account" }, 1000m, 12000m),
         ["Credit Cards of the Day"] = ("CC", new[] { "Visa settlement", "Mastercard settlement", "Amex settlement" }, 800m, 9000m),
         ["Deposit Ledger"] = ("DL", new[] { "Deposit held - advance reservation", "Deposit held - group booking" }, 1000m, 8000m),
         ["Rate Check Report"] = ("RC", new[] { "Rate variance - override not authorized", "Rate variance - system default applied" }, 100m, 2500m),

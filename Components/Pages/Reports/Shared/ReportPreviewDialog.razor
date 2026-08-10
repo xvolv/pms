@@ -1,15 +1,12 @@
 @if (Visible)
 {
-    <div class="rt-modal-backdrop">
+    <div class="rt-modal-backdrop rp-print-backdrop">
         <div class="rt-modal rp-print-modal">
-            <div class="rt-modal-header">
-                <span class="rt-modal-header-title">Preview</span>
-                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
+            <button class="rt-modal-close-btn rp-print-close-btn" @onclick="Close" title="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
 
-            <div class="rt-modal-body" style="overflow:auto; background:#e8e8e8;">
+            <div class="rt-modal-body rp-print-body" style="overflow:auto; background:#e8e8e8;">
                 <div class="rp-print-page">
                     <div style="display:flex; justify-content:space-between;">
                         <div class="hk-print-title">Eden Hotel</div>
