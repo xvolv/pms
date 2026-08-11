@@ -5,6 +5,7 @@
         font-size: 12.5px;
         padding: 8px 12px;
         position: relative;
+        overflow-x: hidden;
     }
 
     .erp-toolbar {
@@ -17,7 +18,8 @@
         border: 1px solid #d6d6d6;
         border-radius: 4px;
         margin-bottom: 8px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        row-gap: 8px;
         position: relative;
         z-index: 20;
         overflow: visible;
@@ -29,7 +31,7 @@
         display: flex;
         gap: 6px;
         align-items: center;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         overflow: visible;
         flex-shrink: 0;
     }
@@ -38,18 +40,19 @@
         display: flex;
         gap: 24px;
         align-items: center;
-        flex: 1 1 auto;
-        min-width: 0;
+        flex: 1 1 320px;
+        min-width: 260px;
         padding: 0 16px;
         margin: 4px 0;
+        flex-wrap: wrap;
     }
 
     .filter-col {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        flex: 1 1 0;
-        min-width: 0;
+        flex: 1 1 220px;
+        min-width: 220px;
     }
 
     .filter-row {
@@ -134,6 +137,7 @@
         box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
         z-index: 9999;
         min-width: 170px;
+        max-width: 90vw;
         padding: 4px 0;
         margin: 0;
         list-style: none;
@@ -179,9 +183,21 @@
         white-space: nowrap;
     }
 
+    /* Scroll wrapper keeps the fixed-width DxGrid usable on narrow screens
+       instead of squashing/breaking its columns. Wrap <DxGrid> in
+       <div class="grid-scroll-wrapper">...</div> in the .razor markup. */
+    .grid-scroll-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #dcdcdc;
+        border-radius: 2px;
+    }
+
     .reg-grid {
         background: #fff;
         width: 100% !important;
+        min-width: 900px;
     }
 
     .reg-grid .dxbl-grid-header-row,
@@ -241,6 +257,7 @@
         justify-content: center;
         align-items: center;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .record-text {
@@ -333,14 +350,17 @@
     .ci-form {
         display: flex;
         gap: 16px;
+        flex-wrap: wrap;
     }
 
     .ci-left {
-        flex: 1;
+        flex: 1 1 260px;
+        min-width: 240px;
     }
 
     .ci-profile {
-        flex: 1;
+        flex: 1 1 260px;
+        min-width: 240px;
         border: 1px solid #c8cdd4;
         border-radius: 3px;
         padding: 8px 12px;
@@ -542,4 +562,106 @@
     .package-table td {
         border: 1px solid #ddd;
         padding: 3px 6px;
+    }
+
+    /* ==========================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================== */
+
+    /* Laptop / narrow desktop: tighten toolbar icon sizing a touch
+       so the button row + filters fit before wrapping. */
+    @media (max-width: 1200px) {
+        .toolbar-icon,
+        .toolbar-icon i {
+            font-size: 24px;
+        }
+
+        .toolbar-btn {
+            min-width: 48px;
+            height: 44px;
+        }
+
+        .filter-columns {
+            gap: 16px;
+        }
+    }
+
+    /* Tablet: toolbar buttons and filters wrap onto their own rows,
+       filter columns stack two-across instead of one flat row. */
+    @media (max-width: 992px) {
+        .reg-browser-page {
+            padding: 8px;
+        }
+
+        .erp-toolbar {
+            padding: 8px;
+        }
+
+        .toolbar-group {
+            justify-content: flex-start;
+        }
+
+        .toolbar-group[style*="margin-left:auto"] {
+            margin-left: 0 !important;
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .filter-columns {
+            flex: 1 1 100%;
+            padding: 0;
+        }
+    }
+
+    /* Mobile: single-column filters, smaller toolbar buttons,
+       grid scrolls horizontally within its wrapper. */
+    @media (max-width: 640px) {
+        .reg-browser-page {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        .erp-toolbar {
+            gap: 6px;
+            padding: 6px;
+        }
+
+        .toolbar-btn {
+            min-width: 42px;
+            height: 40px;
+            padding: 2px 6px;
+        }
+
+        .toolbar-icon,
+        .toolbar-icon i {
+            font-size: 20px;
+        }
+
+        .toolbar-text {
+            font-size: 9px;
+        }
+
+        .filter-columns {
+            gap: 10px;
+        }
+
+        .filter-col {
+            min-width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .search-criteria {
+            width: 100%;
+            white-space: normal;
+            margin-right: 0;
+        }
+
+        .record-bar {
+            gap: 6px;
+            padding: 6px;
+        }
+
+        .record-text {
+            font-size: 12px;
+        }
     }
