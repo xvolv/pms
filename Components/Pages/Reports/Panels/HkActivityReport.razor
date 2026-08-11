@@ -1,0 +1,56 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>HK Activity Report</h2>
+            <p>Log of every status change made on rooms on the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(HkActivityRow.Activity)" Caption="Activity" Width="20%" />
+                <DxGridDataColumn FieldName="@nameof(HkActivityRow.RoomNumber)" Caption="Room Number" Width="15%" />
+                <DxGridDataColumn FieldName="@nameof(HkActivityRow.Date)" Caption="Date" Width="15%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(HkActivityRow.User)" Caption="User" Width="25%" />
+                <DxGridDataColumn FieldName="@nameof(HkActivityRow.DeviceName)" Caption="Device Name" Width="25%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count activit(ies) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="HK Activity Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns = { "Activity", "Room Number", "Date", "User", "Device Name" };
+
+    private DateTime date = DateTime.Today;
+    private List<HkActivityRow> rows = ReportsState.CreateHkActivitySample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+        { r.Activity, r.RoomNumber, r.Date.ToString("dd-MMM-yyyy"), r.User, r.DeviceName }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateHkActivitySample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

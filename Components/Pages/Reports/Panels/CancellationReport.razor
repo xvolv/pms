@@ -14,31 +14,31 @@
 
     <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
 
-    <div class="rt-grid-area rp-wide-grid-area">
-        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid rp-wide-grid">
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
             <Columns>
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RegNo)" Caption="Reg_No" Width="100px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Room)" Caption="Room" Width="70px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomCount)" Caption="Room Count" Width="60px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RegNo)" Caption="Reg_No" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Room)" Caption="Room" Width="4%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomCount)" Caption="Room Count" Width="3%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomType)" Caption="Room Type" Width="100px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Company)" Caption="Company" Width="120px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Guest)" Caption="Guest" Width="130px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Adult)" Caption="Adult" Width="70px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomType)" Caption="Room Type" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Company)" Caption="Company" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Guest)" Caption="Guest" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Adult)" Caption="Adult" Width="4%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Child)" Caption="Child" Width="70px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Child)" Caption="Child" Width="4%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ArrivalDate)" Caption="Arrival Date" Width="140px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ArrivalDate)" Caption="Arrival Date" Width="8%"
                                    DisplayFormat="dd-MMM-yyyy" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.DepartureDate)" Caption="Departure Date" Width="190px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.DepartureDate)" Caption="Departure Date" Width="11%"
                                    DisplayFormat="dd-MMM-yyyy" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateCode)" Caption="Rate Code" Width="90px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateAmount)" Caption="Rate Amount" Width="200px"
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateCode)" Caption="Rate Code" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateAmount)" Caption="Rate Amount" Width="11%"
                                    DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.PaymentType)" Caption="Payment Type" Width="94px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.User)" Caption="User" Width="90px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ActualRtc)" Caption="Actual RTC" Width="120px" />
-                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.MarketCode)" Caption="Market Code" Width="130px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.PaymentType)" Caption="Payment Type" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.User)" Caption="User" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ActualRtc)" Caption="Actual RTC" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.MarketCode)" Caption="Market Code" Width="7%" />
             </Columns>
         </DxGrid>
 

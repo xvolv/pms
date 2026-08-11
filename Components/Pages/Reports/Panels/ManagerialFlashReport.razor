@@ -17,14 +17,19 @@
     <div class="rt-grid-area">
         <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
             <Columns>
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Metric)" Caption="Metric" Width="28%" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Today)" Caption="Today" Width="18%"
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.Sn)" Caption="SN" Width="4%" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.ReportItem)" Caption="Report Item" Width="30%" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.CurrentYearDay)" Caption="@($"{date.Year} Day")" Width="11%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.MonthToDate)" Caption="Month to Date" Width="18%"
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.CurrentYearMonth)" Caption="@($"{date.Year} Month")" Width="11%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorMonth)" Caption="Prior Month" Width="18%"
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.CurrentYearToDate)" Caption="@($"{date.Year} Year")" Width="11%"
                                    TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorYear)" Caption="Prior Year" Width="18%"
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.PriorYearDay)" Caption="@($"{date.Year - 1} Day")" Width="11%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.PriorYearMonth)" Caption="@($"{date.Year - 1} Month")" Width="11%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(ManagerialFlashItemRow.PriorYearToDate)" Caption="@($"{date.Year - 1} Year")" Width="11%"
                                    TextAlignment="GridTextAlignment.Right" />
             </Columns>
         </DxGrid>
@@ -39,19 +44,26 @@
 @code {
     [Parameter] public EventCallback OnBack { get; set; }
 
-    private static readonly string[] PreviewColumns = { "Metric", "Today", "Month to Date", "Prior Month", "Prior Year" };
-
     private DateTime date = DateTime.Today;
-    private List<ManagerialFlashRow> rows = ReportsState.CreateManagerialFlashSample(DateTime.Today);
+    private List<ManagerialFlashItemRow> rows = ReportsState.CreateManagerialFlashItems(DateTime.Today);
     private bool showPreview;
 
+    private string[] PreviewColumns =>
+    [
+        "SN", "Report Item", $"{date.Year} Day", $"{date.Year} Month", $"{date.Year} Year",
+        $"{date.Year - 1} Day", $"{date.Year - 1} Month", $"{date.Year - 1} Year",
+    ];
+
     private List<string[]> PreviewRows => rows.Select(r => new[]
-        { r.Metric, r.Today, r.MonthToDate, r.PriorMonth, r.PriorYear }).ToList();
+    {
+        r.Sn.ToString(), r.ReportItem, r.CurrentYearDay, r.CurrentYearMonth, r.CurrentYearToDate,
+        r.PriorYearDay, r.PriorYearMonth, r.PriorYearToDate,
+    }).ToList();
 
     private void Generate(ReportCriteria criteria)
     {
         date = criteria.Date;
-        rows = ReportsState.CreateManagerialFlashSample(date);
+        rows = ReportsState.CreateManagerialFlashItems(date);
         showPreview = true;
     }
 

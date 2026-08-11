@@ -74,24 +74,52 @@ public class ReportCriteria
     public DateTime RangeEnd { get; set; } = DateTime.Today;
 }
 
-public class ManagerialFlashRow
+public class ManagerialFlashItemRow
 {
     public int Id { get; set; }
-    public string Metric { get; set; } = "";
-    public string Today { get; set; } = "";
-    public string MonthToDate { get; set; } = "";
-    public string PriorMonth { get; set; } = "";
-    public string PriorYear { get; set; } = "";
+    public int Sn { get; set; }
+    public string ReportItem { get; set; } = "";
+    public string CurrentYearDay { get; set; } = "";
+    public string CurrentYearMonth { get; set; } = "";
+    public string CurrentYearToDate { get; set; } = "";
+    public string PriorYearDay { get; set; } = "";
+    public string PriorYearMonth { get; set; } = "";
+    public string PriorYearToDate { get; set; } = "";
 }
 
 public class DiscrepancyReportRow
 {
     public int Id { get; set; }
-    public string Room { get; set; } = "";
-    public string SystemStatus { get; set; } = "";
-    public string HousekeepingStatus { get; set; } = "";
-    public DateTime ReportedDate { get; set; }
-    public string Remark { get; set; } = "";
+    public string RoomNo { get; set; } = "";
+    public string RoomType { get; set; } = "";
+    public string RoomStatus { get; set; } = "";
+    public string HkStatus { get; set; } = "";
+    public string FoStatus { get; set; } = "";
+    public string ResStatus { get; set; } = "";
+    public int FoPerson { get; set; }
+    public int HkPerson { get; set; }
+    public string Discrepancy { get; set; } = "";
+    public DateTime Date { get; set; }
+}
+
+public class HkActivityRow
+{
+    public int Id { get; set; }
+    public string Activity { get; set; } = "";
+    public string RoomNumber { get; set; } = "";
+    public DateTime Date { get; set; }
+    public string User { get; set; } = "";
+    public string DeviceName { get; set; } = "";
+}
+
+public class TaskAssignmentRow
+{
+    public int Id { get; set; }
+    public DateTime TaskDate { get; set; }
+    public string Task { get; set; } = "";
+    public string InAuto { get; set; } = "";
+    public int TotalSheets { get; set; }
+    public int TotalCredits { get; set; }
 }
 
 public class ArrivalListRow
@@ -120,15 +148,6 @@ public class HousekeepingReportRow
     public string Attendant { get; set; } = "";
     public DateTime Date { get; set; }
     public string Remark { get; set; } = "";
-}
-
-public class SummaryMetricRow
-{
-    public int Id { get; set; }
-    public int Sn { get; set; }
-    public string Label { get; set; } = "";
-    public string Value { get; set; } = "";
-    public string Note { get; set; } = "";
 }
 
 public class DailyResidentSummaryRow
@@ -178,6 +197,70 @@ public class CancellationReportRow
     public string MarketCode { get; set; } = "";
 }
 
+public class NoShowReportRow
+{
+    public int Id { get; set; }
+    public int Sn { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public DateTime ArrivalDate { get; set; }
+    public DateTime DepartureDate { get; set; }
+    public string RegState { get; set; } = "";
+    public string RegType { get; set; } = "";
+    public string PaymentType { get; set; } = "";
+    public string MarketCode { get; set; } = "";
+}
+
+public class PackageReportRow
+{
+    public int Id { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Room { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public DateTime ArrivalDate { get; set; }
+    public DateTime DepartureDate { get; set; }
+    public string PackageGroup { get; set; } = "";
+    public string PackageType { get; set; } = "";
+    public int Adult { get; set; }
+    public int Child { get; set; }
+    public decimal PackageAmount { get; set; }
+}
+
+public class RateCheckReportRow
+{
+    public int Id { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Room { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public int Adult { get; set; }
+    public int Child { get; set; }
+    public string RateCodeHeader { get; set; } = "";
+    public decimal RateCodeAmount { get; set; }
+    public decimal RateAmount { get; set; }
+    public decimal Variance { get; set; }
+    public string Currency { get; set; } = "";
+    public DateTime ArrivalDate { get; set; }
+    public DateTime DepartureDate { get; set; }
+    public string RoomType { get; set; } = "";
+    public string Rtc { get; set; } = "";
+    public string RegState { get; set; } = "";
+}
+
+public class DailySalesSummaryRow
+{
+    public int Id { get; set; }
+    public string VoucherId { get; set; } = "";
+    public string Customer { get; set; } = "";
+    public string RoomNo { get; set; } = "";
+    public decimal Cash { get; set; }
+    public decimal RoomCharge { get; set; }
+    public decimal Entertainment { get; set; }
+    public decimal CityLedger { get; set; }
+    public decimal FoodAllowance { get; set; }
+}
+
 public class TrialBalanceLine
 {
     public string Description { get; set; } = "";
@@ -221,10 +304,11 @@ public class CashierUserGroup
     public decimal Total => PaymentMethods.Sum(p => p.Total);
 }
 
-public class DailyBusinessSection
+public class ReportSection
 {
     public string Title { get; set; } = "";
     public string[] Columns { get; set; } = Array.Empty<string>();
+    public bool[] RightAlign { get; set; } = Array.Empty<bool>();
     public List<string[]> Rows { get; set; } = new();
     public string[]? TotalRow { get; set; }
 }

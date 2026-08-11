@@ -1,0 +1,81 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Rate Check Report</h2>
+            <p>Rate amount variations on the given business date and where the difference occurs.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RegNo)" Caption="Reg_No" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Room)" Caption="Room" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Guest)" Caption="Guest" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Company)" Caption="Company" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Adult)" Caption="Adult" Width="5%"
+                                  TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Child)" Caption="Child" Width="5%"
+                                  TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RateCodeHeader)" Caption="Rate Code Header"
+                                  Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RateCodeAmount)" Caption="Rate Code Amount"
+                                  Width="9%" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RateAmount)" Caption="Rate Amount" Width="7%"
+                                  DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Variance)" Caption="Variance" Width="6%"
+                                  DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Currency)" Caption="Currency" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.ArrivalDate)" Caption="Arrival Date" Width="8%"
+                                  DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.DepartureDate)" Caption="Departure Date"
+                                  Width="8%" DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RoomType)" Caption="Room Type" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.Rtc)" Caption="RTC" Width="5%" />
+                <DxGridDataColumn FieldName="@nameof(RateCheckReportRow.RegState)" Caption="Reg_State" Width="6%" />
+            </Columns>
+        </DxGrid>
+        <div class="rt-footer">@rows.Count rate variance(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Rate Check Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                     OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Room", "Guest", "Company", "Adult", "Child", "Rate Code Header", "Rate Code Amount",
+        "Rate Amount", "Variance", "Currency", "Arrival Date", "Departure Date", "Room Type", "RTC", "Reg_State",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<RateCheckReportRow> rows = ReportsState.CreateRateCheckSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Room, r.Guest, r.Company, r.Adult.ToString(), r.Child.ToString(), r.RateCodeHeader,
+        r.RateCodeAmount.ToString("N2"), r.RateAmount.ToString("N2"), r.Variance.ToString("N2"), r.Currency,
+        r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"), r.RoomType, r.Rtc, r.RegState,
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateRateCheckSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

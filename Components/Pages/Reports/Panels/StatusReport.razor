@@ -7,20 +7,20 @@
             <i class="bi bi-arrow-left text-secondary"></i>
         </button>
         <div>
-            <h2>Daily Business Report</h2>
-            <p>Total transactions made on the given date, with month and year-to-date totals compared to the prior year.</p>
+            <h2>Status Report</h2>
+            <p>Detailed status of all rooms within the hotel on the given date.</p>
         </div>
     </div>
 
     <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
 
-    <div class="rt-grid-area rp-wide-grid-area">
+    <div class="rt-grid-area">
         <ReportSectionTable Sections="@sections" />
-        <div class="rt-footer">Daily Business Report for @date.ToString("dd-MMM-yyyy")</div>
+        <div class="rt-footer">Status Report for @date.ToString("dd-MMM-yyyy")</div>
     </div>
 </div>
 
-<ReportPreviewDialog Visible="@showPreview" Title="Daily Business Report" OnClose="() => showPreview = false">
+<ReportPreviewDialog Visible="@showPreview" Title="Status Report" OnClose="() => showPreview = false">
     <CustomBody>
         <ReportSectionTable Sections="@sections" />
     </CustomBody>
@@ -30,13 +30,13 @@
     [Parameter] public EventCallback OnBack { get; set; }
 
     private DateTime date = DateTime.Today;
-    private List<ReportSection> sections = ReportsState.CreateDailyBusinessSections(DateTime.Today);
+    private List<ReportSection> sections = new() { ReportsState.CreateStatusReportSection(DateTime.Today) };
     private bool showPreview;
 
     private void Generate(ReportCriteria criteria)
     {
         date = criteria.Date;
-        sections = ReportsState.CreateDailyBusinessSections(date);
+        sections = new List<ReportSection> { ReportsState.CreateStatusReportSection(date) };
         showPreview = true;
     }
 

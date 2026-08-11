@@ -1,0 +1,69 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Daily Sales Summary</h2>
+            <p>Summary of sales activity for the given business date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.VoucherId)" Caption="Voucher ID" Width="14%" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.Customer)" Caption="Customer" Width="17%" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.RoomNo)" Caption="Room No" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.Cash)" Caption="Cash" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.RoomCharge)" Caption="Room Charge" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.Entertainment)" Caption="Entertainment" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.CityLedger)" Caption="City Ledger" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DailySalesSummaryRow.FoodAllowance)" Caption="Food Allowance" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">Daily Sales Summary for @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Daily Sales Summary" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Voucher ID", "Customer", "Room No", "Cash", "Room Charge", "Entertainment", "City Ledger", "Food Allowance",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<DailySalesSummaryRow> rows = ReportsState.CreateDailySalesSummarySample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.VoucherId, r.Customer, r.RoomNo, r.Cash.ToString("N2"), r.RoomCharge.ToString("N2"),
+        r.Entertainment.ToString("N2"), r.CityLedger.ToString("N2"), r.FoodAllowance.ToString("N2"),
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateDailySalesSummarySample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

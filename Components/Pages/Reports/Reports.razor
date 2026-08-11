@@ -64,17 +64,31 @@
                 }
                 else if (selectedReport.Name == "Daily Sales Summary")
                 {
-                    <SummaryReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
-                                        OnBack="ClearSelection" />
+                    <DailySalesSummaryReport OnBack="ClearSelection" />
                 }
                 else if (selectedReport.Name == "Cancellation of the Day")
                 {
                     <CancellationReport OnBack="ClearSelection" />
                 }
-                else if (selectedReport.Name is "No Show Report" or "Package Report")
+                else if (selectedReport.Name == "No Show Report")
                 {
-                    <GuestListReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
-                                          OnBack="ClearSelection" />
+                    <NoShowReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Package Report")
+                {
+                    <PackageReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Rate Check Report")
+                {
+                    <RateCheckReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Cash Dropped Report")
+                {
+                    <CashDroppedReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Room Income Report")
+                {
+                    <RoomIncomeReport OnBack="ClearSelection" />
                 }
                 else
                 {
@@ -90,6 +104,18 @@
                 else if (selectedReport.Name == "Discrepancy Report")
                 {
                     <DiscrepancyReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "HK Activity Report")
+                {
+                    <HkActivityReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Status Report")
+                {
+                    <StatusReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Task Assignment Report")
+                {
+                    <TaskAssignmentReport OnBack="ClearSelection" />
                 }
                 else
                 {
