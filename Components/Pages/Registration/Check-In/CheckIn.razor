@@ -324,7 +324,7 @@
 <!-- ===================== DIRTY ROOM ALERT ===================== -->
 <DxPopup @bind-Visible="showDirtyRoomAlert"
          HeaderText="CNET_v2016"
-         Width="380px"
+         Width="min(380px, 95vw)"
          CloseOnOutsideClick="false"
          ShowCloseButton="true">
     <BodyContentTemplate>
@@ -344,7 +344,7 @@
 <!-- ===================== ROOM SEARCH POPUP ===================== -->
 <DxPopup @bind-Visible="showRoomSearch"
          HeaderText="@($"Room Search-{SelectedGuestName}")"
-         Width="900px" Height="550px"
+         Width="min(900px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.RoomSearch"
@@ -360,6 +360,7 @@
 
         <DxTabs @bind-ActiveTabIndex="roomTab">
             <DxTabPage Text="Rooms">
+                <div class="grid-scroll-wrap">
                 <DxGrid Data="@roomList" KeyFieldName="SN" PageSize="15" ShowPager="false"
                         SizeMode="SizeMode.Small" Height="390px"
                         RowClick="OnRoomRowClick"
@@ -375,6 +376,7 @@
                         <DxGridDataColumn FieldName="Remark" Caption="Remark" />
                     </Columns>
                 </DxGrid>
+                </div>
             </DxTabPage>
             <DxTabPage Text="Pseudo Rooms">
                 <div style="padding:40px; text-align:center; color:#999;">Pseudo Rooms content</div>
@@ -386,7 +388,7 @@
 <!-- ===================== RATE SEARCH POPUP ===================== -->
 <DxPopup @bind-Visible="showRateSearch"
          HeaderText="@($"Rate Search {rateStartDate:M/d/yyyy} - {rateEndDate:M/d/yyyy}")"
-         Width="920px" Height="480px"
+         Width="min(920px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.RateSearch"
@@ -435,6 +437,7 @@
             </CustomContent>
         </RegistrationToolbar>
 
+        <div class="grid-scroll-wrap">
         <DxGrid Data="@rateSearchRows" KeyFieldName="Name" PageSize="10" ShowPager="false"
                 SizeMode="SizeMode.Small" Height="340px"
                 RowClick="OnRateRowClick"
@@ -446,13 +449,14 @@
                 <DxGridDataColumn FieldName="PseudoRooms" Caption="Pseudo Rooms" />
             </Columns>
         </DxGrid>
+        </div>
     </BodyContentTemplate>
 </DxPopup>
 
 <!-- ===================== LOOKUP POPUP ===================== -->
 <DxPopup @bind-Visible="showLookup"
          HeaderText="@lookupTitle"
-         Width="620px" Height="450px"
+         Width="min(620px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.Lookup">
@@ -463,6 +467,7 @@
             </CustomContent>
         </RegistrationToolbar>
 
+        <div class="grid-scroll-wrap">
         <DxGrid Data="@filteredLookupItems" KeyFieldName="Code" PageSize="10" ShowPager="true"
                 SizeMode="SizeMode.Small" RowClick="OnLookupRowClick" Height="310px">
             <Columns>
@@ -471,6 +476,7 @@
                 <DxGridDataColumn FieldName="IdNumber" Caption="id Number" Width="130px" />
             </Columns>
         </DxGrid>
+        </div>
 
         <div class="lookup-footer">
             <DxButton Text="New" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
@@ -482,7 +488,7 @@
 <!-- ===================== TRAVEL DETAIL POPUP ===================== -->
 <DxPopup @bind-Visible="showTravelDetail"
          HeaderText="Travel Detail"
-         Width="550px" Height="500px"
+         Width="min(550px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.TravelDetail"
@@ -534,7 +540,7 @@
 <!-- ===================== COMMENTS POPUP ===================== -->
 <DxPopup @bind-Visible="showComments"
          HeaderText="Comments"
-         Width="600px" Height="500px"
+         Width="min(600px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.Comments"
@@ -550,7 +556,7 @@
 <!-- ===================== GUEST SEARCH POPUP ===================== -->
 <DxPopup @bind-Visible="showGuestSearch"
          HeaderText="Guest Search"
-         Width="720px" Height="500px"
+         Width="min(720px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
         <RegistrationToolbar ToolbarContext="ToolbarContextType.GuestSearch">
@@ -561,6 +567,7 @@
                 <DxButton Text="Clear" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="ClearGuestFilter" />
             </CustomContent>
         </RegistrationToolbar>
+        <div class="grid-scroll-wrap">
         <DxGrid Data="@filteredGuests" KeyFieldName="Id" PageSize="12" ShowPager="true"
                 SizeMode="SizeMode.Small" RowClick="OnGuestRowClick" Height="360px">
             <Columns>
@@ -571,16 +578,23 @@
                 <DxGridDataColumn FieldName="Identification" Caption="Identification" Width="120px" />
             </Columns>
         </DxGrid>
+        </div>
     </BodyContentTemplate>
 </DxPopup>
 
 <style>
+    * {
+        box-sizing: border-box;
+    }
+
     .reservation-page {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: #f0f2f5;
         min-height: 100vh;
         font-size: 12.5px;
         padding: 0 20px;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     .window-title {
@@ -590,18 +604,21 @@
         padding: 7px 12px;
         background: #fff;
         border-bottom: 1px solid #d0d5dd;
+        flex-wrap: wrap;
     }
 
     .title-icon {
         width: 32px;
         height: 32px;
         object-fit: contain;
+        flex-shrink: 0;
     }
 
     .title-text {
         font-size: 13px;
         font-weight: 500;
         color: #1565c0;
+        word-break: break-word;
     }
 
     .erp-toolbar {
@@ -680,9 +697,11 @@
         color: #0d6efd;
     }
 
+    /* ---------- Responsive layout core ---------- */
     .main-area {
         display: flex;
         min-height: 520px;
+        max-width: 100%;
     }
 
     .comment-bar {
@@ -712,21 +731,24 @@
         flex-direction: column;
         gap: 8px;
         padding: 8px;
+        min-width: 0;
     }
 
     .top-row {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
         width: 100%;
     }
 
     .left-middle {
-        flex: 1;
+        flex: 1 1 320px;
+        min-width: 280px;
     }
 
     .right-col {
-        width: 50%;
-        flex-shrink: 0;
+        flex: 1 1 320px;
+        min-width: 280px;
     }
 
     .section {
@@ -735,6 +757,7 @@
         border-radius: 2px;
         padding: 8px 10px 10px;
         margin: 0;
+        min-width: 0;
     }
 
     .section legend {
@@ -762,21 +785,24 @@
 
     .bottom-row {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
         width: 100%;
     }
 
     .stay-section {
-        width: 50%;
+        flex: 2 1 420px;
+        min-width: 300px;
     }
 
     .class-section {
-        width: 295px;
-        flex-shrink: 0;
+        flex: 1 1 240px;
+        min-width: 220px;
     }
 
     .rate-section {
-        flex: 1;
+        flex: 1 1 320px;
+        min-width: 280px;
     }
 
     .stay-grid {
@@ -806,6 +832,7 @@
 
     .rate-adj-top {
         display: flex;
+        flex-wrap: wrap;
         gap: 15px;
         align-items: center;
         justify-content: end;
@@ -820,6 +847,7 @@
 
     .rate-adj-content {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
@@ -835,10 +863,11 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 20px;
+        gap: 12px;
         border: 1px solid #c8cdd4;
         border-radius: 3px;
-        padding: 60px;
+        padding: 16px 24px;
+        flex-shrink: 0;
     }
 
     .rate-fields {
@@ -846,7 +875,8 @@
         grid-template-columns: 60px 1fr;
         gap: 4px 6px;
         align-items: center;
-        flex: 1;
+        flex: 1 1 200px;
+        min-width: 180px;
     }
 
     .rate-fields label {
@@ -885,21 +915,25 @@
         display: flex;
         gap: 3px;
         align-items: center;
+        min-width: 0;
     }
 
     .input-with-btn > :first-child {
         flex: 1;
+        min-width: 0;
     }
 
     .input-with-error {
         position: relative;
         display: flex;
         align-items: center;
+        min-width: 0;
     }
 
     .input-with-error > :first-child {
         flex: 1;
         width: 100%;
+        min-width: 0;
     }
 
     .mandatory-x {
@@ -908,6 +942,7 @@
         font-size: 16px;
         margin-left: 4px;
         line-height: 1;
+        flex-shrink: 0;
     }
 
     .circle-btn {
@@ -918,6 +953,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
 
     .rate-dates,
@@ -937,6 +973,13 @@
         margin-top: 8px;
         padding-top: 6px;
         border-top: 1px solid #eee;
+        flex-wrap: wrap;
+    }
+
+    /* Allow popup grids to scroll horizontally instead of overflowing the popup */
+    .grid-scroll-wrap {
+        width: 100%;
+        overflow-x: auto;
     }
 
     .travel-form {
@@ -983,6 +1026,146 @@
 
     .checkbox-wrapper span {
         color: #555;
+    }
+
+    /* ===================== RESPONSIVE BREAKPOINTS ===================== */
+
+    /* Tablet / narrow desktop: relax the rate-adjustment row, radio padding, and toolbar */
+    @@media (max-width: 1024px) {
+        .radio-col {
+            padding: 12px 18px;
+        }
+
+        .rate-section {
+            flex: 1 1 100%;
+        }
+
+        .toolbar-text {
+            font-size: 10px;
+        }
+    }
+
+    /* Small tablet: stack the two-column label/field grids into one column */
+    @@media (max-width: 768px) {
+        .reservation-page {
+            padding: 0 8px;
+            font-size: 12px;
+        }
+
+        .main-area {
+            flex-direction: column;
+        }
+
+        .comment-bar {
+            width: 100%;
+            height: 40px;
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        .top-row,
+        .bottom-row {
+            flex-direction: column;
+        }
+
+        .left-middle,
+        .right-col,
+        .stay-section,
+        .class-section,
+        .rate-section {
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .basic-grid,
+        .consignee-grid,
+        .stay-grid,
+        .class-grid,
+        .travel-form {
+            grid-template-columns: 100px 1fr;
+        }
+
+        .basic-grid .wide {
+            grid-column: span 1;
+        }
+
+        .rate-adj-content {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .radio-col {
+            flex-direction: row;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .rate-fields {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .rate-adj-top {
+            justify-content: flex-start;
+        }
+
+        .erp-toolbar {
+            justify-content: flex-start;
+        }
+
+        .toolbar-btn.toolbar-close {
+            margin-left: 0;
+        }
+    }
+
+    /* Phone: single-column everywhere, larger touch targets */
+    @@media (max-width: 480px) {
+        .window-title {
+            padding: 6px 8px;
+        }
+
+        .title-text {
+            font-size: 12px;
+        }
+
+        .toolbar-btn {
+            min-width: 50px;
+            padding: 4px 8px;
+        }
+
+        .toolbar-icon,
+        .toolbar-icon i {
+            font-size: 22px;
+        }
+
+        .basic-grid,
+        .consignee-grid,
+        .stay-grid,
+        .class-grid,
+        .rate-fields,
+        .rate-bottom,
+        .travel-form {
+            grid-template-columns: 1fr;
+        }
+
+        .basic-grid label,
+        .consignee-grid label,
+        .stay-grid label,
+        .class-grid label,
+        .rate-fields label,
+        .rate-bottom label,
+        .travel-form label {
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        .rate-dates,
+        .rate-type,
+        .rate-status {
+            width: 100%;
+            justify-content: flex-start;
+        }
     }
 </style>
 

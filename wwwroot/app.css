@@ -472,8 +472,7 @@ select.form-control-custom.select-custom {
     margin-bottom: 20px;
 }
 
-.sub-tab-item {
-    padding: 8px 20px;
+/* .sub-tab-item {
     font-size: 0.9rem;
     font-weight: 600;
     color: #5f6368;
@@ -487,7 +486,7 @@ select.form-control-custom.select-custom {
 .sub-tab-item.active {
     color: #1a73e8;
     border-bottom: 3px solid #1a73e8;
-}
+} */
 
 /* Main Grid Layout */
 .dashboard-main-grid {

@@ -263,6 +263,7 @@
     [Parameter] public EventCallback OnRateInfo { get; set; }
 }
 
+
 <style>
     .erp-toolbar {
         display: flex;
@@ -312,6 +313,7 @@
         transition: all 0.2s ease;
         border-radius: 4px;
         height: 50px;
+        flex-shrink: 0;
     }
 
     .toolbar-btn:hover {
@@ -351,9 +353,335 @@
         color: #444;
         font-weight: 500;
         transition: color 0.2s ease;
+        white-space: nowrap;
     }
 
     .toolbar-btn:hover .toolbar-text {
         color: #0d6efd;
+    }
+
+    /* =====================================================
+       RESPONSIVE STYLES
+    ===================================================== */
+
+    /* Tablets and smaller screens */
+    @@media (max-width: 1024px) {
+        .erp-toolbar {
+            min-height: 66px;
+            padding: 4px 8px;
+            gap: 2px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .toolbar-btn {
+            min-width: 52px;
+            padding: 3px 8px;
+            height: 44px;
+        }
+
+        .toolbar-icon {
+            font-size: 24px;
+            line-height: 24px;
+        }
+
+        .toolbar-icon i {
+            font-size: 24px;
+        }
+
+        .toolbar-text {
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .state-group {
+            padding: 0 6px;
+            margin: 0 3px;
+        }
+
+        .state-label {
+            font-size: 11px;
+        }
+
+        .toolbar-btn.toolbar-print,
+        .toolbar-btn.toolbar-select {
+            border-left: 1.5px solid #d6d6d6 !important;
+            border-right: 1.5px solid #d6d6d6 !important;
+        }
+    }
+
+    /* Mobile devices */
+    @@media (max-width: 768px) {
+        .erp-toolbar {
+            min-height: 58px;
+            padding: 3px 6px;
+            gap: 2px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            overflow-x: auto;
+            overflow-y: visible;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .erp-toolbar::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .erp-toolbar::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .toolbar-group {
+            gap: 2px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }
+
+        .state-group {
+            padding: 0 4px;
+            margin: 0 2px;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .state-label {
+            font-size: 10px;
+            margin-right: 3px;
+        }
+
+        .toolbar-btn {
+            min-width: 44px;
+            padding: 2px 6px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-icon {
+            font-size: 20px;
+            line-height: 20px;
+        }
+
+        .toolbar-icon i {
+            font-size: 20px;
+        }
+
+        .toolbar-text {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .toolbar-btn.toolbar-close {
+            margin-left: 0;
+        }
+
+        /* Hide text on very small screens to save space */
+        @@media (max-width: 480px) {
+            .erp-toolbar {
+                min-height: 48px;
+                padding: 2px 4px;
+                gap: 1px;
+                margin-top: 4px;
+                margin-bottom: 4px;
+            }
+
+            .toolbar-group {
+                gap: 1px;
+            }
+
+            .toolbar-btn {
+                min-width: 38px;
+                padding: 2px 4px;
+                height: 36px;
+            }
+
+            .toolbar-icon {
+                font-size: 18px;
+                line-height: 18px;
+            }
+
+            .toolbar-icon i {
+                font-size: 18px;
+            }
+
+            .toolbar-text {
+                display: none;
+            }
+
+            /* Show only icons on very small screens */
+            .toolbar-btn {
+                min-width: 34px;
+                padding: 3px 5px;
+                height: 34px;
+            }
+
+            .state-group {
+                padding: 0 3px;
+                margin: 0 2px;
+            }
+
+            .state-label {
+                font-size: 9px;
+                margin-right: 2px;
+            }
+
+            .toolbar-btn.toolbar-print,
+            .toolbar-btn.toolbar-select {
+                border-left: 1px solid #d6d6d6 !important;
+                border-right: 1px solid #d6d6d6 !important;
+            }
+        }
+
+        /* Very small mobile devices */
+        @@media (max-width: 360px) {
+            .erp-toolbar {
+                min-height: 42px;
+                padding: 2px 3px;
+                gap: 1px;
+                margin-top: 3px;
+                margin-bottom: 3px;
+            }
+
+            .toolbar-btn {
+                min-width: 30px;
+                padding: 2px 3px;
+                height: 30px;
+            }
+
+            .toolbar-icon {
+                font-size: 16px;
+                line-height: 16px;
+            }
+
+            .toolbar-icon i {
+                font-size: 16px;
+            }
+
+            .state-group {
+                padding: 0 2px;
+            }
+
+            .state-label {
+                font-size: 8px;
+                margin-right: 1px;
+            }
+        }
+    }
+
+    /* Landscape phones */
+    @@media (max-height: 500px) and (orientation: landscape) {
+        .erp-toolbar {
+            min-height: 46px;
+            padding: 2px 6px;
+            gap: 2px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .toolbar-btn {
+            min-width: 40px;
+            padding: 2px 6px;
+            height: 36px;
+        }
+
+        .toolbar-icon {
+            font-size: 18px;
+            line-height: 18px;
+        }
+
+        .toolbar-icon i {
+            font-size: 18px;
+        }
+
+        .toolbar-text {
+            font-size: 8px;
+            margin-top: 1px;
+        }
+
+        .state-group {
+            padding: 0 4px;
+        }
+
+        .state-label {
+            font-size: 9px;
+        }
+    }
+
+    /* Touch-friendly: larger tap targets on mobile */
+    @@media (hover: none) and (pointer: coarse) {
+        .toolbar-btn {
+            min-height: 44px;
+        }
+
+        @@media (max-width: 480px) {
+            .toolbar-btn {
+                min-height: 38px;
+                min-width: 38px;
+            }
+        }
+
+        @@media (max-width: 360px) {
+            .toolbar-btn {
+                min-height: 34px;
+                min-width: 34px;
+            }
+        }
+    }
+
+    /* Large screens */
+    @@media (min-width: 1600px) {
+        .erp-toolbar {
+            min-height: 82px;
+            padding: 6px 16px;
+            gap: 6px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+        }
+
+        .toolbar-group {
+            gap: 6px;
+        }
+
+        .toolbar-btn {
+            min-width: 72px;
+            padding: 6px 16px;
+            height: 58px;
+        }
+
+        .toolbar-icon {
+            font-size: 32px;
+            line-height: 32px;
+        }
+
+        .toolbar-icon i {
+            font-size: 32px;
+        }
+
+        .toolbar-text {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .state-group {
+            padding: 0 14px;
+            margin: 0 6px;
+        }
+
+        .state-label {
+            font-size: 13px;
+        }
+    }
+
+    /* Print styles */
+    @@media print {
+        .erp-toolbar {
+            display: none !important;
+        }
     }
 </style>
