@@ -1,0 +1,72 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Package Report</h2>
+            <p>Package transactions along with registration details for the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.RegNo)" Caption="Reg_No" Width="12%" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.Room)" Caption="Room" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.Guest)" Caption="Guest" Width="15%" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.ArrivalDate)" Caption="Arrival Date" Width="11%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.DepartureDate)" Caption="Departure Date" Width="11%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.PackageGroup)" Caption="Package Group" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.PackageType)" Caption="Package Type" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.Adult)" Caption="Adult" Width="6%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.Child)" Caption="Child" Width="6%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(PackageReportRow.PackageAmount)" Caption="Package Amount" Width="9%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count package(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Package Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Room", "Guest", "Arrival Date", "Departure Date", "Package Group", "Package Type",
+        "Adult", "Child", "Package Amount",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<PackageReportRow> rows = ReportsState.CreatePackageSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Room, r.Guest, r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"),
+        r.PackageGroup, r.PackageType, r.Adult.ToString(), r.Child.ToString(), r.PackageAmount.ToString("N2"),
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreatePackageSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

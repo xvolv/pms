@@ -1,0 +1,77 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Room Income Report</h2>
+            <p>Income collected or expected to be collected on the given date or date range.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.PeriodRange" InitialDate="@DateTime.Today" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <ReportSectionTable Sections="@sections" />
+        <div class="rt-footer">Room Income Report - @periodLabel</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Room Income Report" OnClose="() => showPreview = false">
+    <CustomBody>
+        <ReportSectionTable Sections="@sections" />
+    </CustomBody>
+</ReportPreviewDialog>
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private List<ReportSection> sections = ReportsState.CreateRoomIncomeSections(DateTime.Today, DateTime.Today);
+    private string periodLabel = "Daily - " + DateTime.Today.ToString("dd-MMM-yyyy");
+    private bool showPreview;
+
+    private void Generate(ReportCriteria criteria)
+    {
+        DateTime start;
+        DateTime end;
+
+        switch (criteria.PeriodType)
+        {
+            case "Date Range":
+                start = criteria.RangeStart;
+                end = criteria.RangeEnd;
+                break;
+            case "Weekly":
+                start = criteria.RangeStart;
+                end = start.AddDays(6);
+                break;
+            case "Monthly":
+                start = criteria.RangeStart;
+                end = start.AddMonths(1).AddDays(-1);
+                break;
+            case "Annually":
+                start = criteria.RangeStart;
+                end = start.AddYears(1).AddDays(-1);
+                break;
+            case "Show all":
+                end = DateTime.Today;
+                start = end.AddDays(-30);
+                break;
+            default:
+                start = criteria.RangeStart;
+                end = criteria.RangeStart;
+                break;
+        }
+
+        sections = ReportsState.CreateRoomIncomeSections(start, end);
+        periodLabel = criteria.PeriodType == "Date Range" || criteria.PeriodType == "Show all"
+            ? $"{criteria.PeriodType} - {start:dd-MMM-yyyy} to {end:dd-MMM-yyyy}"
+            : $"{criteria.PeriodType} - {start:dd-MMM-yyyy}";
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

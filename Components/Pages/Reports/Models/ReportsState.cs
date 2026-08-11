@@ -6,7 +6,6 @@ public class ReportsState
 
     public List<ReportDefinition> Catalog { get; set; } = new();
     public List<CheckoutReportRow> CheckoutRows { get; set; } = new();
-    public List<ManagerialFlashRow> ManagerialFlash { get; set; } = new();
     public List<DiscrepancyReportRow> DiscrepancyRows { get; set; } = new();
     public List<ArrivalListRow> ArrivalRows { get; set; } = new();
 
@@ -156,30 +155,141 @@ public class ReportsState
         };
     }
 
-    public static List<ManagerialFlashRow> CreateManagerialFlashSample(DateTime date)
+    private static readonly (string Item, string CurrentDay)[] ManagerialFlashItems =
     {
-        return new List<ManagerialFlashRow>
+        ("Total Rooms In Hotel", "67.00"),
+        ("Rooms Occupied", "1.00"),
+        ("Total Rooms Minus OOO Rooms", "67.00"),
+        ("Available Rooms", "66.00"),
+        ("Available Rooms Minus OOO Rooms", "66.00"),
+        ("Complementary Rooms", "0.00"),
+        ("House Use Rooms", "0.00"),
+        ("Rooms Occupied Minus Comp and House Use", "1.00"),
+        ("Rooms Occupied Minus House Use", "1.00"),
+        ("Rooms Occupied Minus Comp", "1.00"),
+        ("Day Use Rooms", "67.00"),
+        ("Out Of Order Rooms", "0.00"),
+        ("Out Of Service Rooms", "0.00"),
+        ("In House Adults", "5.00"),
+        ("In House Children", "0.00"),
+        ("Total In House Persons", "5.00"),
+        ("VIP Person In House", "-1.00"),
+        ("VIP Rooms In House", "-1.00"),
+        ("Source Rooms In House", "0.00"),
+        ("Company Rooms In House", "0.00"),
+        ("Travel Agent Rooms In House", "0.00"),
+        ("Group Rooms In House", "0.00"),
+        ("% Rooms Occupied", "1.49"),
+        ("% Rooms Occupied Minus Comp and House", "1.49"),
+        ("% Rooms Occupied Minus Comp House and OOO", "1.49"),
+        ("% Rooms Occupied Minus Comp", "1.49"),
+        ("% Rooms Occupied Minus House", "1.49"),
+        ("% Rooms Occupied Minus Comp and OOO", "1.49"),
+        ("% Rooms Occupied Minus House and OOO", "1.49"),
+        ("% Rooms Occupied Minus OOO", "1.49"),
+        ("Arrival Rooms", "14.00"),
+        ("Arrival Persons", "14.00"),
+        ("Walk In Rooms", "-1.00"),
+        ("Walk In Persons", "-1.00"),
+        ("Extended Stay Rooms", "9.00"),
+        ("Extended Stay Persons", "9.00"),
+        ("Departure Rooms", "0.00"),
+        ("Departure Persons", "0.00"),
+        ("Early Departure Rooms", "0.00"),
+        ("Early Departure Persons", "0.00"),
+        ("No Show Rooms", "1.00"),
+        ("No Show Persons", "1.00"),
+        ("Cancelled Reservations for Today", "1.00"),
+        ("Reservations Made Today", "19.00"),
+        ("Reservation Cancellations Made Today", "1.00"),
+        ("Room Nights Reserved Today", "109.00"),
+        ("Clean Rooms", "0.00"),
+        ("Dirty Rooms", "0.00"),
+        ("ADR", "38,083.23"),
+        ("ADR Minus Comp", "38,083.23"),
+        ("ADR minus house", "38,083.23"),
+        ("ADR minus comp and house", "38,083.23"),
+        ("Average Person Rate", "7,616.65"),
+        ("Room Revenue", "38,083.23"),
+        ("Food and Beverage Revenue", "0.00"),
+        ("Other Revenue", "2,129.33"),
+        ("Total Revenue", "40,212.56"),
+        ("Total Revenue Per Person", "8,042.51"),
+        ("Payments", "32,689.02"),
+        ("Arrival Rooms for Tomorrow", "24.00"),
+        ("Arrival Persons for Tomorrow", "24.00"),
+        ("Departure Rooms for Tomorrow", "11.00"),
+        ("Departure Persons for Tomorrow", "11.00"),
+        ("% Rooms Occupied for Tomorrow", "20.90"),
+        ("% Multiple Occupancy", "400.00"),
+        ("% Rooms Occupied for Next 7 Days", "94.03"),
+        ("Repeat Guest Rooms Occupied", "-347.00"),
+        ("% Rooms Occupied Plus Day Use", "101.49"),
+        ("Rooms Occupied Plus Day Use and No Show", "69.00"),
+        ("% Rooms Occupied Plus Day Use and No Show", "102.99"),
+    };
+
+    public static List<ManagerialFlashItemRow> CreateManagerialFlashItems(DateTime date)
+    {
+        return ManagerialFlashItems.Select((item, i) => new ManagerialFlashItemRow
         {
-            new() { Id = NextId(), Metric = "Occupancy %", Today = "78%", MonthToDate = "71%", PriorMonth = "68%", PriorYear = "65%" },
-            new() { Id = NextId(), Metric = "Rooms Sold", Today = "39", MonthToDate = "742", PriorMonth = "680", PriorYear = "610" },
-            new() { Id = NextId(), Metric = "Average Daily Rate (ADR)", Today = "2,450.00", MonthToDate = "2,380.00", PriorMonth = "2,300.00", PriorYear = "2,150.00" },
-            new() { Id = NextId(), Metric = "RevPAR", Today = "1,911.00", MonthToDate = "1,689.80", PriorMonth = "1,564.00", PriorYear = "1,397.50" },
-            new() { Id = NextId(), Metric = "Room Revenue", Today = "95,550.00", MonthToDate = "1,766,760.00", PriorMonth = "1,564,000.00", PriorYear = "1,311,500.00" },
-            new() { Id = NextId(), Metric = "No Shows", Today = "1", MonthToDate = "14", PriorMonth = "11", PriorYear = "9" },
-            new() { Id = NextId(), Metric = "Cancellations", Today = "2", MonthToDate = "22", PriorMonth = "19", PriorYear = "17" },
-        };
+            Id = NextId(),
+            Sn = i + 1,
+            ReportItem = item.Item,
+            CurrentYearDay = item.CurrentDay,
+        }).ToList();
     }
 
     public static List<DiscrepancyReportRow> CreateDiscrepancyReportSample(DateTime date)
     {
         return new List<DiscrepancyReportRow>
         {
-            new() { Id = NextId(), Room = "306", SystemStatus = "Occupied", HousekeepingStatus = "Vacant Dirty",
-                ReportedDate = date, Remark = "Guest checked out early, HK not updated by front desk." },
-            new() { Id = NextId(), Room = "410", SystemStatus = "Vacant Clean", HousekeepingStatus = "Occupied",
-                ReportedDate = date, Remark = "Walk-in assigned without system update." },
-            new() { Id = NextId(), Room = "118", SystemStatus = "Vacant Dirty", HousekeepingStatus = "Vacant Clean",
-                ReportedDate = date, Remark = "Room cleaned but status not synced from HK app." },
+            new() { Id = NextId(), RoomNo = "306", RoomType = "Standard", RoomStatus = "Vacant Dirty",
+                HkStatus = "Occupied", FoStatus = "Vacant", ResStatus = "Checked Out", FoPerson = 0, HkPerson = 2,
+                Discrepancy = "Sleep", Date = date },
+            new() { Id = NextId(), RoomNo = "410", RoomType = "Deluxe", RoomStatus = "Occupied Clean",
+                HkStatus = "Vacant", FoStatus = "Occupied", ResStatus = "Checked In", FoPerson = 2, HkPerson = 0,
+                Discrepancy = "Skip", Date = date },
+            new() { Id = NextId(), RoomNo = "118", RoomType = "Standard", RoomStatus = "Occupied Clean",
+                HkStatus = "Occupied", FoStatus = "Occupied", ResStatus = "Checked In", FoPerson = 2, HkPerson = 1,
+                Discrepancy = "Person", Date = date },
+            new() { Id = NextId(), RoomNo = "215", RoomType = "Suite", RoomStatus = "Occupied Dirty",
+                HkStatus = "Occupied", FoStatus = "Vacant", ResStatus = "Reserved", FoPerson = 0, HkPerson = 3,
+                Discrepancy = "Sleep/Person", Date = date },
+        };
+    }
+
+    public static List<HkActivityRow> CreateHkActivitySample(DateTime date)
+    {
+        return new List<HkActivityRow>
+        {
+            new() { Id = NextId(), Activity = "Dirty", RoomNumber = "306", Date = date, User = "T. Bekele", DeviceName = "HK Tablet 1" },
+            new() { Id = NextId(), Activity = "Clean", RoomNumber = "410", Date = date, User = "S. Wolde", DeviceName = "HK Tablet 2" },
+            new() { Id = NextId(), Activity = "Out of Order", RoomNumber = "118", Date = date, User = "M. Girma", DeviceName = "Front Desk PC" },
+        };
+    }
+
+    public static ReportSection CreateStatusReportSection(DateTime date)
+    {
+        return new ReportSection
+        {
+            Title = "",
+            Columns = new[] { "Total Rooms", "Clean Rooms", "Dirty Rooms", "Pickup Rooms", "Occ Rooms", "Occ+ Rooms", "Inspected Rooms", "Vacant Rooms", "Occupied Rooms" },
+            RightAlign = new[] { true, true, true, true, true, true, true, true, true },
+            Rows = new List<string[]>
+            {
+                new[] { "91", "53", "30", "8", "1", "2", "45", "90", "1" },
+            },
+        };
+    }
+
+    public static List<TaskAssignmentRow> CreateTaskAssignmentSample(DateTime date)
+    {
+        return new List<TaskAssignmentRow>
+        {
+            new() { Id = NextId(), TaskDate = date, Task = "Checkout Clean", InAuto = "Yes", TotalSheets = 12, TotalCredits = 12 },
+            new() { Id = NextId(), TaskDate = date, Task = "Turndown", InAuto = "No", TotalSheets = 8, TotalCredits = 8 },
+            new() { Id = NextId(), TaskDate = date, Task = "Stay-over Clean", InAuto = "Yes", TotalSheets = 15, TotalCredits = 15 },
         };
     }
 
@@ -216,9 +326,6 @@ public class ReportsState
         ["Check Report of the Day"] = ("CK", new[] { "Check received - folio settlement", "Check received - advance deposit" }, 500m, 6000m),
         ["Credit Cards of the Day"] = ("CC", new[] { "Visa settlement", "Mastercard settlement", "Amex settlement" }, 800m, 9000m),
         ["Deposit Ledger"] = ("DL", new[] { "Deposit held - advance reservation", "Deposit held - group booking" }, 1000m, 8000m),
-        ["Rate Check Report"] = ("RC", new[] { "Rate variance - override not authorized", "Rate variance - system default applied" }, 100m, 2500m),
-        ["Cash Dropped Report"] = ("CD", new[] { "Cash drop - morning shift", "Cash drop - evening shift" }, 2000m, 15000m),
-        ["Room Income Report"] = ("RI", new[] { "Room income - standard rooms", "Room income - deluxe rooms", "Room income - suites" }, 5000m, 40000m),
     };
 
     private static readonly (string Guest, string Room)[] TransactionGuestPool =
@@ -269,39 +376,23 @@ public class ReportsState
         return rows;
     }
 
-    private static readonly Dictionary<string, string[]> HousekeepingReportRooms = new()
-    {
-        ["HK Activity Report"] = new[] { "306", "410", "118" },
-        ["HK Attendants Report"] = new[] { "-", "-", "-" },
-        ["Status Report"] = new[] { "101", "102", "103", "104" },
-        ["Task Assignment Report"] = new[] { "204", "215", "309" },
-    };
+    private static readonly string[] HkAttendantsRooms = { "-", "-", "-" };
 
     public static List<HousekeepingReportRow> CreateHousekeepingSample(string reportName, DateTime date)
     {
-        var rooms = HousekeepingReportRooms.TryGetValue(reportName, out var r) ? r : new[] { "101", "102" };
         var rows = new List<HousekeepingReportRow>();
 
-        for (var i = 0; i < rooms.Length; i++)
+        for (var i = 0; i < HkAttendantsRooms.Length; i++)
         {
-            var (status, attendant, remark) = reportName switch
-            {
-                "HK Activity Report" => ("Vacant Clean", "T. Bekele", i % 2 == 0 ? "Changed from Vacant Dirty to Vacant Clean" : "Changed from Occupied to Vacant Dirty"),
-                "HK Attendants Report" => ($"{6 + i} rooms completed", new[] { "T. Bekele", "S. Wolde", "M. Girma" }[i % 3], "Shift ending 16:00"),
-                "Status Report" => (new[] { "Occupied Clean", "Vacant Dirty", "Vacant Clean", "Out of Order" }[i % 4], "-", ""),
-                "Task Assignment Report" => (new[] { "Checkout Clean", "Turndown", "Stay-over Clean" }[i % 3], new[] { "T. Bekele", "S. Wolde", "M. Girma" }[i % 3], "Assigned for today's shift"),
-                _ => ("-", "-", ""),
-            };
-
             rows.Add(new HousekeepingReportRow
             {
                 Id = NextId(),
                 Sn = i + 1,
-                Room = rooms[i],
-                Status = status,
-                Attendant = attendant,
+                Room = HkAttendantsRooms[i],
+                Status = $"{6 + i} rooms completed",
+                Attendant = new[] { "T. Bekele", "S. Wolde", "M. Girma" }[i % 3],
                 Date = date,
-                Remark = remark,
+                Remark = "Shift ending 16:00",
             });
         }
 
@@ -332,8 +423,6 @@ public class ReportsState
                 "Postmaster In-House List" => (date.AddDays(-1), date.AddDays(2), "Postmaster room type"),
                 "Room Move" => (date.AddDays(-1), date.AddDays(2), $"Moved from Room {100 + i} to Room {g.Room}"),
                 "Arrived List" => (date, date.AddDays(2), "Arrived and checked in today"),
-                "No Show Report" => (date, date.AddDays(2), "No show - did not arrive by day closing"),
-                "Package Report" => (date.AddDays(-1), date.AddDays(2), "Bed & Breakfast package included"),
                 _ => (date.AddDays(-1), date.AddDays(1), ""),
             };
 
@@ -358,43 +447,67 @@ public class ReportsState
         return rows;
     }
 
-    public static List<SummaryMetricRow> CreateSummaryMetricSample(string reportName, DateTime date)
+    public static List<NoShowReportRow> CreateNoShowSample(DateTime date)
     {
-        var lines = reportName switch
+        return new List<NoShowReportRow>
         {
-            "Daily Sales Summary" => new[]
-            {
-                ("Room Sales", "95,550.00", ""),
-                ("F&B Sales", "27,700.00", ""),
-                ("Other Sales", "6,400.00", ""),
-                ("Subtotal", "129,650.00", ""),
-                ("Tax", "19,447.50", "15% VAT"),
-                ("Grand Total", "149,097.50", ""),
-            },
-            _ => new[] { (reportName, "-", "") },
+            new() { Id = NextId(), Sn = 1, RegNo = "RES-20063", Guest = "Tsedale Worku", Company = "",
+                ArrivalDate = date, DepartureDate = date.AddDays(2), RegState = "No Show", RegType = "Individual",
+                PaymentType = "Credit Card", MarketCode = "Leisure" },
+            new() { Id = NextId(), Sn = 2, RegNo = "RES-20071", Guest = "Elias Fikru", Company = "Addis Exporters",
+                ArrivalDate = date, DepartureDate = date.AddDays(1), RegState = "No Show", RegType = "Corporate",
+                PaymentType = "City Ledger", MarketCode = "Corporate" },
+            new() { Id = NextId(), Sn = 3, RegNo = "RES-20084", Guest = "Hiwot Bekele", Company = "",
+                ArrivalDate = date, DepartureDate = date.AddDays(3), RegState = "No Show", RegType = "Individual",
+                PaymentType = "Cash", MarketCode = "Walk-In" },
         };
+    }
 
-        return lines.Select((l, i) => new SummaryMetricRow
+    public static List<PackageReportRow> CreatePackageSample(DateTime date)
+    {
+        return new List<PackageReportRow>
         {
-            Id = NextId(),
-            Sn = i + 1,
-            Label = l.Item1,
-            Value = l.Item2,
-            Note = l.Item3,
-        }).ToList();
+            new() { Id = NextId(), RegNo = "WREG-00599-17", Room = "305", Guest = "GUEST WASA TEST",
+                ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 23),
+                PackageGroup = "Bed Package", PackageType = "Bed and Breakfast", Adult = 1, Child = 0,
+                PackageAmount = 0.00m },
+        };
+    }
+
+    public static List<RateCheckReportRow> CreateRateCheckSample(DateTime date)
+    {
+        return new List<RateCheckReportRow>
+        {
+            new() { Id = NextId(), RegNo = "WREG-00593-17", Room = "304", Guest = "JAVIER PRIETO MINA", Company = "",
+                Adult = 1, Child = 0, RateCodeHeader = "WASSAMARRATE", RateCodeAmount = 85.00m, RateAmount = 85.00m,
+                Variance = 0.00m, Currency = "US Dollar", ArrivalDate = new DateTime(2017, 9, 13),
+                DepartureDate = new DateTime(2017, 9, 14), RoomType = "KING", Rtc = "KING", RegState = "Cancelled" },
+        };
+    }
+
+    public static List<DailySalesSummaryRow> CreateDailySalesSummarySample(DateTime date)
+    {
+        return new List<DailySalesSummaryRow>
+        {
+            new() { Id = NextId(), VoucherId = "BCRS-00729-17", Customer = "AYALEW HIWOT", RoomNo = "",
+                Cash = 4010.00m, RoomCharge = 0m, Entertainment = 0m, CityLedger = 0m, FoodAllowance = 0m },
+        };
     }
 
     private static readonly string[] DailyBusinessItemColumns =
         { "SN", "Particulars", "Total Today", "Month Todate", "Year To Date", "Last Year Date", "Last Year Month", "Last Year" };
 
-    public static List<DailyBusinessSection> CreateDailyBusinessSections(DateTime date)
+    private static readonly bool[] DailyBusinessItemRightAlign = { false, false, true, true, true, true, true, true };
+
+    public static List<ReportSection> CreateDailyBusinessSections(DateTime date)
     {
-        return new List<DailyBusinessSection>
+        return new List<ReportSection>
         {
             new()
             {
                 Title = "Resident Summary",
                 Columns = DailyBusinessItemColumns,
+                RightAlign = DailyBusinessItemRightAlign,
                 Rows = new List<string[]>
                 {
                     new[] { "1", "Room Sales", "29350.51", "0", "0", "0", "0", "0" },
@@ -416,6 +529,7 @@ public class ReportsState
             {
                 Title = "Income Analysis",
                 Columns = DailyBusinessItemColumns,
+                RightAlign = DailyBusinessItemRightAlign,
                 Rows = new List<string[]>
                 {
                     new[] { "1", "Room Sales", "30733.51", "0", "0", "0", "0", "0" },
@@ -429,6 +543,7 @@ public class ReportsState
             {
                 Title = "Sales Centers Activity Analysis",
                 Columns = new[] { "SN", "Machine Name", "Cash", "Room", "City Ledger", "Entertainment", "Food Allowance", "Total Today", "Month Today" },
+                RightAlign = new[] { false, false, true, true, true, true, true, true, true },
                 Rows = new List<string[]>
                 {
                     new[] { "1", "Room Sales", "0", "39384.42", "0", "0", "0", "39384.42", "0" },
@@ -439,6 +554,7 @@ public class ReportsState
             {
                 Title = "Collector Analysis",
                 Columns = new[] { "SN", "Cashier", "From Guest", "Advanced Deposit", "From Credit", "Cash Recieved", "Total" },
+                RightAlign = new[] { false, false, true, true, true, true, true },
                 Rows = new List<string[]>
                 {
                     new[] { "1", "CNET ADMIN", "0", "0", "21863.04", "0", "21863.04" },
@@ -449,6 +565,7 @@ public class ReportsState
             {
                 Title = "Occupancy Summary",
                 Columns = new[] { "SN", "Room Type", "Rooms", "Occupied", "Vacant", "Occupancy [%]", "MTD [%]", "YTD [%]", "Today", "Month", "Yearly", "ADR" },
+                RightAlign = new[] { false, false, true, true, true, true, true, true, true, true, true, true },
                 Rows = new List<string[]>
                 {
                     new[] { "1", "KING", "55", "0", "53", "0", "0", "0", "0", "0", "0", "0" },
@@ -458,6 +575,111 @@ public class ReportsState
                     new[] { "5", "VIP", "5", "0", "4", "0", "0", "0", "0", "0", "0", "0" },
                 },
                 TotalRow = new[] { "", "Total =", "91.00", "0.00", "78.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00" },
+            },
+        };
+    }
+
+    private static readonly string[] CashDroppedDocumentColumns =
+        { "Voucher ID", "Ref Number", "Date", "User", "Received From", "Payment Method", "Total" };
+
+    private static readonly bool[] CashDroppedDocumentRightAlign = { false, false, false, false, false, false, true };
+
+    public static List<ReportSection> CreateCashDroppedSections(DateTime date)
+    {
+        return new List<ReportSection>
+        {
+            new()
+            {
+                Title = "Sales Documents",
+                Columns = new[] { "Voucher ID", "Room No", "Cash", "Room Charge", "Entertainment", "City Ledger", "Food Allowance" },
+                RightAlign = new[] { false, false, true, true, true, true, true },
+                Rows = new List<string[]>
+                {
+                    new[] { "BCS-00624-17", "", "82.96", "0", "0", "0", "0" },
+                },
+            },
+            new()
+            {
+                Title = "Cash Receipt Documents",
+                Columns = CashDroppedDocumentColumns,
+                RightAlign = CashDroppedDocumentRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "CRV-56575", "", "9/13/2017", "CNET ADMIN", "AYALEW HIWOT", "Cash", "500.00" },
+                },
+            },
+            new()
+            {
+                Title = "Refund Documents",
+                Columns = CashDroppedDocumentColumns,
+                RightAlign = CashDroppedDocumentRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "POV-00024-17", "", "9/13/2017", "CNET ADMIN", "SAFARYAN GEVORG", "Cash", "1000.00" },
+                },
+            },
+        };
+    }
+
+    private static readonly string[] RoomIncomeColumns = { "Registration", "Date", "Room No", "Customer Name", "Rate Type", "Amount" };
+    private static readonly bool[] RoomIncomeRightAlign = { false, false, false, false, false, true };
+
+    public static List<ReportSection> CreateRoomIncomeSections(DateTime start, DateTime end)
+    {
+        return new List<ReportSection>
+        {
+            new()
+            {
+                Title = "Room Type: KING",
+                Columns = RoomIncomeColumns,
+                RightAlign = RoomIncomeRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "WREG-00577-17", "9/13/2017", "303", "AYALEW HIWOT", "KING", "3054.71" },
+                    new[] { "WREG-00579-17", "9/13/2017", "308", "SAFARYAN GEVORG", "KING", "3449.98" },
+                    new[] { "WREG-00581-17", "9/13/2017", "308", "CHARLES LIHULUK ERICK", "KING", "1667.36" },
+                    new[] { "WREG-00582-17", "9/13/2017", "308", "KUNWAR SURENDRA SINGH", "KING", "2659.46" },
+                    new[] { "WREG-00583-17", "9/13/2017", "308", "KUNWAR SURENDRA SINGH", "KING", "4288.09" },
+                    new[] { "WREG-00586-17", "9/13/2017", "311", "GUEST WASA TEST", "KING", "2659.46" },
+                    new[] { "WREG-00588-17", "9/13/2017", "402", "AHEMAD NASIR SATARAJ", "KING", "5790.07" },
+                    new[] { "WREG-00590-17", "9/13/2017", "301", "SAFARYAN GEVORG", "KING", "1642.07" },
+                    new[] { "WREG-00597-17", "9/14/2017", "301", "GUO WENZHONG", "KING", "2659.46" },
+                    new[] { "WREG-00599-17", "9/14/2017", "305", "GUEST WASA TEST", "KING", "1087.13" },
+                },
+            },
+            new()
+            {
+                Title = "Room Type: PSEUDO ROOM TYPE",
+                Columns = RoomIncomeColumns,
+                RightAlign = RoomIncomeRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "WREG-00592-17", "9/13/2017", "2002", "SAFARYAN GEVORG", "PSEUDO ROOM TYPE", "1479.85" },
+                },
+            },
+            new()
+            {
+                Title = "Room Type: SUITE",
+                Columns = RoomIncomeColumns,
+                RightAlign = RoomIncomeRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "WREG-00589-17", "9/13/2017", "705", "NAGUIB ALI TAHER", "SUITE", "2659.46" },
+                    new[] { "WREG-00595-17", "9/14/2017", "703", "EBISEE SOLOMON REGASSA", "SUITE", "2659.46" },
+                    new[] { "WREG-00596-17", "9/14/2017", "703", "YONGMING CHEN", "SUITE", "2659.46" },
+                    new[] { "WREG-00600-17", "9/14/2017", "701", "NIJIRI WAWERU DAVID", "SUITE", "1479.85" },
+                },
+            },
+            new()
+            {
+                Title = "Room Type: VIP",
+                Columns = RoomIncomeColumns,
+                RightAlign = RoomIncomeRightAlign,
+                Rows = new List<string[]>
+                {
+                    new[] { "WREG-00603-17", "9/14/2017", "104", "DOUALEH AHMED DOUALEH", "VIP", "1479.46" },
+                },
+                TotalRow = new[] { "", "", "", "", "Grand Total=", "42,555.33" },
             },
         };
     }
@@ -568,7 +790,6 @@ public class ReportsState
             BusinessDate = today,
             Catalog = CreateCatalog(),
             CheckoutRows = CreateCheckoutReportSample(today),
-            ManagerialFlash = CreateManagerialFlashSample(today),
             DiscrepancyRows = CreateDiscrepancyReportSample(today),
             ArrivalRows = CreateArrivalListSample(today)
         };

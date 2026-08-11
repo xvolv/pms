@@ -67,10 +67,6 @@
     overflow-x: auto;
 }
 
-.rp-wide-grid {
-    min-width: 1700px;
-}
-
 /* Report preview dialog: the backdrop is kept out of the sidebar's lane
    (below) so the modal only ever spans the main content area and the
    sidebar stays open and visible. The printed page itself (further down)
@@ -165,28 +161,28 @@
     border-top: 2px solid #333 !important;
 }
 
-/* Daily Business Report: sectioned Report Items tables (Resident Summary,
-   Income Analysis, Sales Centers Activity Analysis, Collector Analysis,
-   Occupancy Summary), each with its own columns and an optional total row. */
-.rp-db-section-title {
+/* Sectioned "Report Items" tables shared by multi-section reports (Daily
+   Business Report, Cash Dropped Report, ...): each section has its own
+   title, columns and optional total row. */
+.rp-sec-section-title {
     font-weight: 700;
     background-color: #f1f3f4;
-    border: 1px solid #333;
+    /* border: 1px solid #333; */
     border-bottom: none;
-    padding: 3px 6px;
+    padding: 0px 6px;
     font-size: 10px;
     margin-top: 10px;
 }
 
-.rp-db-table {
+.rp-sec-table {
     margin-top: 0;
 }
 
-.rp-db-right {
+.rp-sec-right {
     text-align: right;
 }
 
-.rp-db-total-row td {
+.rp-sec-total-row td {
     font-weight: 700;
     background-color: #d9d9d9;
     border-top: 2px solid #333 !important;

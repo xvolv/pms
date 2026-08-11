@@ -1,0 +1,68 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>No Show Report</h2>
+            <p>Reservations that did not arrive by the day-closing time of the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.Sn)" Caption="#" Width="4%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.RegNo)" Caption="Reg No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.Guest)" Caption="Guest" Width="14%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.Company)" Caption="Company" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.ArrivalDate)" Caption="Arrival" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.DepartureDate)" Caption="Departure" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.RegState)" Caption="Reg State" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.RegType)" Caption="Reg Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.PaymentType)" Caption="Payment Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(NoShowReportRow.MarketCode)" Caption="Market Code" Width="8%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count no show(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="No Show Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "#", "Reg No", "Guest", "Company", "Arrival", "Departure", "Reg State", "Reg Type", "Payment Type", "Market Code",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<NoShowReportRow> rows = ReportsState.CreateNoShowSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.Sn.ToString(), r.RegNo, r.Guest, r.Company, r.ArrivalDate.ToString("dd-MMM-yyyy"),
+        r.DepartureDate.ToString("dd-MMM-yyyy"), r.RegState, r.RegType, r.PaymentType, r.MarketCode,
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateNoShowSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

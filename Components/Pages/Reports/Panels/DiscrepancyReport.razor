@@ -18,12 +18,19 @@
     <div class="rt-grid-area">
         <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
             <Columns>
-                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Room)" Caption="Room" Width="10%" />
-                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.SystemStatus)" Caption="System Status" Width="20%" />
-                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.HousekeepingStatus)" Caption="Housekeeping Status" Width="22%" />
-                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.ReportedDate)" Caption="Reported" Width="12%"
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.RoomNo)" Caption="Room No" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.RoomType)" Caption="Room Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.RoomStatus)" Caption="Room Status" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.HkStatus)" Caption="HK Status" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.FoStatus)" Caption="FO Status" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.ResStatus)" Caption="Res Status" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.FoPerson)" Caption="FO Person" Width="9%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.HkPerson)" Caption="HK Person" Width="9%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Discrepancy)" Caption="Discrepancy" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Date)" Caption="Date" Width="10%"
                                    DisplayFormat="dd-MMM-yyyy" />
-                <DxGridDataColumn FieldName="@nameof(DiscrepancyReportRow.Remark)" Caption="Remark" Width="36%" />
             </Columns>
         </DxGrid>
 
@@ -37,14 +44,21 @@
 @code {
     [Parameter] public EventCallback OnBack { get; set; }
 
-    private static readonly string[] PreviewColumns = { "Room", "System Status", "Housekeeping Status", "Reported", "Remark" };
+    private static readonly string[] PreviewColumns =
+    {
+        "Room No", "Room Type", "Room Status", "HK Status", "FO Status", "Res Status", "FO Person", "HK Person",
+        "Discrepancy", "Date",
+    };
 
     private DateTime date = DateTime.Today;
     private List<DiscrepancyReportRow> rows = ReportsState.CreateDiscrepancyReportSample(DateTime.Today);
     private bool showPreview;
 
     private List<string[]> PreviewRows => rows.Select(r => new[]
-        { r.Room, r.SystemStatus, r.HousekeepingStatus, r.ReportedDate.ToString("dd-MMM-yyyy"), r.Remark }).ToList();
+    {
+        r.RoomNo, r.RoomType, r.RoomStatus, r.HkStatus, r.FoStatus, r.ResStatus, r.FoPerson.ToString(),
+        r.HkPerson.ToString(), r.Discrepancy, r.Date.ToString("dd-MMM-yyyy"),
+    }).ToList();
 
     private void Generate(ReportCriteria criteria)
     {

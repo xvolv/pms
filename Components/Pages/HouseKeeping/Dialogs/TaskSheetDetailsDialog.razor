@@ -53,7 +53,7 @@
                         <label>Attendants</label>
                         <div class="hk-attendant-field">
                             <input type="text" class="form-control" value="@selectedAttendantText" readonly />
-                            <button class="btn btn-outline-secondary" style="border-radius:0;"
+                            <button class="btn btn-secondary" style="border-radius:0; background-color:#ffff"
                                     @onclick="() => showAttendantDropdown = !showAttendantDropdown">
                                 <i class="bi bi-chevron-down"></i>
                             </button>
@@ -63,7 +63,10 @@
                     {
                         <div class="hk-attendant-dropdown">
                             <div class="hk-attendant-dropdown-header">
-                                <DxCheckBox @bind-Checked="selectAllAttendants" TextCssClass="text-white">(Select All)</DxCheckBox>
+                                <DxCheckBox Checked="@selectAllAttendants"
+                                            CheckedChanged="@((bool value) => SelectAllAttendants(value))" TextCssClass="text-white">
+                                    (Select All)
+                                </DxCheckBox>
                             </div>
                             @foreach (var a in Attendants)
                             {
@@ -83,8 +86,7 @@
     </div>
 }
 
-<InfoDialog Visible="@showInfoPopup" Title="Information" Message="@infoMessage"
-            OnOk="() => showInfoPopup = false" />
+<InfoDialog Visible="@showInfoPopup" Title="Information" Message="@infoMessage" OnOk="() => showInfoPopup = false" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
@@ -101,6 +103,15 @@
     private string validationMessage = "";
     private bool showInfoPopup;
     private string infoMessage = "";
+    private void SelectAllAttendants(bool value)
+    {
+        selectAllAttendants = value;
+
+        foreach (var a in Attendants)
+        {
+            a.Selected = value;
+        }
+    }
 
     private async Task Close()
     {
