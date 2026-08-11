@@ -312,21 +312,121 @@ public class ReportsState
 
     private static readonly Dictionary<string, (string VoucherPrefix, string[] Descriptions, decimal MinAmount, decimal MaxAmount)> TransactionReportProfiles = new()
     {
-        ["Cash Receipt Report"] = ("CR", new[] { "Cash receipt - room balance", "Cash receipt - advance deposit", "Cash receipt - folio settlement" }, 500m, 5000m),
-        ["Paid Out Report"] = ("PO", new[] { "Taxi fare paid out", "Doctor fee paid out", "Medicine purchase paid out" }, 100m, 1200m),
-        ["Rebate Report"] = ("RB", new[] { "Rebate - rate correction", "Rebate - service complaint", "Rebate - late checkout waiver" }, 100m, 2000m),
-        ["Credit Sales Report"] = ("CS", new[] { "Credit sale - room charge", "Credit sale - F&B", "Credit sale - laundry" }, 300m, 6000m),
-        ["Cash Sales Report"] = ("CH", new[] { "Cash sale - room charge", "Cash sale - F&B", "Cash sale - mini bar" }, 200m, 4500m),
-        ["Debit Note Report"] = ("DN", new[] { "Debit note - additional charge", "Debit note - damage fee", "Debit note - late fee" }, 150m, 3000m),
-        ["Refund Report"] = ("RF", new[] { "Refund - cancelled reservation", "Refund - overpayment", "Refund - service issue" }, 200m, 3500m),
-        ["Daily Room Charge Report"] = ("DR", new[] { "Room charge - standard", "Room charge - deluxe", "Room charge - suite" }, 1500m, 4500m),
-        ["Room POS Charge Report"] = ("PC", new[] { "POS charge - restaurant", "POS charge - room service", "POS charge - spa" }, 150m, 2500m),
         ["Detail Daily Sales Transaction"] = ("DS", new[] { "Room charge + tax", "F&B charge + tax", "Laundry charge + tax" }, 400m, 5500m),
         ["Rate Adjustment Report"] = ("RA", new[] { "Rate adjusted - loyalty discount", "Rate adjusted - manager override", "Rate adjusted - long stay discount" }, 100m, 1500m),
         ["Check Report of the Day"] = ("CK", new[] { "Check received - folio settlement", "Check received - advance deposit" }, 500m, 6000m),
         ["Credit Cards of the Day"] = ("CC", new[] { "Visa settlement", "Mastercard settlement", "Amex settlement" }, 800m, 9000m),
         ["Deposit Ledger"] = ("DL", new[] { "Deposit held - advance reservation", "Deposit held - group booking" }, 1000m, 8000m),
     };
+
+    public static List<CashReceiptTransactionRow> CreateCashReceiptSample(DateTime date)
+    {
+        return new List<CashReceiptTransactionRow>
+        {
+            new() { Id = NextId(), VoucherId = "CRV-56575", RegNo = "WREG-00577-17", CustomerName = "AYALEW H/WOT",
+                IssuedDate = date, RoomNo = "303", Note = "Payment for WREG-00577-17 Room = 303", OtherReference = "",
+                GrandTotal = 500.00m, LastOperator = "PREPARED", Device = "tabletPC" },
+            new() { Id = NextId(), VoucherId = "CRV-56576", RegNo = "WREG-00579-17", CustomerName = "AYALEW H/WOT",
+                IssuedDate = date, RoomNo = "303", Note = "Payment for WREG-00579-17 Room = 303", OtherReference = "",
+                GrandTotal = 3510.01m, LastOperator = "PREPARED", Device = "tabletPC" },
+            new() { Id = NextId(), VoucherId = "CRV-56577", RegNo = "", CustomerName = "SAFARYAN GEVORG",
+                IssuedDate = date, RoomNo = "200", Note = "", OtherReference = "",
+                GrandTotal = 1000.01m, LastOperator = "PREPARED", Device = "tabletPC" },
+        };
+    }
+
+    public const string CashReceiptKnownTotal = "21,863.04";
+
+    public static readonly Dictionary<string, string> SimpleTransactionKnownTotal = new()
+    {
+        ["Paid Out Report"] = "13,412.67",
+        ["Rebate Report"] = "1,785.50",
+    };
+
+    public static List<SimpleTransactionRow> CreateSimpleTransactionSample(string reportName, DateTime date)
+    {
+        return reportName switch
+        {
+            "Paid Out Report" => new List<SimpleTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "POV-00009-17", RegNo = "WREG-01441-17", CustomerName = "BOYEBBE LLC",
+                    IssuedDate = date, RoomNo = "101", Note = "", GrandTotal = 236.35m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "POV-00008-17", RegNo = "WREG-01434-17", CustomerName = "KUNWAR SURENDRA",
+                    IssuedDate = date, RoomNo = "551", Note = "", GrandTotal = 2367.42m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "POV-00007-17", RegNo = "WREG-01444-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "304", Note = "", GrandTotal = 200.15m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            "Rebate Report" => new List<SimpleTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "RCRM-00006-17", RegNo = "WREG-01579-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "308", Note = "", GrandTotal = 463.75m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "RCRM-00005-17", RegNo = "WREG-01578-17", CustomerName = "AHMED NASIR SATARAJ",
+                    IssuedDate = date, RoomNo = "402", Note = "", GrandTotal = 1321.75m, LastOperator = "PREPARED", Device = "Test F" },
+            },
+            "Refund Report" => new List<SimpleTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "RRF-00001-17", RegNo = "WREG-01591-17", CustomerName = "AHMED NASIR SATARAJ",
+                    IssuedDate = new DateTime(2017, 9, 20), RoomNo = "706", Note = "", GrandTotal = 5743.31m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            "Debit Note Report" => new List<SimpleTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "DBN-00003-17", RegNo = "WREG-01560-17", CustomerName = "GUEST WASA TEST",
+                    IssuedDate = date, RoomNo = "305", Note = "Additional charge - damage", GrandTotal = 350.00m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "DBN-00004-17", RegNo = "WREG-01562-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "308", Note = "Additional charge - late fee", GrandTotal = 150.00m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            "Room POS Charge Report" => new List<SimpleTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "PCH-00012-17", RegNo = "WREG-01570-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "308", Note = "POS charge - restaurant", GrandTotal = 245.00m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "PCH-00013-17", RegNo = "WREG-01571-17", CustomerName = "AYALEW H/WOT",
+                    IssuedDate = date, RoomNo = "303", Note = "POS charge - room service", GrandTotal = 180.50m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            _ => new List<SimpleTransactionRow>(),
+        };
+    }
+
+    public static readonly Dictionary<string, (string SubTotal, string ServiceCharge, string Discount, string Vat, string GrandTotal)> DetailedTransactionKnownTotal = new()
+    {
+        ["Credit Sales Report"] = ("13,881.48", "1,406.12", "0.00", "2,077.45", "17,365.05"),
+        ["Cash Sales Report"] = ("5,646.64", "564.66", "0.00", "1,046.47", "7,257.77"),
+        ["Daily Room Charge Report"] = ("9,249.56", "924.95", "0.00", "1,721.48", "11,895.99"),
+    };
+
+    public static List<DetailedTransactionRow> CreateDetailedTransactionSample(string reportName, DateTime date)
+    {
+        return reportName switch
+        {
+            "Credit Sales Report" => new List<DetailedTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "BCRS-00753-17", RegNo = "WREG-01576-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "308", Note = "check_out", SubTotal = 3294.55m, ServiceCharge = 329.46m,
+                    Discount = 0.00m, Vat = 651.01m, GrandTotal = 4275.02m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "BCRS-00752-17", RegNo = "WREG-01561-17", CustomerName = "KUNWAR SURENDRA SI",
+                    IssuedDate = date, RoomNo = "308", Note = "check_out", SubTotal = 2774.71m, ServiceCharge = 277.47m,
+                    Discount = 0.00m, Vat = 457.2m, GrandTotal = 3509.38m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            "Cash Sales Report" => new List<DetailedTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "BCRS-00758-17", RegNo = "WREG-01574-17", CustomerName = "AYALEW H/WOT",
+                    IssuedDate = date, RoomNo = "308", Note = "check_out", SubTotal = 2209.45m, ServiceCharge = 220.94m,
+                    Discount = 0.00m, Vat = 435.2m, GrandTotal = 2865.59m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "BCRS-00756-17", RegNo = "WREG-01576-17", CustomerName = "SAFARYAN GEVORG",
+                    IssuedDate = date, RoomNo = "308", Note = "check_out", SubTotal = 740.55m, ServiceCharge = 74.05m,
+                    Discount = 0.00m, Vat = 139.4m, GrandTotal = 953.99m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            "Daily Room Charge Report" => new List<DetailedTransactionRow>
+            {
+                new() { Id = NextId(), VoucherId = "MDRC-01849-17", RegNo = "WREG-01595-17", CustomerName = "GUEST WASA TEST",
+                    IssuedDate = date, RoomNo = "305", Note = "UpdatedRate", SubTotal = 1552.26m, ServiceCharge = 155.23m,
+                    Discount = 0.00m, Vat = 306.2m, GrandTotal = 2013.69m, LastOperator = "PREPARED", Device = "tabletPC" },
+                new() { Id = NextId(), VoucherId = "MDRC-01848-17", RegNo = "WREG-01594-17", CustomerName = "NIDIRI WAWERU DAVI",
+                    IssuedDate = date, RoomNo = "303", Note = "AU RATE", SubTotal = 2774.71m, ServiceCharge = 277.47m,
+                    Discount = 0.00m, Vat = 457.6m, GrandTotal = 3509.78m, LastOperator = "PREPARED", Device = "tabletPC" },
+            },
+            _ => new List<DetailedTransactionRow>(),
+        };
+    }
 
     private static readonly (string Guest, string Room)[] TransactionGuestPool =
     {

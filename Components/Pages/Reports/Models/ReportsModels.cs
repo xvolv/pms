@@ -313,6 +313,53 @@ public class ReportSection
     public string[]? TotalRow { get; set; }
 }
 
+public class CashReceiptTransactionRow
+{
+    public int Id { get; set; }
+    public string VoucherId { get; set; } = "";
+    public string RegNo { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public DateTime IssuedDate { get; set; }
+    public string RoomNo { get; set; } = "";
+    public string Note { get; set; } = "";
+    public string OtherReference { get; set; } = "";
+    public decimal GrandTotal { get; set; }
+    public string LastOperator { get; set; } = "";
+    public string Device { get; set; } = "";
+}
+
+public class SimpleTransactionRow
+{
+    public int Id { get; set; }
+    public string VoucherId { get; set; } = "";
+    public string RegNo { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public DateTime IssuedDate { get; set; }
+    public string RoomNo { get; set; } = "";
+    public string Note { get; set; } = "";
+    public decimal GrandTotal { get; set; }
+    public string LastOperator { get; set; } = "";
+    public string Device { get; set; } = "";
+}
+
+public class DetailedTransactionRow
+{
+    public int Id { get; set; }
+    public string VoucherId { get; set; } = "";
+    public string RegNo { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public DateTime IssuedDate { get; set; }
+    public string RoomNo { get; set; } = "";
+    public string Note { get; set; } = "";
+    public decimal SubTotal { get; set; }
+    public decimal ServiceCharge { get; set; }
+    public decimal Discount { get; set; }
+    public decimal Vat { get; set; }
+    public decimal GrandTotal { get; set; }
+    public string LastOperator { get; set; } = "";
+    public string Device { get; set; } = "";
+}
+
 public class TransactionReportRow
 {
     public int Id { get; set; }

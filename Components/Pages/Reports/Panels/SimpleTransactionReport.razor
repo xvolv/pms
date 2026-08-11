@@ -1,0 +1,93 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.VoucherId)" Caption="Voucher ID" Width="14%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.RegNo)" Caption="Reg No" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.CustomerName)" Caption="Customer Name" Width="16%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.IssuedDate)" Caption="Issued Date" Width="11%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.RoomNo)" Caption="Room No" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.Note)" Caption="Note" Width="18%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.GrandTotal)" Caption="Grand Total" Width="12%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.LastOperator)" Caption="Last Operator" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(SimpleTransactionRow.Device)" Caption="Device" Width="8%" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(SimpleTransactionRow.GrandTotal)" />
+            </TotalSummary>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count entr(ies) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+        { "Voucher ID", "Reg No", "Customer Name", "Issued Date", "Room No", "Note", "Grand Total", "Last Operator", "Device" };
+
+    private DateTime date = DateTime.Today;
+    private List<SimpleTransactionRow> rows = new();
+    private bool showPreview;
+
+    private List<string[]> PreviewRows
+    {
+        get
+        {
+            var list = rows.Select(r => new[]
+            {
+                r.VoucherId, r.RegNo, r.CustomerName, r.IssuedDate.ToString("dd-MMM-yyyy"), r.RoomNo, r.Note,
+                r.GrandTotal.ToString("N2"), r.LastOperator, r.Device,
+            }).ToList();
+
+            if (KnownTotal is { } total)
+            {
+                list.Add(new[] { "", "", "", "", "", "Total", total, "", "" });
+            }
+
+            return list;
+        }
+    }
+
+    private string? KnownTotal => ReportsState.SimpleTransactionKnownTotal.TryGetValue(ReportName, out var total) ? total : null;
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            rows = ReportsState.CreateSimpleTransactionSample(ReportName, date);
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateSimpleTransactionSample(ReportName, date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

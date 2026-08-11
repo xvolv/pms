@@ -128,10 +128,19 @@
                 {
                     <ReportCatalogList Reports="@GroupReports(ReportGroup.Transaction)" OnSelect="SelectReport" />
                 }
+                else if (selectedReport.Name == "Cash Receipt Report")
+                {
+                    <CashReceiptReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name is "Credit Sales Report" or "Cash Sales Report" or "Daily Room Charge Report")
+                {
+                    <DetailedTransactionReport ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                                OnBack="ClearSelection" />
+                }
                 else
                 {
-                    <TransactionReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
-                                            OnBack="ClearSelection" />
+                    <SimpleTransactionReport ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                              OnBack="ClearSelection" />
                 }
                 break;
             case 4:

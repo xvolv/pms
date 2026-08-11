@@ -1,0 +1,82 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Cash Receipt Report</h2>
+            <p>Cash receipt transactions made within the given date range or on the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.VoucherId)" Caption="Voucher ID" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.RegNo)" Caption="Reg No" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.CustomerName)" Caption="Customer Name" Width="12%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.IssuedDate)" Caption="Issued Date" Width="9%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.RoomNo)" Caption="Room No" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.Note)" Caption="Note" Width="19%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.OtherReference)" Caption="Other Reference" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.GrandTotal)" Caption="Grand Total" Width="10%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.LastOperator)" Caption="Last Operator" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(CashReceiptTransactionRow.Device)" Caption="Device" Width="5%" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="@nameof(CashReceiptTransactionRow.GrandTotal)" />
+            </TotalSummary>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count receipt(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Cash Receipt Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Voucher ID", "Reg No", "Customer Name", "Issued Date", "Room No", "Note", "Other Reference",
+        "Grand Total", "Last Operator", "Device",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<CashReceiptTransactionRow> rows = ReportsState.CreateCashReceiptSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows
+    {
+        get
+        {
+            var list = rows.Select(r => new[]
+            {
+                r.VoucherId, r.RegNo, r.CustomerName, r.IssuedDate.ToString("dd-MMM-yyyy"), r.RoomNo, r.Note,
+                r.OtherReference, r.GrandTotal.ToString("N2"), r.LastOperator, r.Device,
+            }).ToList();
+
+            list.Add(new[] { "", "", "", "", "", "", "Total", ReportsState.CashReceiptKnownTotal, "", "" });
+
+            return list;
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateCashReceiptSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}
