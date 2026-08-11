@@ -71,28 +71,72 @@
     min-width: 1700px;
 }
 
-/* Report preview dialog: report tables can have far more columns than the
-   fixed-width HK print modal was designed for, so give it its own wide,
-   horizontally-scrollable container instead of clipping past the border. */
+/* Report preview dialog: the backdrop is kept out of the sidebar's lane
+   (below) so the modal only ever spans the main content area and the
+   sidebar stays open and visible. The printed page itself (further down)
+   is fixed to A4 proportions and zoomed down, so any number of report
+   columns wraps to fit the page instead of needing to scroll. */
+@media (min-width: 641px) {
+    .page:not(.sidebar-collapsed) .rp-print-backdrop {
+        left: 280px;
+    }
+}
+
 .rp-print-modal {
-    width: min(96vw, 1600px);
-    max-width: 96vw;
+    /* Page itself is fixed at A4 width (794px, see .rp-print-page) - hug it
+       instead of stretching the modal out to some wider fixed/percentage
+       size, which just left dead space either side of the paper. */
+    position: relative;
+    width: fit-content;
+    max-width: 96%;
+}
+
+/* No header bar for this dialog - just the paper - so the close button
+   floats over the top-right corner instead. */
+.rp-print-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    background: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+}
+
+.rp-print-body {
+    padding: 12px;
 }
 
 .rp-print-page {
     background: #ffffff;
     border: 2px solid #00a8e8;
     padding: 20px;
-    width: max-content;
-    min-width: 100%;
+    /* Based on the 794x1123 standard CSS-pixel A4 size (the same reference
+       browsers use for @page A4 printing, i.e. 2480x3508 at 300dpi scaled
+       to the 96dpi css px browsers actually lay out in), widened a bit for
+       breathing room. Fixing the page to this width - rather than letting
+       it grow to fit however many columns a report has - means the page
+       (and the zoom below) is a true preview of what would print. */
+    width: 900px;
+    min-height: 1123px;
     box-sizing: border-box;
-    margin: 0 auto;
+    margin: 0;
     font-size: 11px;
+    zoom: 0.85;
+}
+
+/* Fixed layout so columns share the page's 794px width instead of forcing
+   the table (and page) wider than A4 - wrapping text keeps every column
+   visible on the page rather than clipping or scrolling. */
+.rp-print-page .hk-print-table {
+    table-layout: fixed;
 }
 
 .rp-print-page .hk-print-table th,
 .rp-print-page .hk-print-table td {
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Trial Balance: grouped description/balance table with per-group subtotals */
@@ -118,6 +162,33 @@
 }
 
 .rp-tb-grandtotal-row td {
+    border-top: 2px solid #333 !important;
+}
+
+/* Daily Business Report: sectioned Report Items tables (Resident Summary,
+   Income Analysis, Sales Centers Activity Analysis, Collector Analysis,
+   Occupancy Summary), each with its own columns and an optional total row. */
+.rp-db-section-title {
+    font-weight: 700;
+    background-color: #f1f3f4;
+    border: 1px solid #333;
+    border-bottom: none;
+    padding: 3px 6px;
+    font-size: 10px;
+    margin-top: 10px;
+}
+
+.rp-db-table {
+    margin-top: 0;
+}
+
+.rp-db-right {
+    text-align: right;
+}
+
+.rp-db-total-row td {
+    font-weight: 700;
+    background-color: #d9d9d9;
     border-top: 2px solid #333 !important;
 }
 

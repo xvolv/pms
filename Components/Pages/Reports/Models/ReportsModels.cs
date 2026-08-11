@@ -38,18 +38,32 @@ public class ReportDefinition
 public class CheckoutReportRow
 {
     public int Id { get; set; }
-    public int Sn { get; set; }
     public string RegNo { get; set; } = "";
-    public string Guest { get; set; } = "";
-    public string Company { get; set; } = "";
     public string Room { get; set; } = "";
+    public int RoomCount { get; set; }
     public string RoomType { get; set; } = "";
+    public string Company { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public int Adult { get; set; }
+    public int Child { get; set; }
     public DateTime ArrivalDate { get; set; }
     public DateTime DepartureDate { get; set; }
+    public string RateCode { get; set; } = "";
     public string PaymentType { get; set; } = "";
-    public decimal TotalBill { get; set; }
-    public decimal Paid { get; set; }
-    public decimal Balance => TotalBill - Paid;
+    public string User { get; set; } = "";
+    public string ActualRtc { get; set; } = "";
+    public string MarketCode { get; set; } = "";
+    public decimal RateAmount { get; set; }
+}
+
+public class CityLedgerRow
+{
+    public int Id { get; set; }
+    public string RegNo { get; set; } = "";
+    public DateTime Date { get; set; }
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public decimal SubTotal { get; set; }
 }
 
 public class ReportCriteria
@@ -205,6 +219,14 @@ public class CashierUserGroup
     public string UserName { get; set; } = "";
     public List<CashierPaymentMethodGroup> PaymentMethods { get; set; } = new();
     public decimal Total => PaymentMethods.Sum(p => p.Total);
+}
+
+public class DailyBusinessSection
+{
+    public string Title { get; set; } = "";
+    public string[] Columns { get; set; } = Array.Empty<string>();
+    public List<string[]> Rows { get; set; } = new();
+    public string[]? TotalRow { get; set; }
 }
 
 public class TransactionReportRow
