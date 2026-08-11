@@ -414,6 +414,211 @@
     .code-box {
         background-color: #f0f0f0;
     }
+
+    /* =====================================================
+       RESPONSIVE STYLES
+    ===================================================== */
+
+    /* Tablets and smaller screens */
+    @@media (max-width: 1024px) {
+        .sub-section {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .erp-content ::deep .dxbl-tabs-content {
+            padding: 8px;
+        }
+
+        .rate-category-content,
+        .rate-detail-content {
+            padding: 8px;
+        }
+
+        .detail-form {
+            padding: 12px;
+        }
+    }
+
+    /* Mobile devices */
+    @@media (max-width: 768px) {
+        .sub-section {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .custom-ribbon-tabs ::deep .dxbl-tabs-item {
+            padding: 0 14px !important;
+            font-size: 13px;
+            height: 38px;
+        }
+
+        .custom-content-tabs ::deep .dxbl-tabs-item {
+            padding: 8px 12px !important;
+            font-size: 13px;
+        }
+
+        .erp-content ::deep .dxbl-tabs-content {
+            padding: 6px;
+            overflow-x: auto;
+        }
+
+        .rate-category-content,
+        .rate-detail-content {
+            padding: 6px;
+            overflow-x: auto;
+        }
+
+        .rc-grid {
+            font-size: 13px;
+        }
+
+        .rc-grid ::deep .dxbl-grid-table {
+            min-width: 400px;
+        }
+
+        .rc-grid-nested {
+            margin-left: 2px;
+        }
+
+        .rc-no-children {
+            padding: 6px 16px;
+            font-size: 12px;
+        }
+
+        .detail-form {
+            padding: 10px;
+        }
+
+        .detail-form-row.two-col {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .popup-header {
+            padding: 10px 12px;
+        }
+
+        .popup-header-title {
+            font-size: 14px;
+        }
+
+        .detail-form-label {
+            font-size: 11px;
+        }
+
+        /* Make popup full width on mobile */
+        ::deep .dxbl-popup {
+            width: 95% !important;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        ::deep .dxbl-popup-content {
+            padding: 0 !important;
+        }
+    }
+
+    /* Small mobile devices */
+    @@media (max-width: 480px) {
+        .custom-ribbon-tabs ::deep .dxbl-tabs-item {
+            padding: 0 10px !important;
+            font-size: 12px;
+            height: 34px;
+        }
+
+        .custom-content-tabs ::deep .dxbl-tabs-item {
+            padding: 6px 8px !important;
+            font-size: 12px;
+        }
+
+        .erp-content {
+            min-height: 400px;
+            border-radius: 3px;
+        }
+
+        .rc-grid ::deep .dxbl-grid-table {
+            font-size: 12px;
+            min-width: 300px;
+        }
+
+        .detail-form {
+            padding: 8px;
+        }
+
+        .popup-header {
+            padding: 8px 10px;
+        }
+
+        .popup-header-title {
+            font-size: 13px;
+        }
+
+        .detail-form-label {
+            font-size: 10px;
+        }
+
+        .detail-form-row {
+            margin-bottom: 8px;
+        }
+    }
+
+    /* Landscape phones */
+    @@media (max-height: 600px) and (orientation: landscape) {
+        .erp-content {
+            min-height: 250px;
+        }
+
+        .detail-form {
+            padding: 8px;
+        }
+
+        .detail-form-row {
+            margin-bottom: 6px;
+        }
+
+        ::deep .dxbl-popup {
+            max-height: 90vh !important;
+        }
+
+        ::deep .dxbl-popup-content {
+            max-height: calc(90vh - 60px) !important;
+            overflow-y: auto;
+        }
+    }
+
+    /* Large screens */
+    @@media (min-width: 1600px) {
+        .sub-section {
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        .erp-content ::deep .dxbl-tabs-content {
+            padding: 20px;
+        }
+
+        .detail-form {
+            padding: 24px;
+        }
+    }
+
+    /* Print styles */
+    @@media print {
+        .erp-content {
+            border: none;
+            min-height: auto;
+        }
+
+        .sub-section {
+            padding: 0;
+        }
+
+        .custom-ribbon-tabs,
+        .custom-content-tabs {
+            display: none;
+        }
+    }
 </style>
 
 @code {
