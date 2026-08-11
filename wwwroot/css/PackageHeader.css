@@ -3,6 +3,7 @@
 .grid-container {
     width: 99%;
     margin: 10px auto;
+    overflow-x: auto;
 }
 
 .erp-grid {
@@ -10,56 +11,56 @@
     background: #fff;
 }
 
-    /* Header */
-    .erp-grid .dxbs-header-row > td,
-    .erp-grid .dxbs-header-row > th,
-    .erp-grid th {
-        background: #e0e0e0 !important;
-        color: #222;
-        font-size: 12px;
-        font-weight: bolder;
-        border: 1px solid #cfcfcf;
-        padding: 6px 8px;
-    }
+/* Header */
+.erp-grid .dxbs-header-row > td,
+.erp-grid .dxbs-header-row > th,
+.erp-grid th {
+    background: #e0e0e0 !important;
+    color: #222;
+    font-size: 12px;
+    font-weight: bolder;
+    border: 1px solid #cfcfcf;
+    padding: 6px 8px;
+}
 
-    /* Data cells */
-    .erp-grid .dxbs-data-row > td,
-    .erp-grid tbody td {
-        background: #fff;
-        border: 1px solid #e5e5e5;
-        padding: 6px 8px;
-        font-size: 13px;
-        cursor: pointer;
-    }
+/* Data cells */
+.erp-grid .dxbs-data-row > td,
+.erp-grid tbody td {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    padding: 6px 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
 
-    /* Hover row */
-    .erp-grid .dxbs-data-row:hover > td,
-    .erp-grid tbody tr:hover td {
-        background: #3399FF !important;
-        color: white;
-    }
+/* Hover row */
+.erp-grid .dxbs-data-row:hover > td,
+.erp-grid tbody tr:hover td {
+    background: #3399FF !important;
+    color: white;
+}
 
-    /* Manually-tracked selection */
-    .erp-grid tr.row-manually-selected > td {
-        background: #2f6fb3 !important;
-        color: white !important;
-    }
+/* Manually-tracked selection */
+.erp-grid tr.row-manually-selected > td {
+    background: #2f6fb3 !important;
+    color: white !important;
+}
 
-    /* Remove extra spacing */
-    .erp-grid table {
-        width: 100%;
-        table-layout: fixed;
-    }
+/* Remove extra spacing */
+.erp-grid table {
+    width: 100%;
+    table-layout: fixed;
+}
 
-    /* Header text alignment */
-    .erp-grid .dxbs-header-row > td {
-        text-align: left;
-    }
+/* Header text alignment */
+.erp-grid .dxbs-header-row > td {
+    text-align: left;
+}
 
-    /* Remove focus outline */
-    .erp-grid *:focus {
-        outline: none;
-    }
+/* Remove focus outline */
+.erp-grid *:focus {
+    outline: none;
+}
 
 /* ---------- popup header + toolbar ---------- */
 
@@ -89,6 +90,7 @@
     border-bottom: 1px solid #d9d9d9;
     background: #fafafa;
     margin: -1px -1px 0 -1px;
+    flex-wrap: wrap;
 }
 
 .toolbar-btn {
@@ -108,14 +110,14 @@
     font-family: inherit;
 }
 
-    .toolbar-btn:hover {
-        background: #eaf2fb;
-        border: 1px solid #a9c9ec;
-    }
+.toolbar-btn:hover {
+    background: #eaf2fb;
+    border: 1px solid #a9c9ec;
+}
 
-    .toolbar-btn:active {
-        background: #d6e6fa;
-    }
+.toolbar-btn:active {
+    background: #d6e6fa;
+}
 
 .form-wrapper {
     padding: 30px;
@@ -160,10 +162,10 @@
     cursor: pointer;
 }
 
-    .erp-combobox .dxbl-text-edit-input {
-        background-color: white !important;
-        cursor: pointer !important;
-    }
+.erp-combobox .dxbl-text-edit-input {
+    background-color: white !important;
+    cursor: pointer !important;
+}
 
 .dxbl-text-edit,
 .dxbl-combo-box,
@@ -187,10 +189,10 @@
     overflow: hidden;
 }
 
-    .erp-combobox svg {
-        fill: #666 !important;
-        color: #666 !important;
-    }
+.erp-combobox svg {
+    fill: #666 !important;
+    color: #666 !important;
+}
 
 /* ---------- Article lookup (dropdown-style grid picker) ---------- */
 
@@ -213,9 +215,9 @@
     color: #555;
 }
 
-    .lookup-toggle-btn:hover {
-        background: #e6e6e6;
-    }
+.lookup-toggle-btn:hover {
+    background: #e6e6e6;
+}
 
 .article-lookup-panel {
     position: absolute;
@@ -242,9 +244,9 @@
     padding: 2px 4px;
 }
 
-    .lookup-close-btn:hover {
-        color: #c0392b;
-    }
+.lookup-close-btn:hover {
+    color: #c0392b;
+}
 
 .lookup-search-row {
     display: flex;
@@ -252,10 +254,13 @@
     gap: 6px;
     padding: 8px;
     border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
 }
 
 .lookup-search-input {
     font-size: 12px;
+    flex: 1;
+    min-width: 100px;
 }
 
 .lookup-find-btn {
@@ -269,9 +274,9 @@
     color: #333;
 }
 
-    .lookup-find-btn:hover {
-        background: #e0e0e0;
-    }
+.lookup-find-btn:hover {
+    background: #e0e0e0;
+}
 
 .lookup-grid-wrap {
     max-height: 170px;
@@ -284,25 +289,25 @@
     font-size: 12px;
 }
 
-    .lookup-grid th {
-        text-align: left;
-        font-weight: 700;
-        padding: 5px 8px;
-        background: #eef0f2;
-        border-bottom: 1px solid #ccc;
-        position: sticky;
-        top: 0;
-    }
+.lookup-grid th {
+    text-align: left;
+    font-weight: 700;
+    padding: 5px 8px;
+    background: #eef0f2;
+    border-bottom: 1px solid #ccc;
+    position: sticky;
+    top: 0;
+}
 
-    .lookup-grid td {
-        padding: 5px 8px;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-    }
+.lookup-grid td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
 
-    .lookup-grid tr:hover td {
-        background: #eaf2fb;
-    }
+.lookup-grid tr:hover td {
+    background: #eaf2fb;
+}
 
 .lookup-footer {
     display: flex;
@@ -321,9 +326,9 @@
     color: #333;
 }
 
-    .lookup-clear-btn:hover {
-        background: #e0e0e0;
-    }
+.lookup-clear-btn:hover {
+    background: #e0e0e0;
+}
 
 /* ---------- delete confirmation popup ---------- */
 
@@ -343,9 +348,9 @@
     color: #333;
 }
 
-    .confirm-body p {
-        margin: 0 0 8px 0;
-    }
+.confirm-body p {
+    margin: 0 0 8px 0;
+}
 
 .confirm-subtext {
     color: #888;
@@ -357,6 +362,7 @@
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 20px 18px 20px;
+    flex-wrap: wrap;
 }
 
 .confirm-btn {
@@ -372,9 +378,9 @@
     color: #333;
 }
 
-    .confirm-btn-cancel:hover {
-        background: #e0e0e0;
-    }
+.confirm-btn-cancel:hover {
+    background: #e0e0e0;
+}
 
 .confirm-btn-delete {
     background: #c0392b;
@@ -382,25 +388,124 @@
     color: #fff;
 }
 
-    .confirm-btn-delete:hover {
-        background: #a5301f;
+.confirm-btn-delete:hover {
+    background: #a5301f;
+}
+
+/* =====================================================
+   RESPONSIVE STYLES
+===================================================== */
+
+/* Tablets and smaller screens */
+@media (max-width: 1024px) {
+    .grid-container {
+        width: 100%;
+        margin: 8px auto;
     }
 
-/* Responsive tweaks */
-@media (max-width: 700px) {
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 12px;
+        padding: 5px 6px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 11px;
+        padding: 5px 6px;
+    }
+
     .form-wrapper {
-        padding: 16px;
+        padding: 20px;
     }
 
     .erp-form {
+        max-width: 580px;
         padding: 8px;
     }
 
     .label {
         font-size: 12px;
-        padding-right: 4px;
+        height: 32px;
+    }
+
+    .article-lookup-panel {
+        width: 360px;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+    .grid-container {
+        margin: 6px auto;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 600px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 11px;
+        padding: 4px 5px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 10px;
+        padding: 4px 5px;
+    }
+
+    .form-wrapper {
+        padding: 12px;
+    }
+
+    .erp-form {
+        max-width: 100%;
+        padding: 6px;
+        border-width: 1px;
+    }
+
+    .erp-form ::deep .dxbl-layout-item {
+        flex-direction: column !important;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .label {
+        justify-content: flex-start !important;
+        padding-right: 0 !important;
+        padding-bottom: 2px !important;
+        height: auto !important;
+        min-height: 25px;
+        white-space: normal !important;
+        font-size: 12px;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .checkbox-center {
+        height: auto !important;
+        min-height: 30px;
+        padding-left: 0 !important;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .dxbl-layout-item-content {
+        width: 100% !important;
+    }
+
+    .label {
+        font-size: 11px;
+        height: auto;
+        min-height: 28px;
         white-space: normal;
-        line-height: 1.1;
+        line-height: 1.2;
+        padding-right: 4px;
+    }
+
+    .checkbox-center {
+        height: auto;
+        min-height: 30px;
     }
 
     .dxbl-text-edit,
@@ -409,7 +514,370 @@
         font-size: 12px;
     }
 
+    .modal-toolbar {
+        padding: 4px 8px;
+        gap: 2px;
+    }
+
+    .toolbar-btn {
+        min-width: 44px;
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+
+    .popup-header {
+        padding: 12px 16px;
+    }
+
+    .popup-header-title {
+        font-size: 18px;
+    }
+
     .article-lookup-panel {
         width: 280px;
+        left: -20px;
+    }
+
+    .confirm-body {
+        padding: 12px 16px 2px 16px;
+        font-size: 12px;
+    }
+
+    .confirm-footer {
+        padding: 8px 16px 14px 16px;
+        gap: 6px;
+    }
+
+    .confirm-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .grid-container {
+        margin: 4px auto;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 450px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 10px;
+        padding: 3px 4px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 9px;
+        padding: 3px 4px;
+    }
+
+    .form-wrapper {
+        padding: 8px;
+    }
+
+    .erp-form {
+        padding: 4px;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .label {
+        font-size: 11px;
+        min-height: 22px;
+    }
+
+    .label {
+        font-size: 10px;
+        min-height: 24px;
+    }
+
+    .dxbl-text-edit,
+    .dxbl-combo-box,
+    .dxbl-memo {
+        font-size: 11px;
+    }
+
+    .modal-toolbar {
+        padding: 3px 4px;
+        gap: 1px;
+    }
+
+    .toolbar-btn {
+        min-width: 36px;
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .toolbar-btn .toolbar-text {
+        display: none;
+    }
+
+    .popup-header {
+        padding: 8px 12px;
+    }
+
+    .popup-header-title {
+        font-size: 16px;
+    }
+
+    .popup-header-icon {
+        font-size: 20px;
+    }
+
+    .article-lookup-panel {
+        width: 220px;
+        left: -10px;
+    }
+
+    .lookup-search-row {
+        padding: 4px 6px;
+        gap: 4px;
+    }
+
+    .lookup-search-input {
+        font-size: 11px;
+        min-width: 60px;
+    }
+
+    .lookup-find-btn {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+
+    .lookup-grid {
+        font-size: 11px;
+    }
+
+    .lookup-grid th,
+    .lookup-grid td {
+        padding: 3px 6px;
+    }
+
+    .lookup-grid-wrap {
+        max-height: 130px;
+    }
+
+    .lookup-footer {
+        padding: 4px 6px;
+    }
+
+    .lookup-clear-btn {
+        padding: 3px 10px;
+        font-size: 11px;
+    }
+
+    .confirm-body {
+        padding: 8px 12px 2px 12px;
+        font-size: 11px;
+    }
+
+    .confirm-body p {
+        margin: 0 0 4px 0;
+    }
+
+    .confirm-subtext {
+        font-size: 10px;
+    }
+
+    .confirm-footer {
+        padding: 6px 12px 10px 12px;
+        gap: 4px;
+        flex-direction: column;
+    }
+
+    .confirm-btn {
+        padding: 4px 10px;
+        font-size: 11px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .confirm-header {
+        padding: 8px 12px !important;
+    }
+
+    .confirm-title {
+        font-size: 14px !important;
+    }
+}
+
+/* Very small mobile devices */
+@media (max-width: 360px) {
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 350px;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .label {
+        font-size: 10px;
+    }
+
+    .dxbl-text-edit,
+    .dxbl-combo-box,
+    .dxbl-memo {
+        font-size: 10px;
+    }
+
+    .toolbar-btn {
+        min-width: 32px;
+        padding: 2px 3px;
+    }
+
+    .popup-header-title {
+        font-size: 14px;
+    }
+
+    .article-lookup-panel {
+        width: 180px;
+        left: -5px;
+    }
+
+    .lookup-grid-wrap {
+        max-height: 100px;
+    }
+
+    .lookup-grid th,
+    .lookup-grid td {
+        padding: 2px 4px;
+        font-size: 10px;
+    }
+}
+
+/* Landscape phones */
+@media (max-height: 600px) and (orientation: landscape) {
+    .form-wrapper {
+        padding: 8px;
+    }
+
+    .erp-form {
+        padding: 4px;
+        max-width: 100%;
+    }
+
+    .erp-form ::deep .dxbl-layout-item .label {
+        height: auto !important;
+        min-height: 22px;
+        font-size: 11px;
+    }
+
+    .modal-toolbar {
+        padding: 3px 6px;
+    }
+
+    .toolbar-btn {
+        min-width: 40px;
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .popup-header {
+        padding: 6px 12px;
+    }
+
+    .popup-header-title {
+        font-size: 16px;
+    }
+
+    .article-lookup-panel {
+        width: 260px;
+    }
+
+    .confirm-body {
+        padding: 6px 12px 2px 12px;
+    }
+
+    .confirm-footer {
+        padding: 4px 12px 8px 12px;
+    }
+
+    .confirm-btn {
+        padding: 3px 10px;
+        font-size: 11px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1600px) {
+    .grid-container {
+        width: 98%;
+        margin: 14px auto;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .form-wrapper {
+        padding: 40px;
+    }
+
+    .erp-form {
+        max-width: 780px;
+        padding: 14px;
+    }
+
+    .label {
+        font-size: 14px;
+        height: 40px;
+    }
+
+    .article-lookup-panel {
+        width: 520px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .grid-container {
+        margin: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 10px !important;
+        padding: 3px 5px !important;
+        cursor: default !important;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 10px !important;
+        padding: 3px 5px !important;
+    }
+
+    .erp-grid tr.row-manually-selected > td {
+        background: #ddd !important;
+        color: #000 !important;
+    }
+
+    .erp-grid .dxbs-data-row:hover > td,
+    .erp-grid tbody tr:hover td {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .modal-toolbar,
+    .popup-header,
+    .form-wrapper,
+    .lookup-field,
+    .confirm-header,
+    .confirm-body,
+    .confirm-footer {
+        display: none !important;
     }
 }

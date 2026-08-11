@@ -109,6 +109,7 @@
         height: calc(100vh - 20px);
         display: flex;
         flex-direction: column;
+        min-height: 400px;
     }
 
     .ra-content {
@@ -134,6 +135,7 @@
         border: 1px solid #d7d7d7;
         border-radius: 4px;
         overflow: hidden;
+        min-width: 0;
     }
 
     .ra-pane-header {
@@ -144,6 +146,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .ra-selected-rate {
@@ -215,6 +219,7 @@
         border-collapse: collapse;
         font-size: 12px;
         width: max-content;
+        min-width: 100%;
     }
 
     .ra-availability-table th,
@@ -240,6 +245,7 @@
         cursor: pointer;
         position: sticky;
         left: 0;
+        z-index: 2;
     }
 
     .ra-day-cell {
@@ -281,6 +287,7 @@
         padding: 10px;
         background: #f9f9f9;
         border-top: 1px solid #d7d7d7;
+        flex-wrap: wrap;
     }
 
     .ra-legend-item {
@@ -295,6 +302,444 @@
         height: 20px;
         border: 1px solid #d7d7d7;
         border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    /* =====================================================
+       RESPONSIVE STYLES
+    ===================================================== */
+
+    /* Tablets and smaller screens */
+    @@media (max-width: 1024px) {
+        .ra-page {
+            padding: 8px;
+            height: calc(100vh - 16px);
+        }
+
+        .ra-content {
+            gap: 10px;
+        }
+
+        .ra-left-pane {
+            flex: 0 0 200px;
+        }
+
+        .ra-pane-header {
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .ra-availability-table-wrapper {
+            padding: 6px;
+        }
+
+        .ra-availability-table {
+            font-size: 11px;
+        }
+
+        .ra-availability-table th {
+            padding: 4px 2px;
+            min-width: 22px;
+        }
+
+        .ra-day-cell {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            font-size: 11px;
+        }
+
+        .ra-name-col {
+            min-width: 90px;
+            padding: 4px 6px !important;
+            font-size: 11px;
+        }
+
+        .ra-legend {
+            padding: 8px;
+            gap: 12px;
+        }
+    }
+
+    /* Mobile devices */
+    @@media (max-width: 768px) {
+        .ra-page {
+            padding: 6px;
+            height: calc(100vh - 12px);
+            min-height: 500px;
+        }
+
+        .ra-content {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ra-left-pane {
+            flex: none;
+            width: 100%;
+            max-height: 180px;
+        }
+
+        .ra-tree {
+            max-height: 120px;
+            font-size: 12px;
+        }
+
+        .ra-tree-row {
+            padding: 4px 8px;
+        }
+
+        .ra-tree-child {
+            padding-left: 28px;
+        }
+
+        .ra-right-pane {
+            min-height: 300px;
+        }
+
+        .ra-pane-header {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .ra-selected-rate {
+            font-size: 11px;
+        }
+
+        .ra-availability-table-wrapper {
+            padding: 4px;
+        }
+
+        .ra-availability-table {
+            font-size: 10px;
+            min-width: 500px;
+        }
+
+        .ra-availability-table th {
+            padding: 3px 1px;
+            min-width: 18px;
+            font-size: 10px;
+        }
+
+        .ra-day-cell {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            font-size: 10px;
+        }
+
+        .ra-name-col {
+            min-width: 70px;
+            padding: 3px 4px !important;
+            font-size: 10px;
+        }
+
+        .ra-legend {
+            padding: 6px 8px;
+            gap: 8px;
+        }
+
+        .ra-legend-item {
+            font-size: 11px;
+            gap: 4px;
+        }
+
+        .ra-legend-box {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    /* Small mobile devices */
+    @@media (max-width: 480px) {
+        .ra-page {
+            padding: 4px;
+            height: calc(100vh - 8px);
+            min-height: 450px;
+        }
+
+        .ra-content {
+            gap: 4px;
+        }
+
+        .ra-left-pane {
+            max-height: 140px;
+        }
+
+        .ra-tree {
+            max-height: 100px;
+            font-size: 11px;
+            padding: 2px 0;
+        }
+
+        .ra-tree-row {
+            padding: 3px 6px;
+            gap: 4px;
+        }
+
+        .ra-tree-child {
+            padding-left: 24px;
+        }
+
+        .ra-tree-toggle {
+            width: 12px;
+            font-size: 10px;
+        }
+
+        .ra-right-pane {
+            min-height: 250px;
+        }
+
+        .ra-pane-header {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .ra-selected-rate {
+            font-size: 10px;
+        }
+
+        .ra-availability-table-wrapper {
+            padding: 2px;
+        }
+
+        .ra-availability-table {
+            font-size: 9px;
+            min-width: 400px;
+        }
+
+        .ra-availability-table th {
+            padding: 2px 1px;
+            min-width: 14px;
+            font-size: 9px;
+        }
+
+        .ra-day-cell {
+            width: 14px;
+            height: 14px;
+            min-width: 14px;
+            font-size: 9px;
+        }
+
+        .ra-name-col {
+            min-width: 55px;
+            padding: 2px 3px !important;
+            font-size: 9px;
+        }
+
+        .ra-legend {
+            padding: 4px 6px;
+            gap: 6px;
+        }
+
+        .ra-legend-item {
+            font-size: 10px;
+            gap: 3px;
+        }
+
+        .ra-legend-box {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    /* Landscape phones */
+    @@media (max-height: 600px) and (orientation: landscape) {
+        .ra-page {
+            height: calc(100vh - 8px);
+            min-height: 300px;
+        }
+
+        .ra-content {
+            gap: 6px;
+        }
+
+        .ra-left-pane {
+            max-height: 160px;
+        }
+
+        .ra-tree {
+            max-height: 120px;
+        }
+
+        .ra-right-pane {
+            min-height: 200px;
+        }
+
+        .ra-availability-table-wrapper {
+            padding: 4px;
+        }
+
+        .ra-availability-table {
+            font-size: 10px;
+        }
+
+        .ra-day-cell {
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            font-size: 9px;
+        }
+
+        .ra-name-col {
+            min-width: 60px;
+            padding: 3px 4px !important;
+            font-size: 10px;
+        }
+
+        .ra-pane-header {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .ra-legend {
+            padding: 4px 8px;
+        }
+    }
+
+    /* Large screens */
+    @@media (min-width: 1600px) {
+        .ra-page {
+            padding: 15px;
+            height: calc(100vh - 30px);
+        }
+
+        .ra-content {
+            gap: 20px;
+        }
+
+        .ra-left-pane {
+            flex: 0 0 320px;
+        }
+
+        .ra-pane-header {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .ra-tree {
+            font-size: 14px;
+            padding: 6px 0;
+        }
+
+        .ra-tree-row {
+            padding: 6px 14px;
+        }
+
+        .ra-availability-table-wrapper {
+            padding: 14px;
+        }
+
+        .ra-availability-table {
+            font-size: 13px;
+        }
+
+        .ra-availability-table th {
+            padding: 8px 6px;
+            min-width: 32px;
+        }
+
+        .ra-day-cell {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            font-size: 13px;
+        }
+
+        .ra-name-col {
+            min-width: 140px;
+            padding: 8px 12px !important;
+            font-size: 13px;
+        }
+
+        .ra-legend {
+            padding: 12px 16px;
+            gap: 24px;
+        }
+    }
+
+    /* Print styles */
+    @@media print {
+        .ra-page {
+            height: auto !important;
+            padding: 0 !important;
+            min-height: auto !important;
+        }
+
+        .ra-content {
+            gap: 10px !important;
+            overflow: visible !important;
+        }
+
+        .ra-left-pane {
+            flex: 0 0 200px !important;
+            max-height: none !important;
+            border: 1px solid #ccc !important;
+        }
+
+        .ra-right-pane {
+            min-height: auto !important;
+            border: 1px solid #ccc !important;
+        }
+
+        .ra-tree {
+            max-height: none !important;
+        }
+
+        .ra-availability-table-wrapper {
+            overflow: visible !important;
+        }
+
+        .ra-availability-table {
+            font-size: 10px !important;
+            min-width: auto !important;
+        }
+
+        .ra-day-cell {
+            cursor: default !important;
+        }
+
+        .ra-day-cell.ra-day-available {
+            background: #dbeaff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .ra-day-cell.ra-day-unavailable {
+            background: #ffe1e1 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .ra-day-cell.ra-day-invalid {
+            background: #000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .ra-legend {
+            border-top: 1px solid #ccc !important;
+        }
+
+        .ra-legend-box {
+            border: 1px solid #ccc !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        tr.ra-row-selected .ra-name-col {
+            background: #0078d4 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        tr.ra-row-selected .ra-day-cell.ra-day-available {
+            background: #4a9cf6 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
     }
 </style>
 

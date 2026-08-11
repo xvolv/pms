@@ -23,6 +23,7 @@
     background: #fff;
     min-height: 320px;
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .detail-list-item {
@@ -56,6 +57,14 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+}
+
+.grid-container {
+    width: 100%;
+    padding: 4px;
+    flex: 1;
+    overflow-x: auto;
 }
 
 .detail-table {
@@ -138,6 +147,7 @@
     border-bottom: 1px solid #d9d9d9;
     background: #fafafa;
     margin: -1px -1px 0 -1px;
+    flex-wrap: wrap;
 }
 
 .toolbar-btn {
@@ -221,4 +231,688 @@
 
 .code-box {
     background: #eee !important;
+}
+
+.delete-confirm-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.delete-confirm-content p {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #333;
+}
+
+.delete-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* ---------- erp-grid overrides (same as PackageHeader) ---------- */
+
+.erp-grid {
+    width: 100%;
+    background: #fff;
+}
+
+.erp-grid .dxbs-header-row > td,
+.erp-grid .dxbs-header-row > th,
+.erp-grid th {
+    background: #e0e0e0 !important;
+    color: #222;
+    font-size: 12px;
+    font-weight: bolder;
+    border: 1px solid #cfcfcf;
+    padding: 6px 8px;
+}
+
+.erp-grid .dxbs-data-row > td,
+.erp-grid tbody td {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    padding: 6px 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.erp-grid .dxbs-data-row:hover > td,
+.erp-grid tbody tr:hover td {
+    background: #3399FF !important;
+    color: white;
+}
+
+.erp-grid tr.row-manually-selected > td {
+    background: #2f6fb3 !important;
+    color: white !important;
+}
+
+.erp-grid table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.erp-grid *:focus {
+    outline: none;
+}
+
+/* =====================================================
+   RESPONSIVE STYLES
+===================================================== */
+
+/* Tablets and smaller screens */
+@media (max-width: 1024px) {
+    .page-shell {
+        padding: 8px;
+    }
+
+    .master-detail {
+        width: 100%;
+        gap: 6px;
+    }
+
+    .detail-list-panel {
+        width: 130px;
+        min-width: 130px;
+        min-height: 260px;
+    }
+
+    .detail-list-item {
+        font-size: 12px;
+        padding: 5px 6px;
+    }
+
+    .detail-grid-panel {
+        min-height: 260px;
+    }
+
+    .detail-table {
+        font-size: 12px;
+    }
+
+    .detail-table th,
+    .detail-table td {
+        padding: 5px 6px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 11px;
+        padding: 5px 6px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 12px;
+        padding: 5px 6px;
+    }
+
+    .detail-form {
+        padding: 10px 12px;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+    .page-shell {
+        padding: 6px;
+    }
+
+    .master-detail {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .detail-list-panel {
+        width: 100%;
+        min-width: unset;
+        min-height: auto;
+        max-height: 180px;
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 4px;
+        border: 1px solid #cfcfcf;
+        border-radius: 4px;
+    }
+
+    .detail-list-item {
+        flex: 0 0 auto;
+        padding: 4px 10px;
+        font-size: 12px;
+        border-bottom: none;
+        border-right: 1px solid #eee;
+        background: #f9f9f9;
+        border-radius: 3px;
+        margin: 2px;
+    }
+
+        .detail-list-item.selected {
+            background: #2f6fb3;
+            color: #fff;
+            border-right-color: #2f6fb3;
+        }
+
+    .detail-list-icon {
+        font-size: 12px;
+    }
+
+    .detail-grid-panel {
+        min-height: 200px;
+    }
+
+    .grid-container {
+        padding: 2px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 450px;
+    }
+
+    .detail-table {
+        font-size: 11px;
+    }
+
+    .detail-table th,
+    .detail-table td {
+        padding: 4px 5px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 10px;
+        padding: 4px 5px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 11px;
+        padding: 4px 5px;
+    }
+
+    .modal-toolbar {
+        padding: 4px 6px;
+        gap: 2px;
+    }
+
+    .toolbar-btn {
+        min-width: 44px;
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+
+    .popup-header-title {
+        font-size: 13px;
+    }
+
+    .detail-form {
+        padding: 8px 10px;
+    }
+
+    .detail-form-row.two-col {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .detail-form-row.two-col .col {
+        width: 100%;
+    }
+
+    .detail-form-label {
+        font-size: 11px;
+    }
+
+    .weekdays-row .weekdays {
+        gap: 4px;
+        font-size: 11px;
+    }
+
+    .weekdays-row .weekdays label {
+        font-size: 11px;
+        gap: 2px;
+    }
+
+    .delete-confirm-content {
+        padding: 16px;
+    }
+
+    .delete-confirm-content p {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+
+    .btn {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .page-shell {
+        padding: 4px;
+    }
+
+    .master-detail {
+        gap: 6px;
+    }
+
+    .detail-list-panel {
+        max-height: 140px;
+        padding: 3px;
+    }
+
+    .detail-list-item {
+        font-size: 11px;
+        padding: 3px 8px;
+        margin: 1px;
+    }
+
+    .detail-list-icon {
+        font-size: 11px;
+    }
+
+    .detail-grid-panel {
+        min-height: 160px;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 350px;
+    }
+
+    .detail-table {
+        font-size: 10px;
+    }
+
+    .detail-table th,
+    .detail-table td {
+        padding: 3px 4px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 9px;
+        padding: 3px 4px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 10px;
+        padding: 3px 4px;
+    }
+
+    .modal-toolbar {
+        padding: 3px 4px;
+        gap: 1px;
+    }
+
+    .toolbar-btn {
+        min-width: 36px;
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .toolbar-btn .toolbar-text {
+        display: none;
+    }
+
+    .popup-header {
+        gap: 4px;
+    }
+
+    .popup-header-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .popup-header-title {
+        font-size: 12px;
+    }
+
+    .detail-form {
+        padding: 6px 8px;
+    }
+
+    .detail-form-row {
+        margin-bottom: 6px;
+    }
+
+    .detail-form-label {
+        font-size: 10px;
+    }
+
+    .weekdays-row .weekdays {
+        gap: 3px;
+        font-size: 10px;
+    }
+
+    .weekdays-row .weekdays label {
+        font-size: 10px;
+        gap: 2px;
+    }
+
+    .delete-confirm-content {
+        padding: 12px;
+    }
+
+    .delete-confirm-content p {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .delete-confirm-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .btn {
+        padding: 5px 12px;
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .detail-grid-footer {
+        padding: 4px 6px;
+    }
+
+    .link-btn {
+        font-size: 11px;
+    }
+}
+
+/* Very small mobile devices */
+@media (max-width: 360px) {
+    .detail-list-panel {
+        max-height: 120px;
+    }
+
+    .detail-list-item {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 300px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 9px;
+        padding: 2px 3px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 8px;
+        padding: 2px 3px;
+    }
+
+    .toolbar-btn {
+        min-width: 30px;
+        padding: 2px 3px;
+    }
+
+    .detail-form-label {
+        font-size: 9px;
+    }
+
+    .weekdays-row .weekdays {
+        font-size: 9px;
+    }
+
+    .weekdays-row .weekdays label {
+        font-size: 9px;
+    }
+}
+
+/* Landscape phones */
+@media (max-height: 600px) and (orientation: landscape) {
+    .page-shell {
+        padding: 4px;
+    }
+
+    .master-detail {
+        gap: 6px;
+    }
+
+    .detail-list-panel {
+        max-height: 140px;
+        min-height: auto;
+    }
+
+    .detail-list-item {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .detail-grid-panel {
+        min-height: 140px;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: 400px;
+    }
+
+    .modal-toolbar {
+        padding: 3px 6px;
+    }
+
+    .toolbar-btn {
+        min-width: 40px;
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .detail-form {
+        padding: 6px 8px;
+    }
+
+    .detail-form-row {
+        margin-bottom: 4px;
+    }
+
+    .detail-form-row.two-col {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .popup-header {
+        padding: 4px 8px;
+    }
+
+    .popup-header-title {
+        font-size: 12px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1600px) {
+    .page-shell {
+        padding: 20px;
+    }
+
+    .master-detail {
+        gap: 12px;
+    }
+
+    .detail-list-panel {
+        width: 200px;
+        min-width: 200px;
+        min-height: 400px;
+    }
+
+    .detail-list-item {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .detail-list-icon {
+        font-size: 16px;
+    }
+
+    .detail-grid-panel {
+        min-height: 400px;
+    }
+
+    .grid-container {
+        padding: 8px;
+    }
+
+    .detail-table {
+        font-size: 14px;
+    }
+
+    .detail-table th,
+    .detail-table td {
+        padding: 8px 12px;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .detail-form {
+        padding: 20px 24px;
+    }
+
+    .detail-form-label {
+        font-size: 13px;
+    }
+
+    .weekdays-row .weekdays {
+        font-size: 13px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .page-shell {
+        padding: 0 !important;
+    }
+
+    .master-detail {
+        flex-direction: row !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .detail-list-panel {
+        width: 130px !important;
+        min-width: 130px !important;
+        min-height: auto !important;
+        max-height: none !important;
+        border: 1px solid #ccc !important;
+        flex-wrap: nowrap !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    .detail-list-item {
+        border-bottom: 1px solid #eee !important;
+        border-right: none !important;
+        margin: 0 !important;
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+        background: #fff !important;
+    }
+
+        .detail-list-item.selected {
+            background: #ddd !important;
+            color: #000 !important;
+        }
+
+    .detail-grid-panel {
+        min-height: auto !important;
+        border: 1px solid #ccc !important;
+    }
+
+    .grid-container {
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .grid-container ::deep .dxbl-grid-table {
+        min-width: auto !important;
+    }
+
+    .erp-grid .dxbs-data-row > td,
+    .erp-grid tbody td {
+        cursor: default !important;
+        font-size: 10px !important;
+        padding: 3px 5px !important;
+    }
+
+    .erp-grid .dxbs-header-row > td,
+    .erp-grid .dxbs-header-row > th,
+    .erp-grid th {
+        font-size: 10px !important;
+        padding: 3px 5px !important;
+    }
+
+    .erp-grid .dxbs-data-row:hover > td,
+    .erp-grid tbody tr:hover td {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .erp-grid tr.row-manually-selected > td {
+        background: #ddd !important;
+        color: #000 !important;
+    }
+
+    .modal-toolbar,
+    .popup-header,
+    .detail-form,
+    .delete-confirm-content,
+    .delete-confirm-buttons {
+        display: none !important;
+    }
+
+    .detail-grid-footer {
+        display: none !important;
+    }
 }

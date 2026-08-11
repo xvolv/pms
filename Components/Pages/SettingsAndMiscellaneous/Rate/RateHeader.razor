@@ -300,12 +300,15 @@
         display: flex;
         gap: 15px;
         margin-bottom: 15px;
+        flex-wrap: wrap;
     }
 
     .rh-section {
         display: flex;
         flex-direction: column;
         gap: 10px;
+        flex: 1;
+        min-width: 200px;
     }
 
     .rh-left-section {
@@ -374,6 +377,7 @@
         border-radius: 4px;
         padding: 10px;
         background: #f9f9f9;
+        height: 100%;
     }
 
     .rh-components-title {
@@ -389,6 +393,7 @@
         gap: 6px;
         height: 100%;
         overflow-y: auto;
+        max-height: 400px;
     }
 
     .rh-checkbox-item {
@@ -427,6 +432,7 @@
     .rh-bottom-section {
         border-top: 1px solid #d7d7d7;
         padding-top: 10px;
+        clear: both;
     }
 
     .rh-bottom-tabs {
@@ -436,6 +442,7 @@
     .rh-grid-container {
         border: 1px solid #d7d7d7;
         border-radius: 4px;
+        overflow: hidden;
     }
 
     .rh-grid {
@@ -459,6 +466,7 @@
         display: flex;
         gap: 8px;
         margin-bottom: 10px;
+        flex-wrap: wrap;
     }
 
     .rh-lookup-search-input {
@@ -477,6 +485,274 @@
         margin-top: 12px;
         padding-top: 10px;
         border-top: 1px solid #e0e0e0;
+    }
+
+    /* =====================================================
+       RESPONSIVE STYLES
+    ===================================================== */
+
+    /* Tablets and smaller screens */
+    @@media (max-width: 1024px) {
+        .rh-page {
+            padding: 8px;
+        }
+
+        .rh-content {
+            gap: 12px;
+        }
+
+        .rh-section {
+            min-width: 180px;
+        }
+
+        .rh-left-section {
+            min-width: 200px;
+        }
+
+        .rh-middle-section {
+            min-width: 180px;
+        }
+
+        .rh-right-section {
+            min-width: 220px;
+        }
+
+        .rh-components-list {
+            max-height: 300px;
+        }
+    }
+
+    /* Mobile devices */
+    @@media (max-width: 768px) {
+        .rh-page {
+            padding: 6px;
+        }
+
+        .rh-content {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rh-section {
+            flex: none;
+            width: 100%;
+            min-width: unset;
+        }
+
+        .rh-left-section,
+        .rh-middle-section,
+        .rh-right-section {
+            min-width: unset;
+            width: 100%;
+        }
+
+        .rh-form-row-split {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rh-form-col {
+            width: 100%;
+        }
+
+        .rh-components-box {
+            height: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .rh-components-list {
+            max-height: 250px;
+        }
+
+        .rh-checkbox-item {
+            font-size: 13px;
+        }
+
+        .rh-bottom-tabs ::deep .dxbl-tabs-item {
+            padding: 8px 16px !important;
+            font-size: 13px;
+        }
+
+        .rh-grid-container {
+            overflow-x: auto;
+        }
+
+        .rh-grid ::deep .dxbl-grid-table {
+            min-width: 400px;
+        }
+
+        .rh-lookup-search-row {
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rh-lookup-find-btn {
+            width: 100%;
+        }
+
+        /* Make popup full width on mobile */
+        ::deep .rh-lookup-popup-content {
+            width: 95% !important;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+    }
+
+    /* Small mobile devices */
+    @@media (max-width: 480px) {
+        .rh-page {
+            padding: 4px;
+        }
+
+        .rh-content {
+            gap: 8px;
+        }
+
+        .rh-section {
+            gap: 6px;
+        }
+
+        .rh-form-row {
+            gap: 3px;
+        }
+
+        .rh-form-row label {
+            font-size: 11px;
+        }
+
+        .rh-form-row-split {
+            gap: 6px;
+        }
+
+        .rh-small-btn {
+            min-width: 24px;
+            padding: 0 4px;
+            font-size: 12px;
+        }
+
+        .rh-components-title {
+            font-size: 12px;
+        }
+
+        .rh-checkbox-item {
+            font-size: 12px;
+            gap: 6px;
+        }
+
+        .rh-components-box {
+            padding: 8px;
+            max-height: 250px;
+        }
+
+        .rh-components-list {
+            max-height: 200px;
+            gap: 4px;
+        }
+
+        .rh-bottom-tabs ::deep .dxbl-tabs-item {
+            padding: 6px 10px !important;
+            font-size: 12px;
+        }
+
+        .rh-grid ::deep .dxbl-grid-table {
+            font-size: 12px;
+            min-width: 300px;
+        }
+
+        .rh-memo {
+            min-height: 60px;
+        }
+
+        .rh-lookup-grid ::deep .dxbl-grid-table {
+            font-size: 12px;
+            min-width: 250px;
+        }
+
+        ::deep .rh-lookup-popup-content {
+            width: 98% !important;
+            max-width: 350px;
+        }
+    }
+
+    /* Landscape phones */
+    @@media (max-height: 600px) and (orientation: landscape) {
+        .rh-content {
+            gap: 10px;
+        }
+
+        .rh-section {
+            gap: 6px;
+        }
+
+        .rh-form-row {
+            gap: 2px;
+        }
+
+        .rh-components-box {
+            max-height: 200px;
+        }
+
+        .rh-components-list {
+            max-height: 150px;
+        }
+
+        .rh-memo {
+            min-height: 40px;
+        }
+    }
+
+    /* Large screens */
+    @@media (min-width: 1600px) {
+        .rh-page {
+            padding: 20px;
+        }
+
+        .rh-content {
+            gap: 20px;
+        }
+
+        .rh-section {
+            gap: 14px;
+        }
+
+        .rh-components-list {
+            gap: 8px;
+        }
+
+        .rh-checkbox-item {
+            font-size: 13px;
+        }
+    }
+
+    /* Print styles */
+    @@media print {
+        .rh-page {
+            padding: 0;
+        }
+
+        .rh-content {
+            gap: 10px;
+        }
+
+        .rh-components-box {
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        .rh-bottom-section {
+            border-top: 1px solid #ccc;
+        }
+
+        .rh-grid-container {
+            border: 1px solid #ccc;
+        }
+
+        .rh-grid .dxbl-grid-data-row:nth-of-type(even),
+        .rh-lookup-grid .dxbl-grid-data-row:nth-of-type(even) {
+            --dxbl-grid-cell-back: #f0f0f0 !important;
+            background-color: #f0f0f0 !important;
+        }
     }
 </style>
 
