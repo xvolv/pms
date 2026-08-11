@@ -1,0 +1,85 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+
+<div class="rp-criteria-bar">
+    @if (Mode == ReportCriteriaMode.SimpleDate)
+    {
+        <div class="rp-criteria-field">
+            <label>Date</label>
+            <DxDateEdit @bind-Date="date" CssClass="rt-detail-input" />
+        </div>
+    }
+    else
+    {
+        <div class="rp-criteria-field">
+            <label>Period</label>
+            <DxComboBox Data="@PeriodOptions" @bind-Value="periodType" CssClass="erp-combobox" />
+        </div>
+
+        @if (periodType == "Date Range")
+        {
+            <div class="rp-criteria-field">
+                <label>From</label>
+                <DxDateEdit @bind-Date="rangeStart" CssClass="rt-detail-input" />
+            </div>
+            <div class="rp-criteria-field">
+                <label>To</label>
+                <DxDateEdit @bind-Date="rangeEnd" CssClass="rt-detail-input" />
+            </div>
+        }
+        else if (periodType != "Show all")
+        {
+            <div class="rp-criteria-field">
+                <label>At the day of</label>
+                <DxDateEdit @bind-Date="rangeStart" CssClass="rt-detail-input" />
+            </div>
+        }
+    }
+
+    <button type="button" class="rt-toolbar-btn rp-generate-btn" @onclick="Generate">
+        <i class="bi bi-play-fill text-secondary"></i>
+        <span>Generate</span>
+    </button>
+</div>
+
+@code {
+    private static readonly string[] PeriodOptions =
+    {
+        "Daily", "Weekly", "Monthly", "At the day of", "Annually", "Date Range", "Show all",
+    };
+
+    [Parameter] public ReportCriteriaMode Mode { get; set; } = ReportCriteriaMode.SimpleDate;
+    [Parameter] public DateTime InitialDate { get; set; } = DateTime.Today;
+    [Parameter] public string InitialPeriodType { get; set; } = "Daily";
+    [Parameter] public EventCallback<ReportCriteria> OnGenerate { get; set; }
+
+    private DateTime date;
+    private string periodType = "Daily";
+    private DateTime rangeStart;
+    private DateTime rangeEnd;
+    private bool initialized;
+
+    protected override void OnParametersSet()
+    {
+        if (initialized)
+        {
+            return;
+        }
+
+        date = InitialDate;
+        periodType = InitialPeriodType;
+        rangeStart = InitialDate;
+        rangeEnd = InitialDate;
+        initialized = true;
+    }
+
+    private async Task Generate()
+    {
+        await OnGenerate.InvokeAsync(new ReportCriteria
+        {
+            Date = date,
+            PeriodType = periodType,
+            RangeStart = rangeStart,
+            RangeEnd = rangeEnd,
+        });
+    }
+}

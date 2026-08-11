@@ -1,0 +1,66 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(SummaryMetricRow.Sn)" Caption="#" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(SummaryMetricRow.Label)" Caption="Line Item" Width="34%" />
+                <DxGridDataColumn FieldName="@nameof(SummaryMetricRow.Value)" Caption="Amount" Width="20%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryMetricRow.Note)" Caption="Note" Width="40%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@ReportName for @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns = { "#", "Line Item", "Amount", "Note" };
+
+    private DateTime date = DateTime.Today;
+    private List<SummaryMetricRow> rows = new();
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+        { r.Sn.ToString(), r.Label, r.Value, r.Note }).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            rows = ReportsState.CreateSummaryMetricSample(ReportName, date);
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateSummaryMetricSample(ReportName, date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

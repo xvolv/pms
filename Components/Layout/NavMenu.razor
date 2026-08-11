@@ -150,9 +150,23 @@
                         <i class="bi bi-calendar-check-fill item-icon" style="color: #198754;"></i>
                         <span>End of Month</span>
                     </NavLink>
-                    <NavLink class="menu-item" href="weather">
-                        <i class="bi bi-file-earmark-bar-graph-fill item-icon" style="color: #0d6efd;"></i>
-                        <span>Weather (Reports)</span>
+                </div>
+            }
+        </div>
+
+        <!-- Reports Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleReports">
+                <i class="bi bi-chevron-right chevron-icon @(isReportsExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-file-earmark-bar-graph-fill group-icon" style="color: #0d6efd;"></i>
+                <span class="group-title">Reports</span>
+            </div>
+            @if (isReportsExpanded)
+            {
+                <div class="group-items">
+                    <NavLink class="menu-item" href="reports">
+                        <i class="bi bi-bar-chart-line-fill item-icon" style="color: #0d6efd;"></i>
+                        <span>Reports</span>
                     </NavLink>
                 </div>
             }
@@ -215,6 +229,7 @@
     private bool isCashieringExpanded = true;
     private bool isProfileExpanded = true;
     private bool isNightAuditExpanded = true;
+    private bool isReportsExpanded = true;
     private bool isSettingsExpanded = true;
 
     private bool allExpanded = true;
@@ -224,6 +239,7 @@
     private void ToggleCashiering() => isCashieringExpanded = !isCashieringExpanded;
     private void ToggleProfile() => isProfileExpanded = !isProfileExpanded;
     private void ToggleNightAudit() => isNightAuditExpanded = !isNightAuditExpanded;
+    private void ToggleReports() => isReportsExpanded = !isReportsExpanded;
     private void ToggleSettings() => isSettingsExpanded = !isSettingsExpanded;
 
     private void ToggleExpandAll()
@@ -234,6 +250,7 @@
         isCashieringExpanded = allExpanded;
         isProfileExpanded = allExpanded;
         isNightAuditExpanded = allExpanded;
+        isReportsExpanded = allExpanded;
         isSettingsExpanded = allExpanded;
     }
 }

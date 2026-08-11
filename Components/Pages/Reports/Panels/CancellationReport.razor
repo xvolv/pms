@@ -1,0 +1,81 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>Cancellation of the Day</h2>
+            <p>List of reservations that are cancelled on the given date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area rp-wide-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid rp-wide-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RegNo)" Caption="Reg_No" Width="100px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Room)" Caption="Room" Width="70px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomCount)" Caption="Room Count" Width="100px"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RoomType)" Caption="Room Type" Width="100px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Company)" Caption="Company" Width="120px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Guest)" Caption="Guest" Width="130px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Adult)" Caption="Adult" Width="70px"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.Child)" Caption="Child" Width="70px"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ArrivalDate)" Caption="Arrival Date" Width="100px"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.DepartureDate)" Caption="Departure Date" Width="190px"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateCode)" Caption="Rate Code" Width="90px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.RateAmount)" Caption="Rate Amount" Width="190px"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.PaymentType)" Caption="Payment Type" Width="100px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.User)" Caption="User" Width="90px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.ActualRtc)" Caption="Actual RTC" Width="90px" />
+                <DxGridDataColumn FieldName="@nameof(CancellationReportRow.MarketCode)" Caption="Market Code" Width="100px" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count cancellation(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Cancellation of the Day" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Room", "Room Count", "Room Type", "Company", "Guest", "Adult", "Child", "Arrival Date",
+        "Departure Date", "Rate Code", "Rate Amount", "Payment Type", "User", "Actual RTC", "Market Code",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<CancellationReportRow> rows = ReportsState.CreateCancellationSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Room, r.RoomCount.ToString(), r.RoomType, r.Company, r.Guest, r.Adult.ToString(), r.Child.ToString(),
+        r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"), r.RateCode,
+        r.RateAmount.ToString("N2"), r.PaymentType, r.User, r.ActualRtc, r.MarketCode,
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateCancellationSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

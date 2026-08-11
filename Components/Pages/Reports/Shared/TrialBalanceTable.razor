@@ -1,0 +1,39 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+
+<table class="hk-print-table rp-tb-table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th class="rp-tb-balance">Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in Groups)
+        {
+            <tr class="rp-tb-group-row">
+                <td colspan="2">Group: @group.GroupName (Count=@group.Count)</td>
+            </tr>
+            @foreach (var line in group.Lines)
+            {
+                <tr>
+                    <td class="rp-tb-line">@line.Description</td>
+                    <td class="rp-tb-balance">@line.Balance.ToString("N2")</td>
+                </tr>
+            }
+            <tr class="rp-tb-subtotal-row">
+                <td></td>
+                <td class="rp-tb-balance"><i>etbTotal = @group.Total.ToString("N2")</i></td>
+            </tr>
+        }
+        <tr class="rp-tb-grandtotal-row">
+            <td></td>
+            <td class="rp-tb-balance"><b>etbTotal = @GrandTotal.ToString("N2")</b></td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public List<TrialBalanceGroup> Groups { get; set; } = new();
+
+    private decimal GrandTotal => Groups.Sum(g => g.Total);
+}

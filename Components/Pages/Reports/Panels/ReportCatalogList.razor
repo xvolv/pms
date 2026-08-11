@@ -1,0 +1,32 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+
+<div class="rt-grid-area rp-catalog-grid-area">
+    <DxGrid Data="@Reports" KeyFieldName="Id" CssClass="rt-grid">
+        <Columns>
+            <DxGridDataColumn FieldName="@nameof(ReportDefinition.Name)" Caption="Report Name" Width="26%" />
+            <DxGridDataColumn FieldName="@nameof(ReportDefinition.Description)" Caption="Description" Width="54%" />
+            <DxGridDataColumn Caption="Status" Width="20%">
+                <CellDisplayTemplate>
+                    @{ var row = (ReportDefinition)context.DataItem; }
+                    @if (row.IsImplemented)
+                    {
+                        <button type="button" class="rt-toolbar-btn rp-view-btn" @onclick="() => Select(row)">
+                            <span>View Report</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="rp-coming-soon">Coming soon</span>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+    </DxGrid>
+</div>
+
+@code {
+    [Parameter] public List<ReportDefinition> Reports { get; set; } = new();
+    [Parameter] public EventCallback<ReportDefinition> OnSelect { get; set; }
+
+    private async Task Select(ReportDefinition row) => await OnSelect.InvokeAsync(row);
+}

@@ -1,0 +1,67 @@
+@if (Visible)
+{
+    <div class="rt-modal-backdrop">
+        <div class="rt-modal rp-print-modal">
+            <div class="rt-modal-header">
+                <span class="rt-modal-header-title">Preview</span>
+                <button class="rt-modal-close-btn" @onclick="Close" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="rt-modal-body" style="overflow:auto; background:#e8e8e8;">
+                <div class="rp-print-page">
+                    <div style="display:flex; justify-content:space-between;">
+                        <div class="hk-print-title">Eden Hotel</div>
+                        <div style="text-align:right; font-size:10px;">Addis Ababa, Ethiopia</div>
+                    </div>
+                    <div style="text-align:center; margin:8px 0;"><b>@Title</b></div>
+                    <div style="margin-bottom:6px;"><b>Generated</b> @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt")</div>
+                    @if (CustomBody is not null)
+                    {
+                        @CustomBody
+                    }
+                    else
+                    {
+                        <table class="hk-print-table">
+                            <thead>
+                                <tr style="background:#f5e6c8;">
+                                    @foreach (var column in Columns)
+                                    {
+                                        <th>@column</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in Rows)
+                                {
+                                    <tr>
+                                        @foreach (var cell in row)
+                                        {
+                                            <td>@cell</td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:11px;">
+                        <div><b>Prepared By:</b> CNET ADMINISTRATOR</div>
+                        <div>@(CustomBody is not null ? "" : $"{Rows.Count} record(s)")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string[] Columns { get; set; } = Array.Empty<string>();
+    [Parameter] public List<string[]> Rows { get; set; } = new();
+    [Parameter] public RenderFragment? CustomBody { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

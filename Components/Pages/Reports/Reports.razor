@@ -1,0 +1,150 @@
+@page "/reports"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Panels
+@inject NavigationManager NavigationManager
+
+<PageTitle>Reports</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Reports
+            <i class="bi bi-x fs-4" @onclick="ClosePage"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <DxTabs ActiveTabIndex="@activeTabIndex" ActiveTabIndexChanged="@OnTabChanged" CssClass="hk-tabs">
+            <DxTabPage Text="Interactive Reports" />
+            <DxTabPage Text="Night Audit" />
+            <DxTabPage Text="Housekeeping" />
+            <DxTabPage Text="Transaction" />
+            <DxTabPage Text="Other" />
+        </DxTabs>
+
+        @switch (activeTabIndex)
+        {
+            case 0:
+                <ReportCatalogList Reports="@GroupReports(ReportGroup.Interactive)" />
+                break;
+            case 1:
+                @if (selectedReport is null)
+                {
+                    <ReportCatalogList Reports="@GroupReports(ReportGroup.NightAudit)" OnSelect="SelectReport" />
+                }
+                else if (selectedReport.Name == "Checkout Report")
+                {
+                    <CheckoutReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Managerial Flash")
+                {
+                    <ManagerialFlashReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Daily Business Report")
+                {
+                    <DailyBusinessReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Daily Resident Summary")
+                {
+                    <DailyResidentSummaryReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Trial Balance")
+                {
+                    <TrialBalanceReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Cashier Summary")
+                {
+                    <CashierSummaryReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Daily Sales Summary")
+                {
+                    <SummaryReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                        OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Cancellation of the Day")
+                {
+                    <CancellationReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name is "No Show Report" or "Package Report")
+                {
+                    <GuestListReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                          OnBack="ClearSelection" />
+                }
+                else
+                {
+                    <TransactionReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                            OnBack="ClearSelection" />
+                }
+                break;
+            case 2:
+                @if (selectedReport is null)
+                {
+                    <ReportCatalogList Reports="@GroupReports(ReportGroup.Housekeeping)" OnSelect="SelectReport" />
+                }
+                else if (selectedReport.Name == "Discrepancy Report")
+                {
+                    <DiscrepancyReport OnBack="ClearSelection" />
+                }
+                else
+                {
+                    <HousekeepingReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                             OnBack="ClearSelection" />
+                }
+                break;
+            case 3:
+                @if (selectedReport is null)
+                {
+                    <ReportCatalogList Reports="@GroupReports(ReportGroup.Transaction)" OnSelect="SelectReport" />
+                }
+                else
+                {
+                    <TransactionReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                            OnBack="ClearSelection" />
+                }
+                break;
+            case 4:
+                @if (selectedReport is null)
+                {
+                    <ReportCatalogList Reports="@GroupReports(ReportGroup.Other)" OnSelect="SelectReport" />
+                }
+                else if (selectedReport.Name == "Arrival List")
+                {
+                    <ArrivalListReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Detail Daily Sales Transaction")
+                {
+                    <TransactionReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                            OnBack="ClearSelection" />
+                }
+                else
+                {
+                    <GuestListReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                          OnBack="ClearSelection" />
+                }
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    private ReportsState state = ReportsState.CreateSample();
+    private int activeTabIndex;
+    private ReportDefinition? selectedReport;
+
+    private List<ReportDefinition> GroupReports(ReportGroup group) =>
+        state.Catalog.Where(r => r.Group == group).ToList();
+
+    private void OnTabChanged(int index)
+    {
+        activeTabIndex = index;
+        selectedReport = null;
+    }
+
+    private void SelectReport(ReportDefinition report) => selectedReport = report;
+
+    private void ClearSelection() => selectedReport = null;
+
+    private void ClosePage() => NavigationManager.NavigateTo("/");
+}

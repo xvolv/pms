@@ -1,0 +1,76 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+            <span>Back</span>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Sn)" Caption="#" Width="4%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.RegNo)" Caption="Reg No" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Guest)" Caption="Guest" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Company)" Caption="Company" Width="12%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Room)" Caption="Room" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.RoomType)" Caption="Room Type" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.ArrivalDate)" Caption="Arrival" Width="9%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.DepartureDate)" Caption="Departure" Width="9%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Remark)" Caption="Remark" Width="28%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count guest(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+        { "#", "Reg No", "Guest", "Company", "Room", "Room Type", "Arrival", "Departure", "Remark" };
+
+    private DateTime date = DateTime.Today;
+    private List<ArrivalListRow> rows = new();
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.Sn.ToString(), r.RegNo, r.Guest, r.Company, r.Room, r.RoomType,
+        r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"), r.Remark,
+    }).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            rows = ReportsState.CreateGuestListSample(ReportName, date);
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateGuestListSample(ReportName, date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}
