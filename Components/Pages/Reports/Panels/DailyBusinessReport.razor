@@ -14,44 +14,29 @@
 
     <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
 
-    <div class="rt-grid-area">
-        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
-            <Columns>
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Metric)" Caption="Metric" Width="28%" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.Today)" Caption="Today" Width="18%"
-                                   TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.MonthToDate)" Caption="Month to Date" Width="18%"
-                                   TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorMonth)" Caption="Prior Month" Width="18%"
-                                   TextAlignment="GridTextAlignment.Right" />
-                <DxGridDataColumn FieldName="@nameof(ManagerialFlashRow.PriorYear)" Caption="Prior Year" Width="18%"
-                                   TextAlignment="GridTextAlignment.Right" />
-            </Columns>
-        </DxGrid>
-
+    <div class="rt-grid-area rp-wide-grid-area">
+        <DailyBusinessReportTable Sections="@sections" />
         <div class="rt-footer">Daily Business Report for @date.ToString("dd-MMM-yyyy")</div>
     </div>
 </div>
 
-<ReportPreviewDialog Visible="@showPreview" Title="Daily Business Report" Columns="@PreviewColumns" Rows="@PreviewRows"
-                      OnClose="() => showPreview = false" />
+<ReportPreviewDialog Visible="@showPreview" Title="Daily Business Report" OnClose="() => showPreview = false">
+    <CustomBody>
+        <DailyBusinessReportTable Sections="@sections" />
+    </CustomBody>
+</ReportPreviewDialog>
 
 @code {
     [Parameter] public EventCallback OnBack { get; set; }
 
-    private static readonly string[] PreviewColumns = { "Metric", "Today", "Month to Date", "Prior Month", "Prior Year" };
-
     private DateTime date = DateTime.Today;
-    private List<ManagerialFlashRow> rows = ReportsState.CreateDailyBusinessSample(DateTime.Today);
+    private List<DailyBusinessSection> sections = ReportsState.CreateDailyBusinessSections(DateTime.Today);
     private bool showPreview;
-
-    private List<string[]> PreviewRows => rows.Select(r => new[]
-        { r.Metric, r.Today, r.MonthToDate, r.PriorMonth, r.PriorYear }).ToList();
 
     private void Generate(ReportCriteria criteria)
     {
         date = criteria.Date;
-        rows = ReportsState.CreateDailyBusinessSample(date);
+        sections = ReportsState.CreateDailyBusinessSections(date);
         showPreview = true;
     }
 

@@ -165,6 +165,33 @@
     border-top: 2px solid #333 !important;
 }
 
+/* Daily Business Report: sectioned Report Items tables (Resident Summary,
+   Income Analysis, Sales Centers Activity Analysis, Collector Analysis,
+   Occupancy Summary), each with its own columns and an optional total row. */
+.rp-db-section-title {
+    font-weight: 700;
+    background-color: #f1f3f4;
+    border: 1px solid #333;
+    border-bottom: none;
+    padding: 3px 6px;
+    font-size: 10px;
+    margin-top: 10px;
+}
+
+.rp-db-table {
+    margin-top: 0;
+}
+
+.rp-db-right {
+    text-align: right;
+}
+
+.rp-db-total-row td {
+    font-weight: 700;
+    background-color: #d9d9d9;
+    border-top: 2px solid #333 !important;
+}
+
 /* Cashier Summary: nested User > Payment Method > Currency > Voucher table */
 .rp-cs-table {
     width: 100%;

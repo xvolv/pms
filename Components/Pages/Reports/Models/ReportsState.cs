@@ -384,14 +384,81 @@ public class ReportsState
         }).ToList();
     }
 
-    public static List<ManagerialFlashRow> CreateDailyBusinessSample(DateTime date)
+    private static readonly string[] DailyBusinessItemColumns =
+        { "SN", "Particulars", "Total Today", "Month Todate", "Year To Date", "Last Year Date", "Last Year Month", "Last Year" };
+
+    public static List<DailyBusinessSection> CreateDailyBusinessSections(DateTime date)
     {
-        return new List<ManagerialFlashRow>
+        return new List<DailyBusinessSection>
         {
-            new() { Id = NextId(), Metric = "Total Transactions", Today = "149,097.50", MonthToDate = "3,254,300.00", PriorMonth = "3,010,500.00", PriorYear = "2,780,900.00" },
-            new() { Id = NextId(), Metric = "Room Revenue", Today = "95,550.00", MonthToDate = "1,766,760.00", PriorMonth = "1,564,000.00", PriorYear = "1,311,500.00" },
-            new() { Id = NextId(), Metric = "F&B Revenue", Today = "27,700.00", MonthToDate = "612,400.00", PriorMonth = "580,100.00", PriorYear = "540,300.00" },
-            new() { Id = NextId(), Metric = "Other Revenue", Today = "6,400.00", MonthToDate = "142,600.00", PriorMonth = "135,900.00", PriorYear = "121,200.00" },
+            new()
+            {
+                Title = "Resident Summary",
+                Columns = DailyBusinessItemColumns,
+                Rows = new List<string[]>
+                {
+                    new[] { "1", "Room Sales", "29350.51", "0", "0", "0", "0", "0" },
+                    new[] { "2", "Package", "1383.00", "0", "0", "0", "0", "0" },
+                    new[] { "3", "Service Charge", "3339.30", "0", "0", "0", "0", "0" },
+                    new[] { "4", "VAT", "5311.61", "0", "0", "0", "0", "0" },
+                    new[] { "5", "POS Charge", "0.00", "0", "0", "0", "0", "0" },
+                    new[] { "6", "Today Total", "39384.42", "0", "0", "0", "0", "0" },
+                    new[] { "7", "Brought Forward", "0.00", "0", "0", "0", "0", "0" },
+                    new[] { "8", "Todate Total", "39384.42", "0", "0", "0", "0", "0" },
+                    new[] { "9", "Rebate", "1321.75", "0", "0", "0", "0", "0" },
+                    new[] { "10", "Paid Out", "1000.00", "0", "0", "0", "0", "0" },
+                    new[] { "11", "Cash Receipt", "14743.03", "0", "0", "0", "0", "0" },
+                    new[] { "12", "Carried Forward", "3382.03", "0", "0", "0", "0", "0" },
+                    new[] { "13", "Outstanding", "20937.61", "0", "0", "0", "0", "0" },
+                },
+            },
+            new()
+            {
+                Title = "Income Analysis",
+                Columns = DailyBusinessItemColumns,
+                Rows = new List<string[]>
+                {
+                    new[] { "1", "Room Sales", "30733.51", "0", "0", "0", "0", "0" },
+                    new[] { "2", "Discount", "-1321.75", "0", "0", "0", "0", "0" },
+                    new[] { "3", "Service Charge", "3339.30", "0", "0", "0", "0", "0" },
+                    new[] { "4", "VAT", "5311.61", "0", "0", "0", "0", "0" },
+                },
+                TotalRow = new[] { "", "Grand Total=", "38,062.67", "0.00", "0.00", "0.00", "0.00", "0.00" },
+            },
+            new()
+            {
+                Title = "Sales Centers Activity Analysis",
+                Columns = new[] { "SN", "Machine Name", "Cash", "Room", "City Ledger", "Entertainment", "Food Allowance", "Total Today", "Month Today" },
+                Rows = new List<string[]>
+                {
+                    new[] { "1", "Room Sales", "0", "39384.42", "0", "0", "0", "39384.42", "0" },
+                },
+                TotalRow = new[] { "", "Total =", "0.00", "39,384.42", "0.00", "0.00", "0.00", "39,384.42", "0.00" },
+            },
+            new()
+            {
+                Title = "Collector Analysis",
+                Columns = new[] { "SN", "Cashier", "From Guest", "Advanced Deposit", "From Credit", "Cash Recieved", "Total" },
+                Rows = new List<string[]>
+                {
+                    new[] { "1", "CNET ADMIN", "0", "0", "21863.04", "0", "21863.04" },
+                },
+                TotalRow = new[] { "", "Total =", "0.00", "0.00", "21,863.04", "0.00", "21,863.04" },
+            },
+            new()
+            {
+                Title = "Occupancy Summary",
+                Columns = new[] { "SN", "Room Type", "Rooms", "Occupied", "Vacant", "Occupancy [%]", "MTD [%]", "YTD [%]", "Today", "Month", "Yearly", "ADR" },
+                Rows = new List<string[]>
+                {
+                    new[] { "1", "KING", "55", "0", "53", "0", "0", "0", "0", "0", "0", "0" },
+                    new[] { "2", "SUITE", "6", "0", "6", "0", "0", "0", "0", "0", "0", "0" },
+                    new[] { "3", "TWIN", "5", "0", "5", "0", "0", "0", "0", "0", "0", "0" },
+                    new[] { "4", "PSEUDO ROOM TYP", "20", "0", "10", "0", "0", "0", "0", "0", "0", "0" },
+                    new[] { "5", "VIP", "5", "0", "4", "0", "0", "0", "0", "0", "0", "0" },
+                },
+                TotalRow = new[] { "", "Total =", "91.00", "0.00", "78.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00" },
+            },
         };
     }
 

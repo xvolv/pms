@@ -221,6 +221,14 @@ public class CashierUserGroup
     public decimal Total => PaymentMethods.Sum(p => p.Total);
 }
 
+public class DailyBusinessSection
+{
+    public string Title { get; set; } = "";
+    public string[] Columns { get; set; } = Array.Empty<string>();
+    public List<string[]> Rows { get; set; } = new();
+    public string[]? TotalRow { get; set; }
+}
+
 public class TransactionReportRow
 {
     public int Id { get; set; }
