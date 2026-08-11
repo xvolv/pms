@@ -154,8 +154,24 @@
                 }
                 else if (selectedReport.Name == "Detail Daily Sales Transaction")
                 {
-                    <TransactionReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
-                                            OnBack="ClearSelection" />
+                    <DetailDailySalesTransactionReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name is "Drop Off Report" or "Pickup Report")
+                {
+                    <ShuttleReportView ReportName="@selectedReport.Name" ReportDescription="@selectedReport.Description"
+                                        OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Police Report")
+                {
+                    <PoliceReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Room Move")
+                {
+                    <RoomMoveReport OnBack="ClearSelection" />
+                }
+                else if (selectedReport.Name == "Summary Of Summary Report")
+                {
+                    <SummaryOfSummaryReport OnBack="ClearSelection" />
                 }
                 else
                 {

@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <Reference Include="CNET_V7_Domain">
-      <HintPath>..\..\..\..\..\DLL\CNET_V7_Domain.dll</HintPath>
+      <HintPath>..\..\Users\salhadin\Downloads\Telegram Desktop\CNET_V7_Domain.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -1,0 +1,74 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Police Report</h2>
+            <p>In-house guests with name, gender, ID number, arrival and departure dates.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.RegNo)" Caption="Reg_No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.Room)" Caption="Room" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.Guest)" Caption="Guest" Width="16%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.Gender)" Caption="Gender" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.Nationality)" Caption="Nationality" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.Dob)" Caption="DOB" Width="9%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.IdDescription)" Caption="ID Description" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.IdNumber)" Caption="ID Number" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.ArrivalDate)" Caption="Arrival Date" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(PoliceReportRow.DepartureDate)" Caption="Departure Date" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count in-house guest(s) on @date.ToString("dd-MMM-yyyy")</div>
+        <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:12px;">
+            <div><b>Checked By:</b> ______________________</div>
+            <div><b>Received By:</b> ______________________</div>
+        </div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Police Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Room", "Guest", "Gender", "Nationality", "DOB", "ID Description", "ID Number",
+        "Arrival Date", "Departure Date",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<PoliceReportRow> rows = ReportsState.CreatePoliceReportSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Room, r.Guest, r.Gender, r.Nationality, r.Dob.ToString("dd-MMM-yyyy"), r.IdDescription,
+        r.IdNumber, r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"),
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreatePoliceReportSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

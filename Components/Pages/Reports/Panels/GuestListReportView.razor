@@ -17,17 +17,19 @@
     <div class="rt-grid-area">
         <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
             <Columns>
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Sn)" Caption="#" Width="4%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.RegNo)" Caption="Reg No" Width="10%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Guest)" Caption="Guest" Width="13%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Company)" Caption="Company" Width="12%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Room)" Caption="Room" Width="6%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.RoomType)" Caption="Room Type" Width="9%" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.ArrivalDate)" Caption="Arrival" Width="9%"
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.RegNo)" Caption="Reg_No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.RoomType)" Caption="Room Type" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.Room)" Caption="Room" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.Guest)" Caption="Guest" Width="14%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.Company)" Caption="Company" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.IdNumber)" Caption="ID_Number" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.ArrivalDate)" Caption="Arrival Date" Width="9%"
                                    DisplayFormat="dd-MMM-yyyy" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.DepartureDate)" Caption="Departure" Width="9%"
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.DepartureDate)" Caption="Departure Date" Width="9%"
                                    DisplayFormat="dd-MMM-yyyy" />
-                <DxGridDataColumn FieldName="@nameof(ArrivalListRow.Remark)" Caption="Remark" Width="28%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.ResType)" Caption="Res_Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.PaymentMethod)" Caption="Payment Method" Width="7%" />
+                <DxGridDataColumn FieldName="@nameof(GuestStayRow.Market)" Caption="Market" Width="6%" />
             </Columns>
         </DxGrid>
 
@@ -44,30 +46,34 @@
     [Parameter] public EventCallback OnBack { get; set; }
 
     private static readonly string[] PreviewColumns =
-        { "#", "Reg No", "Guest", "Company", "Room", "Room Type", "Arrival", "Departure", "Remark" };
+    {
+        "Reg_No", "Room Type", "Room", "Guest", "Company", "ID_Number", "Arrival Date", "Departure Date",
+        "Res_Type", "Payment Method", "Market",
+    };
 
     private DateTime date = DateTime.Today;
-    private List<ArrivalListRow> rows = new();
+    private List<GuestStayRow> rows = new();
     private bool showPreview;
 
     private List<string[]> PreviewRows => rows.Select(r => new[]
     {
-        r.Sn.ToString(), r.RegNo, r.Guest, r.Company, r.Room, r.RoomType,
-        r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"), r.Remark,
+        r.RegNo, r.RoomType, r.Room, r.Guest, r.Company, r.IdNumber,
+        r.ArrivalDate.ToString("dd-MMM-yyyy"), r.DepartureDate.ToString("dd-MMM-yyyy"),
+        r.ResType, r.PaymentMethod, r.Market,
     }).ToList();
 
     protected override void OnParametersSet()
     {
         if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
         {
-            rows = ReportsState.CreateGuestListSample(ReportName, date);
+            rows = ReportsState.CreateGuestStaySample(ReportName, date);
         }
     }
 
     private void Generate(ReportCriteria criteria)
     {
         date = criteria.Date;
-        rows = ReportsState.CreateGuestListSample(ReportName, date);
+        rows = ReportsState.CreateGuestStaySample(ReportName, date);
         showPreview = true;
     }
 

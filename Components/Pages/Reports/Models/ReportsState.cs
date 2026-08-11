@@ -7,7 +7,7 @@ public class ReportsState
     public List<ReportDefinition> Catalog { get; set; } = new();
     public List<CheckoutReportRow> CheckoutRows { get; set; } = new();
     public List<DiscrepancyReportRow> DiscrepancyRows { get; set; } = new();
-    public List<ArrivalListRow> ArrivalRows { get; set; } = new();
+    public List<GuestStayRow> ArrivalRows { get; set; } = new();
 
     private static int _nextId;
     private static int NextId() => ++_nextId;
@@ -118,7 +118,7 @@ public class ReportsState
         catalog.Add(new() { Id = NextId(), Group = ReportGroup.Other, Name = "Stayovers",
             Description = "In-house guests who will not be checked out on the next business date.", IsImplemented = true });
         catalog.Add(new() { Id = NextId(), Group = ReportGroup.Other, Name = "Summary Of Summary Report",
-            Description = "Room, POS and tax transaction summaries for a given date or date range." });
+            Description = "Room, POS and tax transaction summaries for a given date or date range.", IsImplemented = true });
 
         return catalog;
     }
@@ -293,26 +293,226 @@ public class ReportsState
         };
     }
 
-    public static List<ArrivalListRow> CreateArrivalListSample(DateTime date)
+    public static List<GuestStayRow> CreateGuestStaySample(string reportName, DateTime date)
     {
-        var nextDay = date.AddDays(1);
-        return new List<ArrivalListRow>
+        List<GuestStayRow> rows = reportName switch
         {
-            new() { Id = NextId(), Sn = 1, RegNo = "RES-20031", Guest = "Yared Alemayehu", Company = "", Room = "204",
-                RoomType = "Standard", ArrivalDate = nextDay, DepartureDate = nextDay.AddDays(2), Adults = 1, Children = 0,
-                Agent = "Direct" },
-            new() { Id = NextId(), Sn = 2, RegNo = "RES-20044", Guest = "Meron Haile", Company = "Blue Nile Logistics", Room = "312",
-                RoomType = "Deluxe", ArrivalDate = nextDay, DepartureDate = nextDay.AddDays(3), Adults = 2, Children = 1,
-                Agent = "Corporate" },
-            new() { Id = NextId(), Sn = 3, RegNo = "RES-20051", Guest = "Robel Getachew", Company = "", Room = "101",
-                RoomType = "Standard", ArrivalDate = nextDay, DepartureDate = nextDay.AddDays(1), Adults = 1, Children = 0,
-                Agent = "OTA" },
+            "Arrival List" => new List<GuestStayRow>
+            {
+                new() { RegNo = "WREG-01517-17", RoomType = "KING", Room = "318", Guest = "NIDIRI WAWERU", Company = "",
+                    IdNumber = "", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01516-17", RoomType = "KING", Room = "314", Guest = "ADMAS BELE", Company = "",
+                    IdNumber = "314", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01507-17", RoomType = "KING", Room = "318", Guest = "MASULIB ALI TAHIR", Company = "",
+                    IdNumber = "BA30118", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+            },
+            "Departure List" => new List<GuestStayRow>
+            {
+                new() { RegNo = "WREG-01534-17", RoomType = "KING", Room = "803", Guest = "CHARLES LIHULUK ERIC", Company = "WRO-INDUSTRY",
+                    IdNumber = "14851178", ArrivalDate = new DateTime(2017, 8, 20), DepartureDate = new DateTime(2017, 8, 30),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01534-17", RoomType = "Twin", Room = "805", Guest = "TENAYN YIMEN", Company = "",
+                    IdNumber = "263655", ArrivalDate = new DateTime(2017, 8, 30), DepartureDate = new DateTime(2017, 8, 30),
+                    ResType = "Phone Reservation", PaymentMethod = "Credit Card", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01532-17", RoomType = "Twin", Room = "801", Guest = "TENAYN YIMEN", Company = "THE EUROPE LIMITED CORP",
+                    IdNumber = "261855", ArrivalDate = new DateTime(2017, 8, 30), DepartureDate = new DateTime(2017, 8, 30),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+            },
+            "Postmaster In-House List" => new List<GuestStayRow>
+            {
+                new() { RegNo = "WREG-00592-17", RoomType = "PSEUDO ROOM TYPE", Room = "2002", Guest = "SAFARYAN GEVORG", Company = "",
+                    IdNumber = "BA1429506", ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 20),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+            },
+            "Due Outs" => CreateDueOutsRows(),
+            "Arrived List" => new List<GuestStayRow>
+            {
+                new() { RegNo = "WREG-01517-17", RoomType = "KING", Room = "318", Guest = "NIDIRI WAWERU", Company = "",
+                    IdNumber = "", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Check In", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01516-17", RoomType = "KING", Room = "314", Guest = "ADMAS BELE", Company = "",
+                    IdNumber = "314", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Check In", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-01507-17", RoomType = "KING", Room = "318", Guest = "MASULIB ALI TAHIR", Company = "",
+                    IdNumber = "BA30118", ArrivalDate = new DateTime(2017, 9, 20), DepartureDate = new DateTime(2017, 9, 21),
+                    ResType = "Check In", PaymentMethod = "Cash", Market = "Corporate Business" },
+            },
+            "Stayovers" => new List<GuestStayRow>
+            {
+                new() { RegNo = "WREG-00592-17", RoomType = "PSEUDO ROOM TYPE", Room = "2002", Guest = "SAFARYAN GEVORG", Company = "",
+                    IdNumber = "BA1429506", ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 23),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-00594-17", RoomType = "KING", Room = "302", Guest = "CHARLES LIHULUK ERICK", Company = "",
+                    IdNumber = "A8355378", ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 23),
+                    ResType = "Phone Reservation", PaymentMethod = "Credit Card", Market = "Corporate Business" },
+                new() { RegNo = "WREG-00597-17", RoomType = "KING", Room = "301", Guest = "GUO WENZHONG", Company = "",
+                    IdNumber = "G3540256", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 23),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-00598-17", RoomType = "KING", Room = "303", Guest = "NJIRI WAWERU DAVID", Company = "",
+                    IdNumber = "C042628", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 23),
+                    ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+                new() { RegNo = "WREG-00599-17", RoomType = "KING", Room = "305", Guest = "GUEST WASA TEST", Company = "",
+                    IdNumber = "123456", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 23),
+                    ResType = "Check In", PaymentMethod = "Credit Card", Market = "Corporate Business" },
+            },
+            "Guest In-House List" => CreateDueOutsRows(),
+            _ => new List<GuestStayRow>(),
+        };
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            rows[i].Id = NextId();
+            rows[i].Sn = i + 1;
+        }
+
+        return rows;
+    }
+
+    private static List<GuestStayRow> CreateDueOutsRows() => new()
+    {
+        new() { RegNo = "WREG-00592-17", RoomType = "PSEUDO ROOM TYPE", Room = "2002", Guest = "SAFARYAN GEVORG", Company = "",
+            IdNumber = "BA1429506", ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 20),
+            ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+        new() { RegNo = "WREG-00594-17", RoomType = "KING", Room = "302", Guest = "CHARLES LIHULUK ERICK", Company = "",
+            IdNumber = "A8355378", ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 20),
+            ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+        new() { RegNo = "WREG-00597-17", RoomType = "KING", Room = "301", Guest = "GUO WENZHONG", Company = "",
+            IdNumber = "G3540256", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20),
+            ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+        new() { RegNo = "WREG-00598-17", RoomType = "KING", Room = "303", Guest = "NJIRI WAWERU DAVID", Company = "",
+            IdNumber = "C042628", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20),
+            ResType = "Phone Reservation", PaymentMethod = "Cash", Market = "Corporate Business" },
+        new() { RegNo = "WREG-00599-17", RoomType = "KING", Room = "305", Guest = "GUEST WASA TEST", Company = "",
+            IdNumber = "123456", ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20),
+            ResType = "Check In", PaymentMethod = "Cash", Market = "Corporate Business" },
+    };
+
+    public static List<PoliceReportRow> CreatePoliceReportSample(DateTime date)
+    {
+        var rows = new List<PoliceReportRow>
+        {
+            new() { RegNo = "WREG-00599-17", Room = "305", Guest = "GUEST WASA TEST", Gender = "Male", Nationality = "Ethiopian",
+                Dob = new DateTime(2017, 7, 2), IdDescription = "Passport", IdNumber = "123456",
+                ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20) },
+            new() { RegNo = "WREG-00598-17", Room = "303", Guest = "NIDIRI WAWERU DAVID", Gender = "Male", Nationality = "Kenyan",
+                Dob = new DateTime(1980, 7, 2), IdDescription = "Passport", IdNumber = "C042628",
+                ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20) },
+            new() { RegNo = "WREG-00597-17", Room = "301", Guest = "GUO WENZHONG", Gender = "Male", Nationality = "Chinese",
+                Dob = new DateTime(2017, 7, 17), IdDescription = "Passport", IdNumber = "G3540256",
+                ArrivalDate = new DateTime(2017, 9, 14), DepartureDate = new DateTime(2017, 9, 20) },
+            new() { RegNo = "WREG-00594-17", Room = "302", Guest = "CHARLES LIHULUK ERICK", Gender = "Male", Nationality = "Tanzanian",
+                Dob = new DateTime(1986, 2, 2), IdDescription = "Passport", IdNumber = "A8355378",
+                ArrivalDate = new DateTime(2017, 9, 13), DepartureDate = new DateTime(2017, 9, 20) },
+        };
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            rows[i].Id = NextId();
+            rows[i].Sn = i + 1;
+        }
+
+        return rows;
+    }
+
+    public static List<RoomMoveRow> CreateRoomMoveSample(DateTime date)
+    {
+        var rows = new List<RoomMoveRow>
+        {
+            new() { RegNo = "WREG-00523-17", Guest = "DOULALEH AHMED DOU", Company = "", PreviousRoom = "305", PreviousRoomType = "KING",
+                CurrentRoom = "314", CurrentRoomType = "KING", RoomCount = 1, Adult = 1, Child = 0,
+                RateCode = "CORPORATE RATE", RateAmount = 85.00m, User = "CNET AD", ActualRtc = "KING" },
+            new() { RegNo = "WREG-00503-17", Guest = "KUNWAR SURENDRA SI", Company = "", PreviousRoom = "303", PreviousRoomType = "KING",
+                CurrentRoom = "318", CurrentRoomType = "KING", RoomCount = 1, Adult = 1, Child = 0,
+                RateCode = "LOYALTY RATE C", RateAmount = 95.00m, User = "CNET AD", ActualRtc = "KING" },
+            new() { RegNo = "WREG-00575-17", Guest = "SAFARYAN GEVORG", Company = "", PreviousRoom = "304", PreviousRoomType = "KING",
+                CurrentRoom = "318", CurrentRoomType = "KING", RoomCount = 1, Adult = 1, Child = 0,
+                RateCode = "AU RATE KING", RateAmount = 85.00m, User = "CNET AD", ActualRtc = "KING" },
+        };
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            rows[i].Id = NextId();
+            rows[i].Sn = i + 1;
+        }
+
+        return rows;
+    }
+
+    public static List<ShuttleRow> CreateShuttleSample(string reportName, DateTime date)
+    {
+        List<ShuttleRow> rows = reportName switch
+        {
+            "Pickup Report" => new List<ShuttleRow>
+            {
+                new() { RegNo = "WREG-00009-17", Guest = "JAVIER PRIETO RIBASSA", Room = "311", RoomType = "KING", Company = "",
+                    TransactionType = "Bus", Station = "Bus Station", Carrier = "Carrier One", TransportationNo = "000000",
+                    TravelTimestamp = new DateTime(2017, 9, 26) },
+            },
+            _ => new List<ShuttleRow>
+            {
+                new() { RegNo = "WREG-00007-17", Guest = "KUNWAR SURENDRA SINGH", Room = "309", RoomType = "KING", Company = "",
+                    TransactionType = "Drop Off", Station = "Bus Station", Carrier = "Carrier One", TransportationNo = "999979",
+                    TravelTimestamp = new DateTime(2017, 9, 21) },
+                new() { RegNo = "WREG-00008-17", Guest = "JAVIER PRIETO RIBASSA", Room = "311", RoomType = "KING", Company = "",
+                    TransactionType = "Train", Station = "Bus Station", Carrier = "Carrier One", TransportationNo = "76767676",
+                    TravelTimestamp = new DateTime(2017, 9, 21) },
+            },
+        };
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            rows[i].Id = NextId();
+            rows[i].Sn = i + 1;
+        }
+
+        return rows;
+    }
+
+    public static List<DetailSalesTransactionRow> CreateDetailSalesTransactionSample(DateTime date)
+    {
+        var rows = new List<DetailSalesTransactionRow>
+        {
+            new() { RegNo = "BCRS-00759-17", Guest = "AYALEW H/WOT", SubTotal = 6085.00m, Discount = 0.00m,
+                AdditionalCharge = 631.64m, Tax = 622.09m, GrandTotal = 6085.00m, UserName = "", DeviceName = "",
+                VoucherType = "Normal Transaction Voucher" },
+            new() { RegNo = "BCRS-00758-17", Guest = "SAFARYAN GEVORG", SubTotal = 785.52m, Discount = 0.00m,
+                AdditionalCharge = 78.00m, Tax = 139.44m, GrandTotal = 1002.96m, UserName = "CNET ADMIN", DeviceName = "tabletPC",
+                VoucherType = "Normal Transaction Voucher" },
+            new() { RegNo = "BCRS-00757-17", Guest = "SAFARYAN GEVORG", SubTotal = 5348.42m, Discount = 888.37m,
+                AdditionalCharge = 788.52m, Tax = 761.61m, GrandTotal = 6900.00m, UserName = "CNET ADMIN", DeviceName = "tabletPC",
+                VoucherType = "Normal Transaction Voucher" },
+        };
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            rows[i].Id = NextId();
+            rows[i].Sn = i + 1;
+        }
+
+        return rows;
+    }
+
+    public static List<SummaryOfSummaryRow> CreateSummaryOfSummarySample(DateTime start, DateTime end)
+    {
+        return new List<SummaryOfSummaryRow>
+        {
+            new() { Id = NextId(), Date = new DateTime(2017, 9, 13), RoomRevenue = 29350.51m, Package = 1383.00m,
+                ServiceCharge = 3339.30m, Vat = 5311.61m, PosCharge = 0.00m, Bbf = 0.00m, Payment = 14743.03m,
+                Discount = 1321.75m, Paidout = 1000.00m, Bcf = 3382.03m, Outstanding = 20937.61m },
+            new() { Id = NextId(), Date = new DateTime(2017, 9, 14), RoomRevenue = 9144.56m, Package = 461.00m,
+                ServiceCharge = 960.56m, Vat = 1584.92m, PosCharge = 0.00m, Bbf = 5732.20m, Payment = 7120.02m,
+                Discount = 0.00m, Paidout = 0.00m, Bcf = 4201.03m, Outstanding = 8562.19m },
+            new() { Id = NextId(), Date = new DateTime(2017, 9, 20), RoomRevenue = 0.00m, Package = 0.00m,
+                ServiceCharge = 0.00m, Vat = 0.00m, PosCharge = 0.00m, Bbf = 3510.01m, Payment = 0.00m,
+                Discount = 0.00m, Paidout = 0.00m, Bcf = 3510.01m, Outstanding = 0.00m },
         };
     }
 
     private static readonly Dictionary<string, (string VoucherPrefix, string[] Descriptions, decimal MinAmount, decimal MaxAmount)> TransactionReportProfiles = new()
     {
-        ["Detail Daily Sales Transaction"] = ("DS", new[] { "Room charge + tax", "F&B charge + tax", "Laundry charge + tax" }, 400m, 5500m),
         ["Rate Adjustment Report"] = ("RA", new[] { "Rate adjusted - loyalty discount", "Rate adjusted - manager override", "Rate adjusted - long stay discount" }, 100m, 1500m),
         ["Check Report of the Day"] = ("CK", new[] { "Check received - folio settlement", "Check received - advance deposit" }, 500m, 6000m),
         ["Credit Cards of the Day"] = ("CC", new[] { "Visa settlement", "Mastercard settlement", "Amex settlement" }, 800m, 9000m),
@@ -493,54 +693,6 @@ public class ReportsState
                 Attendant = new[] { "T. Bekele", "S. Wolde", "M. Girma" }[i % 3],
                 Date = date,
                 Remark = "Shift ending 16:00",
-            });
-        }
-
-        return rows;
-    }
-
-    private static readonly (string Guest, string Room, string RoomType, string Company)[] GuestListPool =
-    {
-        ("Tsedale Worku", "203", "Standard", ""),
-        ("Elias Fikru", "310", "Deluxe", "Addis Exporters"),
-        ("Hiwot Bekele", "115", "Standard", ""),
-    };
-
-    public static List<ArrivalListRow> CreateGuestListSample(string reportName, DateTime date)
-    {
-        var rows = new List<ArrivalListRow>();
-
-        for (var i = 0; i < GuestListPool.Length; i++)
-        {
-            var g = GuestListPool[i];
-            var (arrival, departure, remark) = reportName switch
-            {
-                "Departure List" or "Due Outs" => (date.AddDays(-2), date.AddDays(1), "Scheduled to check out"),
-                "Guest In-House List" or "Stayovers" => (date.AddDays(-1), date.AddDays(3), "Currently in-house"),
-                "Pickup Report" => (date.AddDays(1), date.AddDays(3), "Needs airport pickup on arrival"),
-                "Drop Off Report" => (date.AddDays(-2), date, "Requests shuttle drop-off at checkout"),
-                "Police Report" => (date.AddDays(-1), date.AddDays(2), i % 2 == 0 ? "Gender: M, ID#: ETH-00123456" : "Gender: F, ID#: ETH-00987654"),
-                "Postmaster In-House List" => (date.AddDays(-1), date.AddDays(2), "Postmaster room type"),
-                "Room Move" => (date.AddDays(-1), date.AddDays(2), $"Moved from Room {100 + i} to Room {g.Room}"),
-                "Arrived List" => (date, date.AddDays(2), "Arrived and checked in today"),
-                _ => (date.AddDays(-1), date.AddDays(1), ""),
-            };
-
-            rows.Add(new ArrivalListRow
-            {
-                Id = NextId(),
-                Sn = i + 1,
-                RegNo = $"REG-1{i:00}45",
-                Guest = g.Guest,
-                Company = g.Company,
-                Room = g.Room,
-                RoomType = reportName == "Postmaster In-House List" ? "Postmaster" : g.RoomType,
-                ArrivalDate = arrival,
-                DepartureDate = departure,
-                Adults = 1 + i % 2,
-                Children = i == 1 ? 1 : 0,
-                Agent = "Direct",
-                Remark = remark,
             });
         }
 
@@ -891,7 +1043,7 @@ public class ReportsState
             Catalog = CreateCatalog(),
             CheckoutRows = CreateCheckoutReportSample(today),
             DiscrepancyRows = CreateDiscrepancyReportSample(today),
-            ArrivalRows = CreateArrivalListSample(today)
+            ArrivalRows = CreateGuestStaySample("Arrival List", today)
         };
 
         return state;

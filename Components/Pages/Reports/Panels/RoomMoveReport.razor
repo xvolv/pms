@@ -1,0 +1,76 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Room Move</h2>
+            <p>Guests moved from one room to another on the given business date.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.RegNo)" Caption="Reg_No" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.Guest)" Caption="Guest" Width="13%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.Company)" Caption="Company" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.PreviousRoom)" Caption="Previous Room" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.PreviousRoomType)" Caption="Previous Room Type" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.CurrentRoom)" Caption="Current Room" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.CurrentRoomType)" Caption="Current Room Type" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.RoomCount)" Caption="Room Count" Width="6%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.Adult)" Caption="Adult" Width="5%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.Child)" Caption="Child" Width="5%"
+                                   TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.RateCode)" Caption="Rate Code" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.RateAmount)" Caption="Rate Amount" Width="9%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.User)" Caption="User" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(RoomMoveRow.ActualRtc)" Caption="Actual RTC" Width="6%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count room move(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Room Move" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Guest", "Company", "Previous Room", "Previous Room Type", "Current Room", "Current Room Type",
+        "Room Count", "Adult", "Child", "Rate Code", "Rate Amount", "User", "Actual RTC",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<RoomMoveRow> rows = ReportsState.CreateRoomMoveSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Guest, r.Company, r.PreviousRoom, r.PreviousRoomType, r.CurrentRoom, r.CurrentRoomType,
+        r.RoomCount.ToString(), r.Adult.ToString(), r.Child.ToString(), r.RateCode, r.RateAmount.ToString("N2"),
+        r.User, r.ActualRtc,
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateRoomMoveSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

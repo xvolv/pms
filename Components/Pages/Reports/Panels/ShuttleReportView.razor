@@ -1,0 +1,78 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>@ReportName</h2>
+            <p>@ReportDescription</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.RegNo)" Caption="Reg_No" Width="11%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.Guest)" Caption="Guest" Width="16%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.Room)" Caption="Room" Width="6%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.RoomType)" Caption="Room Type" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.Company)" Caption="Company" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.TransactionType)" Caption="Transaction Type" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.Station)" Caption="Station" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.Carrier)" Caption="Carrier" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.TransportationNo)" Caption="Transportation No" Width="10%" />
+                <DxGridDataColumn FieldName="@nameof(ShuttleRow.TravelTimestamp)" Caption="Travel Timestamp" Width="10%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count record(s) on @date.ToString("dd-MMM-yyyy")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="@ReportName" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public string ReportName { get; set; } = "";
+    [Parameter] public string ReportDescription { get; set; } = "";
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Guest", "Room", "Room Type", "Company", "Transaction Type", "Station", "Carrier",
+        "Transportation No", "Travel Timestamp",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<ShuttleRow> rows = new();
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Guest, r.Room, r.RoomType, r.Company, r.TransactionType, r.Station, r.Carrier,
+        r.TransportationNo, r.TravelTimestamp.ToString("dd-MMM-yyyy"),
+    }).ToList();
+
+    protected override void OnParametersSet()
+    {
+        if (rows.Count == 0 && !string.IsNullOrEmpty(ReportName))
+        {
+            rows = ReportsState.CreateShuttleSample(ReportName, date);
+        }
+    }
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateShuttleSample(ReportName, date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

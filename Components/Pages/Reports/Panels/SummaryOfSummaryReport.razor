@@ -1,0 +1,122 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Summary Of Summary Report</h2>
+            <p>Room, POS and tax transaction summaries for a given date or date range.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.PeriodRange" InitialDate="@DateTime.Today" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Date)" Caption="Date" Width="8%"
+                                   DisplayFormat="dd-MMM-yyyy" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.RoomRevenue)" Caption="Room Revenue" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Package)" Caption="Package" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.ServiceCharge)" Caption="Service Charge" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Vat)" Caption="Vat" Width="6%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.RoomTotal)" Caption="Room Total" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.PosCharge)" Caption="POS Charge" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.TodayTotal)" Caption="Today Total" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Bbf)" Caption="BBF" Width="6%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.ToDateTotal)" Caption="to Date Total" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Payment)" Caption="Payment" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Discount)" Caption="Discount" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Paidout)" Caption="Paid out" Width="7%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Bcf)" Caption="BCF" Width="6%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(SummaryOfSummaryRow.Outstanding)" Caption="Outstanding" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">Summary Of Summary Report - @periodLabel</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Summary Of Summary Report" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Date", "Room Revenue", "Package", "Service Charge", "Vat", "Room Total", "POS Charge", "Today Total",
+        "BBF", "to Date Total", "Payment", "Discount", "Paid out", "BCF", "Outstanding",
+    };
+
+    private List<SummaryOfSummaryRow> rows = ReportsState.CreateSummaryOfSummarySample(DateTime.Today, DateTime.Today);
+    private string periodLabel = "Daily - " + DateTime.Today.ToString("dd-MMM-yyyy");
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.Date.ToString("dd-MMM-yyyy"), r.RoomRevenue.ToString("N2"), r.Package.ToString("N2"),
+        r.ServiceCharge.ToString("N2"), r.Vat.ToString("N2"), r.RoomTotal.ToString("N2"), r.PosCharge.ToString("N2"),
+        r.TodayTotal.ToString("N2"), r.Bbf.ToString("N2"), r.ToDateTotal.ToString("N2"), r.Payment.ToString("N2"),
+        r.Discount.ToString("N2"), r.Paidout.ToString("N2"), r.Bcf.ToString("N2"), r.Outstanding.ToString("N2"),
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        DateTime start;
+        DateTime end;
+
+        switch (criteria.PeriodType)
+        {
+            case "Date Range":
+                start = criteria.RangeStart;
+                end = criteria.RangeEnd;
+                break;
+            case "Weekly":
+                start = criteria.RangeStart;
+                end = start.AddDays(6);
+                break;
+            case "Monthly":
+                start = criteria.RangeStart;
+                end = start.AddMonths(1).AddDays(-1);
+                break;
+            case "Annually":
+                start = criteria.RangeStart;
+                end = start.AddYears(1).AddDays(-1);
+                break;
+            case "Show all":
+                end = DateTime.Today;
+                start = end.AddDays(-30);
+                break;
+            default:
+                start = criteria.RangeStart;
+                end = criteria.RangeStart;
+                break;
+        }
+
+        rows = ReportsState.CreateSummaryOfSummarySample(start, end);
+        periodLabel = criteria.PeriodType == "Date Range" || criteria.PeriodType == "Show all"
+            ? $"{criteria.PeriodType} - {start:dd-MMM-yyyy} to {end:dd-MMM-yyyy}"
+            : $"{criteria.PeriodType} - {start:dd-MMM-yyyy}";
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

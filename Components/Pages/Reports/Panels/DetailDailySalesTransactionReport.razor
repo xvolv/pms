@@ -1,0 +1,72 @@
+@using ERP.V7.WebPMS.Components.Pages.Reports.Models
+@using ERP.V7.WebPMS.Components.Pages.Reports.Shared
+
+<div class="na-step-card rp-report-card">
+    <div class="na-step-header rp-report-header">
+        <button type="button" class="rt-toolbar-btn rp-back-btn" @onclick="Back">
+            <i class="bi bi-arrow-left text-secondary"></i>
+        </button>
+        <div>
+            <h2>Detail Daily Sales Transaction</h2>
+            <p>Transaction amount, additional charges, tax and totals from each guest, by cashier.</p>
+        </div>
+    </div>
+
+    <ReportCriteriaBar Mode="ReportCriteriaMode.SimpleDate" InitialDate="@date" OnGenerate="Generate" />
+
+    <div class="rt-grid-area">
+        <DxGrid Data="@rows" KeyFieldName="Id" CssClass="rt-grid">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.RegNo)" Caption="Reg_No" Width="12%" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.Guest)" Caption="Guest" Width="14%" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.SubTotal)" Caption="Sub Total" Width="10%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.Discount)" Caption="Discount" Width="9%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.AdditionalCharge)" Caption="Additional Charge" Width="11%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.Tax)" Caption="Tax" Width="8%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.GrandTotal)" Caption="Grand Total" Width="10%"
+                                   DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.UserName)" Caption="User Name" Width="9%" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.DeviceName)" Caption="Device Name" Width="8%" />
+                <DxGridDataColumn FieldName="@nameof(DetailSalesTransactionRow.VoucherType)" Caption="Voucher Type" Width="9%" />
+            </Columns>
+        </DxGrid>
+
+        <div class="rt-footer">@rows.Count transaction(s) on @date.ToString("dd-MMM-yyyy") - total @rows.Sum(r => r.GrandTotal).ToString("N2")</div>
+    </div>
+</div>
+
+<ReportPreviewDialog Visible="@showPreview" Title="Detail Daily Sales Transaction" Columns="@PreviewColumns" Rows="@PreviewRows"
+                      OnClose="() => showPreview = false" />
+
+@code {
+    [Parameter] public EventCallback OnBack { get; set; }
+
+    private static readonly string[] PreviewColumns =
+    {
+        "Reg_No", "Guest", "Sub Total", "Discount", "Additional Charge", "Tax", "Grand Total", "User Name",
+        "Device Name", "Voucher Type",
+    };
+
+    private DateTime date = DateTime.Today;
+    private List<DetailSalesTransactionRow> rows = ReportsState.CreateDetailSalesTransactionSample(DateTime.Today);
+    private bool showPreview;
+
+    private List<string[]> PreviewRows => rows.Select(r => new[]
+    {
+        r.RegNo, r.Guest, r.SubTotal.ToString("N2"), r.Discount.ToString("N2"), r.AdditionalCharge.ToString("N2"),
+        r.Tax.ToString("N2"), r.GrandTotal.ToString("N2"), r.UserName, r.DeviceName, r.VoucherType,
+    }).ToList();
+
+    private void Generate(ReportCriteria criteria)
+    {
+        date = criteria.Date;
+        rows = ReportsState.CreateDetailSalesTransactionSample(date);
+        showPreview = true;
+    }
+
+    private async Task Back() => await OnBack.InvokeAsync();
+}

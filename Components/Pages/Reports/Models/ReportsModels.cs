@@ -122,21 +122,109 @@ public class TaskAssignmentRow
     public int TotalCredits { get; set; }
 }
 
-public class ArrivalListRow
+public class GuestStayRow
+{
+    public int Id { get; set; }
+    public int Sn { get; set; }
+    public string RegNo { get; set; } = "";
+    public string RoomType { get; set; } = "";
+    public string Room { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public string IdNumber { get; set; } = "";
+    public DateTime ArrivalDate { get; set; }
+    public DateTime DepartureDate { get; set; }
+    public string ResType { get; set; } = "";
+    public string PaymentMethod { get; set; } = "";
+    public string Market { get; set; } = "";
+}
+
+public class PoliceReportRow
+{
+    public int Id { get; set; }
+    public int Sn { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Room { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public string Gender { get; set; } = "";
+    public string Nationality { get; set; } = "";
+    public DateTime Dob { get; set; }
+    public string IdDescription { get; set; } = "";
+    public string IdNumber { get; set; } = "";
+    public DateTime ArrivalDate { get; set; }
+    public DateTime DepartureDate { get; set; }
+}
+
+public class RoomMoveRow
 {
     public int Id { get; set; }
     public int Sn { get; set; }
     public string RegNo { get; set; } = "";
     public string Guest { get; set; } = "";
     public string Company { get; set; } = "";
+    public string PreviousRoom { get; set; } = "";
+    public string PreviousRoomType { get; set; } = "";
+    public string CurrentRoom { get; set; } = "";
+    public string CurrentRoomType { get; set; } = "";
+    public int RoomCount { get; set; }
+    public int Adult { get; set; }
+    public int Child { get; set; }
+    public string RateCode { get; set; } = "";
+    public decimal RateAmount { get; set; }
+    public string User { get; set; } = "";
+    public string ActualRtc { get; set; } = "";
+}
+
+public class ShuttleRow
+{
+    public int Id { get; set; }
+    public int Sn { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Guest { get; set; } = "";
     public string Room { get; set; } = "";
     public string RoomType { get; set; } = "";
-    public DateTime ArrivalDate { get; set; }
-    public DateTime DepartureDate { get; set; }
-    public int Adults { get; set; }
-    public int Children { get; set; }
-    public string Agent { get; set; } = "";
-    public string Remark { get; set; } = "";
+    public string Company { get; set; } = "";
+    public string TransactionType { get; set; } = "";
+    public string Station { get; set; } = "";
+    public string Carrier { get; set; } = "";
+    public string TransportationNo { get; set; } = "";
+    public DateTime TravelTimestamp { get; set; }
+}
+
+public class DetailSalesTransactionRow
+{
+    public int Id { get; set; }
+    public int Sn { get; set; }
+    public string RegNo { get; set; } = "";
+    public string Guest { get; set; } = "";
+    public decimal SubTotal { get; set; }
+    public decimal Discount { get; set; }
+    public decimal AdditionalCharge { get; set; }
+    public decimal Tax { get; set; }
+    public decimal GrandTotal { get; set; }
+    public string UserName { get; set; } = "";
+    public string DeviceName { get; set; } = "";
+    public string VoucherType { get; set; } = "";
+}
+
+public class SummaryOfSummaryRow
+{
+    public int Id { get; set; }
+    public DateTime Date { get; set; }
+    public decimal RoomRevenue { get; set; }
+    public decimal Package { get; set; }
+    public decimal ServiceCharge { get; set; }
+    public decimal Vat { get; set; }
+    public decimal RoomTotal => RoomRevenue + Package + ServiceCharge + Vat;
+    public decimal PosCharge { get; set; }
+    public decimal TodayTotal => RoomTotal + PosCharge;
+    public decimal Bbf { get; set; }
+    public decimal ToDateTotal => TodayTotal + Bbf;
+    public decimal Payment { get; set; }
+    public decimal Discount { get; set; }
+    public decimal Paidout { get; set; }
+    public decimal Bcf { get; set; }
+    public decimal Outstanding { get; set; }
 }
 
 public class HousekeepingReportRow
