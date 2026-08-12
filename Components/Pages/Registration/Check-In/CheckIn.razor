@@ -113,46 +113,41 @@
                         <legend>Consignee</legend>
                         <div class="consignee-grid">
                             <label>Company</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="company" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Company"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="company" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Company"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Company"))">▾</button>
                             </div>
                             <label>Agent</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="agent" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Agent"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="agent" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Agent"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Agent"))">▾</button>
                             </div>
 
                             <label>Contact</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="contact" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Contact"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="contact" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Contact"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Contact"))">▾</button>
                             </div>
                             <label>Group</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="group" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Group"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="group" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Group"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Group"))">▾</button>
                             </div>
 
                             <label>Source</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="consigneeSource" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Source"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="consigneeSource" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Source"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Source"))">▾</button>
                             </div>
                             <label>Member Type</label>
                             <DxComboBox CssClass="erp-combobox" Data="@memberTypes" @bind-Value="memberType" SizeMode="SizeMode.Small" />
