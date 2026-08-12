@@ -69,467 +69,585 @@
                     <div class="info-left">
                         <div class="info-row"><span class="lbl">Name</span><span class="val">System CNET
                             ADMINISTRATOR</span></div>
-                            <div class="info-row"><span class="lbl">Role</span><span class="val">Cnet Admin</span></div>
-                            <div class="info-row"><span class="lbl">Department</span><span class="val"></span></div>
-                        </div>
-                        <div class="info-right">
-                            <div class="info-row"><span class="lbl">Access Level</span><span class="val">81.07%</span></div>
-                            <div class="info-row"><span class="lbl">Release Date</span><span class="val">15-05-2017
-                                (V6.0.1.21)</span></div>
-                            </div>
-                        </div>
+                        <div class="info-row"><span class="lbl">Role</span><span class="val">Cnet Admin</span></div>
+                        <div class="info-row"><span class="lbl">Department</span><span class="val"></span></div>
+                    </div>
+                    <div class="info-right">
+                        <div class="info-row"><span class="lbl">Access Level</span><span class="val">81.07%</span></div>
+                        <div class="info-row"><span class="lbl">Release Date</span><span class="val">15-05-2017
+                            (V6.0.1.21)</span></div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="calendar-box">
-                    <div class="cal-left">
-                        <div class="cal-toggle">
-                            <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="cal-mode-combo" />
-                        </div>
-                        <div class="cal-nav-vert">
-                            <span class="cal-lbl">Month</span>
-                            <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" />
-                            <span class="cal-lbl">Year</span>
-                            <DxSpinEdit @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
-                        </div>
-                        <div class="cal-footer-vert">
-                            <DxButton Text="Today" RenderStyle="ButtonRenderStyle.Link" Click="GoToday" />
-                            <span class="cal-date">@selectedDate.ToString("dd/MM/yyyy")</span>
-                        </div>
+        <div class="calendar-box">
+            <div class="cal-left">
+                <div class="cal-toggle">
+                    <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="cal-mode-combo" />
+                </div>
+                <div class="cal-nav-vert">
+                    <span class="cal-lbl">Month</span>
+                    <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" />
+                    <span class="cal-lbl">Year</span>
+                    <DxSpinEdit @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
+                </div>
+                <div class="cal-footer-vert">
+                    <DxButton Text="Today" RenderStyle="ButtonRenderStyle.Link" Click="GoToday" />
+                    <span class="cal-date">@selectedDate.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+            <div class="cal-right">
+                <DxCalendar @bind-SelectedDate="selectedDate" CssClass="dash-calendar" VisibleDate="@visibleDate"
+                            VisibleDateChanged="OnVisibleDateChanged" />
+            </div>
+        </div>
+
+        <div class="logo-box">
+            <img src="cnet logo.jpg" alt="CNET Logo" class="cnet-logo-img" />
+        </div>
+    </div>
+
+    <!-- ===================== MAIN TABS ===================== -->
+    <DxTabs @bind-ActiveTabIndex="activeTab" CssClass="main-tabs">
+        <DxTabPage Text="Dashboard">
+            <div class="dashboard-body">
+
+                <!-- Left: Task Statistics Grid -->
+                <div class="left-panel">
+                    <div class="panel-toolbar">
+                        <DxButton Text="Refresh" IconCssClass="oi oi-reload" Click="RefreshTasks"
+                                  RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="cal-right">
-                        <DxCalendar @bind-SelectedDate="selectedDate" CssClass="dash-calendar" VisibleDate="@visibleDate"
-                                    VisibleDateChanged="OnVisibleDateChanged" />
-                    </div>
+                    <DxGrid Data="@taskItems" KeyFieldName="SN" CssClass="task-grid" RowClick="OnTaskRowClick"
+                            CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false"
+                            TextWrapEnabled="true">
+                        <Columns>
+                            <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                            <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
+                            <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
+                            <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
+                        </Columns>
+                    </DxGrid>
                 </div>
 
-                <div class="logo-box">
-                    <img src="cnet logo.jpg" alt="CNET Logo" class="cnet-logo-img" />
+                <!-- Right: Charts -->
+                <div class="right-panel">
+                    <!-- Pie: Room Occupancy -->
+                    <div class="chart-card">
+                        <div class="chart-title">Room Occupancy (Today)</div>
+                        <DxPieChart Data="@occupancyData" Height="200px" Width="100%">
+                            <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                            <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                              ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                                <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
+                            </DxPieChartSeries>
+                        </DxPieChart>
+                        <div class="legend-manual">
+                            <span class="leg-item"><span class="dot vacant"></span> Vacant (2): 6.90 %</span>
+                            <span class="leg-item"><span class="dot occupied"></span> Occupied (1): 93.10 %</span>
+                        </div>
+                    </div>
+
+                    <!-- Line: Reservations -->
+                    <div class="chart-card">
+                        <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
+                        <DxChart Data="@reservationData" Height="200px" Width="100%">
+                            <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                            <DxChartArgumentAxis>
+                                <DxChartAxisLabel />
+                            </DxChartArgumentAxis>
+                            <DxChartValueAxis>
+                                <DxChartAxisRange StartValue="0" EndValue="80" />
+                            </DxChartValueAxis>
+                            <DxChartLineSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                               ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                               Color="@reservationLineColor">
+                                <DxChartSeriesPoint Visible="true" />
+                            </DxChartLineSeries>
+                        </DxChart>
+                    </div>
                 </div>
             </div>
 
-            <!-- ===================== MAIN TABS ===================== -->
-            <DxTabs @bind-ActiveTabIndex="activeTab" CssClass="main-tabs">
-                <DxTabPage Text="Dashboard">
-                    <div class="dashboard-body">
+            <!-- Bottom: Today's Room Status -->
+            <div class="room-status-panel">
+                <div class="room-status-title">Today's Room Status</div>
+                <div class="room-status-placeholder">
+                    <!-- Placeholder – wire to real room status data when available -->
+                </div>
+            </div>
+        </DxTabPage>
 
-                        <!-- Left: Task Statistics Grid -->
-                        <div class="left-panel">
-                            <div class="panel-toolbar">
-                                <DxButton Text="Refresh" IconCssClass="oi oi-reload" Click="RefreshTasks"
-                                          RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
-                            </div>
-                            <DxGrid Data="@taskItems" KeyFieldName="SN" CssClass="task-grid" RowClick="OnTaskRowClick"
-                                    CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false"
-                                    TextWrapEnabled="true">
-                                <Columns>
-                                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
-                                    <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
-                                    <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
-                                    <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
-                                </Columns>
-                            </DxGrid>
-                        </div>
+        <DxTabPage Text="Task Notification">
+            <div class="tab-placeholder">Task Notification content</div>
+        </DxTabPage>
+        <DxTabPage Text="Activity">
+            <div class="tab-placeholder">Activity content</div>
+        </DxTabPage>
+        <DxTabPage Text="Message">
+            <div class="tab-placeholder">Message content</div>
+        </DxTabPage>
+        <DxTabPage Text="E-mail">
+            <div class="tab-placeholder">E-mail content</div>
+        </DxTabPage>
+        <DxTabPage Text="Security">
+            <div class="tab-placeholder">Security content</div>
+        </DxTabPage>
+        <DxTabPage Text="Personal Record">
+            <div class="tab-placeholder">Personal Record content</div>
+        </DxTabPage>
+        <DxTabPage Text="My Note">
+            <div class="tab-placeholder">My Note content</div>
+        </DxTabPage>
+    </DxTabs>
+</div>
 
-                        <!-- Right: Charts -->
-                        <div class="right-panel">
-                            <!-- Pie: Room Occupancy -->
-                            <div class="chart-card">
-                                <div class="chart-title">Room Occupancy (Today)</div>
-                                <DxPieChart Data="@occupancyData" Height="200px" Width="100%">
-                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
-                                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
-                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
-                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
-                                    </DxPieChartSeries>
-                                </DxPieChart>
-                                <div class="legend-manual">
-                                    <span class="leg-item"><span class="dot vacant"></span> Vacant (2): 6.90 %</span>
-                                    <span class="leg-item"><span class="dot occupied"></span> Occupied (1): 93.10 %</span>
-                                </div>
-                            </div>
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-                            <!-- Line: Reservations -->
-                            <div class="chart-card">
-                                <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
-                                <DxChart Data="@reservationData" Height="200px" Width="100%">
-                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
-                                    <DxChartArgumentAxis>
-                                        <DxChartAxisLabel />
-                                    </DxChartArgumentAxis>
-                                    <DxChartValueAxis>
-                                        <DxChartAxisRange StartValue="0" EndValue="80" />
-                                    </DxChartValueAxis>
-                                    <DxChartLineSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
-                                                       ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
-                                                       Color="@reservationLineColor">
-                                        <DxChartSeriesPoint Visible="true" />
-                                    </DxChartLineSeries>
-                                </DxChart>
-                            </div>
-                        </div>
-                    </div>
+    .dashboard-page {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        min-height: 100vh;
+        padding: 0;
+    }
 
-                    <!-- Bottom: Today's Room Status -->
-                    <div class="room-status-panel">
-                        <div class="room-status-title">Today's Room Status</div>
-                        <div class="room-status-placeholder">
-                            <!-- Placeholder – wire to real room status data when available -->
-                        </div>
-                    </div>
-                </DxTabPage>
+    /* ---------- Top header ---------- */
+    .top-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 6px 12px;
+        background: #fff;
+        border-bottom: 1px solid #d0d5dd;
+        align-items: stretch;
+    }
 
-                <DxTabPage Text="Task Notification">
-                    <div class="tab-placeholder">Task Notification content</div>
-                </DxTabPage>
-                <DxTabPage Text="Activity">
-                    <div class="tab-placeholder">Activity content</div>
-                </DxTabPage>
-                <DxTabPage Text="Message">
-                    <div class="tab-placeholder">Message content</div>
-                </DxTabPage>
-                <DxTabPage Text="E-mail">
-                    <div class="tab-placeholder">E-mail content</div>
-                </DxTabPage>
-                <DxTabPage Text="Security">
-                    <div class="tab-placeholder">Security content</div>
-                </DxTabPage>
-                <DxTabPage Text="Personal Record">
-                    <div class="tab-placeholder">Personal Record content</div>
-                </DxTabPage>
-                <DxTabPage Text="My Note">
-                    <div class="tab-placeholder">My Note content</div>
-                </DxTabPage>
-            </DxTabs>
-        </div>
+    .user-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        flex: 1 1 320px;
+        min-width: 280px;
+        padding: 4px 0;
+    }
 
-        <style>
-            .dashboard-page {
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background: #f0f2f5;
-                min-height: 100vh;
-                padding: 0;
-            }
+    /* Left: female icon — fluid, capped size */
+    .avatar {
+        width: clamp(64px, 12vw, 200px);
+        height: clamp(64px, 12vw, 200px);
+        border-radius: 4px;
+        background: #eceff1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #cfd8dc;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
 
-            /* ---------- Top header ---------- */
-            .top-header {
-                display: flex;
-                gap: 12px;
-                padding: 6px 12px;
-                background: #fff;
-                border-bottom: 1px solid #d0d5dd;
-                align-items: stretch;
-            }
+    .avatar svg {
+        width: 100%;
+        height: 100%;
+    }
 
-            .user-card {
-                display: flex;
-                gap: 12px;
-                flex: 1;
-                padding: 4px 0;
-            }
+    /* Right: flex column */
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 220px;
+        min-width: 220px;
+        gap: 4px;
+        padding-top: 2px;
+    }
 
-            /* Left: female icon */
-            .avatar {
-                width: 300px;
-                height: 300px;
-                border-radius: 4px;
-                background: #eceff1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid #cfd8dc;
-                flex-shrink: 0;
-                overflow: hidden;
-            }
+    /* Row 1: full-width hotel name — fluid type */
+    .welcome-row {
+        width: 100%;
+        font-size: clamp(18px, 3.2vw, 35px);
+        font-weight: 700;
+        color: #222;
+        line-height: 1.3;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
 
-            /* Right: flex column */
-            .user-details {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                gap: 4px;
-                padding-top: 2px;
+    .hotel-name {
+        color: #1565c0;
+    }
 
-                
-            }
+    /* Row 2: two-column grid, collapses to one column when tight */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 2px 24px;
+    }
 
-            /* Row 1: full-width hotel name */
-            .welcome-row {
-                width: 100%;
-                font-size: 35px;
-                font-weight: 700;
-                color: #222;
-                line-height: 2.3;
-            }
+    .info-left,
+    .info-right {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
 
-            .hotel-name {
-                color: #1565c0;
-            }
+    .info-row {
+        font-size: clamp(11px, 1vw, 12px);
+        line-height: 1.5;
+        color: #555;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
 
-            /* Row 2: two-column grid */
-            .info-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 0 24px;
-            }
+    .info-row .lbl {
+        display: inline-block;
+        width: 95px;
+        max-width: 40%;
+        color: #777;
+        vertical-align: top;
+    }
 
-            .info-left,
-            .info-right {
-                display: flex;
-                flex-direction: column;
-                gap: 1px;
-            }
+    .info-row .val {
+        font-weight: 500;
+        color: #222;
+    }
 
-            .info-row {
-                font-size: 12px;
-                line-height: 1.5;
-                color: #555;
-                white-space: nowrap;
-            }
+    /* ---------- Calendar (landscape) ---------- */
+    .calendar-box {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border: 1px solid #bdbdbd;
+        background: #fff;
+        padding: 5px 7px;
+        flex-shrink: 0;
+        gap: 8px;
+        height: 155px;
+        box-sizing: border-box;
+    }
 
-            .info-row .lbl {
-                display: inline-block;
-                width: 95px;
-                color: #777;
-            }
+    /* Left sidebar: controls */
+    .cal-left {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 4px;
+        min-width: 95px;
+        flex-shrink: 0;
+        overflow: visible;
+        border-right: 1px solid #e0e0e0;
+        padding-right: 8px;
+    }
 
-            .info-row .val {
-                font-weight: 500;
-                color: #222;
-            }
+    .cal-toggle {
+        font-size: 11px;
+    }
 
-            /* ---------- Calendar (landscape) ---------- */
-            .calendar-box {
-                display: flex;
-                flex-direction: row;
-                align-items: stretch;
-                border: 1px solid #bdbdbd;
-                background: #fff;
-                padding: 5px 7px;
-                flex-shrink: 0;
-                gap: 8px;
-                height: 155px;
-                box-sizing: border-box;
-            }
+    .cal-nav-vert {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 11px;
+    }
 
-            /* Left sidebar: controls */
-            .cal-left {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                gap: 4px;
-                min-width: 95px;
-                border-right: 1px solid #e0e0e0;
-                padding-right: 8px;
-            }
+    .cal-lbl {
+        color: #777;
+        font-size: 10px;
+    }
 
-            .cal-toggle {
-                font-size: 11px;
-            }
+    .cal-footer-vert {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+        margin-top: 10px;
+        padding-top: 8px;
+        font-size: 11px;
+        position: relative;
+        z-index: 2;
+        flex-shrink: 0;
+    }
 
-            .cal-nav-vert {
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-                font-size: 11px;
-            }
+    .cal-date {
+        color: #555;
+        font-size: 14px;
+        text-align: center;
+        padding: 3px 5px;
+        border: 1px solid lightgrey;
+        border-radius: 5px;
+        white-space: nowrap;
+        background: #fff;
+    }
 
-            .cal-lbl {
-                color: #777;
-                font-size: 10px;
-            }
+    /* Right: calendar grid */
+    .cal-right {
+        flex: 1;
+        overflow: hidden;
+    }
 
-            .cal-footer-vert {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                text-align: center;
-                gap: 1px;
-                margin-top: 20px;
-                font-size: 11px;
-            }
+    .dash-calendar {
+        width: 100%;
+        font-size: 10px;
+    }
 
-            .cal-date {
-                color: #555;
-                font-size: 14px;
-                text-align: center;
-                padding: 3px;
-                border: 1px solid lightgrey;
-                border-radius: 5px;
-            }
+    /* ---------- Logo ---------- */
+    .logo-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: clamp(90px, 12vw, 180px);
+        flex: 0 0 auto;
+        min-height: 100px;
+        padding: 6px;
+    }
 
-            /* Right: calendar grid */
-            .cal-right {
-                flex: 1;
-                overflow: hidden;
-            }
+    .cnet-logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
 
-            .dash-calendar {
-                width: 100%;
-                font-size: 10px;
-            }
+    /* ---------- Main tabs ---------- */
+    .main-tabs {
+        background: #fff;
+        margin: 0 8px;
+    }
 
-            /* ---------- Logo ---------- */
-            .logo-box {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 180px;
-                flex-shrink: 0;
-                height: 155px;
-                box-sizing: border-box;
-                padding: 6px;
-            }
+    .main-tabs ::deep .dxbl-tabs {
+        border-bottom: 1px solid #d0d5dd;
+        padding-left: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
 
-            .cnet-logo-img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
+    .main-tabs ::deep .dxbl-tabs-item {
+        padding: 8px 16px !important;
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        white-space: nowrap;
+    }
 
-            /* ---------- Main tabs ---------- */
-            .main-tabs {
-                background: #fff;
-                margin: 0 8px;
-            }
+    .main-tabs ::deep .dxbl-tabs-item-active {
+        color: #1565c0 !important;
+        border-bottom: 2px solid #1565c0 !important;
+    }
 
-            .main-tabs ::deep .dxbl-tabs {
-                border-bottom: 1px solid #d0d5dd;
-                padding-left: 8px;
-            }
+    /* ---------- Dashboard body ---------- */
+    .dashboard-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px;
+        background: #f5f6f8;
+        min-height: 380px;
+    }
 
-            .main-tabs ::deep .dxbl-tabs-item {
-                padding: 8px 16px !important;
-                font-size: 13px;
-                font-weight: 600;
-                color: #666;
-            }
+    .left-panel {
+        flex: 1.2 1 320px;
+        background: #fff;
+        border: 1px solid #c8cdd4;
+        display: flex;
+        flex-direction: column;
+        min-width: 280px;
+    }
 
-            .main-tabs ::deep .dxbl-tabs-item-active {
-                color: #1565c0 !important;
-                border-bottom: 2px solid #1565c0 !important;
-            }
+    .panel-toolbar {
+        padding: 4px 6px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
 
-            /* ---------- Dashboard body ---------- */
-            .dashboard-body {
-                display: flex;
-                gap: 10px;
-                padding: 10px;
-                background: #f5f6f8;
-                min-height: 380px;
-            }
+    .task-grid {
+        flex: 1;
+        font-size: 12px;
+    }
 
-            .left-panel {
-                flex: 1.2;
-                background: #fff;
-                border: 1px solid #c8cdd4;
-                display: flex;
-                flex-direction: column;
-            }
+    /* Selected row */
+    .task-row-selected,
+    .task-row-selected td,
+    .task-row-selected .dxbl-grid-cell {
+        --dxbl-grid-cell-back: #0078d4 !important;
+        background-color: #0078d4 !important;
+        color: white !important;
+    }
 
-            .panel-toolbar {
-                padding: 4px 6px;
-                border-bottom: 1px solid #e0e0e0;
-                background: #f8f9fa;
-            }
+    .task-grid .dxbl-grid-data-row {
+        cursor: pointer;
+    }
 
-            .task-grid {
-                flex: 1;
-                font-size: 12px;
-            }
+    .right-panel {
+        flex: 1 1 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 260px;
+    }
 
-            /* Selected row */
-            .task-row-selected,
-            .task-row-selected td,
-            .task-row-selected .dxbl-grid-cell {
-                --dxbl-grid-cell-back: #0078d4 !important;
-                background-color: #0078d4 !important;
-                color: white !important;
-            }
+    .chart-card {
+        background: #fff;
+        border: 1px solid #c8cdd4;
+        padding: 8px 12px;
+        flex: 1;
+    }
 
-            .task-grid .dxbl-grid-data-row {
-                cursor: pointer;
-            }
+    .chart-title {
+        text-align: center;
+        font-size: clamp(13px, 1.6vw, 15px);
+        font-weight: 600;
+        color: #1565c0;
+        margin-bottom: 4px;
+    }
 
-            .right-panel {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
+    .legend-manual {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+        font-size: 11px;
+        margin-top: 4px;
+    }
 
-            .chart-card {
-                background: #fff;
-                border: 1px solid #c8cdd4;
-                padding: 8px 12px;
-                flex: 1;
-            }
+    .leg-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
 
-            .chart-title {
-                text-align: center;
-                font-size: 15px;
-                font-weight: 600;
-                color: #1565c0;
-                margin-bottom: 4px;
-            }
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        display: inline-block;
+    }
 
-            .legend-manual {
-                display: flex;
-                justify-content: center;
-                gap: 18px;
-                font-size: 11px;
-                margin-top: 4px;
-            }
+    .dot.vacant {
+        background: #1e88e5;
+    }
 
-            .leg-item {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-            }
+    .dot.occupied {
+        background: #c62828;
+    }
 
-            .dot {
-                width: 10px;
-                height: 10px;
-                border-radius: 2px;
-                display: inline-block;
-            }
+    /* ---------- Room status ---------- */
+    .room-status-panel {
+        margin: 0 10px 10px;
+        background: #fff;
+        border: 1px solid #c8cdd4;
+        min-height: 120px;
+    }
 
-            .dot.vacant {
-                background: #1e88e5;
-            }
+    .room-status-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1565c0;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
 
-            .dot.occupied {
-                background: #c62828;
-            }
+    .room-status-placeholder {
+        height: 80px;
+    }
 
-            /* ---------- Room status ---------- */
-            .room-status-panel {
-                margin: 0 10px 10px;
-                background: #fff;
-                border: 1px solid #c8cdd4;
-                min-height: 120px;
-            }
+    .tab-placeholder {
+        padding: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+    }
 
-            .room-status-title {
-                text-align: center;
-                font-size: 16px;
-                font-weight: 600;
-                color: #1565c0;
-                padding: 10px;
-                border-bottom: 1px solid #eee;
-            }
+    /* ===================== RESPONSIVE BREAKPOINTS ===================== */
 
-            .room-status-placeholder {
-                height: 80px;
-            }
+    /* Tablet: calendar + logo drop under the user card */
+    @@media (max-width: 1100px) {
+        .logo-box {
+            order: 4;
+            width: 140px;
+        }
 
-            .tab-placeholder {
-                padding: 40px;
-                text-align: center;
-                color: #999;
-                font-size: 14px;
-            }
-        </style>
+        .user-card {
+            order: 1;
+        }
+    }
+
+    /* Small tablet / large phone: stack avatar above details, single-column info */
+    @@media (max-width: 768px) {
+        .top-header {
+            padding: 10px;
+        }
+
+        .user-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 96px;
+            height: 96px;
+        }
+
+        .welcome-row {
+            text-align: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            text-align: left;
+            justify-items: start;
+            width: 100%;
+        }
+
+        .logo-box {
+            width: 100%;
+            min-height: 70px;
+        }
+
+        .dashboard-body {
+            flex-direction: column;
+        }
+
+        .left-panel,
+        .right-panel {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+    }
+
+    /* Phone */
+    @@media (max-width: 480px) {
+        .welcome-row {
+            font-size: 20px;
+            line-height: 1.25;
+        }
+
+        .info-row .lbl {
+            width: auto;
+            max-width: none;
+            margin-right: 4px;
+        }
+
+        .info-row {
+            white-space: normal;
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+        }
+
+        .main-tabs ::deep .dxbl-tabs-item {
+            padding: 6px 10px !important;
+            font-size: 12px;
+        }
+    }
+</style>
 
 @code {
     // ---------- Header / Calendar ----------
