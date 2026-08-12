@@ -1,33 +1,33 @@
 @using ERP.V7.WebPMS.Components.Pages.Reports.Models
 
-@foreach (var section in Sections)
+@foreach (var reportSection in Sections)
 {
-    <div class="rp-sec-section-title">@section.Title</div>
+    <div class="rp-sec-section-title">@reportSection.Title</div>
     <table class="hk-print-table rp-sec-table">
         <thead>
             <tr>
-                @for (var i = 0; i < section.Columns.Length; i++)
+                @for (var i = 0; i < reportSection.Columns.Length; i++)
                 {
-                    <th class="@(IsRightAlign(section, i) ? "rp-sec-right" : "")">@section.Columns[i]</th>
+                    <th class="@(IsRightAlign(reportSection, i) ? "rp-sec-right" : "")">@reportSection.Columns[i]</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @foreach (var row in section.Rows)
+            @foreach (var row in reportSection.Rows)
             {
                 <tr>
                     @for (var i = 0; i < row.Length; i++)
                     {
-                        <td class="@(IsRightAlign(section, i) ? "rp-sec-right" : "")">@row[i]</td>
+                        <td class="@(IsRightAlign(reportSection, i) ? "rp-sec-right" : "")">@row[i]</td>
                     }
                 </tr>
             }
-            @if (section.TotalRow is not null)
+            @if (reportSection.TotalRow is not null)
             {
                 <tr class="rp-sec-total-row">
-                    @for (var i = 0; i < section.TotalRow.Length; i++)
+                    @for (var i = 0; i < reportSection.TotalRow.Length; i++)
                     {
-                        <td class="@(IsRightAlign(section, i) ? "rp-sec-right" : "")">@section.TotalRow[i]</td>
+                        <td class="@(IsRightAlign(reportSection, i) ? "rp-sec-right" : "")">@reportSection.TotalRow[i]</td>
                     }
                 </tr>
             }
