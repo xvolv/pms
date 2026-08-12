@@ -29,7 +29,7 @@
                 <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="true" />
             </div>
             <div class="amend-row"><label>Payment Method</label>
-                <DxComboBox Data="@Payments" Value="@PayMethod"
+                <DxComboBox CssClass="erp-combobox" Data="@Payments" Value="@PayMethod"
                             ValueChanged="@((string? v) => PayMethodChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
@@ -40,7 +40,7 @@
                 <legend>Credit Card Detail</legend>
                 <div class="amend-form">
                     <div class="amend-row"><label>Credit Card</label>
-                        <DxComboBox Data="@CreditCardTypes" Value="@CreditCard"
+                        <DxComboBox CssClass="erp-combobox" Data="@CreditCardTypes" Value="@CreditCard"
                                     ValueChanged="@((string? v) => CreditCardChanged.InvokeAsync(v))"
                                     SizeMode="SizeMode.Small" />
                     </div>
@@ -48,7 +48,7 @@
                         <DxTextBox Text="@CreditCardNo" TextChanged="@((string v) => CreditCardNoChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Currency</label>
-                        <DxComboBox Data="@Currencies" Value="@Currency"
+                        <DxComboBox CssClass="erp-combobox" Data="@Currencies" Value="@Currency"
                                     ValueChanged="@((string? v) => CurrencyChanged.InvokeAsync(v))"
                                     SizeMode="SizeMode.Small" />
                     </div>
@@ -62,7 +62,7 @@
                         <DxTextBox Text="@ApprovalCode" TextChanged="@((string v) => ApprovalCodeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Approval Amt.</label>
-                        <DxSpinEdit Value="@ApprovalAmt" ValueChanged="@((decimal v) => ApprovalAmtChanged.InvokeAsync(v))"
+                        <DxSpinEdit CssClass="dx-input-num" Value="@ApprovalAmt" ValueChanged="@((decimal v) => ApprovalAmtChanged.InvokeAsync(v))"
                                     SizeMode="SizeMode.Small" MinValue="0" />
                     </div>
                 </div>

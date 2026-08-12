@@ -10,7 +10,7 @@
                 <div class="ci-text">Select</div>
             </button>
             <span style="margin-left:12px;">Feature</span>
-            <DxComboBox Data="@Features" @bind-Value="SelectedFeature" Width="130px" SizeMode="SizeMode.Small" />
+            <DxComboBox CssClass="erp-combobox" Data="@Features" @bind-Value="SelectedFeature" Width="130px" SizeMode="SizeMode.Small" />
             <span style="margin-left:8px;">Room</span>
             <DxTextBox @bind-Text="FilterText" Width="90px" SizeMode="SizeMode.Small" />
             <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="HandleClose">

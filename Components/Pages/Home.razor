@@ -90,7 +90,7 @@
                     <span class="cal-lbl">Month</span>
                     <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" />
                     <span class="cal-lbl">Year</span>
-                    <DxSpinEdit @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
                 </div>
                 <div class="cal-footer-vert">
                     <DxButton Text="Today" RenderStyle="ButtonRenderStyle.Link" Click="GoToday" />

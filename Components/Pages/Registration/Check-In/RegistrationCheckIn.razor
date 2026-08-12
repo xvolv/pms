@@ -128,13 +128,13 @@
                 <div class="filter-row">
                     <span class="filter-icon text-secondary"><i class="bi bi-person-fill"></i></span>
                     <span class="filter-label">Guest</span>
-                    <DxComboBox Data="@guestFilterList" @bind-Value="filterGuest" Width="100%"
+                    <DxComboBox CssClass="erp-combobox" Data="@guestFilterList" @bind-Value="filterGuest" Width="100%"
                                 SizeMode="SizeMode.Small" />
                 </div>
                 <div class="filter-row">
                     <span class="filter-icon text-secondary"><i class="bi bi-star-fill text-secondary"></i></span>
                     <span class="filter-label">State</span>
-                    <DxComboBox Data="@stateFilterList" 
+                    <DxComboBox CssClass="erp-combobox" Data="@stateFilterList" 
                                 Value="filterState" 
                                 ValueChanged="@((string s) => { filterState = s; ApplyFilters(); })" 
                                 Width="100%" 
@@ -163,7 +163,7 @@
                 </div>
                 <div class="filter-row">
                     <span class="filter-label filter-label-plain">Company</span>
-                    <DxComboBox Data="@companyFilterList" @bind-Value="filterCompany" Width="100%"
+                    <DxComboBox CssClass="erp-combobox" Data="@companyFilterList" @bind-Value="filterCompany" Width="100%"
                                 SizeMode="SizeMode.Small" />
                 </div>
             </div>
@@ -562,7 +562,7 @@
     </ToolbarContent>
     <ExtraFields>
         <div class="ci-row"><label>Reason</label>
-            <DxComboBox Data="@(new List<string> { "No Reason Given", "Guest Plan Changed", "Trip/Meeting Cancelled", "Trip/Meeting Postponed", "Competitor Hotel", "Overbooking", "Flight Cancelled" })" @bind-Value="ciCancelReason" SizeMode="SizeMode.Small" />
+            <DxComboBox CssClass="erp-combobox" Data="@(new List<string> { "No Reason Given", "Guest Plan Changed", "Trip/Meeting Cancelled", "Trip/Meeting Postponed", "Competitor Hotel", "Overbooking", "Flight Cancelled" })" @bind-Value="ciCancelReason" SizeMode="SizeMode.Small" />
         </div>
     </ExtraFields>
 </StateReviewPopup>
@@ -581,7 +581,7 @@
     </ToolbarContent>
     <ExtraFields>
         <div class="ci-row"><label>Action</label>
-            <DxComboBox Data="@(new List<string> { "With receipt reprint", "Without receipt reprint" })" @bind-Value="ciReinstateAction" SizeMode="SizeMode.Small" />
+            <DxComboBox CssClass="erp-combobox" Data="@(new List<string> { "With receipt reprint", "Without receipt reprint" })" @bind-Value="ciReinstateAction" SizeMode="SizeMode.Small" />
         </div>
     </ExtraFields>
 </StateReviewPopup>

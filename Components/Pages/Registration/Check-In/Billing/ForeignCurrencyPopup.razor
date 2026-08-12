@@ -29,7 +29,7 @@
                 {
                     <tr>
                         <td>@r.SN</td>
-                        <td><DxComboBox Data="@Currencies" @bind-Value="r.Currency" SizeMode="SizeMode.Small" /></td>
+                        <td><DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="r.Currency" SizeMode="SizeMode.Small" /></td>
                         <td>@r.Amount.ToString("N2")</td>
                         <td>@r.Rate.ToString("N4")</td>
                         <td>@r.TotalAmount.ToString("N2")</td>

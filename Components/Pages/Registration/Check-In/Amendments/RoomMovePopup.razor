@@ -28,7 +28,7 @@
                 <DxTextBox @bind-Text="CurrentRoom" SizeMode="SizeMode.Small" ReadOnly="true" />
             </div>
             <div class="amend-row"><label>New Room Type</label>
-                <DxComboBox Data="@RoomTypes" Value="@NewRoomType"
+                <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" Value="@NewRoomType"
                             ValueChanged="@((string? v) => NewRoomTypeChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
@@ -47,7 +47,7 @@
                 <DxDateEdit @bind-Date="End" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Reason</label>
-                <DxComboBox Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
             </div>
         </div>
     </BodyContentTemplate>

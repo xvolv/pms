@@ -36,10 +36,10 @@
                 <DxTextBox Text="@GrandTotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
             </div>
             <div class="amend-row"><label>Split By</label>
-                <DxComboBox Data="@(new List<string> { "Amount", "Quantity" })" @bind-Value="SplitBy" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@(new List<string> { "Amount", "Quantity" })" @bind-Value="SplitBy" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>No. of Split</label>
-                <DxSpinEdit @bind-Value="NoOfSplit" MinValue="2" MaxValue="8" SizeMode="SizeMode.Small" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="NoOfSplit" MinValue="2" MaxValue="8" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Factor</label>
                 <div style="display:flex; gap:16px; align-items:center; padding-top:4px;">
@@ -54,13 +54,13 @@
             @if (FactorPercent)
             {
                 <div class="amend-row"><label>% Value</label>
-                    <DxSpinEdit @bind-Value="PercentValue" MinValue="1" MaxValue="99" SizeMode="SizeMode.Small" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="PercentValue" MinValue="1" MaxValue="99" SizeMode="SizeMode.Small" />
                 </div>
             }
             else
             {
                 <div class="amend-row"><label>Amount</label>
-                    <DxSpinEdit @bind-Value="AmountValue" MinValue="0" SizeMode="SizeMode.Small" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="AmountValue" MinValue="0" SizeMode="SizeMode.Small" />
                 </div>
             }
         </div>

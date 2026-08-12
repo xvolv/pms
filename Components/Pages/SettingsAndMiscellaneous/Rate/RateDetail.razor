@@ -557,11 +557,11 @@
                         <div class="row">
                             <div class="col-6">
                                 <label>Min</label>
-                                <DxSpinEdit @bind-Value="detailForm.Min" MinValue="1" />
+                                <DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Min" MinValue="1" />
                             </div>
                             <div class="col-6">
                                 <label>Max</label>
-                                <DxSpinEdit @bind-Value="detailForm.Max" MinValue="1" />
+                                <DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Max" MinValue="1" />
                             </div>
                         </div>
                     </div>
@@ -570,12 +570,12 @@
                 <div class="col-md-3">
                     <div class="form-section h-100">
                         <div class="form-section-title">Adult Count</div>
-                        <label>1 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult1" />
-                        <label>2 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult2" />
-                        <label>3 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult3" />
-                        <label>4 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult4" />
-                        <label>5 Adult</label><DxSpinEdit @bind-Value="detailForm.Adult5" />
-                        <label>Extra Adult</label><DxSpinEdit @bind-Value="detailForm.ExtraAdult" />
+                        <label>1 Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Adult1" />
+                        <label>2 Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Adult2" />
+                        <label>3 Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Adult3" />
+                        <label>4 Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Adult4" />
+                        <label>5 Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Adult5" />
+                        <label>Extra Adult</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.ExtraAdult" />
                     </div>
                 </div>
 
@@ -583,10 +583,10 @@
                     <div class="form-section h-100">
                         <div class="form-section-title">Extra Child</div>
                         <label>Default Child Amt.</label>
-                        <DxSpinEdit @bind-Value="detailForm.DefaultChildAmt" />
-                        <label>0-3</label><DxSpinEdit @bind-Value="detailForm.Child0to3" />
-                        <label>4-12</label><DxSpinEdit @bind-Value="detailForm.Child4to12" />
-                        <label>13-18</label><DxSpinEdit @bind-Value="detailForm.Child13to18" />
+                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.DefaultChildAmt" />
+                        <label>0-3</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Child0to3" />
+                        <label>4-12</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Child4to12" />
+                        <label>13-18</label><DxSpinEdit CssClass="dx-input-num" @bind-Value="detailForm.Child13to18" />
                     </div>
                 </div>
 
@@ -620,7 +620,7 @@
             <div class="mt-3">
                 <label>Type <span style="color:red">*</span></label>
                 <DxComboBox Data="@(new[] { "Customer", "Guest", "Company" })"
-                            @bind-Value="negotiatedForm.Type" />
+                            @bind-Value="negotiatedForm.Type" CssClass="erp-combobox" />
             </div>
             <div class="mt-2">
                 <label>Consignee <span style="color:red">*</span></label>
@@ -680,28 +680,28 @@
             <div class="mt-2">
                 <label>Condition <span style="color:red">*</span></label>
                 <DxComboBox Data="@(new[] { "Occupied", "Times Sold" })"
-                            @bind-Value="strategyForm.Condition" />
+                            @bind-Value="strategyForm.Condition" CssClass="erp-combobox" />
             </div>
             <div class="row mt-2">
                 <div class="col-6">
                     <label>Value</label>
-                    <DxSpinEdit @bind-Value="strategyForm.Value" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="strategyForm.Value" />
                 </div>
                 <div class="col-6">
                     <label>Value Type</label>
                     <DxComboBox Data="@(new[] { "Percent (%)", "Flat" })"
-                                @bind-Value="strategyForm.ValueType" />
+                                @bind-Value="strategyForm.ValueType" CssClass="erp-combobox" />
                 </div>
             </div>
             <div class="mt-2">
                 <label>Restriction Type</label>
                 <DxComboBox Data="@(new[] { "Open", "Close" })"
-                            @bind-Value="strategyForm.RestrictionType" />
+                            @bind-Value="strategyForm.RestrictionType" CssClass="erp-combobox" />
             </div>
             <div class="row mt-2">
                 <div class="col-6">
                     <label>Priority</label>
-                    <DxSpinEdit @bind-Value="strategyForm.Priority" MinValue="1" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="strategyForm.Priority" MinValue="1" />
                 </div>
                 <div class="col-6 d-flex align-items-end">
                     <DxCheckBox @bind-Checked="strategyForm.IsActive">Is Active</DxCheckBox>

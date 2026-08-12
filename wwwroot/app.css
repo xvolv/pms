@@ -1023,3 +1023,17 @@ a.menu-item.active {
 .dxbl-combo-box {
     background-color: white !important;
 }
+
+.dx-input-num .dxbs-spin-edit-button.inc{
+    background: white !important;
+    
+}
+.dx-input-num .dxbs-spin-edit-button.dec{
+    background: white !important;
+}
+.dx-input-num .dxbs-spin-edit-button {
+    color: gray !important;
+}
+.dx-input-num .dxbs-form-control {
+    padding-right: 30px !important;
+}

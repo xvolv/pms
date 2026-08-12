@@ -39,7 +39,7 @@
                     <DxDateEdit @bind-Date="Departure" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Room Type</label>
-                    <DxComboBox Data="@RoomTypes" @bind-Value="RoomType" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" @bind-Value="RoomType" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row">
                     <label>Room</label>
@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <div class="ci-row"><label>Payment Type</label>
-                    <DxComboBox Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Total Bill</label>
                     <DxTextBox @bind-Text="TotalBill" SizeMode="SizeMode.Small" />
@@ -66,22 +66,22 @@
             <fieldset class="ci-profile">
                 <legend>Profile</legend>
                 <div class="ci-row"><label>Guest</label>
-                    <DxComboBox Data="@GuestNames" @bind-Value="Guest" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@GuestNames" @bind-Value="Guest" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Company</label>
-                    <DxComboBox Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Agent</label>
-                    <DxComboBox Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Source</label>
-                    <DxComboBox Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Group</label>
-                    <DxComboBox Data="@GroupList" @bind-Value="Group" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@GroupList" @bind-Value="Group" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Contact</label>
-                    <DxComboBox Data="@ContactList" @bind-Value="Contact" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@ContactList" @bind-Value="Contact" SizeMode="SizeMode.Small" />
                 </div>
             </fieldset>
         </div>

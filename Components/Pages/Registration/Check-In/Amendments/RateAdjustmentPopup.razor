@@ -22,7 +22,7 @@
                 <DxTextBox @bind-Text="RateCode" SizeMode="SizeMode.Small" ReadOnly="true" />
             </div>
             <div class="amend-row"><label>Amount</label>
-                <DxSpinEdit @bind-Value="Amount" SizeMode="SizeMode.Small" ReadOnly="true" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Amount" SizeMode="SizeMode.Small" ReadOnly="true" />
             </div>
             <div class="amend-row"><label>Start Date</label>
                 <DxDateEdit @bind-Date="StartDate" SizeMode="SizeMode.Small" />
@@ -46,10 +46,10 @@
                 <DxTextBox @bind-Text="Factor" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Value</label>
-                <DxSpinEdit @bind-Value="Value" SizeMode="SizeMode.Small" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Value" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Reason</label>
-                <DxComboBox Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
             </div>
         </div>
     </BodyContentTemplate>
