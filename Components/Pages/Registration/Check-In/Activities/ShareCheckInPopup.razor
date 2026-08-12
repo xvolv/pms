@@ -4,7 +4,7 @@
 <DxPopup @bind-Visible="Visible"
          HeaderText="@($"CHECK-IN (Share) - {RegistrationNo}")"
          Width="1000px"  
-         CloseOnOutsideClick="false" ShowCloseButton="false">
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="amend-toolbar" style="flex-wrap:wrap;">
             <button type="button" class="ci-btn" @onclick="HandleNew">

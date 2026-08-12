@@ -3,7 +3,7 @@
 
 <DxPopup @bind-Visible="Visible"
          HeaderText="@($"Travel Detail ({RegistrationNo})")"
-         Width="460px" CloseOnOutsideClick="false" ShowCloseButton="false">
+         Width="460px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="amend-toolbar">
             <button type="button" class="ci-btn" @onclick="HandleReset">

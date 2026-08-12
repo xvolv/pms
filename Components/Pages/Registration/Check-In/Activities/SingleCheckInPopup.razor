@@ -2,7 +2,7 @@
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
 <DxPopup @bind-Visible="Visible" HeaderText="Check In" Width="640px"
-         CloseOnOutsideClick="false" ShowCloseButton="false">
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="ci-toolbar">
             <button type="button" class="ci-btn" @onclick="HandleCheckIn">

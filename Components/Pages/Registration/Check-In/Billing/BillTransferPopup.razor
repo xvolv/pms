@@ -2,7 +2,7 @@
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
 <DxPopup @bind-Visible="Visible" HeaderText="Bill Transfer" Width="980px"
-         CloseOnOutsideClick="false" ShowCloseButton="false">
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="amend-toolbar" style="flex-wrap:wrap;">
             <button type="button" class="toolbar-btn" @onclick="HandleRefresh">

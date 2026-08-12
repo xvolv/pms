@@ -427,7 +427,7 @@
     OnTravelDetail="@(() => showTravelDetail = true)" />
 
 <DxPopup @bind-Visible="showRoomAssignConfirm" HeaderText="Room Assignment" Width="380px"
-         CloseOnOutsideClick="false" ShowCloseButton="false">
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-info-circle" style="font-size:32px; color:#1565c0;"></i>
@@ -441,7 +441,7 @@
 </DxPopup>
 
 <DxPopup @bind-Visible="showStateConfirm" HeaderText="State Change Confirmation" Width="420px"
-         CloseOnOutsideClick="false" ShowCloseButton="false">
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-question-circle" style="font-size:36px; color:#1565c0;"></i>
@@ -454,7 +454,7 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showArrivalError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
+<DxPopup @bind-Visible="showArrivalError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-exclamation-triangle" style="font-size:36px; color:#c62828;"></i>
@@ -466,7 +466,7 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showValidationError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
+<DxPopup @bind-Visible="showValidationError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-exclamation-triangle" style="font-size:36px; color:#c62828;"></i>
@@ -478,7 +478,7 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showPassedDateError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false">
+<DxPopup @bind-Visible="showPassedDateError" HeaderText="Error" Width="420px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-exclamation-triangle" style="font-size:36px; color:#c62828;"></i>
@@ -490,7 +490,7 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showNoSelection" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false">
+<DxPopup @bind-Visible="showNoSelection" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-info-circle" style="font-size:36px; color:#e0a52c;"></i>
@@ -502,7 +502,7 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<DxPopup @bind-Visible="showSuccessInfo" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false">
+<DxPopup @bind-Visible="showSuccessInfo" HeaderText="Information" Width="360px" CloseOnOutsideClick="true" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="confirm-body">
             <i class="bi bi-check-circle" style="font-size:36px; color:#2e7d32;"></i>
