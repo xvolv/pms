@@ -84,11 +84,11 @@
         <div class="calendar-box">
             <div class="cal-left">
                 <div class="cal-toggle">
-                    <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="cal-mode-combo" />
+                    <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="erp-combobox" />
                 </div>
                 <div class="cal-nav-vert">
                     <span class="cal-lbl">Month</span>
-                    <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" />
+                    <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" CssClass="erp-combobox" />
                     <span class="cal-lbl">Year</span>
                     <DxSpinEdit CssClass="dx-input-num" @bind-Value="selectedYear" MinValue="2000" MaxValue="2030" Width="72px" />
                 </div>
