@@ -26,7 +26,7 @@
                 <div class="toolbar-text">Close</div>
             </button>
             <span style="margin-left:12px; font-size:12px;">Window</span>
-            <DxComboBox Data="@WindowList" @bind-Value="Window" Width="120px" SizeMode="SizeMode.Small" />
+            <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window" Width="120px" SizeMode="SizeMode.Small" />
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:8px; font-size:12px; border:1px solid #c8cdd4; padding:8px;">
             <div><label style="color:#555;">Guest Name</label> <DxTextBox @bind-Text="GuestName" SizeMode="SizeMode.Small" ReadOnly="true" /></div>

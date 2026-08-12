@@ -74,7 +74,7 @@
                         <div class="basic-grid">
                             <label>Guest Name</label>
                             <div class="input-with-btn wide">
-                                <DxComboBox Data="@guestList"
+                                <DxComboBox CssClass="erp-combobox" Data="@guestList"
                                             TextFieldName="FullName"
                                             ValueFieldName="Id"
                                             @bind-Value="selectedGuestId"
@@ -113,49 +113,44 @@
                         <legend>Consignee</legend>
                         <div class="consignee-grid">
                             <label>Company</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="company" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Company"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="company" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Company"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Company"))">▾</button>
                             </div>
                             <label>Agent</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="agent" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Agent"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="agent" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Agent"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Agent"))">▾</button>
                             </div>
 
                             <label>Contact</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="contact" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Contact"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="contact" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Contact"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Contact"))">▾</button>
                             </div>
                             <label>Group</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="group" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Group"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="group" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Group"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Group"))">▾</button>
                             </div>
 
                             <label>Source</label>
-                            <div class="input-with-btn">
-                                <DxTextBox @bind-Text="consigneeSource" SizeMode="SizeMode.Small" ReadOnly="true" />
-                                <DxButton IconCssClass="bi bi-caret-down-fill"
-                                          RenderStyle="ButtonRenderStyle.Secondary"
-                                          SizeMode="SizeMode.Small"
-                                          Click="@(() => OpenLookup("Source"))" />
+                            <div class="lookup-field">
+                                <DxTextBox @bind-Text="consigneeSource" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" Click="@(() => OpenLookup("Source"))" />
+                                <button type="button" class="lookup-toggle-btn"
+                                        @onclick="@(() => OpenLookup("Source"))">▾</button>
                             </div>
                             <label>Member Type</label>
-                            <DxComboBox Data="@memberTypes" @bind-Value="memberType" SizeMode="SizeMode.Small" />
+                            <DxComboBox CssClass="erp-combobox" Data="@memberTypes" @bind-Value="memberType" SizeMode="SizeMode.Small" />
                         </div>
                     </fieldset>
                 </div>
@@ -173,7 +168,7 @@
                         <DxTimeEdit @bind-Time="eta" SizeMode="SizeMode.Small" />
 
                         <label>Nights</label>
-                        <DxSpinEdit @bind-Value="nights" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="nights" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
                         <label></label><span></span>
 
                         <label>Departure</label>
@@ -181,17 +176,17 @@
                         <label></label><span></span>
 
                         <label>Adults</label>
-                        <DxSpinEdit @bind-Value="adults" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="adults" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
                         <label>Child</label>
-                        <DxSpinEdit @bind-Value="children" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="children" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
 
                         <label>No . of. Rooms</label>
-                        <DxSpinEdit @bind-Value="noOfRooms" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="noOfRooms" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
                         <label></label><span></span>
 
                         <label>Room Type</label>
                         <div class="input-with-error">
-                            <DxComboBox Data="@roomTypes" @bind-Value="roomType" SizeMode="SizeMode.Small" />
+                            <DxComboBox CssClass="erp-combobox" Data="@roomTypes" @bind-Value="roomType" SizeMode="SizeMode.Small" />
                             @if (showValidation && string.IsNullOrWhiteSpace(roomType))
                             {
                                 <span class="mandatory-x">✕</span>
@@ -199,7 +194,7 @@
                         </div>
                         <label>RTC.</label>
                         <div class="input-with-error">
-                            <DxComboBox Data="@rtcList" @bind-Value="rtc" SizeMode="SizeMode.Small" />
+                            <DxComboBox CssClass="erp-combobox" Data="@rtcList" @bind-Value="rtc" SizeMode="SizeMode.Small" />
                             @if (showValidation && string.IsNullOrWhiteSpace(rtc))
                             {
                                 <span class="mandatory-x">✕</span>
@@ -230,7 +225,7 @@
                         <label>Rate Code</label>
                         <div class="input-with-btn">
                             <div class="input-with-error" style="flex:1;">
-                                <DxComboBox Data="@rateCodes" @bind-Value="rateCode" SizeMode="SizeMode.Small" />
+                                <DxComboBox CssClass="erp-combobox" Data="@rateCodes" @bind-Value="rateCode" SizeMode="SizeMode.Small" />
                                 @if (showValidation && string.IsNullOrWhiteSpace(rateCode))
                                 {
                                     <span class="mandatory-x">✕</span>
@@ -243,7 +238,7 @@
                                       Click="OpenRateSearch" />
                         </div>
                         <label>Packages</label>
-                        <DxComboBox Data="@packages" @bind-Value="package" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@packages" @bind-Value="package" SizeMode="SizeMode.Small" />
 
                         <label>Rate</label>
                         <DxTextBox @bind-Text="rate" SizeMode="SizeMode.Small" />
@@ -256,15 +251,15 @@
                 <fieldset class="section class-section">
                     <div class="class-grid">
                         <label>Res. Type</label>
-                        <DxComboBox Data="@resTypes" @bind-Value="resType" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@resTypes" @bind-Value="resType" SizeMode="SizeMode.Small" />
                         <label>Market</label>
-                        <DxComboBox Data="@markets" @bind-Value="market" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@markets" @bind-Value="market" SizeMode="SizeMode.Small" />
                         <label>Source</label>
-                        <DxComboBox Data="@sources" @bind-Value="source" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@sources" @bind-Value="source" SizeMode="SizeMode.Small" />
                         <label>Origin</label>
-                        <DxComboBox Data="@origins" @bind-Value="origin" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@origins" @bind-Value="origin" SizeMode="SizeMode.Small" />
                         <label>Payment</label>
-                        <DxComboBox Data="@payments" @bind-Value="payment" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@payments" @bind-Value="payment" SizeMode="SizeMode.Small" />
                     </div>
                 </fieldset>
 
@@ -300,11 +295,11 @@
                     </div>
                     <div class="rate-adj-top">
                         <label>Reason</label>
-                        <DxComboBox Data="@reasons" @bind-Value="reason" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@reasons" @bind-Value="reason" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="rate-bottom">
                         <label>Specials</label>
-                        <DxComboBox Data="@specials" @bind-Value="special" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@specials" @bind-Value="special" SizeMode="SizeMode.Small" />
                         <label>Voucher #</label>
                         <DxTextBox @bind-Text="voucher" SizeMode="SizeMode.Small" />
                     </div>
@@ -352,7 +347,7 @@
                             OnClose="() => showRoomSearch = false">
             <CustomContent>
                 <span style="margin-left:12px;">Feature</span>
-                <DxComboBox Data="@roomFeatures" @bind-Value="selectedFeature" Width="140px" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@roomFeatures" @bind-Value="selectedFeature" Width="140px" SizeMode="SizeMode.Small" />
                 <span style="margin-left:8px;">Room</span>
                 <DxTextBox @bind-Text="roomFilter" Width="100px" SizeMode="SizeMode.Small" />
             </CustomContent>
@@ -500,13 +495,13 @@
             <DxTabPage Text="Arrival">
                 <div class="travel-form">
                     <label>Pick Up Required</label>
-                    <DxComboBox Data="@yesNo" @bind-Value="pickupRequired" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@yesNo" @bind-Value="pickupRequired" SizeMode="SizeMode.Small" />
                     <label>Transportation Type</label>
-                    <DxComboBox Data="@transportTypes" @bind-Value="arrivalTransportType" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@transportTypes" @bind-Value="arrivalTransportType" SizeMode="SizeMode.Small" />
                     <label>Station Code</label>
                     <DxTextBox @bind-Text="arrivalStationCode" SizeMode="SizeMode.Small" />
                     <label>Carrier Code</label>
-                    <DxComboBox Data="@carrierCodes" @bind-Value="arrivalCarrierCode" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@carrierCodes" @bind-Value="arrivalCarrierCode" SizeMode="SizeMode.Small" />
                     <label>Transportation #</label>
                     <DxTextBox @bind-Text="arrivalTransportNo" SizeMode="SizeMode.Small" />
                     <label>Arrival Date</label>
@@ -518,13 +513,13 @@
             <DxTabPage Text="Departure">
                 <div class="travel-form">
                     <label>Drop Off Required</label>
-                    <DxComboBox Data="@yesNo" @bind-Value="dropoffRequired" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@yesNo" @bind-Value="dropoffRequired" SizeMode="SizeMode.Small" />
                     <label>Transportation Type</label>
-                    <DxComboBox Data="@transportTypes" @bind-Value="departureTransportType" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@transportTypes" @bind-Value="departureTransportType" SizeMode="SizeMode.Small" />
                     <label>Station Code</label>
                     <DxTextBox @bind-Text="departureStationCode" SizeMode="SizeMode.Small" />
                     <label>Carrier Code</label>
-                    <DxComboBox Data="@carrierCodes" @bind-Value="departureCarrierCode" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@carrierCodes" @bind-Value="departureCarrierCode" SizeMode="SizeMode.Small" />
                     <label>Departure Date</label>
                     <DxDateEdit @bind-Date="departureTravelDate" SizeMode="SizeMode.Small" />
                     <label>Transportation #</label>

@@ -347,6 +347,57 @@
         background-color: #fff;
     }
 
+.dxbs-editor-dropdown-button {
+    background-color: white !important;
+    border: none !important;
+    color: #6c757d !important;
+    width: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.dxbs-editor-dropdown-button:hover {
+    background-color: white !important;
+}
+
+.dxbs-editor-dropdown-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: white !important;
+}
+
+/* ── Dropdown Box ── */
+.dxbs-dropdown-box {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    padding: 4px 0 !important;
+}
+
+/* ── Dropdown Items ── */
+.dxbs-dropdown-box .dxbs-list-item {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item:hover {
+    background-color: #f1f3f5 !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item.dxbs-selected {
+    background-color: #e7f1ff !important;
+    color: #0d6efd !important;
+}
+
+.dxbs-dropdown-box .dxbs-list-item.dxbs-focused {
+    background-color: #f8f9fa !important;
+}
+    
+
     /* Selected row highlighting.
        DxGrid paints each cell's background via the --dxbl-grid-cell-back
        CSS variable, which normally overrides a plain background-color on

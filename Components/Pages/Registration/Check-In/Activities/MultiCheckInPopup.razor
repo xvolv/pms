@@ -44,7 +44,7 @@
                                    @onchange="@(e => row.Selected = (bool)(e.Value ?? false))" /></td>
                         <td>@row.SN</td>
                         <td>@row.Company</td>
-                        <td><DxComboBox Data="@GuestNames" @bind-Value="row.Guest" SizeMode="SizeMode.Small" Width="100%" /></td>
+                        <td><DxComboBox CssClass="erp-combobox" Data="@GuestNames" @bind-Value="row.Guest" SizeMode="SizeMode.Small" Width="100%" /></td>
                         <td>@row.GuestNo</td>
                         <td>
                             <div class="input-with-btn">

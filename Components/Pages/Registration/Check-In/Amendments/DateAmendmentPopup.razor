@@ -22,15 +22,15 @@
                 <DxDateEdit Date="@Departure" DateChanged="@((DateTime? v) => DepartureChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Adult</label>
-                <DxSpinEdit Value="@Adult" ValueChanged="@((int v) => AdultChanged.InvokeAsync(v))"
+                <DxSpinEdit CssClass="dx-input-num" Value="@Adult" ValueChanged="@((int v) => AdultChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
             </div>
             <div class="amend-row"><label>Child</label>
-                <DxSpinEdit Value="@Child" ValueChanged="@((int v) => ChildChanged.InvokeAsync(v))"
+                <DxSpinEdit CssClass="dx-input-num" Value="@Child" ValueChanged="@((int v) => ChildChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" MinValue="0" MaxValue="10" />
             </div>
             <div class="amend-row"><label>Room Type</label>
-                <DxComboBox Data="@RoomTypes" Value="@RoomType"
+                <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" Value="@RoomType"
                             ValueChanged="@((string? v) => RoomTypeChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="amend-row"><label>Amount</label>
-                <DxSpinEdit Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
+                <DxSpinEdit CssClass="dx-input-num" Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" MinValue="0" />
             </div>
             <div class="amend-row"><label></label>

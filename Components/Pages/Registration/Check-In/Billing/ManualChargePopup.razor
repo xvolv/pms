@@ -23,7 +23,7 @@
                 <div class="amend-form" style="border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
                     <div class="amend-row"><label>Article</label>
                         <div class="input-with-btn">
-                            <DxComboBox Data="@Articles.Select(a => a.Name).ToList()" Value="@Article"
+                            <DxComboBox CssClass="erp-combobox" Data="@Articles.Select(a => a.Name).ToList()" Value="@Article"
                                         ValueChanged="@((string? v) => ArticleChanged.InvokeAsync(v))"
                                         SizeMode="SizeMode.Small" />
                             <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
@@ -31,11 +31,11 @@
                         </div>
                     </div>
                     <div class="amend-row"><label>Qty.</label>
-                        <DxSpinEdit Value="@Qty" ValueChanged="@((int v) => QtyChanged.InvokeAsync(v))"
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Qty" ValueChanged="@((int v) => QtyChanged.InvokeAsync(v))"
                                     MinValue="1" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Amount</label>
-                        <DxSpinEdit Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
                                     MinValue="0" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Total</label>
@@ -78,13 +78,13 @@
                         <DxTextBox @bind-Text="No" SizeMode="SizeMode.Small" ReadOnly="true" />
                     </div>
                     <div class="amend-row"><label>Charge Type</label>
-                        <DxComboBox Data="@ChargeTypes" @bind-Value="ChargeType" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@ChargeTypes" @bind-Value="ChargeType" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Transaction Type</label>
                         <DxTextBox @bind-Text="TransactionType" SizeMode="SizeMode.Small" ReadOnly="true" />
                     </div>
                     <div class="amend-row"><label>Currency</label>
-                        <DxComboBox Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Registration</label>
                         <DxTextBox @bind-Text="Registration" SizeMode="SizeMode.Small" ReadOnly="true" />
@@ -96,7 +96,7 @@
                         <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Window</label>
-                        <DxComboBox Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Subtotal</label>
                         <DxTextBox Text="@Subtotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />

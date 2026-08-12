@@ -25,7 +25,7 @@
             <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px;">
                 <div class="amend-row"><label>Customer</label>
                     <div class="input-with-btn">
-                        <DxComboBox Data="@Customers.Select(c => c.Name).ToList()" @bind-Value="Customer" SizeMode="SizeMode.Small" />
+                        <DxComboBox CssClass="erp-combobox" Data="@Customers.Select(c => c.Name).ToList()" @bind-Value="Customer" SizeMode="SizeMode.Small" />
                         @if (ShowCustomerFind)
                         {
                             <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleOpenCustomerFind" />
@@ -33,16 +33,16 @@
                     </div>
                 </div>
                 <div class="amend-row"><label>Payment Type</label>
-                    <DxComboBox Data="@PaymentMethods" @bind-Value="PaymentType" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@PaymentMethods" @bind-Value="PaymentType" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="amend-row"><label>Currency</label>
-                    <DxComboBox Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="amend-row"><label>Ex. Rate</label>
-                    <DxSpinEdit @bind-Value="ExRate" SizeMode="SizeMode.Small" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="ExRate" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="amend-row"><label>Amount</label>
-                    <DxSpinEdit @bind-Value="Amount" SizeMode="SizeMode.Small" />
+                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="Amount" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="amend-row"><label>Total Amount</label>
                     <DxTextBox Text="@TotalAmount.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
@@ -65,7 +65,7 @@
                     <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
                 <div class="amend-row"><label>Window</label>
-                    <DxComboBox Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="amend-row"><label>Reference</label>
                     <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />

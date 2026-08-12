@@ -22,16 +22,16 @@
                 <DxDateEdit @bind-Date="Model.ThroughDate" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Adult</label>
-                <DxSpinEdit @bind-Value="Model.Adult" SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Model.Adult" SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
             </div>
             <div class="amend-row"><label>Child</label>
-                <DxSpinEdit @bind-Value="Model.Child" SizeMode="SizeMode.Small" MinValue="0" MaxValue="10" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Model.Child" SizeMode="SizeMode.Small" MinValue="0" MaxValue="10" />
             </div>
             <div class="amend-row"><label>Room Type</label>
-                <DxComboBox Data="@RoomTypes" @bind-Value="Model.RoomType" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" @bind-Value="Model.RoomType" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>RTC</label>
-                <DxComboBox Data="@RoomTypes" @bind-Value="Model.RTC" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" @bind-Value="Model.RTC" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Room</label>
                 <div class="input-with-btn">
@@ -48,22 +48,22 @@
                 </div>
             </div>
             <div class="amend-row"><label>Amount</label>
-                <DxSpinEdit @bind-Value="Model.Amount" SizeMode="SizeMode.Small" MinValue="0" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Model.Amount" SizeMode="SizeMode.Small" MinValue="0" />
             </div>
             <div class="amend-row"><label></label>
                 <DxCheckBox @bind-Checked="Model.FixedRate">Fixed Rate</DxCheckBox>
             </div>
             <div class="amend-row"><label>No. Of Rooms</label>
-                <DxSpinEdit @bind-Value="Model.NoOfRooms" SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Model.NoOfRooms" SizeMode="SizeMode.Small" MinValue="1" MaxValue="10" />
             </div>
             <div class="amend-row"><label>Adjustment</label>
-                <DxSpinEdit @bind-Value="Model.Adjustment" SizeMode="SizeMode.Small" />
+                <DxSpinEdit CssClass="dx-input-num" @bind-Value="Model.Adjustment" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Source</label>
-                <DxComboBox Data="@SourceList" @bind-Value="Model.Source" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@SourceList" @bind-Value="Model.Source" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Market</label>
-                <DxComboBox Data="@MarketList" @bind-Value="Model.Market" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@MarketList" @bind-Value="Model.Market" SizeMode="SizeMode.Small" />
             </div>
         </div>
     </BodyContentTemplate>

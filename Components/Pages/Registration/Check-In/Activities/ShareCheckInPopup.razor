@@ -51,7 +51,7 @@
                 <div class="amend-form">
                     <div class="amend-row"><label>Guest Name</label>
                         <div class="input-with-btn">
-                            <DxComboBox Data="@GuestNames" Value="@GuestName"
+                            <DxComboBox CssClass="erp-combobox" Data="@GuestNames" Value="@GuestName"
                                         ValueChanged="@((string v) => GuestNameChanged.InvokeAsync(v))"
                                         SizeMode="SizeMode.Small" />
                             <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
@@ -92,7 +92,7 @@
                         <DxTextBox Text="@ConsigneeSource" TextChanged="@((string v) => ConsigneeSourceChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Member Type</label>
-                        <DxComboBox Data="@MemberTypes" Value="@MemberType"
+                        <DxComboBox CssClass="erp-combobox" Data="@MemberTypes" Value="@MemberType"
                                     ValueChanged="@((string? v) => MemberTypeChanged.InvokeAsync(v))"
                                     SizeMode="SizeMode.Small" />
                     </div>
@@ -110,26 +110,26 @@
                         <DxTextBox Text="@Eta.ToString(@"hh\:mm\:ss")" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Nights</label>
-                        <DxSpinEdit Value="@Nights" ValueChanged="@((int v) => NightsChanged.InvokeAsync(v))" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Nights" ValueChanged="@((int v) => NightsChanged.InvokeAsync(v))" MinValue="1" MaxValue="365" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Departure</label>
                         <DxDateEdit Date="@Departure" DateChanged="@((DateTime? v) => DepartureChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Adults</label>
-                        <DxSpinEdit Value="@Adults" ValueChanged="@((int v) => AdultsChanged.InvokeAsync(v))" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Adults" ValueChanged="@((int v) => AdultsChanged.InvokeAsync(v))" MinValue="1" MaxValue="20" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Child</label>
-                        <DxSpinEdit Value="@Children" ValueChanged="@((int v) => ChildrenChanged.InvokeAsync(v))" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Children" ValueChanged="@((int v) => ChildrenChanged.InvokeAsync(v))" MinValue="0" MaxValue="20" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>No. of Rooms</label>
-                        <DxSpinEdit Value="@NoOfRooms" ValueChanged="@((int v) => NoOfRoomsChanged.InvokeAsync(v))" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
+                        <DxSpinEdit CssClass="dx-input-num" Value="@NoOfRooms" ValueChanged="@((int v) => NoOfRoomsChanged.InvokeAsync(v))" MinValue="1" MaxValue="50" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Room Type</label>
-                        <DxComboBox Data="@RoomTypes" Value="@RoomType"
+                        <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" Value="@RoomType"
                                     ValueChanged="@((string? v) => RoomTypeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>RTC</label>
-                        <DxComboBox Data="@RtcList" Value="@Rtc"
+                        <DxComboBox CssClass="erp-combobox" Data="@RtcList" Value="@Rtc"
                                     ValueChanged="@((string? v) => RtcChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Room</label>
@@ -144,11 +144,11 @@
                         <DxCheckBox Checked="@FixedRate" CheckedChanged="@((bool v) => FixedRateChanged.InvokeAsync(v))">Fixed Rate</DxCheckBox>
                     </div>
                     <div class="amend-row"><label>Rate Code</label>
-                        <DxComboBox Data="@RateCodes" Value="@RateCode"
+                        <DxComboBox CssClass="erp-combobox" Data="@RateCodes" Value="@RateCode"
                                     ValueChanged="@((string? v) => RateCodeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Packages</label>
-                        <DxComboBox Data="@Packages" Value="@Package"
+                        <DxComboBox CssClass="erp-combobox" Data="@Packages" Value="@Package"
                                     ValueChanged="@((string? v) => PackageChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Rate</label>
@@ -160,23 +160,23 @@
             <fieldset style="width:200px; flex-shrink:0; border:1px solid #c8cdd4; border-radius:2px; padding:8px 10px; margin:0;">
                 <div class="amend-form">
                     <div class="amend-row"><label>Res. Type</label>
-                        <DxComboBox Data="@ResTypes" Value="@ResType"
+                        <DxComboBox CssClass="erp-combobox" Data="@ResTypes" Value="@ResType"
                                     ValueChanged="@((string? v) => ResTypeChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Market</label>
-                        <DxComboBox Data="@Markets" Value="@Market"
+                        <DxComboBox CssClass="erp-combobox" Data="@Markets" Value="@Market"
                                     ValueChanged="@((string? v) => MarketChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Source</label>
-                        <DxComboBox Data="@Sources" Value="@Source"
+                        <DxComboBox CssClass="erp-combobox" Data="@Sources" Value="@Source"
                                     ValueChanged="@((string? v) => SourceChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Origin</label>
-                        <DxComboBox Data="@Origins" Value="@Origin"
+                        <DxComboBox CssClass="erp-combobox" Data="@Origins" Value="@Origin"
                                     ValueChanged="@((string? v) => OriginChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Payment</label>
-                        <DxComboBox Data="@Payments" Value="@Payment"
+                        <DxComboBox CssClass="erp-combobox" Data="@Payments" Value="@Payment"
                                     ValueChanged="@((string? v) => PaymentChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                 </div>
@@ -208,11 +208,11 @@
                 </div>
                 <div class="amend-form">
                     <div class="amend-row"><label>Reason</label>
-                        <DxComboBox Data="@Reasons" Value="@Reason"
+                        <DxComboBox CssClass="erp-combobox" Data="@Reasons" Value="@Reason"
                                     ValueChanged="@((string? v) => ReasonChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Specials</label>
-                        <DxComboBox Data="@Specials" Value="@Special"
+                        <DxComboBox CssClass="erp-combobox" Data="@Specials" Value="@Special"
                                     ValueChanged="@((string? v) => SpecialChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
                     </div>
                     <div class="amend-row"><label>Voucher #</label>

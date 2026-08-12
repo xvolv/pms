@@ -22,13 +22,13 @@
                     <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
                 <div class="ci-row"><label>Company</label>
-                    <DxComboBox Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@CompanyList" @bind-Value="Company" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Room</label>
                     <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="@RoomReadOnly" />
                 </div>
                 <div class="ci-row"><label>Payment Type</label>
-                    <DxComboBox Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@Payments" @bind-Value="Payment" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Total Bill</label>
                     <DxTextBox @bind-Text="TotalBill" SizeMode="SizeMode.Small" />
@@ -45,10 +45,10 @@
                     <DxDateEdit @bind-Date="Departure" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Agent</label>
-                    <DxComboBox Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@AgentList" @bind-Value="Agent" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="ci-row"><label>Source</label>
-                    <DxComboBox Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
+                    <DxComboBox CssClass="erp-combobox" Data="@SourceList" @bind-Value="Source" SizeMode="SizeMode.Small" />
                 </div>
                 @ExtraFields
             </div>

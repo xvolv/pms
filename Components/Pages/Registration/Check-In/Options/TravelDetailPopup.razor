@@ -25,16 +25,16 @@
         </div>
         <div class="amend-form">
             <div class="amend-row"><label>Pick Up Required</label>
-                <DxComboBox Data="@YesNoList" @bind-Value="PickupRequired" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@YesNoList" @bind-Value="PickupRequired" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Transportation Type</label>
-                <DxComboBox Data="@TransportTypes" @bind-Value="TransportType" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@TransportTypes" @bind-Value="TransportType" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Station Code</label>
-                <DxComboBox Data="@TransportTypes" @bind-Value="TransportType" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@TransportTypes" @bind-Value="TransportType" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Carrier Code</label>
-                <DxComboBox Data="@CarrierCodes" @bind-Value="CarrierCode" SizeMode="SizeMode.Small" />
+                <DxComboBox CssClass="erp-combobox" Data="@CarrierCodes" @bind-Value="CarrierCode" SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Transportation #</label>
                 <DxTextBox @bind-Text="TransportNo" SizeMode="SizeMode.Small" />

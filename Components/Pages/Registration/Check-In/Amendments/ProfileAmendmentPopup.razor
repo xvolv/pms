@@ -16,32 +16,32 @@
         </div>
         <div class="amend-form">
             <div class="amend-row"><label>Guest</label>
-                <DxComboBox Data="@GuestNames" Value="@Guest"
+                <DxComboBox CssClass="erp-combobox" Data="@GuestNames" Value="@Guest"
                             ValueChanged="@((string? v) => GuestChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Contact</label>
-                <DxComboBox Data="@ContactList" Value="@Contact"
+                <DxComboBox CssClass="erp-combobox" Data="@ContactList" Value="@Contact"
                             ValueChanged="@((string? v) => ContactChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Company</label>
-                <DxComboBox Data="@CompanyList" Value="@Company"
+                <DxComboBox CssClass="erp-combobox" Data="@CompanyList" Value="@Company"
                             ValueChanged="@((string? v) => CompanyChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Agent</label>
-                <DxComboBox Data="@AgentList" Value="@Agent"
+                <DxComboBox CssClass="erp-combobox" Data="@AgentList" Value="@Agent"
                             ValueChanged="@((string? v) => AgentChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Group</label>
-                <DxComboBox Data="@GroupList" Value="@Group"
+                <DxComboBox CssClass="erp-combobox" Data="@GroupList" Value="@Group"
                             ValueChanged="@((string? v) => GroupChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>
             <div class="amend-row"><label>Source</label>
-                <DxComboBox Data="@SourceList" Value="@Source"
+                <DxComboBox CssClass="erp-combobox" Data="@SourceList" Value="@Source"
                             ValueChanged="@((string? v) => SourceChanged.InvokeAsync(v))"
                             SizeMode="SizeMode.Small" />
             </div>

@@ -37,7 +37,7 @@
                                SizeMode="SizeMode.Small" ReadOnly="@(MsgType == "Internal Message")" />
                 </div>
                 <div class="amend-row"><label>Message Type</label>
-                    <DxComboBox Data="@MessageTypes" Value="@MsgType"
+                    <DxComboBox CssClass="erp-combobox" Data="@MessageTypes" Value="@MsgType"
                                 ValueChanged="@((string? v) => MsgTypeChanged.InvokeAsync(v))"
                                 SizeMode="SizeMode.Small" />
                 </div>
