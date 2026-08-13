@@ -40,6 +40,16 @@
     flex-wrap: wrap;
 }
 
+.hk-chk-row .dxbs-checkbox {
+    display: inline-flex;
+    align-items: center;
+}
+
+.hk-chk-row .dxbs-checkbox-label-right {
+    padding-left: 6px;
+    margin-left: 0;
+}
+
 .hk-toolbar-sep {
     width: 1px;
     align-self: stretch;
