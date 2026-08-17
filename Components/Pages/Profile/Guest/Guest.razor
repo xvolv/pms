@@ -115,6 +115,7 @@
                                             ValueFieldName="@nameof(CountryNationality.Nationality)"
                                             NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            FilteringMode="DataGridFilteringMode.Contains"
                                             CssClass="rt-form-input">
                                     <ItemTemplate Context="item">
                                         @{ var row = (CountryNationality)item; }
@@ -538,97 +539,3 @@
         NavigationManager.NavigateTo("/dashboard");
     }
 }
-<style>
-    .toolbar-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-width: 70px;
-        padding: 6px 12px;
-        cursor: pointer;
-        user-select: none;
-    }
-
-    .toolbar-icon {
-        font-size: 1.8rem;
-        color: #5c5c5c;
-        margin-bottom: 4px;
-    }
-
-    .toolbar-item span {
-        font-size: 0.82rem;
-        font-weight: 500;
-    }
-
-    .toolbar-item:hover .toolbar-icon {
-        color: #0d6efd !important;
-    }
-
-    .toolbar-item:hover span {
-        color: #0d6efd;
-    }
-
-    .profile-search-box {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        padding: 6px 10px;
-        margin-bottom: 10px;
-        background-color: #ffffff;
-    }
-
-    .profile-search-box i {
-        color: #6c757d;
-    }
-
-    .profile-search-box input {
-        border: none;
-        outline: none;
-        flex: 1;
-        font-size: 0.85rem;
-    }
-
-    .profile-note-body {
-        padding: 16px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .profile-note-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 8px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
-
-</style>

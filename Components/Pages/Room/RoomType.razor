@@ -42,7 +42,7 @@
                         <DxGridDataColumn FieldName="NoOfRooms" Caption="No. Of Rooms" Width="8%" />
                         <DxGridDataColumn FieldName="Status" Caption="Status" Width="7%">
                             <CellDisplayTemplate>
-                                <input type="checkbox" class="rt-grid-checkbox"
+                                <input type="checkbox" class="rt-grid-checkbox" 
                                        checked="@(((RoomTypeRow)context.DataItem).Status)" disabled />
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
@@ -238,7 +238,7 @@
 
 
     // --- Rooms tab (Block / Floor management) ---
-  
+
     private List<BlockRow> blocks = CreateSampleBlocks();
     private int? currentFloorId;
     private HashSet<int> selectedTileIds = new();
@@ -257,8 +257,8 @@
 
     private FloorRow? currentFloor => blocks.SelectMany(b => b.Floors).FirstOrDefault(f => f.Id == currentFloorId);
 
-    private List<Toolbar.ToolbarItem> roomTypeToolbarItems = new();
-    private List<Toolbar.ToolbarItem> blocksToolbarItems = new();
+    private List<Toolbar.ToolbarItem> roomTypeToolbarItems = new List<Toolbar.ToolbarItem>();
+    private List<Toolbar.ToolbarItem> blocksToolbarItems = new List<Toolbar.ToolbarItem>();
 
     protected override void OnInitialized()
     {
@@ -767,7 +767,8 @@ RefreshBlocks) },
     private RoomTypeRow? editingItem;
 
     private List<string> roomClasses = new() { "Non-VIP", "VIP", "VIIP" };
-    private List<string> spaceArrangements = new() { "Theater", "Classroom", "U-Shape", "Boardroom", "Banquet", "Reception", "Hollow Square" };
+    private List<string> spaceArrangements = new() { "Theater", "Classroom", "U-Shape", "Boardroom", "Banquet", "Reception",
+"Hollow Square" };
 
     private List<RoomTypeRow> roomTypes = new()
     {
