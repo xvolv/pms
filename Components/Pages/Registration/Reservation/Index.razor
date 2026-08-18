@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration
+@using ERP.V7.WebPMS.Components.Shared
 
 <PageTitle>Reservation - CNET ERP</PageTitle>
 
@@ -175,7 +176,7 @@
 
                         <label>Rate Code</label>
                         <div class="input-with-btn">
-                            <DxComboBox CssClass="erp-combobox" Data="@rateCodes" @bind-Value="rateCode" SizeMode="SizeMode.Small" />
+                            <DxTextBox @bind-Text="rateCode" ReadOnly="true" SizeMode="SizeMode.Small" />
                             <DxButton IconCssClass="bi bi-plus-lg"
                                       CssClass="circle-btn"
                                       RenderStyle="ButtonRenderStyle.Secondary"
@@ -309,72 +310,18 @@
 </DxPopup>
 
 <!-- ===================== RATE SEARCH POPUP ===================== -->
-<DxPopup @bind-Visible="showRateSearch"
-         HeaderText="@($"Rate Search {rateStartDate:M/d/yyyy} - {rateEndDate:M/d/yyyy}")"
-         Width="min(920px, 95vw)"
-         CloseOnOutsideClick="false" ShowCloseButton="true">
-    <BodyContentTemplate>
-        <RegistrationToolbar ToolbarContext="ToolbarContextType.RateSearch"
-                            OnSelect="SelectRate"
-                            OnSearch="SearchRates"
-                            OnRateInfo="ShowRateInfo"
-                            OnClose="() => showRateSearch = false">
-            <CustomContent>
-                <div class="rate-dates">
-                    <label>Start Date</label>
-                    <DxDateEdit @bind-Date="rateStartDate" Width="110px" SizeMode="SizeMode.Small" />
-                    <label>End Date</label>
-                    <DxDateEdit @bind-Date="rateEndDate" Width="110px" SizeMode="SizeMode.Small" />
-                </div>
-
-                <div class="rate-type">
-                    <label>
-                        <input type="radio" name="rateType" checked="@(rateSearchType == "Average")"
-                               @onchange="@(() => rateSearchType = "Average")" /> Average Rate
-                    </label>
-                    <label>
-                        <input type="radio" name="rateType" checked="@(rateSearchType == "Total")"
-                               @onchange="@(() => rateSearchType = "Total")" /> Total Rate
-                    </label>
-                </div>
-
-                <div>
-                    <label>Rate Code</label>
-                    <DxTextBox @bind-Text="rateSearchCode" Width="100px" SizeMode="SizeMode.Small" />
-                </div>
-
-                <div class="rate-status">
-                    <label>
-                        <input type="radio" name="rateStatus" checked="@(rateStatus == "Closed")"
-                               @onchange="@(() => rateStatus = "Closed")" /> Closed
-                    </label>
-                    <label>
-                        <input type="radio" name="rateStatus" checked="@(rateStatus == "Negotiated")"
-                               @onchange="@(() => rateStatus = "Negotiated")" /> Negotiated
-                    </label>
-                    <label>
-                        <input type="radio" name="rateStatus" checked="@(rateStatus == "DayUse")"
-                               @onchange="@(() => rateStatus = "DayUse")" /> Day Use
-                    </label>
-                </div>
-            </CustomContent>
-        </RegistrationToolbar>
-
-        <div class="grid-scroll-wrap">
-        <DxGrid Data="@rateSearchRows" KeyFieldName="Name" PageSize="10" ShowPager="false"
-                SizeMode="SizeMode.Small" Height="340px"
-                RowClick="OnRateRowClick"
-                CustomizeElement="OnRateCustomizeElement">
-            <Columns>
-                <DxGridDataColumn FieldName="Name" Caption="Name" Width="160px" />
-                <DxGridDataColumn FieldName="StandardRoom" Caption="Standard Room" />
-                <DxGridDataColumn FieldName="Executive" Caption="Executive" />
-                <DxGridDataColumn FieldName="PseudoRooms" Caption="Pseudo Rooms" />
-            </Columns>
-        </DxGrid>
-        </div>
-    </BodyContentTemplate>
-</DxPopup>
+<RateSearchPopup @bind-Visible="showRateSearch"
+                 StartDate="rateStartDate"
+                 EndDate="rateEndDate"
+                 SearchType="rateSearchType"
+                 RateCode="rateSearchCode"
+                 Status="rateStatus"
+                 RateSearchRows="rateSearchRows"
+                 OnSelect="SelectRate"
+                 OnSearch="SearchRates"
+                 OnRateInfo="ShowRateInfo"
+                 OnRowClick="OnRateRowClick"
+                 OnCustomizeElement="OnRateCustomizeElement" />
 
 <!-- ===================== LOOKUP POPUP ===================== -->
 <DxPopup @bind-Visible="showLookup"
@@ -835,21 +782,6 @@
         flex-wrap: wrap;
     }
 
-    .rate-dates,
-    .rate-type,
-    .rate-status {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        margin: 0 6px;
-        flex-wrap: wrap;
-    }
-
-    .rate-search-toolbar label {
-        font-size: 12px;
-        margin: 0;
-    }
-
     .lookup-bar {
         display: flex;
         gap: 8px;
@@ -927,6 +859,7 @@
     .checkbox-wrapper span {
         color: #555;
     }
+
 
     /* ===================== RESPONSIVE BREAKPOINTS ===================== */
 
@@ -1037,20 +970,13 @@
             text-align: left;
             margin-top: 4px;
         }
-
-        .rate-dates,
-        .rate-type,
-        .rate-status {
-            width: 100%;
-            justify-content: flex-start;
-        }
     }
 </style>
 
 @code {
     string ReservationNo = "REG-00040-17";
-    string selectedState = "GPM";
-    string[] reservationStates = { "GPM", "Confirmed", "Tentative", "Cancelled", "No Show", "Checked In", "Checked Out" };
+    string selectedState = "6PM";
+    string[] reservationStates = { "6PM", "Confirmed", "Tentative", "Cancelled", "No Show", "Checked In", "Checked Out" };
 
     // Basic Info
     int? selectedGuestId = 7;
@@ -1432,13 +1358,23 @@
             if (item?.Name == selectedRateRow.Name)
                 e.CssClass = "rate-row-selected";
         }
+        else if (e.ElementType == GridElementType.DataCell && selectedRateRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateRow;
+            if (item?.Name == selectedRateRow.Name)
+                e.CssClass = "rate-row-selected";
+        }
     }
 
     void SelectRate()
     {
-        if (selectedRateRow != null && selectedRateRow.Name.Contains("Rate"))
+        if (selectedRateRow != null)
         {
-            rate = selectedRateRow.StandardRoom;
+            rateCode = selectedRateRow.Name;
+            if (selectedRateRow.Name.Contains("Rate"))
+            {
+                rate = selectedRateRow.StandardRoom;
+            }
         }
         showRateSearch = false;
     }

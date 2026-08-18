@@ -28,7 +28,7 @@
                         <li class="dropdown-item" @onclick="@(() => OnOption("Replicate"))">Replicate(Add on)</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Attachment"))">Attachment</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("History"))">History</li>
-                        <li class="dropdown-item" @onclick="@(() => OnOption("HouseKeeping"))">House Keeping</li>
+                        <li class="dropdown-item" @onclick="@(() => Navigation.NavigateTo("housekeeping"))">House Keeping</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("WakeupCall"))">Wakeup Calls</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Messages"))">Messages</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Routing"))">Routing</li>
@@ -170,7 +170,7 @@
         </div>
 
         <div class="toolbar-group" style="margin-left:auto;">
-            <div class="search-criteria">@GetSearchCriteria()</div>
+            <!-- <div class="search-criteria">@GetSearchCriteria()</div> -->
             <button type="button" class="toolbar-btn" @onclick="ApplyFilters">
                 <div class="toolbar-icon"><i class="bi bi-search"></i></div>
                 <div class="toolbar-text">Advanced<br />Search ▾</div>
@@ -771,14 +771,14 @@
     void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; }
     void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; }
 
-    string GetSearchCriteria()
-    {
-        var parts = new List<string>();
-        if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
-        if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
-        if (parts.Count == 0) return "";
-        return "Search Criteria: " + string.Join(", ", parts);
-    }
+    //string GetSearchCriteria()
+    //{
+    //    var parts = new List<string>();
+    //    if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
+    //    if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
+    //    if (parts.Count == 0) return "";
+    //    return "Search Criteria: " + string.Join(", ", parts);
+    //}
 
     bool IsActivityEnabled(string activity)
     {
