@@ -45,13 +45,13 @@
                 </button>
 
                 <div class="profile-toolbar-code">
-                    <label>Code</label>
+                    <label>Id</label>
                     <DxTextBox @bind-Text="@contact.Code" ReadOnly="true" CssClass="rt-form-input" />
                 </div>
             </div>
         </div>
 
-        <div class="rt-modal-body" style="padding:0px;">
+        <div class="rt-modal-body rt-modal-labeled" style="padding:0px;">
             <ValidationSummary class="rt-validation-summary" />
             <div class="profile-body-columns">
             <div class="profile-main-col" style="padding: 0px 10px 10px 10px; background-color:#ffff; padding:0px;">
@@ -129,6 +129,15 @@
                     </div>
 
                     <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Category</label>
+                            <DxComboBox Data="@categories" @bind-Value="@contact.Category" NullText="-- Select --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        CssClass="rt-form-input" />
+                        </div>
+                    </div>
+
+                    <div class="rt-form-row">
                         <div class="rt-form-field">
                             <label>Date Of Birth</label>
                             <DxDateEdit @bind-Date="@contact.DateOfBirth" CssClass="rt-form-input" />
@@ -173,13 +182,7 @@
                     else
                     {
                         <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>Category</label>
-                                <DxComboBox Data="@categories" @bind-Value="@contact.Category" NullText="-- Select --"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            CssClass="rt-form-input" />
-                            </div>
-                            <div class="rt-form-field">
+                            <div class="rt-form-field rt-form-field-wide">
                                 <label>Currency</label>
                                 <DxComboBox Data="@currencies" @bind-Value="@contact.Currency" NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -188,12 +191,24 @@
                         </div>
 
                         <div class="rt-form-row">
-                            <div class="rt-form-field">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Tax Type</label>
+                                <DxComboBox Data="@taxTypes" @bind-Value="@contact.TaxType" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
                                 <label>Status</label>
                                 <DxComboBox Data="@statuses" @bind-Value="@contact.Status" NullText="-- Select --"
                                             CssClass="rt-form-input" />
                             </div>
-                            <div class="rt-form-field">
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
                                 <label>Religion</label>
                                 <DxComboBox Data="@religions" @bind-Value="@contact.Religion" NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -209,13 +224,16 @@
                         </div>
 
                         <div class="rt-form-row">
-                            <div class="rt-form-field">
+                            <div class="rt-form-field rt-form-field-wide">
                                 <label>Mailing Action</label>
                                 <DxComboBox Data="@mailingActions" @bind-Value="@contact.MailingAction"
                                             NullText="-- Select --" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                             CssClass="rt-form-input" />
                             </div>
-                            <div class="rt-form-field">
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
                                 <label>Rate Code</label>
                                 <DxComboBox Data="@rateCodes" @bind-Value="@contact.RateCode" NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -229,32 +247,89 @@
             <div class="profile-side-col">
                 <fieldset class="rt-form-fieldset">
                     <legend>Address</legend>
-                    <div class="profile-address-table">
-                        <div class="profile-address-header">
-                            <div class="col-desc">Description</div>
-                            <div class="col-value">Value</div>
+
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Phone 1</label>
+                            <DxTextBox @bind-Text="@contact.Phone1" CssClass="rt-form-input" />
                         </div>
-                        <div class="profile-address-group" @onclick="ToggleAddressGroup">
-                            <i class="bi @(isAddressGroupExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-                            <span>Contact</span>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Phone 2</label>
+                            <DxTextBox @bind-Text="@contact.Phone2" CssClass="rt-form-input" />
                         </div>
-                        @if (isAddressGroupExpanded)
-                        {
-                            <div class="profile-address-row @(selectedAddressItem == "Email" ? "selected" : "")"
-                                 @onclick='() => SelectAddressItem("Email")'>
-                                <div class="col-desc">Email</div>
-                                <div class="col-value">@contact.Email</div>
-                            </div>
-                            <div class="profile-address-row @(selectedAddressItem == "POBox" ? "selected" : "")"
-                                 @onclick='() => SelectAddressItem("POBox")'>
-                                <div class="col-desc">POBox</div>
-                                <div class="col-value">@contact.POBox</div>
-                            </div>
-                        }
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Email</label>
+                            <DxTextBox @bind-Text="@contact.Email" CssClass="rt-form-input" />
+                            <ValidationMessage For="@(() => contact.Email)" class="rt-validation-message" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Website</label>
+                            <DxTextBox @bind-Text="@contact.Website" CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Wereda</label>
+                            <DxComboBox Data="@weredas" @bind-Value="@contact.Wereda" NullText="-- Select --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Kebele</label>
+                            <DxTextBox @bind-Text="@contact.Kebele" CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Street</label>
+                            <DxTextBox @bind-Text="@contact.Street" CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Address 1</label>
+                            <DxTextBox @bind-Text="@contact.Address1" CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Po Box</label>
+                            <DxTextBox @bind-Text="@contact.POBox" CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>Region</label>
+                            <DxComboBox Data="@regions" @bind-Value="@contact.Region" NullText="-- Select --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>City</label>
+                            <DxComboBox Data="@cities" @bind-Value="@contact.City" NullText="-- Select --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        CssClass="rt-form-input" />
+                        </div>
+                    </div>
+                    <div class="rt-form-row">
+                        <div class="rt-form-field rt-form-field-wide">
+                            <label>SubCity</label>
+                            <DxComboBox Data="@subCities" @bind-Value="@contact.SubCity" NullText="-- Select --"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        CssClass="rt-form-input" />
+                        </div>
                     </div>
                 </fieldset>
-
-                <div class="profile-address-detail"></div>
             </div>
             </div>
         </div>
@@ -293,8 +368,6 @@
     private bool confirmDanger;
     private Func<Task>? pendingConfirmAction;
     private int searchTabIndex = 0;
-    private bool isAddressGroupExpanded = true;
-    private string? selectedAddressItem = "Email";
     private string? statusMessage = "passport scanner device is not detected!";
 
     private IEnumerable<ContactRow> FilteredSearchResults =>
@@ -322,6 +395,13 @@
     private List<string> rateCodes = new() { "CORP-001", "GOV-002", "GROUP-003", "VVIP-004", "LEISURE-005", "AGENT-006",
 "RACK-007", "COMP-008" };
 
+    private List<string> taxTypes = new() { "VAT", "TOT", "Exempt" };
+
+    private List<string> regions = AddressLookup.Regions;
+    private List<string> cities = AddressLookup.Cities;
+    private List<string> subCities = AddressLookup.SubCities;
+    private List<string> weredas = AddressLookup.Weredas;
+
     protected override void OnInitialized()
     {
         contact = CreateBlankContact();
@@ -347,7 +427,7 @@
             Code = GenerateContactCode(),
             Gender = "Male",
             IdType = "Passport",
-            Email = "sayele@abc.com",
+            Email = "",
         };
     }
 
@@ -485,10 +565,21 @@
         DateOfBirth = source.DateOfBirth,
         IdType = source.IdType,
         PassportNum = source.PassportNum,
+        Phone1 = source.Phone1,
+        Phone2 = source.Phone2,
         Email = source.Email,
+        Website = source.Website,
+        Wereda = source.Wereda,
+        Kebele = source.Kebele,
+        Street = source.Street,
+        Address1 = source.Address1,
         POBox = source.POBox,
+        Region = source.Region,
+        City = source.City,
+        SubCity = source.SubCity,
         Category = source.Category,
         Currency = source.Currency,
+        TaxType = source.TaxType,
         Status = source.Status,
         Religion = source.Religion,
         Account = source.Account,
@@ -511,26 +602,27 @@
         target.DateOfBirth = source.DateOfBirth;
         target.IdType = source.IdType;
         target.PassportNum = source.PassportNum;
+        target.Phone1 = source.Phone1;
+        target.Phone2 = source.Phone2;
         target.Email = source.Email;
+        target.Website = source.Website;
+        target.Wereda = source.Wereda;
+        target.Kebele = source.Kebele;
+        target.Street = source.Street;
+        target.Address1 = source.Address1;
         target.POBox = source.POBox;
+        target.Region = source.Region;
+        target.City = source.City;
+        target.SubCity = source.SubCity;
         target.Category = source.Category;
         target.Currency = source.Currency;
+        target.TaxType = source.TaxType;
         target.Status = source.Status;
         target.Religion = source.Religion;
         target.Account = source.Account;
         target.MailingAction = source.MailingAction;
         target.RateCode = source.RateCode;
         target.Note = source.Note;
-    }
-
-    private void ToggleAddressGroup()
-    {
-        isAddressGroupExpanded = !isAddressGroupExpanded;
-    }
-
-    private void SelectAddressItem(string item)
-    {
-        selectedAddressItem = item;
     }
 
     private void Close()

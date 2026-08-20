@@ -1,7 +1,7 @@
 @if (Visible && EditingItem != null)
 {
     <div class="rt-modal-backdrop">
-        <div class="rt-modal">
+        <div class="rt-modal rt-modal-roomtype rt-modal-labeled">
             <div class="rt-modal-header">
                 <span class="rt-modal-header-title"><i class="bi bi-asterisk text-danger me-2"></i>Room Type</span>
                 <button class="rt-modal-close-btn" @onclick="Close" title="Close">
@@ -13,10 +13,10 @@
                 <DataAnnotationsValidator />
 
                 <div class="rt-toolbar">
-                    @* <button type="button" class="rt-toolbar-btn" @onclick="New">
-                        <i class="bi bi-file-earmark-plus-fill text-primary"></i>
+                    <button type="button" class="rt-toolbar-btn" @onclick="New">
+                        <i class="bi bi-file-earmark-plus text-secondary"></i>
                         <span>New</span>
-                    </button> *@
+                    </button>
                     <button type="submit" class="rt-toolbar-btn">
                         <i class="bi bi-floppy text-secondary"></i>
                         <span>Save</span>
@@ -46,11 +46,6 @@
                             <div class="rt-form-field rt-form-field-inline">
                                 <DxCheckBox @bind-Checked="@EditingItem.Status">Active</DxCheckBox>
                             </div>
-                            <div class="rt-form-field">
-                                <label>Activation Date</label>
-                                <DxDateEdit @bind-Date="@EditingItem.ActivationDate" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.ActivationDate)" class="rt-validation-message" />
-                            </div>
                         </div>
 
                         <div class="rt-form-row">
@@ -58,6 +53,19 @@
                                 <label>Description</label>
                                 <DxTextBox @bind-Text="@EditingItem.Description" CssClass="rt-form-input" />
                                 <ValidationMessage For="@(() => EditingItem.Description)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Hotel</label>
+                                <DxComboBox Data="@Hotels" @bind-Value="@EditingItem.Hotel" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
+                            </div>
+                            <div class="rt-form-field">
+                                <label>Activation Date</label>
+                                <DxDateEdit @bind-Date="@EditingItem.ActivationDate" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.ActivationDate)" class="rt-validation-message" />
                             </div>
                         </div>
 
@@ -96,14 +104,14 @@
                                 <div class="rt-occupancy-grid">
                                     <div class="rt-form-field">
                                         <label>Default Occupancy</label>
-                                        <DxSpinEdit @bind-Value="@EditingItem.DefaultOccupancy" MinValue="0"
+                                        <DxSpinEdit @bind-Value="@EditingItem.DefaultOccupancy" MinValue="1"
                                                     CssClass="rt-form-input" />
                                         <ValidationMessage For="@(() => EditingItem.DefaultOccupancy)"
                                                            class="rt-validation-message" />
                                     </div>
                                     <div class="rt-form-field">
                                         <label>Maximum Occupancy</label>
-                                        <DxSpinEdit @bind-Value="@EditingItem.MaximumOccupancy" MinValue="0"
+                                        <DxSpinEdit @bind-Value="@EditingItem.MaximumOccupancy" MinValue="1"
                                                     CssClass="rt-form-input" />
                                         <ValidationMessage For="@(() => EditingItem.MaximumOccupancy)"
                                                            class="rt-validation-message" />
@@ -132,6 +140,13 @@
                                 <DxCheckBox @bind-Checked="@EditingItem.IsHouseKeeping">House Keeping</DxCheckBox>
                                 <DxCheckBox @bind-Checked="@EditingItem.AutoRoomAssign">Auto Room Assign</DxCheckBox>
                             </fieldset>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide rt-form-field-stacked">
+                                <label>Room Description</label>
+                                <DxMemo @bind-Text="@EditingItem.RoomDescription" Rows="3" CssClass="rt-form-input" />
+                            </div>
                         </div>
                     }
                     else
@@ -181,6 +196,7 @@
     [Parameter] public RoomTypeRow? EditingItem { get; set; }
     [Parameter] public List<RoomTypeRow> RoomTypes { get; set; } = new();
     [Parameter] public List<string> RoomClasses { get; set; } = new();
+    [Parameter] public List<string> Hotels { get; set; } = new();
     [Parameter] public EventCallback OnNew { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }

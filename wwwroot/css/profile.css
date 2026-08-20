@@ -27,6 +27,10 @@
     min-width: 0;
 }
 
+.profile-toolbar-code.no-push {
+    margin-left: 0;
+}
+
 .profile-toolbar-code label {
     font-size: 0.8rem;
     font-weight: 600;
@@ -177,6 +181,7 @@
     font-size: 0.82rem;
     font-family: inherit;
     color: inherit;
+    margin-bottom: 4px;;
 }
 
 .profile-address-leaf .col-value input:focus {
@@ -223,7 +228,7 @@
 .rt-form-input input:not([type]) {
     background-color: #ffffff !important;
     border: 1px solid #ced4da !important;
-    border-radius: 4px !important;
+    border-radius: 0px !important;
     padding: 6px 12px !important;
 }
 

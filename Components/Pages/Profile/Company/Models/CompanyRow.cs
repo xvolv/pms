@@ -24,6 +24,7 @@ public class CompanyRow
 
     // Additional Information
     public string AccountNo { get; set; } = "";
+    public string TaxType { get; set; } = "";
     public string RateCode { get; set; } = "";
     public string Status { get; set; } = "Active";
     public string MailingAction { get; set; } = "";
@@ -37,21 +38,21 @@ public class CompanyRow
     [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Potential Revenue cannot be negative.")]
     public decimal? PotentialRevenue { get; set; }
 
-    // Address - Contact
-    public string SmtpServer { get; set; } = "";
-    public string Password { get; set; } = "";
-    public string POBox { get; set; } = "";
+    // Address
+    public string Phone1 { get; set; } = "";
+    public string Phone2 { get; set; } = "";
 
-    // Address - Social Media
-    public string Facebook { get; set; } = "";
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public string Email { get; set; } = "";
 
     [Url(ErrorMessage = "Enter a valid website URL.")]
     public string Website { get; set; } = "";
-
-    // Address - Telephone
-    [Phone(ErrorMessage = "Enter a valid office phone number.")]
-    public string OfficePhone { get; set; } = "";
-
-    [Phone(ErrorMessage = "Enter a valid mobile phone number.")]
-    public string MobilePhone { get; set; } = "";
+    public string Kebele { get; set; } = "";
+    public string Street { get; set; } = "";
+    public string Address1 { get; set; } = "";
+    public string POBox { get; set; } = "";
+    public string Region { get; set; } = "";
+    public string City { get; set; } = "";
+    public string SubCity { get; set; } = "";
+    public string Wereda { get; set; } = "";
 }
