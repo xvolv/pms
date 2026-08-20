@@ -44,221 +44,297 @@
                 </button>
 
                 <div class="profile-toolbar-code">
-                    <label>Code</label>
+                    <label>Id</label>
                     <DxTextBox @bind-Text="@guest.Code" ReadOnly="true" CssClass="rt-form-input" />
                 </div>
             </div>
 
         </div>
-        <div class="profile-card">
+        <div class="profile-card rt-modal-labeled">
             <div class="rt-modal-body " style="padding:0px;">
                 <ValidationSummary class="rt-validation-summary" />
                 <div class="profile-body-columns">
-                <div class="profile-main-col">
-                    <fieldset class="rt-form-fieldset">
-                        <legend>Personal Information</legend>
+                    <div class="profile-main-col">
+                        <fieldset class="rt-form-fieldset">
+                            <legend>Personal Information</legend>
 
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>Last Name</label>
-                                <DxTextBox @bind-Text="@guest.LastName" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => guest.LastName)" class="rt-validation-message" />
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Last Name</label>
+                                    <DxTextBox @bind-Text="@guest.LastName" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => guest.LastName)" class="rt-validation-message" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>First Name</label>
-                                <DxTextBox @bind-Text="@guest.FirstName" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => guest.FirstName)" class="rt-validation-message" />
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>First Name</label>
+                                    <DxTextBox @bind-Text="@guest.FirstName" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => guest.FirstName)" class="rt-validation-message" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>Middle Name</label>
-                                <DxTextBox @bind-Text="@guest.MiddleName" CssClass="rt-form-input" />
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Middle Name</label>
+                                    <DxTextBox @bind-Text="@guest.MiddleName" CssClass="rt-form-input" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>Title</label>
-                                <DxComboBox Data="@titles" @bind-Value="@guest.Title" NullText="-- Select --"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            CssClass="rt-form-input" />
-                            </div>
-                            <div class="rt-form-field">
-                                <label>Gender</label>
-                                <DxComboBox Data="@genders" @bind-Value="@guest.Gender" NullText="-- Select --"
-                                            CssClass="rt-form-input" />
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>Language</label>
-                                <DxComboBox Data="@languages" @bind-Value="@guest.Language" NullText="-- Select --"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            CssClass="rt-form-input" />
-                            </div>
-                            <div class="rt-form-field rt-form-field-inline">
-                                <DxCheckBox @bind-Checked="@guest.IsActive">Is Active</DxCheckBox>
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>Nationality</label>
-                                <DxComboBox Data="@nationalities" @bind-Value="@guest.Nationality"
-                                            TextFieldName="@nameof(CountryNationality.Nationality)"
-                                            ValueFieldName="@nameof(CountryNationality.Nationality)"
-                                            NullText="-- Select --"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            FilteringMode="DataGridFilteringMode.Contains"
-                                            CssClass="rt-form-input">
-                                    <ItemTemplate Context="item">
-                                        @{ var row = (CountryNationality)item; }
-                                        <div class="na-lookup-row">
-                                            <span class="na-lookup-col">@row.Country</span>
-                                            <span class="na-lookup-col">@row.Nationality</span>
-                                        </div>
-                                    </ItemTemplate>
-                                </DxComboBox>
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>Date Of Birth</label>
-                                <DxDateEdit @bind-Date="@guest.DateOfBirth" CssClass="rt-form-input" />
-                            </div>
-                            <div class="rt-form-field">
-                                <label>ID. Type</label>
-                                <DxComboBox Data="@idTypes" @bind-Value="@guest.IdType" NullText="-- Select --"
-                                            CssClass="rt-form-input" />
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>Passport Num</label>
-                                <DxTextBox @bind-Text="@guest.PassportNum" CssClass="rt-form-input" />
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <DxTabs @bind-ActiveTabIndex="searchTabIndex" CssClass="rt-modal-tabs">
-                        <DxTabPage Text="Search" />
-                        <DxTabPage Text="Personal Details" />
-                    </DxTabs>
-
-                    <div class="profile-search-tabs-body">
-                        @if (searchTabIndex == 0)
-                        {
-                            <div class="profile-search-box">
-                                <i class="bi bi-search"></i>
-                                <input type="text" placeholder="Search by name or code..." @bind="searchQuery" @bind:event="oninput" />
-                            </div>
-                            <DxGrid @ref="searchGrid" Data="@FilteredSearchResults" KeyFieldName="Id" CssClass="rt-grid"
-                                    RowClick="@OnSearchRowClick" CustomizeElement="@OnSearchCustomizeElement">
-                                <Columns>
-                                    <DxGridDataColumn FieldName="Code" Caption="Code" Width="18%" />
-                                    <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
-                                    <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
-                                    <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
-                                </Columns>
-                            </DxGrid>
-                        }
-                        else
-                        {
                             <div class="rt-form-row">
                                 <div class="rt-form-field">
+                                    <label>Title</label>
+                                    <DxComboBox Data="@titles" @bind-Value="@guest.Title" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Gender</label>
+                                    <DxComboBox Data="@genders" @bind-Value="@guest.Gender" NullText="-- Select --"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Language</label>
+                                    <DxComboBox Data="@languages" @bind-Value="@guest.Language" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                                <div class="rt-form-field rt-form-field-inline">
+                                    <DxCheckBox @bind-Checked="@guest.IsActive">Is Active</DxCheckBox>
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Nationality</label>
+                                    <DxComboBox Data="@nationalities" @bind-Value="@guest.Nationality"
+                                                TextFieldName="@nameof(CountryNationality.Nationality)"
+                                                ValueFieldName="@nameof(CountryNationality.Nationality)" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                FilteringMode="DataGridFilteringMode.Contains" CssClass="rt-form-input">
+                                        <ItemTemplate Context="item">
+                                            @{
+                                                var row = (CountryNationality)item;
+                                            }
+                                            <div class="na-lookup-row">
+                                                <span class="na-lookup-col">@row.Country</span>
+                                                <span class="na-lookup-col">@row.Nationality</span>
+                                            </div>
+                                        </ItemTemplate>
+                                    </DxComboBox>
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
                                     <label>Category</label>
                                     <DxComboBox Data="@categories" @bind-Value="@guest.Category" NullText="-- Select --"
                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                 CssClass="rt-form-input" />
                                 </div>
-                                <div class="rt-form-field">
-                                    <label>Currency</label>
-                                    <DxComboBox Data="@currencies" @bind-Value="@guest.Currency" NullText="-- Select --"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                CssClass="rt-form-input" />
-                                </div>
                             </div>
 
                             <div class="rt-form-row">
                                 <div class="rt-form-field">
-                                    <label>Status</label>
-                                    <DxComboBox Data="@statuses" @bind-Value="@guest.Status" NullText="-- Select --"
-                                                CssClass="rt-form-input" />
+                                    <label>Date Of Birth</label>
+                                    <DxDateEdit @bind-Date="@guest.DateOfBirth" CssClass="rt-form-input" />
                                 </div>
                                 <div class="rt-form-field">
-                                    <label>Religion</label>
-                                    <DxComboBox Data="@religions" @bind-Value="@guest.Religion" NullText="-- Select --"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    <label>ID. Type</label>
+                                    <DxComboBox Data="@idTypes" @bind-Value="@guest.IdType" NullText="-- Select --"
                                                 CssClass="rt-form-input" />
                                 </div>
                             </div>
 
                             <div class="rt-form-row">
                                 <div class="rt-form-field rt-form-field-wide">
-                                    <label>Account</label>
-                                    <DxTextBox @bind-Text="@guest.Account" CssClass="rt-form-input" />
+                                    <label>Passport Num</label>
+                                    <DxTextBox @bind-Text="@guest.PassportNum" CssClass="rt-form-input" />
                                 </div>
                             </div>
+                        </fieldset>
 
-                            <div class="rt-form-row">
-                                <div class="rt-form-field">
-                                    <label>Mailing Action</label>
-                                    <DxComboBox Data="@mailingActions" @bind-Value="@guest.MailingAction"
-                                                NullText="-- Select --"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                CssClass="rt-form-input" />
-                                </div>
-                                <div class="rt-form-field">
-                                    <label>Rate Code</label>
-                                    <DxComboBox Data="@rateCodes" @bind-Value="@guest.RateCode" NullText="-- Select --"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                CssClass="rt-form-input" />
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
+                        <DxTabs @bind-ActiveTabIndex="searchTabIndex" CssClass="rt-modal-tabs">
+                            <DxTabPage Text="Search" />
+                            <DxTabPage Text="Personal Details" />
+                        </DxTabs>
 
-                <div class="profile-side-col">
-                    <fieldset class="rt-form-fieldset">
-                        <legend>Address</legend>
-                        <div class="profile-address-table">
-                            <div class="profile-address-header">
-                                <div class="col-desc">Description</div>
-                                <div class="col-value">Value</div>
-                            </div>
-                            <div class="profile-address-group" @onclick="ToggleAddressGroup">
-                                <i class="bi @(isAddressGroupExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-                                <span>Contact</span>
-                            </div>
-                            @if (isAddressGroupExpanded)
+                        <div class="profile-search-tabs-body">
+                            @if (searchTabIndex == 0)
                             {
-                                <div class="profile-address-row @(selectedAddressItem == "Email" ? "selected" : "")"
-                                     @onclick='() => SelectAddressItem("Email")'>
-                                    <div class="col-desc">Email</div>
-                                    <div class="col-value">@guest.Email</div>
+                                <div class="profile-search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" placeholder="Search by name or code..." @bind="searchQuery"
+                                           @bind:event="oninput" />
                                 </div>
-                                <div class="profile-address-row @(selectedAddressItem == "POBox" ? "selected" : "")"
-                                     @onclick='() => SelectAddressItem("POBox")'>
-                                    <div class="col-desc">POBox</div>
-                                    <div class="col-value">@guest.POBox</div>
+                                <DxGrid @ref="searchGrid" Data="@FilteredSearchResults" KeyFieldName="Id" CssClass="rt-grid"
+                                        RowClick="@OnSearchRowClick" CustomizeElement="@OnSearchCustomizeElement">
+                                    <Columns>
+                                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="18%" />
+                                        <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
+                                        <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
+                                        <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
+                                    </Columns>
+                                </DxGrid>
+                            }
+                            else
+                            {
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Currency</label>
+                                        <DxComboBox Data="@currencies" @bind-Value="@guest.Currency" NullText="-- Select --"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Tax Type</label>
+                                        <DxComboBox Data="@taxTypes" @bind-Value="@guest.TaxType" NullText="-- Select --"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Status</label>
+                                        <DxComboBox Data="@statuses" @bind-Value="@guest.Status" NullText="-- Select --"
+                                                    CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Religion</label>
+                                        <DxComboBox Data="@religions" @bind-Value="@guest.Religion" NullText="-- Select --"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Account</label>
+                                        <DxTextBox @bind-Text="@guest.Account" CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Mailing Action</label>
+                                        <DxComboBox Data="@mailingActions" @bind-Value="@guest.MailingAction"
+                                                    NullText="-- Select --"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    CssClass="rt-form-input" />
+                                    </div>
+                                </div>
+
+                                <div class="rt-form-row">
+                                    <div class="rt-form-field rt-form-field-wide">
+                                        <label>Rate Code</label>
+                                        <DxComboBox Data="@rateCodes" @bind-Value="@guest.RateCode" NullText="-- Select --"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    CssClass="rt-form-input" />
+                                    </div>
                                 </div>
                             }
                         </div>
-                    </fieldset>
+                    </div>
 
-                    <div class="profile-address-detail"></div>
+                    <div class="profile-side-col">
+                        <fieldset class="rt-form-fieldset">
+                            <legend>Address</legend>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Phone 1</label>
+                                    <DxTextBox @bind-Text="@guest.Phone1" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Phone 2</label>
+                                    <DxTextBox @bind-Text="@guest.Phone2" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Email</label>
+                                    <DxTextBox @bind-Text="@guest.Email" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => guest.Email)" class="rt-validation-message" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Website</label>
+                                    <DxTextBox @bind-Text="@guest.Website" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Wereda</label>
+                                    <DxComboBox Data="@weredas" @bind-Value="@guest.Wereda" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Kebele</label>
+                                    <DxTextBox @bind-Text="@guest.Kebele" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Street</label>
+                                    <DxTextBox @bind-Text="@guest.Street" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Address 1</label>
+                                    <DxTextBox @bind-Text="@guest.Address1" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Po Box</label>
+                                    <DxTextBox @bind-Text="@guest.POBox" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Region</label>
+                                    <DxComboBox Data="@regions" @bind-Value="@guest.Region" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>City</label>
+                                    <DxComboBox Data="@cities" @bind-Value="@guest.City" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>SubCity</label>
+                                    <DxComboBox Data="@subCities" @bind-Value="@guest.SubCity" NullText="-- Select --"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                CssClass="rt-form-input" />
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
-        </div>
 
             <div class="profile-status-bar">@statusMessage</div>
         </div>
@@ -268,8 +344,8 @@
 <ConfirmDialog Visible="@isConfirmVisible" Title="@confirmTitle" Message="@confirmMessage" Danger="@confirmDanger"
                OnConfirm="HandleConfirmYes" OnCancel="HandleConfirmNo" />
 
-<DxPopup @bind-Visible="@isNotePopupVisible" Width="420px" HeaderText="@($"Note - {guest.FirstName} {guest.LastName}".Trim())"
-         ShowFooter="false" CloseOnOutsideClick="false">
+<DxPopup @bind-Visible="@isNotePopupVisible" Width="420px"
+         HeaderText="@($"Note - {guest.FirstName} {guest.LastName}".Trim())" ShowFooter="false" CloseOnOutsideClick="false">
     <BodyContentTemplate>
         <div class="profile-note-body">
             <DxMemo @bind-Text="@guest.Note" Rows="6" CssClass="rt-form-input" />
@@ -294,8 +370,6 @@
     private bool confirmDanger;
     private Func<Task>? pendingConfirmAction;
     private int searchTabIndex = 0;
-    private bool isAddressGroupExpanded = true;
-    private string? selectedAddressItem = "Email";
     private string? statusMessage = "passport scanner device is not detected!";
 
     private IEnumerable<GuestRow> FilteredSearchResults =>
@@ -307,7 +381,7 @@
                 (g.MiddleName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (g.LastName?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    private List<string> titles = new() { "Ato", "W/ro", "Captain", "Sheikh", "Lowret","Professor" };
+    private List<string> titles = new() { "Ato", "W/ro", "Captain", "Sheikh", "Lowret", "Professor" };
     private List<string> genders = new() { "Male", "Female" };
     private List<string> languages = new() { "English", "Amharic", "French", "Arabic" };
     private List<CountryNationality> nationalities = NationalityLookup.Items;
@@ -322,6 +396,13 @@
     private List<string> mailingActions = new() { "Email", "Post", "SMS", "Phone", "Fax", "None" };
     private List<string> rateCodes = new() { "CORP-001", "GOV-002", "GROUP-003", "VVIP-004", "LEISURE-005", "AGENT-006",
 "RACK-007", "COMP-008" };
+
+    private List<string> taxTypes = new() { "VAT", "TOT", "Exempt" };
+
+    private List<string> regions = AddressLookup.Regions;
+    private List<string> cities = AddressLookup.Cities;
+    private List<string> subCities = AddressLookup.SubCities;
+    private List<string> weredas = AddressLookup.Weredas;
 
     protected override void OnInitialized()
     {
@@ -348,7 +429,7 @@
             Code = GenerateGuestCode(),
             Gender = "Male",
             IdType = "Passport",
-            Email = "sayele@abc.com",
+            Email = "",
         };
     }
 
@@ -486,10 +567,21 @@
         DateOfBirth = source.DateOfBirth,
         IdType = source.IdType,
         PassportNum = source.PassportNum,
+        Phone1 = source.Phone1,
+        Phone2 = source.Phone2,
         Email = source.Email,
+        Website = source.Website,
+        Wereda = source.Wereda,
+        Kebele = source.Kebele,
+        Street = source.Street,
+        Address1 = source.Address1,
         POBox = source.POBox,
+        Region = source.Region,
+        City = source.City,
+        SubCity = source.SubCity,
         Category = source.Category,
         Currency = source.Currency,
+        TaxType = source.TaxType,
         Status = source.Status,
         Religion = source.Religion,
         Account = source.Account,
@@ -512,10 +604,21 @@
         target.DateOfBirth = source.DateOfBirth;
         target.IdType = source.IdType;
         target.PassportNum = source.PassportNum;
+        target.Phone1 = source.Phone1;
+        target.Phone2 = source.Phone2;
         target.Email = source.Email;
+        target.Website = source.Website;
+        target.Wereda = source.Wereda;
+        target.Kebele = source.Kebele;
+        target.Street = source.Street;
+        target.Address1 = source.Address1;
         target.POBox = source.POBox;
+        target.Region = source.Region;
+        target.City = source.City;
+        target.SubCity = source.SubCity;
         target.Category = source.Category;
         target.Currency = source.Currency;
+        target.TaxType = source.TaxType;
         target.Status = source.Status;
         target.Religion = source.Religion;
         target.Account = source.Account;
@@ -524,15 +627,6 @@
         target.Note = source.Note;
     }
 
-    private void ToggleAddressGroup()
-    {
-        isAddressGroupExpanded = !isAddressGroupExpanded;
-    }
-
-    private void SelectAddressItem(string item)
-    {
-        selectedAddressItem = item;
-    }
 
     private void Close()
     {

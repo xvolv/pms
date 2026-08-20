@@ -1,6 +1,7 @@
 @page "/company"
 @rendermode InteractiveServer
 @using ERP.V7.WebPMS.Components.Pages.Profile.Company.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @inject NavigationManager NavigationManager
 
 
@@ -26,6 +27,13 @@
                     <i class="bi bi-floppy text-secondary"></i>
                     <span>Save</span>
                 </button>
+
+                <div class="profile-toolbar-code no-push">
+                    <label>TIN</label>
+                    <DxTextBox @bind-Text="@company.TinNo" CssClass="rt-form-input" />
+                    <ValidationMessage For="@(() => company.TinNo)" class="rt-validation-message" />
+                </div>
+
                 <button type="button" class="rt-toolbar-btn" @onclick="OpenNote">
                     <i class="bi bi-sticky text-secondary"></i>
                     <span>Note</span>
@@ -38,7 +46,7 @@
         </div>
 
 
-        <div class="rt-modal-body" style="padding:0px;">
+        <div class="rt-modal-body rt-modal-labeled" style="padding:0px;">
             <ValidationSummary class="rt-validation-summary" />
             <div class="profile-body-columns">
                 <div class="profile-main-col">
@@ -57,14 +65,6 @@
                                 <label>Name</label>
                                 <DxTextBox @bind-Text="@company.Name" CssClass="rt-form-input" />
                                 <ValidationMessage For="@(() => company.Name)" class="rt-validation-message" />
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field rt-form-field-wide">
-                                <label>TIN No</label>
-                                <DxTextBox @bind-Text="@company.TinNo" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => company.TinNo)" class="rt-validation-message" />
                             </div>
                         </div>
 
@@ -100,6 +100,15 @@
                             <div class="rt-form-field rt-form-field-wide">
                                 <label>Account No.</label>
                                 <DxComboBox Data="@accountNos" @bind-Value="@company.AccountNo" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Tax Type</label>
+                                <DxComboBox Data="@taxTypes" @bind-Value="@company.TaxType" NullText="-- Select --"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                             CssClass="rt-form-input" />
                             </div>
@@ -151,7 +160,7 @@
                         </div>
                     </fieldset>
 
-                    <fieldset class="rt-form-fieldset">
+                    @* <fieldset class="rt-form-fieldset">
                         <legend>Potential Information</legend>
 
                         <div class="rt-form-row">
@@ -170,110 +179,94 @@
                                                    class="rt-validation-message" />
                             </div>
                         </div>
-                    </fieldset>
+                    </fieldset> *@
                 </div>
 
                 <div class="profile-side-col">
                     <fieldset class="rt-form-fieldset">
                         <legend>Address</legend>
 
-                        <div class="profile-address-table">
-                            <!-- Header -->
-                            <div class="profile-address-header">
-                                <div class="col-desc">Description</div>
-                                <div class="col-value">Value</div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Phone 1</label>
+                                <DxTextBox @bind-Text="@company.Phone1" CssClass="rt-form-input" />
                             </div>
-
-                            <!-- ========== CONTACT ========== -->
-                            <div class="profile-address-group" @onclick="ToggleContact">
-                                <i class="bi @(isContactExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-
-                                <span>Contact</span>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Phone 2</label>
+                                <DxTextBox @bind-Text="@company.Phone2" CssClass="rt-form-input" />
                             </div>
-
-                            @if (isContactExpanded)
-                            {
-                                <!-- Email (sub-group) -->
-                                <div class="profile-address-subgroup" @onclick="ToggleEmail">
-                                    <i class="bi @(isEmailExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-
-                                    <span>Email</span>
-                                </div>
-
-                                @if (isEmailExpanded)
-                                {
-                                    <div class="profile-address-leaf level-2">
-                                        <div class="col-desc">SMTP Server</div>
-                                        <div class="col-value">
-                                            <input @bind="company.SmtpServer" @bind:event="oninput" />
-                                        </div>
-                                    </div>
-                                    <div class="profile-address-leaf level-2">
-                                        <div class="col-desc">Password</div>
-                                        <div class="col-value">
-                                            <input type="password" @bind="company.Password" @bind:event="oninput" />
-                                        </div>
-                                    </div>
-                                }
-
-                                <!-- POBox (same level as Email) -->
-                                <div class="profile-address-leaf level-1">
-                                    <div class="col-desc">POBox</div>
-                                    <div class="col-value">
-                                        <input @bind="company.POBox" @bind:event="oninput" />
-                                    </div>
-                                </div>
-                            }
-
-                            <!-- ========== SOCIAL MEDIA ========== -->
-                            <div class="profile-address-group" @onclick="ToggleSocialMedia">
-                                <i class="bi @(isSocialMediaExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-
-                                <span>Social Media</span>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Email</label>
+                                <DxTextBox @bind-Text="@company.Email" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => company.Email)" class="rt-validation-message" />
                             </div>
-
-                            @if (isSocialMediaExpanded)
-                            {
-                                <div class="profile-address-leaf level-1">
-                                    <div class="col-desc">Facebook</div>
-                                    <div class="col-value">
-                                        <input @bind="company.Facebook" @bind:event="oninput" />
-                                    </div>
-                                </div>
-                                <div class="profile-address-leaf level-1">
-                                    <div class="col-desc">Website</div>
-                                    <div class="col-value">
-                                        <input @bind="company.Website" @bind:event="oninput" />
-                                        <ValidationMessage For="@(() => company.Website)" class="rt-validation-message" />
-                                    </div>
-                                </div>
-                            }
-
-                            <!-- ========== TELEPHONE ========== -->
-                            <div class="profile-address-group" @onclick="ToggleTelephone">
-                                <i class="bi @(isTelephoneExpanded ? "bi-dash-square" : "bi-plus-square")"></i>
-                                <span>Telephone</span>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Website</label>
+                                <DxTextBox @bind-Text="@company.Website" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => company.Website)" class="rt-validation-message" />
                             </div>
-
-                            @if (isTelephoneExpanded)
-                            {
-                                <div class="profile-address-leaf level-1">
-                                    <div class="col-desc">Office phone</div>
-                                    <div class="col-value">
-                                        <input @bind="company.OfficePhone" @bind:event="oninput" />
-                                        <ValidationMessage For="@(() => company.OfficePhone)"
-                                                           class="rt-validation-message" />
-                                    </div>
-                                </div>
-                                <div class="profile-address-leaf level-1">
-                                    <div class="col-desc">Mobile phone</div>
-                                    <div class="col-value">
-                                        <input @bind="company.MobilePhone" @bind:event="oninput" />
-                                        <ValidationMessage For="@(() => company.MobilePhone)"
-                                                           class="rt-validation-message" />
-                                    </div>
-                                </div>
-                            }
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Kebele</label>
+                                <DxTextBox @bind-Text="@company.Kebele" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Street</label>
+                                <DxTextBox @bind-Text="@company.Street" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Address 1</label>
+                                <DxTextBox @bind-Text="@company.Address1" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>PoBox.</label>
+                                <DxTextBox @bind-Text="@company.POBox" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Region</label>
+                                <DxComboBox Data="@regions" @bind-Value="@company.Region" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>City</label>
+                                <DxComboBox Data="@cities" @bind-Value="@company.City" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>SubCity</label>
+                                <DxComboBox Data="@subCities" @bind-Value="@company.SubCity" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Wereda</label>
+                                <DxComboBox Data="@weredas" @bind-Value="@company.Wereda" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -289,21 +282,22 @@
     private CompanyRow company = new();
     private string? statusMessage;
 
-    private bool isContactExpanded = true;
-    private bool isEmailExpanded = true;
-    private bool isSocialMediaExpanded = true;
-    private bool isTelephoneExpanded = true;
-
     private List<string> businessTypes = new() { "Hotel", "Travel Agency", "Tour Operator", "Corporate", "Government",
 "NGO", "Airline", "Event Planner", "Other" };
     private List<string> categories = new() { "Business", "Leisure", "Group", "Government", "Travel Agent", "Corporate",
 "VIP" };
     private List<string> accountNos = new() { "AR-001", "AR-002", "AR-003", "AR-004" };
+    private List<string> taxTypes = new() { "VAT", "TOT", "Exempt" };
     private List<string> rateCodes = new() { "CORP-001", "CORP-002", "GOV-001", "AGENT-001", "GROUP-001" };
     private List<string> statuses = new() { "Active", "Inactive" };
     private List<string> mailingActions = new() { "Email", "Post", "SMS", "Phone", "Fax", "None" };
     private List<string> currencies = new() { "ETB", "USD", "EUR", "GBP", "AED" };
     private List<string> owners = new() { "John Doe", "Jane Smith", "Robert Williams" };
+
+    private List<string> regions = AddressLookup.Regions;
+    private List<string> cities = AddressLookup.Cities;
+    private List<string> subCities = AddressLookup.SubCities;
+    private List<string> weredas = AddressLookup.Weredas;
 
     protected override void OnInitialized()
     {
@@ -338,11 +332,6 @@
     private void OpenNote()
     {
     }
-
-    private void ToggleContact() => isContactExpanded = !isContactExpanded;
-    private void ToggleEmail() => isEmailExpanded = !isEmailExpanded;
-    private void ToggleSocialMedia() => isSocialMediaExpanded = !isSocialMediaExpanded;
-    private void ToggleTelephone() => isTelephoneExpanded = !isTelephoneExpanded;
 
     private void Close()
     {

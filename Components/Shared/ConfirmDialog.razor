@@ -3,14 +3,17 @@
     <div class="rt-modal-backdrop confirm-dialog-backdrop">
         <div class="confirm-dialog">
             <div class="confirm-dialog-header">
-                <i class="bi @IconClass confirm-dialog-icon @(Danger ? "text-danger" : "text-primary")"></i>
+                <i class="bi @ResolvedIcon confirm-dialog-icon @ResolvedIconColorClass"></i>
                 <span class="confirm-dialog-title">@Title</span>
             </div>
             <div class="confirm-dialog-body">
                 <p>@Message</p>
             </div>
             <div class="confirm-dialog-buttons">
-                <button type="button" class="btn btn-secondary" @onclick="HandleCancel">@CancelText</button>
+                @if (ShowCancelButton)
+                {
+                    <button type="button" class="btn btn-secondary" @onclick="HandleCancel">@CancelText</button>
+                }
                 <button type="button" class="btn @(Danger ? "btn-danger" : "btn-primary")" @onclick="HandleConfirm">@ConfirmText</button>
             </div>
         </div>
@@ -24,10 +27,14 @@
     [Parameter] public string ConfirmText { get; set; } = "Yes";
     [Parameter] public string CancelText { get; set; } = "Cancel";
     [Parameter] public bool Danger { get; set; }
+    [Parameter] public bool ShowCancelButton { get; set; } = true;
+    [Parameter] public string? IconOverride { get; set; }
+    [Parameter] public string? IconColorClassOverride { get; set; }
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
 
-    private string IconClass => Danger ? "bi-exclamation-triangle-fill" : "bi-question-circle-fill";
+    private string ResolvedIcon => IconOverride ?? (Danger ? "bi-exclamation-triangle-fill" : "bi-question-circle-fill");
+    private string ResolvedIconColorClass => IconColorClassOverride ?? (Danger ? "text-danger" : "text-primary");
 
     private async Task HandleConfirm() => await OnConfirm.InvokeAsync();
     private async Task HandleCancel() => await OnCancel.InvokeAsync();

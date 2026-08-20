@@ -23,14 +23,18 @@ public class RoomTypeRow : IValidatableObject
 
     public string ComponentRoom { get; set; } = "";
 
+    public string Hotel { get; set; } = "";
+
+    public string RoomDescription { get; set; } = "";
+
     [Required(ErrorMessage = "Room Class is required.")]
     public string RoomClass { get; set; } = "Non-VIP";
 
     [Range(1, 20, ErrorMessage = "Default Occupancy must be between 1 and 20.")]
-    public int DefaultOccupancy { get; set; }
+    public int DefaultOccupancy { get; set; } = 1;
 
     [Range(1, 20, ErrorMessage = "Maximum Occupancy must be between 1 and 20.")]
-    public int MaximumOccupancy { get; set; }
+    public int MaximumOccupancy { get; set; } = 1;
 
     [Range(0, 20, ErrorMessage = "Maximum Adult must be between 0 and 20.")]
     public int MaximumAdult { get; set; }
@@ -49,6 +53,9 @@ public class RoomTypeRow : IValidatableObject
     public decimal PickupCredit { get; set; }
     public decimal VacantCredit { get; set; }
     public decimal EveningSectionCredit { get; set; }
+
+    public HashSet<string> SelectedAmenities { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, string> AmenityDescriptions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

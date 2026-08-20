@@ -1,9 +1,9 @@
 @if (Visible && EditingItem != null)
 {
     <div class="rt-modal-backdrop">
-        <div class="rt-modal">
+        <div class="rt-modal rt-modal-blockgen rt-modal-labeled">
             <div class="rt-modal-header">
-                <span class="rt-modal-header-title">@(IsNew ? "Add Block" : "Edit Block")</span>
+                <span class="rt-modal-header-title">@(IsNew ? "Space Generator" : "Edit Block")</span>
                 <button class="rt-modal-close-btn" @onclick="Close" title="Close">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -13,12 +13,22 @@
                 <DataAnnotationsValidator />
 
                 <div class="rt-toolbar">
-                    <button type="submit" class="rt-toolbar-btn">
-                        <i class="bi bi-floppy text-secondary"></i>
-                        <span>@(IsNew ? "Generate" : "Save")</span>
-                    </button>
+                    @if (IsNew)
+                    {
+                        <button type="submit" class="rt-toolbar-btn">
+                            <i class="bi bi-check-circle text-secondary"></i>
+                            <span>Generate</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="rt-toolbar-btn">
+                            <i class="bi bi-floppy text-secondary"></i>
+                            <span>Save</span>
+                        </button>
+                    }
                     <button type="button" class="rt-toolbar-btn" @onclick="Close">
-                        <i class="bi bi-x-circle text-secondary"></i>
+                        <i class="bi @(IsNew ? "bi-x-circle text-secondary" : "bi-x-circle text-secondary")"></i>
                         <span>Close</span>
                     </button>
                 </div>
@@ -26,64 +36,84 @@
                 <div class="rt-modal-body">
                     <ValidationSummary class="rt-validation-summary" />
 
-                    <div class="rt-form-row">
-                        <div class="rt-form-field">
-                            <label>Building Code</label>
-                            <DxTextBox @bind-Text="@EditingItem.Code" CssClass="rt-form-input" />
-                            <ValidationMessage For="@(() => EditingItem.Code)" class="rt-validation-message" />
-                        </div>
-                        <div class="rt-form-field rt-form-field-wide">
-                            <label>Building Name</label>
-                            <DxTextBox @bind-Text="@EditingItem.Name" CssClass="rt-form-input" />
-                            <ValidationMessage For="@(() => EditingItem.Name)" class="rt-validation-message" />
-                        </div>
-                    </div>
-
                     @if (IsNew)
                     {
                         <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>No of Floors</label>
-                                <DxSpinEdit @bind-Value="@EditingItem.NoOfFloors" MinValue="1" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.NoOfFloors)" class="rt-validation-message" />
-                            </div>
-                            <div class="rt-form-field">
-                                <label>Floor Starts From</label>
-                                <DxSpinEdit @bind-Value="@EditingItem.FloorStartsFrom" MinValue="0" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.FloorStartsFrom)" class="rt-validation-message" />
-                            </div>
-                        </div>
-
-                        <div class="rt-form-row">
-                            <div class="rt-form-field">
-                                <label>Room No Digit</label>
-                                <DxSpinEdit @bind-Value="@EditingItem.RoomNoDigit" MinValue="1" MaxValue="6"
-                                            CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.RoomNoDigit)" class="rt-validation-message" />
-                            </div>
-                            <div class="rt-form-field">
-                                <label>Room No Starts From</label>
-                                <DxSpinEdit @bind-Value="@EditingItem.RoomNoStartsFrom" MinValue="0" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.RoomNoStartsFrom)" class="rt-validation-message" />
-                            </div>
-                            <div class="rt-form-field">
-                                <label>Rooms on Each Floor</label>
-                                <DxSpinEdit @bind-Value="@EditingItem.RoomsPerFloor" MinValue="0" CssClass="rt-form-input" />
-                                <ValidationMessage For="@(() => EditingItem.RoomsPerFloor)" class="rt-validation-message" />
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Building Name</label>
+                                <DxTextBox @bind-Text="@EditingItem.Name" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.Name)" class="rt-validation-message" />
                             </div>
                         </div>
 
                         <div class="rt-form-row">
                             <div class="rt-form-field rt-form-field-wide">
-                                <label>Remarks</label>
-                                <DxTextBox @bind-Text="@EditingItem.Remarks" CssClass="rt-form-input" />
+                                <label>Hotel</label>
+                                <DxComboBox Data="@Hotels" @bind-Value="@EditingItem.Hotel" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" CssClass="rt-form-input" />
                             </div>
                         </div>
 
-                        <div class="block-generate-summary">
-                            <i class="bi bi-info-circle-fill me-1"></i>
-                            Will generate @EditingItem.NoOfFloors floor(s) starting at Floor - @EditingItem.FloorStartsFrom,
-                            each with @EditingItem.RoomsPerFloor room(s) (e.g. room @SampleRoomNumber).
+                        <fieldset class="rt-form-fieldset">
+                            <legend>Floors</legend>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>No of Floors</label>
+                                    <DxSpinEdit @bind-Value="@EditingItem.NoOfFloors" MinValue="1" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => EditingItem.NoOfFloors)" class="rt-validation-message" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Floor Starts From</label>
+                                    <DxSpinEdit @bind-Value="@EditingItem.FloorStartsFrom" MinValue="0" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => EditingItem.FloorStartsFrom)" class="rt-validation-message" />
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="rt-form-fieldset">
+                            <legend>Rooms</legend>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Room No Digit</label>
+                                    <DxSpinEdit @bind-Value="@EditingItem.RoomNoDigit" MinValue="1" MaxValue="6"
+                                                CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => EditingItem.RoomNoDigit)" class="rt-validation-message" />
+                                </div>
+                                <div class="rt-form-field">
+                                    <label>Room No Starts From</label>
+                                    <DxSpinEdit @bind-Value="@EditingItem.RoomNoStartsFrom" MinValue="0" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => EditingItem.RoomNoStartsFrom)" class="rt-validation-message" />
+                                </div>
+                            </div>
+                            <div class="rt-form-row">
+                                <div class="rt-form-field">
+                                    <label>Rooms on Each</label>
+                                    <DxSpinEdit @bind-Value="@EditingItem.RoomsPerFloor" MinValue="0" CssClass="rt-form-input" />
+                                    <ValidationMessage For="@(() => EditingItem.RoomsPerFloor)" class="rt-validation-message" />
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide rt-form-field-stacked rt-form-field-centered">
+                                <label>Remark for Rooms</label>
+                                <DxMemo @bind-Text="@EditingItem.Remarks" Rows="5" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Building Code</label>
+                                <DxTextBox @bind-Text="@EditingItem.Code" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.Code)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Building Name</label>
+                                <DxTextBox @bind-Text="@EditingItem.Name" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => EditingItem.Name)" class="rt-validation-message" />
+                            </div>
                         </div>
                     }
                 </div>
@@ -96,6 +126,7 @@
     [Parameter] public bool Visible { get; set; }
     [Parameter] public bool IsNew { get; set; } = true;
     [Parameter] public BlockDraft? EditingItem { get; set; }
+    [Parameter] public List<string> Hotels { get; set; } = new();
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
 

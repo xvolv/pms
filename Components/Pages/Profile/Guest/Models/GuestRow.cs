@@ -24,13 +24,25 @@ public class GuestRow
     public string IdType { get; set; } = "Passport";
     public string PassportNum { get; set; } = "";
 
+    public string Phone1 { get; set; } = "";
+    public string Phone2 { get; set; } = "";
+
     [EmailAddress(ErrorMessage = "Enter a valid email address.")]
     public string Email { get; set; } = "";
+    public string Website { get; set; } = "";
+    public string Wereda { get; set; } = "";
+    public string Kebele { get; set; } = "";
+    public string Street { get; set; } = "";
+    public string Address1 { get; set; } = "";
     public string POBox { get; set; } = "";
+    public string Region { get; set; } = "";
+    public string City { get; set; } = "";
+    public string SubCity { get; set; } = "";
 
     // Personal Detail
     public string Category { get; set; } = "";
     public string Currency { get; set; } = "";
+    public string TaxType { get; set; } = "";
     public string Status { get; set; } = "Active";
     public string Religion { get; set; } = "";
     public string Account { get; set; } = "";

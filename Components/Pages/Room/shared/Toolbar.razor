@@ -12,23 +12,11 @@
             </DxToolbarItem>
         }
 
-        @if (!string.IsNullOrEmpty(StatusMessage))
-        {
-            <DxToolbarItem Alignment="ToolbarItemAlignment.Right">
-                <Template>
-                    <span class="rt-status-message">
-                        <i class="bi bi-check-circle-fill me-1"></i>
-                        @* @StatusMessage *@
-                    </span>
-                </Template>
-            </DxToolbarItem>
-        }
     </Items>
 </DxToolbar>
 
 @code {
     [Parameter] public List<ToolbarItem> Items { get; set; } = new List<ToolbarItem>();
-    [Parameter] public string? StatusMessage { get; set; }
 
     public class ToolbarItem
     {

@@ -76,6 +76,8 @@ public class BlockDraft
     [Required(ErrorMessage = "Building Name is required.")]
     public string Name { get; set; } = "";
 
+    public string Hotel { get; set; } = "";
+
     [Range(1, 200, ErrorMessage = "No of Floors must be between 1 and 200.")]
     public int NoOfFloors { get; set; } = 1;
 
