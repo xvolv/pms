@@ -32,6 +32,7 @@
                         <DxGridLayoutRow Height="35px" />
                         <DxGridLayoutRow Height="35px" />
                         <DxGridLayoutRow Height="35px" />
+                        <DxGridLayoutRow Height="35px" />
                         <DxGridLayoutRow Height="80px" />
                     </Rows>
 
@@ -47,7 +48,7 @@
                         <!-- Code -->
                         <DxGridLayoutItem Row="0" Column="0">
                             <Template>
-                                <div class="label">Code</div>
+                                <div class="label">Id</div>
                             </Template>
                         </DxGridLayoutItem>
 
@@ -72,14 +73,29 @@
                             </Template>
                         </DxGridLayoutItem>
 
-                        <!-- Article -->
+                        <!-- Hotel -->
                         <DxGridLayoutItem Row="2" Column="0">
+                            <Template>
+                                <div class="label">Hotel</div>
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <DxGridLayoutItem Row="2" Column="1" ColumnSpan="4">
+                            <Template>
+                                <DxComboBox TData="string" TValue="string" Data="@hotelItems"
+                                            @bind-Value="@Model.Hotel" Width="100%" CssClass="erp-combobox" />
+                                <ValidationMessage For="@(() => Model.Hotel)" />
+                            </Template>
+                        </DxGridLayoutItem>
+
+                        <!-- Article -->
+                        <DxGridLayoutItem Row="3" Column="0">
                             <Template>
                                 <div class="label">Article</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="2" Column="1">
+                        <DxGridLayoutItem Row="3" Column="1">
                             <Template>
                                 <div class="lookup-field">
                                     <DxTextBox @bind-Text="@Model.Article" ReadOnly="true" Width="100%"
@@ -130,13 +146,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Currency -->
-                        <DxGridLayoutItem Row="2" Column="3">
+                        <DxGridLayoutItem Row="3" Column="3">
                             <Template>
                                 <div class="label">Currency</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="2" Column="4">
+                        <DxGridLayoutItem Row="3" Column="4">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@currencyItems"
                                             @bind-Value="@Model.Currency" Width="100%" CssClass="erp-combobox" />
@@ -145,13 +161,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Group -->
-                        <DxGridLayoutItem Row="3" Column="0">
+                        <DxGridLayoutItem Row="4" Column="0">
                             <Template>
                                 <div class="label">Group</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="3" Column="1">
+                        <DxGridLayoutItem Row="4" Column="1">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@groupItems" @bind-Value="@Model.Group"
                                             Width="100%" CssClass="erp-combobox" />
@@ -160,13 +176,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Type -->
-                        <DxGridLayoutItem Row="3" Column="3">
+                        <DxGridLayoutItem Row="4" Column="3">
                             <Template>
                                 <div class="label">Type</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="3" Column="4">
+                        <DxGridLayoutItem Row="4" Column="4">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@typeItems" @bind-Value="@Model.Type"
                                             Width="100%" CssClass="erp-combobox" />
@@ -175,13 +191,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Rate Appearance -->
-                        <DxGridLayoutItem Row="4" Column="0">
+                        <DxGridLayoutItem Row="5" Column="0">
                             <Template>
                                 <div class="label">Rate Appearance</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="4" Column="1">
+                        <DxGridLayoutItem Row="5" Column="1">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@rateAppearanceItems"
                                             @bind-Value="@Model.RateAppearance" Width="100%" CssClass="erp-combobox" />
@@ -189,13 +205,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Sale Separate -->
-                        <DxGridLayoutItem Row="4" Column="3">
+                        <DxGridLayoutItem Row="5" Column="3">
                             <Template>
                                 <div class="label">Sale Separate</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="4" Column="4">
+                        <DxGridLayoutItem Row="5" Column="4">
                             <Template>
                                 <div class="checkbox-center">
                                     <DxCheckBox @bind-Checked="@Model.SaleSeparate" />
@@ -204,13 +220,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Posting Rhythm -->
-                        <DxGridLayoutItem Row="5" Column="0">
+                        <DxGridLayoutItem Row="6" Column="0">
                             <Template>
                                 <div class="label">Posting Rhythm</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="5" Column="1" ColumnSpan="4">
+                        <DxGridLayoutItem Row="6" Column="1" ColumnSpan="4">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@postingRhythmItems"
                                             @bind-Value="@Model.PostingRhythm" Width="100%" CssClass="erp-combobox" />
@@ -219,13 +235,13 @@
                         </DxGridLayoutItem>
 
                         <!-- Calculate Rule -->
-                        <DxGridLayoutItem Row="6" Column="0">
+                        <DxGridLayoutItem Row="7" Column="0">
                             <Template>
                                 <div class="label">Calculate Rule</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="6" Column="1">
+                        <DxGridLayoutItem Row="7" Column="1">
                             <Template>
                                 <DxComboBox TData="string" TValue="string" Data="@calculateRuleItems"
                                             @bind-Value="@Model.CalculateRule" Width="100%" CssClass="erp-combobox" />
@@ -233,26 +249,26 @@
                         </DxGridLayoutItem>
 
                         <!-- Formula -->
-                        <DxGridLayoutItem Row="7" Column="0">
+                        <DxGridLayoutItem Row="8" Column="0">
                             <Template>
                                 <div class="label">Formula</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="7" Column="1" ColumnSpan="4">
+                        <DxGridLayoutItem Row="8" Column="1" ColumnSpan="4">
                             <Template>
                                 <DxTextBox @bind-Text="@Model.Formula" Width="100%" />
                             </Template>
                         </DxGridLayoutItem>
 
                         <!-- Remark -->
-                        <DxGridLayoutItem Row="8" Column="0">
+                        <DxGridLayoutItem Row="9" Column="0">
                             <Template>
                                 <div class="label">Remark</div>
                             </Template>
                         </DxGridLayoutItem>
 
-                        <DxGridLayoutItem Row="8" Column="1" ColumnSpan="4">
+                        <DxGridLayoutItem Row="9" Column="1" ColumnSpan="4">
                             <Template>
                                 <DxMemo @bind-Text="@Model.Remark" Rows="3" Width="100%" />
                             </Template>
@@ -293,6 +309,18 @@
     private EditForm? editForm;
 
     // Combo box data
+    private List<string> hotelItems = new()
+    {
+        "Hilton",
+        "Marriott",
+        "Sheraton",
+        "Hyatt",
+        "Radisson",
+        "InterContinental",
+        "Westin",
+        "Ritz-Carlton"
+    };
+
     private List<string> currencyItems = new()
     {
         "ETB - Ethiopian Birr",

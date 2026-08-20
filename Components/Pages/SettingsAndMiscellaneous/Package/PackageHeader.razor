@@ -2,34 +2,124 @@
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
 
-<div class="grid-container">
+<div class="ph-master-detail">
+    <!-- Left Panel with ParentId and Hotel columns using DxGrid -->
+    <div class="package-header-left-pannel">
+        <div class="grid-container">
+            <DxGrid @ref="LeftGrid"
+                    Data="@packageHeaderListItems"
+                    KeyFieldName="ParentId"
+                    CssClass="erp-grid"
+                    ShowGroupPanel="false"
+                    ShowFilterRow="false"
+                    CustomizeElement="@OnLeftCustomizeElement">
 
-    <DxGrid @ref="Grid"
-            Data="@Packages"
-            KeyFieldName="Code"
-            CssClass="erp-grid"
-            Width="100%"
-            ShowGroupPanel="false"
-            ShowFilterRow="false"
-            RowClick="@OnRowClick"
-            CustomizeElement="@OnCustomizeElement">
+                <Columns>
+                    <DxGridDataColumn FieldName="ParentId" Caption="ParentId">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnLeftColumnClick(context.DataItem as PackageHeaderListItem)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderListItem)?.ParentId)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Hotel" Caption="Hotel">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnLeftColumnClick(context.DataItem as PackageHeaderListItem)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderListItem)?.Hotel)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
 
-        <Columns>
+            </DxGrid>
+        </div>
+    </div>
 
-            <DxGridDataColumn FieldName="Code" Caption="Code" />
-            <DxGridDataColumn FieldName="Description" Caption="Description" />
-            <DxGridDataColumn FieldName="Group" Caption="Group" />
-            <DxGridDataColumn FieldName="Type" Caption="Type" />
-            <DxGridDataColumn FieldName="Currency" Caption="Currency" />
-            <DxGridDataColumn FieldName="Article" Caption="Article" />
-            <DxGridDataColumn FieldName="PostingRhythm" Caption="Posting-Rhythm" />
+    <!-- Right Panel with the existing grid -->
+    <div class="detail-grid-panel">
+        <div class="grid-container">
+            <DxGrid @ref="Grid"
+                    Data="@Packages"
+                    KeyFieldName="Code"
+                    CssClass="erp-grid"
+                    Width="100%"
+                    ShowGroupPanel="false"
+                    ShowFilterRow="false"
+                    CustomizeElement="@OnCustomizeElement">
 
-        </Columns>
+                <Columns>
+                    <DxGridDataColumn FieldName="Code" Caption="Code">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Code)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Description" Caption="Description">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Description)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Hotel" Caption="Hotel">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Hotel)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Group" Caption="Group">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Group)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Type" Caption="Type">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Type)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Currency" Caption="Currency">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Currency)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Article" Caption="Article">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.Article)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="PostingRhythm" Caption="Posting-Rhythm">
+                        <CellDisplayTemplate>
+                            <span @onclick="() => OnColumnClick(context.DataItem as PackageHeaderModel)" 
+                                  style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                @((context.DataItem as PackageHeaderModel)?.PostingRhythm)
+                            </span>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
 
-    </DxGrid>
-
+            </DxGrid>
+        </div>
+    </div>
 </div>
-
 
 <!-- ===================== PACKAGE HEADER POPUP (Add / Edit) ===================== -->
 
@@ -88,8 +178,43 @@
 
     private List<PackageHeaderModel> Packages = new();
     private DxGrid? Grid;
+    private DxGrid? LeftGrid;
     private object? SelectedItemObj;
     private PackageHeaderModel? SelectedItem => SelectedItemObj as PackageHeaderModel;
+
+    // Left panel data
+    private List<PackageHeaderListItem> packageHeaderListItems = new()
+    {
+        new PackageHeaderListItem { ParentId = "PKG-001", Hotel = "Hilton" },
+        new PackageHeaderListItem { ParentId = "PKG-002", Hotel = "Marriott" },
+        new PackageHeaderListItem { ParentId = "PKG-003", Hotel = "Sheraton" },
+        new PackageHeaderListItem { ParentId = "PKG-004", Hotel = "Hyatt" },
+        new PackageHeaderListItem { ParentId = "PKG-005", Hotel = "Radisson" }
+    };
+
+    private object? SelectedLeftItemObj;
+    private PackageHeaderListItem? SelectedLeftItem => SelectedLeftItemObj as PackageHeaderListItem;
+
+    // Left column click handler
+    void OnLeftColumnClick(PackageHeaderListItem? clickedItem)
+    {
+        if (clickedItem is not null)
+        {
+            SelectedLeftItemObj = (clickedItem == SelectedLeftItem) ? null : clickedItem;
+        }
+    }
+
+    void OnLeftCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && LeftGrid is not null)
+        {
+            var rowItem = LeftGrid.GetDataItem(e.VisibleIndex) as PackageHeaderListItem;
+            if (rowItem is not null && rowItem == SelectedLeftItem)
+            {
+                e.CssClass = "row-manually-selected";
+            }
+        }
+    }
 
     private bool ShowDialog;
     private string popupTitle = "Create Package Header";
@@ -104,10 +229,13 @@
         Packages = Service.GetPackages();
     }
 
-    void OnRowClick(GridRowClickEventArgs e)
+    // Right column click handler
+    void OnColumnClick(PackageHeaderModel? clickedItem)
     {
-        var clickedItem = Grid?.GetDataItem(e.VisibleIndex) as PackageHeaderModel;
-        SelectedItemObj = (clickedItem is not null && clickedItem == SelectedItem) ? null : clickedItem;
+        if (clickedItem is not null)
+        {
+            SelectedItemObj = (clickedItem == SelectedItem) ? null : clickedItem;
+        }
     }
 
     void OnCustomizeElement(GridCustomizeElementEventArgs e)

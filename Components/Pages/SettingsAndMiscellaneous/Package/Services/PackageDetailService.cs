@@ -9,6 +9,7 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
             new PackageGroup
             {
                 Name = "Lunch",
+                Hotel = "Hilton",
                 Details = new()
                 {
                     new PackageDetailRow
@@ -17,12 +18,43 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
                         EndDate = new DateTime(2018, 5, 31),
                         Price = 60.00m,
                         Allowance = 0.00m
+                    },
+                    new PackageDetailRow
+                    {
+                        StartDate = new DateTime(2018, 6, 1),
+                        EndDate = new DateTime(2019, 5, 31),
+                        Price = 65.00m,
+                        Allowance = 5.00m
+                    },
+                    new PackageDetailRow
+                    {
+                        StartDate = new DateTime(2019, 6, 1),
+                        EndDate = new DateTime(2020, 5, 31),
+                        Price = 70.00m,
+                        Allowance = 10.00m
                     }
                 }
             },
             new PackageGroup
             {
+                Name = "Lunch 2",
+                Hotel = "Hilton",
+                Details = new()
+                {
+                    new PackageDetailRow
+                    {
+                        StartDate = new DateTime(2017, 5, 6),
+                        EndDate = new DateTime(2018, 5, 31),
+                        Price = 60.00m,
+                        Allowance = 0.00m
+                    },
+                    
+                }
+            },
+            new PackageGroup
+            {
                 Name = "Suit Lunch",
+                Hotel = "Marriott",
                 Details = new()
             }
         };

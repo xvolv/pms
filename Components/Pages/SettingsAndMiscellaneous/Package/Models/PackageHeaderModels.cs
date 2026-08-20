@@ -11,6 +11,9 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
         [StringLength(200, ErrorMessage = "Description cannot exceed 200 characters")]
         public string Description { get; set; } = "";
 
+        [Required(ErrorMessage = "Hotel is required")]
+        public string Hotel { get; set; } = "";
+
         [Required(ErrorMessage = "Group is required")]
         public string Group { get; set; } = "";
 
@@ -38,5 +41,11 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
         public string Code { get; set; } = "";
         public string Name { get; set; } = "";
         public string Preference { get; set; } = "";
+    }
+
+    public class PackageHeaderListItem
+    {
+        public string ParentId { get; set; } = "";
+        public string Hotel { get; set; } = "";
     }
 }

@@ -19,8 +19,36 @@
 
         <div class="sub-section">
             <!-- Toolbar -->
-            <RateToolbar OnRefresh="Refresh" OnSave="Save" OnNew="New" OnEdit="Edit" OnDelete="Delete"
-                         OnPrint="Print" />
+            <RateToolbar 
+                OnRefresh="Refresh" 
+                OnSave="Save" 
+                OnNew="New" 
+                OnEdit="Edit" 
+                OnDelete="Delete" 
+                OnClearAll="ClearAll"
+                OnPrint="Print"
+                ShowRefresh="@GetShowRefresh()"
+                ShowNew="@GetShowNew()"
+                ShowEdit="@GetShowEdit()"
+                ShowSave="@GetShowSave()"
+                ShowDelete="@GetShowDelete()"
+                ShowClearAll="@GetShowClearAll()"
+                ShowPrint="@GetShowPrint()"
+                ShowDropdown1="@GetShowDropdown1()"
+                Dropdown1Label="@GetDropdown1Label()"
+                Dropdown1Data="@GetDropdown1Data()"
+                Dropdown1SelectedValue="@Dropdown1SelectedValue"
+                Dropdown1SelectedValueChanged="Dropdown1ValueChanged"
+                ShowDropdown2="@GetShowDropdown2()"
+                Dropdown2Label="@GetDropdown2Label()"
+                Dropdown2Data="@GetDropdown2Data()"
+                Dropdown2SelectedValue="@Dropdown2SelectedValue"
+                Dropdown2SelectedValueChanged="Dropdown2ValueChanged"
+                ShowRateHeaderDropdown="@GetShowRateHeaderDropdown()"
+                RateHeaderDropdownLabel="Rate Header"
+                RateHeaderDropdownData="@GetRateHeaderDropdownData()"
+                RateHeaderDropdownSelectedValue="@_selectedRateHeaderId"
+                RateHeaderDropdownSelectedValueChanged="RateHeaderDropdownValueChanged" />
 
   
 
@@ -74,7 +102,10 @@
 
                     @* ---------------- Rate Header ---------------- *@
                     <DxTabPage Text="Rate Header">
-                        <RateHeader @ref="rateHeader" OnDeleteRequest="ShowDeleteConfirmation" />
+                        <RateHeader @ref="rateHeader" 
+                                    OnDeleteRequest="ShowDeleteConfirmation"
+                                    SelectedRateHeaderId="@_selectedRateHeaderId"
+                                    RateHeaderOptions="@_rateHeaderOptions" />
                     </DxTabPage>
 
                     @* ---------------- Rate Detail ---------------- *@
@@ -678,6 +709,10 @@
     RateDetail? rateDetail;
     RateAvailability? rateAvailability;
 
+    // ---------- Rate Header Dropdown State (owned by parent so toolbar always has it) ----------
+    private int? _selectedRateHeaderId;
+    private List<RateHeader.RateHeaderOption> _rateHeaderOptions = new();
+
     // ---------- Ribbon Tabs ----------
     private int ribbonActiveTab = 0;
 
@@ -740,6 +775,110 @@ EndDate = new DateTime(2018,4,7), Type = "Rate Class", Remark = "", RatePolicy =
     private List<string> ParentOptions => AllCategories.Where(c => c.Id != EditModel.Id).Select(c =>
 c.Description).ToList();
 
+    // ---------- Toolbar Visibility Methods ----------
+    bool GetShowRefresh() => true;
+    bool GetShowNew() => ActiveOuterTabIndex != 3; // Hide New for Rate Availability
+    bool GetShowEdit() => ActiveOuterTabIndex == 0  || ActiveOuterTabIndex == 2; // Show for Rate Category, Rate Header, and Rate Detail
+    bool GetShowSave() => true;
+    bool GetShowDelete() => ActiveOuterTabIndex != 3; // Hide Delete for Rate Availability
+    bool GetShowClearAll() => ActiveOuterTabIndex == 3; // Show only for Rate Availability
+    bool GetShowPrint() => true;
+    bool GetShowDropdown1() => false; // Hide the old dropdown
+    string GetDropdown1Label() => "Dropdown";
+    bool GetShowDropdown2() => ActiveOuterTabIndex == 3; // Show only for Rate Availability
+    string GetDropdown2Label() => "Year";
+    bool GetShowRateHeaderDropdown() => ActiveOuterTabIndex == 1; // Show only for Rate Header
+
+    // ---------- Dropdown Data ----------
+    private string? Dropdown1SelectedValue;
+    private string? Dropdown2SelectedValue = DateTime.Today.Year.ToString();
+
+    private IEnumerable<string>? GetDropdown1Data()
+    {
+        if (ActiveOuterTabIndex == 1)
+        {
+            // Return list of rate headers for Rate Header tab
+            return new List<string> { "Standard Rate", "Special Rate", "Weekend Special", "Group Room Rate" };
+        }
+        return null;
+    }
+
+    private IEnumerable<string>? GetDropdown2Data()
+    {
+        if (ActiveOuterTabIndex == 3)
+        {
+            // Return list of years for Rate Availability tab
+            int currentYear = DateTime.Today.Year;
+            return Enumerable.Range(currentYear - 5, 11).Select(y => y.ToString()).ToList();
+        }
+        return null;
+    }
+
+    private void Dropdown1ValueChanged(string? value)
+    {
+        Dropdown1SelectedValue = value;
+        // Handle rate header selection change
+    }
+
+    private void Dropdown2ValueChanged(string? value)
+    {
+        Dropdown2SelectedValue = value;
+        if (int.TryParse(value, out int year) && rateAvailability != null)
+        {
+            rateAvailability.SetYear(year);
+        }
+    }
+
+    // ---------- Rate Header Dropdown Methods ----------
+    private int? GetRateHeaderDropdownSelectedValue()
+    {
+        return ActiveOuterTabIndex == 1 ? _selectedRateHeaderId : null;
+    }
+
+    private IEnumerable<object>? GetRateHeaderDropdownData()
+    {
+        if (ActiveOuterTabIndex == 1)
+            return _rateHeaderOptions;
+        return null;
+    }
+
+    private void RateHeaderDropdownValueChanged(int? value)
+    {
+        if (ActiveOuterTabIndex != 1) return;
+        
+        _selectedRateHeaderId = value;
+        
+        if (rateHeader != null)
+        {
+            rateHeader.ApplySelection(value);
+        }
+        else
+        {
+            // Tab hasn't rendered yet — RateHeader.OnAfterRender will pick this up
+            _pendingRateHeaderSelection = value;
+        }
+        StateHasChanged();
+    }
+
+    // Replayed into rateHeader.ApplySelection on first AfterRender when ref becomes available
+    private int? _pendingRateHeaderSelection;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_pendingRateHeaderSelection.HasValue && rateHeader != null)
+        {
+            var id = _pendingRateHeaderSelection;
+            _pendingRateHeaderSelection = null;
+            rateHeader.ApplySelection(id);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _rateHeaderOptions = RateHeader.BuildDefaultRateHeaderOptions();
+    }
+
     // ---------- Toolbar Actions (delegated to child components) ----------
     void New()
     {
@@ -771,6 +910,12 @@ c.Description).ToList();
             rateHeader?.Delete();
         else if (ActiveOuterTabIndex == 2)
             rateDetail?.Delete();
+    }
+
+    void ClearAll()
+    {
+        if (ActiveOuterTabIndex == 3)
+            rateAvailability?.ClearAll();
     }
 
     void Print()

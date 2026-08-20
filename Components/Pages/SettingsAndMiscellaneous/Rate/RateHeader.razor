@@ -1,9 +1,9 @@
-
 @using DevExpress.Blazor
 @using System.ComponentModel.DataAnnotations
 @rendermode InteractiveServer
 
 <div class="rh-page">
+
     <div class="rh-content">
         <!-- Left Section: Basic Information -->
         <div class="rh-section rh-left-section">
@@ -18,6 +18,14 @@
             <div class="rh-form-row">
                 <label>Folio Text</label>
                 <DxTextBox @bind-Text="@EditModel.FolioText" CssClass="rh-input" />
+            </div>
+
+            <div class="rh-form-row">
+                <label>Hotel</label>
+                <DxComboBox Data="@HotelOptions"
+                            @bind-Value="@EditModel.Hotel"
+                            CssClass="rh-input"
+                            AllowUserInput="true" />
             </div>
 
             <div class="rh-form-row">
@@ -192,32 +200,6 @@
                         <span>Regional Availability</span>
                     </div>
                 </div>
-
-                <!-- <div class="rh-weekend-section">
-                    <div class="rh-section-title">Weekend Days</div>
-                    <div class="rh-weekend-row">
-                        @foreach (var day in WeekDays)
-                        {
-                            <div class="rh-weekend-checkbox">
-                                <DxCheckBox @bind-Checked="@day.Selected" />
-                                <span>@day.Name</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="rh-weekend-section">
-                    <div class="rh-section-title">Closed to Arrival</div>
-                    <div class="rh-weekend-row">
-                        @foreach (var day in ClosedToArrivalDays)
-                        {
-                            <div class="rh-weekend-checkbox">
-                                <DxCheckBox @bind-Checked="@day.Selected" />
-                                <span>@day.Name</span>
-                            </div>
-                        }
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
@@ -225,30 +207,36 @@
     <!-- Bottom Section: Room Type and Package Tabs -->
     <div class="rh-bottom-section">
         <DxTabs @bind-ActiveTabIndex="@ActiveBottomTabIndex" CssClass="rh-bottom-tabs">
-           <DxTabPage Text="Package">
-                <div class="rh-grid-container">
-                    <DxGrid Data="@Packages"
-                            SelectionMode="GridSelectionMode.Multiple"
-                            CssClass="rh-grid"
-                            ShowAlternatingRows="true">
-                        <Columns>
-                            <DxGridSelectionColumn />
-                            <DxGridDataColumn FieldName="Name" Caption="Package" />
-                            <DxGridDataColumn FieldName="IsIncluded" Caption="Is Included" />
-                            <DxGridDataColumn FieldName="Quantity" Caption="Quantity" />
-                        </Columns>
-                    </DxGrid>
-                </div>
-            </DxTabPage>
+           
             <DxTabPage Text="Room Type">
                 <div class="rh-grid-container">
                     <DxGrid Data="@RoomTypes"
                             SelectionMode="GridSelectionMode.Multiple"
                             CssClass="rh-grid"
-                            ShowAlternatingRows="true">
+                            ShowAlternatingRows="true"
+                            KeyFieldName="Id"
+                            SelectedDataItems="@SelectedRoomTypes">
                         <Columns>
                             <DxGridSelectionColumn />
                             <DxGridDataColumn FieldName="Name" Caption="Room Type" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+            </DxTabPage>
+
+            <DxTabPage Text="Package">
+                <div class="rh-grid-container">
+                    <DxGrid Data="@Packages"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            CssClass="rh-grid"
+                            ShowAlternatingRows="true"
+                            KeyFieldName="Id"
+                            SelectedDataItems="@SelectedPackages">
+                        <Columns>
+                            <DxGridSelectionColumn />
+                            <DxGridDataColumn FieldName="Name" Caption="Package" />
+                            <DxGridDataColumn FieldName="IsIncluded" Caption="Is Included" />
+                            <DxGridDataColumn FieldName="Quantity" Caption="Quantity" />
                         </Columns>
                     </DxGrid>
                 </div>
@@ -294,6 +282,28 @@
         font-family: Segoe UI, Arial, sans-serif;
         background: #fff;
         padding: 10px;
+    }
+
+    /* Simple Rate Header Display */
+    .rh-simple-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #d7d7d7;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .rh-simple-header label {
+        font-size: 12px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .rh-current-header {
+        font-size: 14px;
+        color: #1d73d4;
+        font-weight: 600;
     }
 
     .rh-content {
@@ -403,32 +413,6 @@
         font-size: 12px;
     }
 
-    .rh-weekend-section {
-        margin-top: 15px;
-        border-top: 1px solid #e0e0e0;
-        padding-top: 10px;
-    }
-
-    .rh-section-title {
-        font-weight: 600;
-        font-size: 12px;
-        margin-bottom: 6px;
-        color: #333;
-    }
-
-    .rh-weekend-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .rh-weekend-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-    }
-
     .rh-bottom-section {
         border-top: 1px solid #d7d7d7;
         padding-top: 10px;
@@ -449,12 +433,7 @@
         width: 100%;
     }
 
-    /* Alternating row stripes.
-       DxGrid normally paints alternating rows via its own theme variable,
-       but that variable isn't always populated by the default theme in
-       this project, so the "ShowAlternatingRows" flag alone renders no
-       visible stripe. Forcing the cell-background variable on every
-       even data row guarantees the stripe shows regardless of theme. */
+    /* Alternating row stripes */
     .rh-grid .dxbl-grid-data-row:nth-of-type(even),
     .rh-lookup-grid .dxbl-grid-data-row:nth-of-type(even) {
         --dxbl-grid-cell-back: #f5f7fa;
@@ -528,6 +507,18 @@
             padding: 6px;
         }
 
+        .rh-simple-header {
+            font-size: 11px;
+        }
+
+        .rh-simple-header label {
+            font-size: 11px;
+        }
+
+        .rh-current-header {
+            font-size: 13px;
+        }
+
         .rh-content {
             flex-direction: column;
             gap: 12px;
@@ -591,7 +582,6 @@
             width: 100%;
         }
 
-        /* Make popup full width on mobile */
         ::deep .rh-lookup-popup-content {
             width: 95% !important;
             max-width: 420px;
@@ -759,10 +749,17 @@
 @code {
     private int ActiveBottomTabIndex = 0;
 
+    // ---------- Parameters (data owned by parent Index.razor) ----------
+    [Parameter] public List<RateHeaderOption> RateHeaderOptions { get; set; } = new();
+    [Parameter] public int? SelectedRateHeaderId { get; set; }
+
     // ---------- Public methods for toolbar delegation ----------
     public void New()
     {
         EditModel = new RateHeaderEditModel();
+        SelectedRoomTypes = new List<RoomTypeItem>();
+        SelectedPackages = new List<PackageItem>();
+        StateHasChanged();
     }
 
     public void Edit()
@@ -783,11 +780,82 @@
         // Save changes
     }
 
+    /// <summary>Called by Index.razor when the toolbar dropdown selection changes.</summary>
+    public void ApplySelection(int? selectedId)
+    {
+        _lastAppliedSelectedId = selectedId;
+
+        if (RateHeaderOptions == null || RateHeaderOptions.Count == 0)
+        {
+            RateHeaderOptions = BuildDefaultRateHeaderOptions();
+        }
+
+        if (selectedId.HasValue)
+        {
+            var selected = RateHeaderOptions.FirstOrDefault(r => r.Id == selectedId.Value);
+            if (selected != null)
+            {
+                var source = selected.RateHeader;
+                EditModel = new RateHeaderEditModel
+                {
+                    RateName = source.RateName,
+                    FolioText = source.FolioText,
+                    Hotel = source.Hotel,
+                    RateCategory = source.RateCategory,
+                    StartDate = source.StartDate,
+                    EndDate = source.EndDate,
+                    Article = source.Article,
+                    Currency = source.Currency,
+                    Exchange = source.Exchange,
+                    Market = source.Market,
+                    Source = source.Source,
+                    Commission = source.Commission,
+                    Addition = source.Addition,
+                    MaxOccupancy = source.MaxOccupancy,
+                    MinOccupancy = source.MinOccupancy,
+                    Multiplication = source.Multiplication,
+                    Remark = source.Remark,
+                    PackageComponent = source.PackageComponent,
+                    Negotiated = source.Negotiated,
+                    DayType = source.DayType,
+                    SuppressRate = source.SuppressRate,
+                    PrintRate = source.PrintRate,
+                    Discount = source.Discount,
+                    Tiered = source.Tiered,
+                    DayUse = source.DayUse,
+                    Membership = source.Membership,
+                    Complimentary = source.Complimentary,
+                    HouseUse = source.HouseUse,
+                    OwnerRate = source.OwnerRate,
+                    ChannelAllowed = source.ChannelAllowed,
+                    BAR = source.BAR,
+                    CateringPackage = source.CateringPackage,
+                    DailyRates = source.DailyRates,
+                    BenefitRateCode = source.BenefitRateCode,
+                    RegionalAvailability = source.RegionalAvailability
+                };
+
+                SelectedRoomTypes = RoomTypes.Where(r => selected.SelectedRoomTypeIds.Contains(r.Id)).ToList();
+                SelectedPackages = Packages.Where(p => selected.SelectedPackageIds.Contains(p.Id)).ToList();
+            }
+            else
+            {
+                New();
+            }
+        }
+        else
+        {
+            New();
+        }
+        StateHasChanged();
+    }
+
     // Edit Model
     private RateHeaderEditModel EditModel = new();
 
     // Options
     private readonly List<string> RateCategoryOptions = new() { "Standard Rate", "Special Rate", "Group Room Rate" };
+    private readonly List<string> HotelOptions = new() { "Main Hotel", "Branch Hotel", "Resort" };
     private readonly List<string> CurrencyOptions = new() { "Birr", "USD", "EUR", "GBP" };
     private readonly List<string> ExchangeOptions = new() { "Arrival Day Rate", "Reservation Day Rate", "Posting Date Rate" };
     private readonly List<string> MarketOptions = new() { "Corporate Business", "Leisure", "Group" };
@@ -806,6 +874,8 @@
         new ArticleLookupItem { Code = "SE-00001", Name = "ACCOMMODATION" },
         new ArticleLookupItem { Code = "SE-00002", Name = "SERVICE CHARGE" },
         new ArticleLookupItem { Code = "SE-00005", Name = "ROOM CHARGE" },
+        new ArticleLookupItem { Code = "SE-00008", Name = "MEAL PLAN" },
+        new ArticleLookupItem { Code = "SE-00012", Name = "AIRPORT TRANSFER" },
     };
 
     private List<ArticleLookupItem> FilteredArticleOptions =>
@@ -843,81 +913,183 @@
         IsArticleLookupVisible = false;
     }
 
-    // Weekend Days
-    private List<DaySelection> WeekDays = new()
-    {
-        new DaySelection { Name = "Sunday", Selected = false },
-        new DaySelection { Name = "Monday", Selected = false },
-        new DaySelection { Name = "Tuesday", Selected = false },
-        new DaySelection { Name = "Wednesday", Selected = false },
-        new DaySelection { Name = "Thursday", Selected = false },
-        new DaySelection { Name = "Friday", Selected = false },
-        new DaySelection { Name = "Saturday", Selected = false }
-    };
-
-    // Closed to Arrival Days
-    private List<DaySelection> ClosedToArrivalDays = new()
-    {
-        new DaySelection { Name = "Sunday", Selected = false },
-        new DaySelection { Name = "Monday", Selected = false },
-        new DaySelection { Name = "Tuesday", Selected = false },
-        new DaySelection { Name = "Wednesday", Selected = false },
-        new DaySelection { Name = "Thursday", Selected = false },
-        new DaySelection { Name = "Friday", Selected = false },
-        new DaySelection { Name = "Saturday", Selected = false }
-    };
-
-    // Room Types
+    // Room Types with selection
     private List<RoomTypeItem> RoomTypes = new()
     {
         new RoomTypeItem { Id = 1, Name = "Standard Room" },
         new RoomTypeItem { Id = 2, Name = "Executive" },
-        new RoomTypeItem { Id = 3, Name = "Pseudo Rooms" }
+        new RoomTypeItem { Id = 3, Name = "Pseudo Rooms" },
+        new RoomTypeItem { Id = 4, Name = "Deluxe Suite" },
+        new RoomTypeItem { Id = 5, Name = "Presidential Suite" }
     };
+    private List<RoomTypeItem> SelectedRoomTypes = new();
 
-    // Packages
+    // Packages with selection
     private List<PackageItem> Packages = new()
     {
         new PackageItem { Id = 1, Name = "Lunch", IsIncluded = true, Quantity = 0 },
-        new PackageItem { Id = 2, Name = "Suit Lunch", IsIncluded = true, Quantity = 0 }
+        new PackageItem { Id = 2, Name = "Suit Lunch", IsIncluded = true, Quantity = 0 },
+        new PackageItem { Id = 3, Name = "Dinner", IsIncluded = false, Quantity = 0 },
+        new PackageItem { Id = 4, Name = "Breakfast", IsIncluded = true, Quantity = 2 },
+        new PackageItem { Id = 5, Name = "Spa Package", IsIncluded = false, Quantity = 0 }
     };
+    private List<PackageItem> SelectedPackages = new();
 
-    // Event Handlers
-    private void OnNewClick()
+    // Pending selection — replayed on first render if ApplySelection was called before the tab rendered
+    private int? _pendingSelectionId;
+    private int? _lastAppliedSelectedId;
+
+    protected override void OnInitialized()
     {
-        EditModel = new RateHeaderEditModel();
+        base.OnInitialized();
+        if (RateHeaderOptions == null || RateHeaderOptions.Count == 0)
+        {
+            RateHeaderOptions = BuildDefaultRateHeaderOptions();
+        }
     }
 
-    private void OnEditClick()
+    protected override void OnParametersSet()
     {
-        // Load selected item into EditModel
+        base.OnParametersSet();
+        if (RateHeaderOptions == null || RateHeaderOptions.Count == 0)
+        {
+            RateHeaderOptions = BuildDefaultRateHeaderOptions();
+        }
+
+        if (SelectedRateHeaderId != _lastAppliedSelectedId)
+        {
+            ApplySelection(SelectedRateHeaderId);
+        }
     }
 
-    private void OnSaveClick()
+    protected override void OnAfterRender(bool firstRender)
     {
-        // Save logic here
+        if (firstRender && _pendingSelectionId.HasValue)
+        {
+            ApplySelection(_pendingSelectionId);
+            _pendingSelectionId = null;
+            StateHasChanged();
+        }
+        
+        // Also check if we have a selected rate header ID from parameters on first render
+        if (firstRender && SelectedRateHeaderId.HasValue && _pendingSelectionId == null)
+        {
+            ApplySelection(SelectedRateHeaderId);
+        }
     }
 
-    private void OnDeleteClick()
+    public void Refresh()
     {
-        // Delete logic here
+        New();
     }
 
-    private void OnRefreshClick()
-    {
-        // Refresh logic here
-    }
+    private void OnRateNameClick() { }
+    private void OnSaveClick() { }
+    private void OnEditClick() { }
 
-    private void OnRateNameClick()
+    // ---------- Static factory — called by Index.razor OnInitialized ----------
+    public static List<RateHeaderOption> BuildDefaultRateHeaderOptions() => new()
     {
-        // Rate name button logic
-    }
+        new RateHeaderOption
+        {
+            Id = 1,
+            DisplayName = "CORP-2024-001 - Corporate Standard Rate",
+            RateHeader = new RateHeaderEditModel
+            {
+                RateName = "Corporate Standard Rate", FolioText = "Corporate Rate - Standard",
+                Hotel = "Main Hotel", RateCategory = "Standard Rate",
+                StartDate = DateTime.Today, EndDate = DateTime.Today.AddMonths(6),
+                Article = "SE-00001 - ACCOMMODATION", Currency = "USD",
+                Exchange = "Reservation Day Rate", Market = "Corporate Business", Source = "Company Direct",
+                Commission = 10.5m, Addition = 5.0m, MaxOccupancy = 2, MinOccupancy = 1,
+                Multiplication = 1.0m, Remark = "Standard corporate rate for business travelers",
+                Negotiated = true, PrintRate = true, ChannelAllowed = true, RegionalAvailability = true
+            },
+            SelectedRoomTypeIds = new List<int> { 1, 2 },
+            SelectedPackageIds = new List<int> { 1, 4 }
+        },
+        new RateHeaderOption
+        {
+            Id = 2,
+            DisplayName = "LEISURE-2024-002 - Weekend Special",
+            RateHeader = new RateHeaderEditModel
+            {
+                RateName = "Weekend Special", FolioText = "Weekend Getaway Rate",
+                Hotel = "Resort", RateCategory = "Special Rate",
+                StartDate = DateTime.Today.AddDays(-30), EndDate = DateTime.Today.AddMonths(3),
+                Article = "SE-00005 - ROOM CHARGE", Currency = "EUR",
+                Exchange = "Arrival Day Rate", Market = "Leisure", Source = "Online",
+                Commission = 15.0m, Addition = 8.5m, MaxOccupancy = 3, MinOccupancy = 2,
+                Multiplication = 1.2m, Remark = "Weekend special rate for leisure travelers",
+                DayType = true, PrintRate = true, Discount = true, ChannelAllowed = true
+            },
+            SelectedRoomTypeIds = new List<int> { 2, 4 },
+            SelectedPackageIds = new List<int> { 2, 3, 4 }
+        },
+        new RateHeaderOption
+        {
+            Id = 3,
+            DisplayName = "GROUP-2024-003 - Group Room Rate",
+            RateHeader = new RateHeaderEditModel
+            {
+                RateName = "Group Room Rate", FolioText = "Group Booking Rate",
+                Hotel = "Branch Hotel", RateCategory = "Group Room Rate",
+                StartDate = DateTime.Today.AddDays(-15), EndDate = DateTime.Today.AddMonths(4),
+                Article = "SE-00002 - SERVICE CHARGE", Currency = "Birr",
+                Exchange = "Posting Date Rate", Market = "Group", Source = "Travel Agent",
+                Commission = 12.0m, Addition = 3.0m, MaxOccupancy = 4, MinOccupancy = 2,
+                Multiplication = 0.9m, Remark = "Group rate for tour operators",
+                PackageComponent = true, Negotiated = true, SuppressRate = true,
+                PrintRate = true, Tiered = true, CateringPackage = true, RegionalAvailability = true
+            },
+            SelectedRoomTypeIds = new List<int> { 1, 3, 4 },
+            SelectedPackageIds = new List<int> { 1, 2, 5 }
+        },
+        new RateHeaderOption
+        {
+            Id = 4,
+            DisplayName = "MEMBERSHIP-2024-004 - Member Exclusive",
+            RateHeader = new RateHeaderEditModel
+            {
+                RateName = "Member Exclusive", FolioText = "Membership Rate",
+                Hotel = "Main Hotel", RateCategory = "Special Rate",
+                StartDate = DateTime.Today.AddDays(-60), EndDate = DateTime.Today.AddMonths(12),
+                Article = "SE-00001 - ACCOMMODATION", Currency = "USD",
+                Exchange = "Reservation Day Rate", Market = "Leisure", Source = "Company Direct",
+                Commission = 8.0m, Addition = 2.0m, MaxOccupancy = 2, MinOccupancy = 1,
+                Multiplication = 1.0m, Remark = "Exclusive rate for loyalty members",
+                PrintRate = true, Discount = true, Membership = true,
+                Complimentary = true, ChannelAllowed = true, BAR = true, BenefitRateCode = true
+            },
+            SelectedRoomTypeIds = new List<int> { 1, 4, 5 },
+            SelectedPackageIds = new List<int> { 4, 5 }
+        },
+        new RateHeaderOption
+        {
+            Id = 5,
+            DisplayName = "DAYUSE-2024-005 - Day Use Rate",
+            RateHeader = new RateHeaderEditModel
+            {
+                RateName = "Day Use Rate", FolioText = "Day Use Rate",
+                Hotel = "Resort", RateCategory = "Standard Rate",
+                StartDate = DateTime.Today, EndDate = DateTime.Today.AddMonths(6),
+                Article = "SE-00005 - ROOM CHARGE", Currency = "EUR",
+                Exchange = "Arrival Day Rate", Market = "Corporate Business", Source = "Online",
+                Commission = 5.0m, Addition = 1.5m, MaxOccupancy = 2, MinOccupancy = 1,
+                Multiplication = 0.75m, Remark = "Day use rate for business travelers",
+                PrintRate = true, DayUse = true, ChannelAllowed = true
+            },
+            SelectedRoomTypeIds = new List<int> { 1, 2 },
+            SelectedPackageIds = new List<int> { 1, 3, 4 }
+        }
+    };
 
     // Models
     public class RateHeaderEditModel
     {
         public string RateName { get; set; } = string.Empty;
         public string FolioText { get; set; } = string.Empty;
+        public string Hotel { get; set; } = string.Empty;
         public string RateCategory { get; set; } = string.Empty;
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
@@ -952,6 +1124,15 @@
         public bool DailyRates { get; set; }
         public bool BenefitRateCode { get; set; }
         public bool RegionalAvailability { get; set; }
+    }
+
+    public class RateHeaderOption
+    {
+        public int Id { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public RateHeaderEditModel RateHeader { get; set; } = new();
+        public List<int> SelectedRoomTypeIds { get; set; } = new();
+        public List<int> SelectedPackageIds { get; set; } = new();
     }
 
     public class DaySelection
