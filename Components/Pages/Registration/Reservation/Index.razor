@@ -313,9 +313,6 @@
 <RateSearchPopup @bind-Visible="showRateSearch"
                  StartDate="rateStartDate"
                  EndDate="rateEndDate"
-                 SearchType="rateSearchType"
-                 RateCode="rateSearchCode"
-                 Status="rateStatus"
                  RateSearchRows="rateSearchRows"
                  OnSelect="SelectRate"
                  OnSearch="SearchRates"
@@ -1148,9 +1145,6 @@
     bool showRateSearch = false;
     DateTime? rateStartDate = new DateTime(2017, 8, 10);
     DateTime? rateEndDate = new DateTime(2017, 8, 12);
-    string rateSearchType = "Average";
-    string rateSearchCode = "";
-    string rateStatus = "Closed";
     RateRow? selectedRateRow;
     List<RateRow> rateSearchRows = new()
     {
