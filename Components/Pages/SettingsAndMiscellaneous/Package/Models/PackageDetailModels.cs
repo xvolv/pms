@@ -36,6 +36,7 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
     public class PackageGroup
     {
         public string Name { get; set; } = "";
+        public string Hotel { get; set; } = "";
         public List<PackageDetailRow> Details { get; set; } = new();
     }
 

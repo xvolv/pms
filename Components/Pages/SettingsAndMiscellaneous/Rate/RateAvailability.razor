@@ -836,6 +836,21 @@
         });
     }
 
+    public void ClearAll()
+    {
+        OnDeleteRequest?.Invoke("Are you sure you want to clear all availability data?", () =>
+        {
+            AvailabilityData.Clear();
+        });
+    }
+
+    public void SetYear(int year)
+    {
+        CurrentYear = year;
+        AvailabilityData.Clear(); // Clear availability data when year changes
+        SelectedMonth = 0;
+    }
+
     // ---------------- Toolbar actions ----------------
     private void OnRefreshClick()
     {

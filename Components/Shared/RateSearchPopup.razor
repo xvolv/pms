@@ -587,7 +587,7 @@
     public EventCallback<GridRowClickEventArgs> OnRowClick { get; set; }
 
     [Parameter]
-    public Action<GridCustomizeElementEventArgs> OnCustomizeElement { get; set; }
+    public Action<GridCustomizeElementEventArgs>? OnCustomizeElement { get; set; }
 
     private void ClosePopup()
     {

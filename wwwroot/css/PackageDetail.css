@@ -17,7 +17,7 @@
 }
 
 .detail-list-panel {
-    width: 160px;
+    width: 200px;
     min-width: 160px;
     border: 1px solid #cfcfcf;
     background: #fff;
@@ -914,4 +914,190 @@
     .detail-grid-footer {
         display: none !important;
     }
+}
+
+
+.detail-list-panel {
+.detail-list-panel {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+ 
+.pd-tree-header {
+    display: flex;
+    align-items: center;
+    height: 29px;
+    background: #F8F8F8;
+    border: 1px solid #ABABAB;
+    border-bottom: 1px solid #ABABAB;
+    font-size: 13px;
+    color: #777777;
+    flex-shrink: 0;
+}
+ 
+.pd-tree-header-flag {
+    width: 40px;
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #ABABAB;
+}
+ 
+.pd-tree-header-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+ 
+.pd-sort-arrow {
+    font-size: 9px;
+    color: #777777;
+}
+ 
+.pd-tree-body {
+    border: 1px solid #ABABAB;
+    border-top: none;
+    flex: 1;
+    overflow-y: auto;
+}
+ 
+.pd-group-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 8px;
+    background: #F0F0F0;
+    border-bottom: 1px solid #D2D2D2;
+    font-weight: 700;
+    color: #2B2B2B;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+}
+ 
+.pd-group-row:hover {
+    background: #E8E8E8;
+}
+ 
+.pd-chevron {
+    width: 14px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 12px;
+    color: #2B2B2B;
+}
+ 
+.pd-item-row {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #202020;
+    border-bottom: 1px solid #EDEDED;
+}
+ 
+.pd-item-icon {
+    width: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+ 
+.pd-item-name {
+    flex: 1;
+    padding-right: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+ 
+.pd-item-row:hover {
+    background: #EEF4FB;
+}
+ 
+.pd-item-row.selected {
+    background: #0078D7;
+    color: #FFFFFF;
+}
+ 
+/* ===================== Responsive breakpoints =====================
+   Follows the same 992px / 640px pattern used on the Dashboard page.
+*/
+ 
+/* Tablet: stack the tree panel above the grid instead of side-by-side */
+@media (max-width: 992px) {
+    .master-detail {
+        flex-direction: column;
+    }
+ 
+    .detail-list-panel {
+        width: 100%;
+        max-height: 260px;
+        flex-shrink: 0;
+    }
+ 
+    .detail-grid-panel {
+        width: 100%;
+    }
+ 
+    .grid-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+ 
+/* Mobile: shrink rows, icons, and text so the tree panel stays usable */
+@media (max-width: 640px) {
+    .detail-list-panel {
+        max-height: 200px;
+    }
+ 
+    .pd-tree-header {
+        height: 26px;
+        font-size: 12px;
+    }
+ 
+    .pd-tree-header-flag,
+    .pd-item-icon {
+        width: 32px;
+    }
+ 
+    .pd-sort-arrow {
+        font-size: 8px;
+    }
+ 
+    .pd-group-row {
+        height: 24px;
+        padding: 0 6px;
+        font-size: 12px;
+    }
+ 
+    .pd-item-row {
+        height: 30px;
+        font-size: 12px;
+    }
+ 
+    .pd-item-icon {
+        font-size: 13px;
+    }
+ 
+    .pd-chevron {
+        width: 12px;
+        font-size: 11px;
+    }
+ 
+    .pd-item-name {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+}
 }

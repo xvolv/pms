@@ -1,7 +1,7 @@
 @rendermode InteractiveServer
 
 <div class="erp-toolbar">
- @if (OnRefresh.HasDelegate)
+ @if (ShowRefresh && OnRefresh.HasDelegate)
     {
         <button class="toolbar-btn" @onclick="OnRefresh">
             <div class="toolbar-icon">
@@ -11,7 +11,7 @@
         </button>
     }
 
-    @if (OnNew.HasDelegate)
+    @if (ShowNew && OnNew.HasDelegate)
     {
         <button class="toolbar-btn" @onclick="OnNew">
             <div class="toolbar-icon">
@@ -21,7 +21,7 @@
         </button>
     }
 
-    @if (OnEdit.HasDelegate)
+    @if (ShowEdit && OnEdit.HasDelegate)
     {
         <button class="toolbar-btn" @onclick="OnEdit">
             <div class="toolbar-icon">
@@ -31,7 +31,7 @@
         </button>
     }
 
-    @if (OnSave.HasDelegate)
+    @if (ShowSave && OnSave.HasDelegate)
     {
         <button class="toolbar-btn" @onclick="OnSave">
             <div class="toolbar-icon">
@@ -43,7 +43,7 @@
 
    
 
-    @if (OnDelete.HasDelegate)
+    @if (ShowDelete && OnDelete.HasDelegate)
     {
         <button class="toolbar-btn" @onclick="OnDelete">
             <div class="toolbar-icon">
@@ -53,7 +53,17 @@
         </button>
     }
 
-    @if (OnPrint.HasDelegate)
+    @if (ShowClearAll && OnClearAll.HasDelegate)
+    {
+        <button class="toolbar-btn" @onclick="OnClearAll">
+            <div class="toolbar-icon">
+                <i class="bi bi-eraser"></i>
+            </div>
+            <div class="toolbar-text">Clear All</div>
+        </button>
+    }
+
+    @if (ShowPrint && OnPrint.HasDelegate)
     {
         <button class="toolbar-btn toolbar-print" @onclick="OnPrint">
             <div class="toolbar-icon">
@@ -61,6 +71,46 @@
             </div>
             <div class="toolbar-text">Print</div>
         </button>
+    }
+
+    @if (ShowDropdown1 && Dropdown1Data != null)
+    {
+        <div class="toolbar-dropdown-wrapper">
+            <div class="toolbar-dropdown-label">@Dropdown1Label</div>
+            <DxComboBox Data="@Dropdown1Data" 
+                        Value="@Dropdown1SelectedValue" 
+                        ValueChanged="@((string? value) => Dropdown1SelectedValueChanged.InvokeAsync(value))"
+                        CssClass="toolbar-dropdown"
+                        AllowUserInput="true" />
+        </div>
+    }
+
+    @if (ShowDropdown2 && Dropdown2Data != null)
+    {
+        <div class="toolbar-dropdown-wrapper">
+            <label class="toolbar-dropdown-label">@Dropdown2Label</label>
+            <DxComboBox Data="@Dropdown2Data" 
+                        Value="@Dropdown2SelectedValue" 
+                        ValueChanged="@((string? value) => Dropdown2SelectedValueChanged.InvokeAsync(value))"
+                        CssClass="toolbar-dropdown"
+                        AllowUserInput="true" />
+        </div>
+    }
+
+    @if (ShowRateHeaderDropdown && RateHeaderDropdownData != null)
+    {
+        <div class="toolbar-dropdown-wrapper">
+            <label class="toolbar-dropdown-label">@RateHeaderDropdownLabel</label>
+            <DxComboBox Data="@(RateHeaderDropdownData.Cast<RateHeader.RateHeaderOption>())" 
+                        Value="@RateHeaderDropdownSelectedValue"
+                        ValueChanged="@((int? value) => OnRateHeaderDropdownValueChanged(value))"
+                        CssClass="toolbar-dropdown"
+                        TextFieldName="DisplayName"
+                        ValueFieldName="Id"
+                        AllowUserInput="false"
+                        NullText="-- Select a Rate Header --"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+        </div>
     }
 
     @if (OnClose.HasDelegate)
@@ -81,8 +131,85 @@
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRefresh { get; set; }
     [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnClearAll { get; set; }
     [Parameter] public EventCallback OnPrint { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
+
+    // Button visibility parameters
+    [Parameter] public bool ShowRefresh { get; set; } = true;
+    [Parameter] public bool ShowNew { get; set; } = true;
+    [Parameter] public bool ShowEdit { get; set; } = true;
+    [Parameter] public bool ShowSave { get; set; } = true;
+    [Parameter] public bool ShowDelete { get; set; } = true;
+    [Parameter] public bool ShowClearAll { get; set; } = true;
+    [Parameter] public bool ShowPrint { get; set; } = true;
+
+    // Dropdown parameters
+    [Parameter] public bool ShowDropdown1 { get; set; } = false;
+    [Parameter] public string Dropdown1Label { get; set; } = "Dropdown";
+    [Parameter] public IEnumerable<string>? Dropdown1Data { get; set; }
+    [Parameter] public string? Dropdown1SelectedValue { get; set; }
+    [Parameter] public EventCallback<string?> Dropdown1SelectedValueChanged { get; set; }
+
+    [Parameter] public bool ShowDropdown2 { get; set; } = false;
+    [Parameter] public string Dropdown2Label { get; set; } = "Dropdown";
+    [Parameter] public IEnumerable<string>? Dropdown2Data { get; set; }
+    [Parameter] public string? Dropdown2SelectedValue { get; set; }
+    [Parameter] public EventCallback<string?> Dropdown2SelectedValueChanged { get; set; }
+
+    // Rate Header Dropdown parameters
+    [Parameter] public bool ShowRateHeaderDropdown { get; set; } = false;
+    [Parameter] public string RateHeaderDropdownLabel { get; set; } = "Rate Header";
+    [Parameter] public IEnumerable<object>? RateHeaderDropdownData { get; set; }
+    [Parameter] public int? RateHeaderDropdownSelectedValue { get; set; }
+    [Parameter] public EventCallback<int?> RateHeaderDropdownSelectedValueChanged { get; set; }
+
+    private async Task OnRateHeaderDropdownValueChanged(int? value)
+    {
+        RateHeaderDropdownSelectedValue = value;
+        await RateHeaderDropdownSelectedValueChanged.InvokeAsync(value);
+    }
+
+    // Methods to control the component
+    public void New()
+    {
+        if (OnNew.HasDelegate)
+        {
+            OnNew.InvokeAsync();
+        }
+    }
+
+    public void Edit()
+    {
+        if (OnEdit.HasDelegate)
+        {
+            OnEdit.InvokeAsync();
+        }
+    }
+
+    public void Save()
+    {
+        if (OnSave.HasDelegate)
+        {
+            OnSave.InvokeAsync();
+        }
+    }
+
+    public void Delete()
+    {
+        if (OnDelete.HasDelegate)
+        {
+            OnDelete.InvokeAsync();
+        }
+    }
+
+    public void Refresh()
+    {
+        if (OnRefresh.HasDelegate)
+        {
+            OnRefresh.InvokeAsync();
+        }
+    }
 }
 
 <style>
@@ -380,6 +507,97 @@
     @@media print {
         .erp-toolbar {
             display: none !important;
+        }
+    }
+
+    /* =====================================================
+       DROPDOWN STYLES
+    ===================================================== */
+    .toolbar-dropdown-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        padding: 10px 12px;
+        gap:10px;
+        flex-shrink: 0;
+    }
+
+    .toolbar-dropdown-label {
+        font-size: 29px;
+        color: #444;
+        font-weight: 400;
+    }
+
+    .toolbar-dropdown {
+        min-width: 100px;
+        font-size: 12px;
+    }
+
+    /* Responsive dropdown styles */
+    @@media (max-width: 1024px) {
+        .toolbar-dropdown-wrapper {
+            min-width: 100px;
+            padding: 4px 8px;
+        }
+
+        .toolbar-dropdown-label {
+            font-size: 9px;
+        }
+
+        .toolbar-dropdown {
+            min-width: 90px;
+            font-size: 11px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .toolbar-dropdown-wrapper {
+            min-width: 80px;
+            padding: 3px 6px;
+        }
+
+        .toolbar-dropdown-label {
+            font-size: 8px;
+        }
+
+        .toolbar-dropdown {
+            min-width: 70px;
+            font-size: 10px;
+        }
+
+        @@media (max-width: 480px) {
+            .toolbar-dropdown-wrapper {
+                min-width: 70px;
+                padding: 2px 4px;
+            }
+
+            .toolbar-dropdown-label {
+                font-size: 7px;
+            }
+
+            .toolbar-dropdown {
+                min-width: 60px;
+                font-size: 9px;
+            }
+        }
+    }
+
+    @@media (min-width: 1600px) {
+        .toolbar-dropdown-wrapper {
+            min-width: 140px;
+            padding: 6px 16px;
+        }
+
+        .toolbar-dropdown-label {
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .toolbar-dropdown {
+            min-width: 120px;
+            font-size: 13px;
         }
     }
 </style>

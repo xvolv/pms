@@ -10,6 +10,7 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
             {
                 Code = "PK001",
                 Description = "Lunch Package",
+                Hotel = "Hilton",
                 Group = "Food",
                 Type = "Standard",
                 Currency = "USD",
@@ -20,11 +21,23 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
             {
                 Code = "PK002",
                 Description = "Dinner Package",
+                Hotel = "Marriott",
                 Group = "Food",
                 Type = "Premium",
                 Currency = "USD",
                 Article = "Dinner",
                 PostingRhythm = "Weekly"
+            },
+            new PackageHeaderModel
+            {
+                Code = "PK003",
+                Description = "Breakfast Package",
+                Hotel = "Hilton",
+                Group = "Food",
+                Type = "Standard",
+                Currency = "USD",
+                Article = "Breakfast",
+                PostingRhythm = "Daily"
             }
         };
 
@@ -53,6 +66,7 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
             if (existing != null)
             {
                 existing.Description = package.Description;
+                existing.Hotel = package.Hotel;
                 existing.Group = package.Group;
                 existing.Type = package.Type;
                 existing.Currency = package.Currency;
@@ -79,6 +93,7 @@ namespace ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
             {
                 Code = GenerateNextCode(),
                 Description = "",
+                Hotel = "",
                 Group = "",
                 Type = "",
                 Currency = "",

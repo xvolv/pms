@@ -13,14 +13,36 @@
 
         <div class="detail-list-panel">
 
-            @foreach (var group in packageGroups)
-            {
-                <div class="detail-list-item @(selectedGroup == group ? "selected" : "")"
-                     @onclick="@(() => SelectGroup(group))">
-                    <span class="detail-list-icon">🍱</span>
-                    <span>@group.Name</span>
+            <!-- Header row: "*" flag column + "Package Header" title + sort arrow -->
+            <div class="pd-tree-header">
+                <div class="pd-tree-header-flag">*</div>
+                <div class="pd-tree-header-title">
+                    <span>Package Header</span>
+                    <!-- <i class="bi bi-chevron-up pd-sort-arrow"></i> -->
                 </div>
-            }
+            </div>
+
+            <div class="pd-tree-body">
+                @foreach (var hotelGroup in packageGroups.GroupBy(g => g.Hotel))
+                {
+                    <div class="pd-group-row" @onclick="@(() => ToggleHotelGroup(hotelGroup.Key))">
+                        <i class="@(expandedHotels.Contains(hotelGroup.Key) ? "bi bi-chevron-down" : "bi bi-chevron-right") pd-chevron"></i>
+                        <span class="pd-group-title">Hotel: @hotelGroup.Key</span>
+                    </div>
+
+                    @if (expandedHotels.Contains(hotelGroup.Key))
+                    {
+                        @foreach (var group in hotelGroup)
+                        {
+                            <div class="pd-item-row @(selectedGroup == group ? "selected" : "")"
+                                 @onclick="@(() => SelectGroup(group))">
+                                <span class="pd-item-icon">&#128230;</span>
+                                <span class="pd-item-name">@group.Name</span>
+                            </div>
+                        }
+                    }
+                }
+            </div>
 
         </div>
 
@@ -81,6 +103,9 @@
     private PackageDetailRow? editingRow = null;
     private string popupTitle = "Create Package Detail";
 
+    // NEW: tracks which "Hotel: X" groups are expanded in the left tree panel
+    private HashSet<string> expandedHotels = new();
+
     private bool ShowDeleteConfirm = false;
     private PackageDetailRow? PendingDelete = null;
 
@@ -88,7 +113,20 @@
     {
         packageGroups = Service.GetPackageGroups();
         selectedGroup = Service.GetFirstGroup();
+
+        // Expand every hotel group by default (matches reference: groups start open)
+        expandedHotels = packageGroups.Select(g => g.Hotel).Distinct().ToHashSet();
+
         ResetForm();
+    }
+
+    // NEW: toggles a hotel group open/closed in the tree panel
+    private void ToggleHotelGroup(string hotel)
+    {
+        if (!expandedHotels.Add(hotel))
+        {
+            expandedHotels.Remove(hotel);
+        }
     }
 
     private void SelectGroup(PackageGroup group)
@@ -248,4 +286,3 @@
     </BodyContentTemplate>
 
 </DxPopup>
-
