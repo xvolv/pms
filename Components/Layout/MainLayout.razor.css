@@ -47,7 +47,93 @@ main {
     }
 }
 
+/* Sidebar-as-overlay range. Anything narrower than the "desktop push" query
+   below (now ≥1405px, was ≥1100px) gets an off-canvas drawer instead: fixed
+   position + translateX slide, so opening it lays on top of the content
+   instead of squeezing main/article into a narrower column. At these widths
+   .page is still its base flex-direction: column, so main naturally takes
+   the full width regardless of the sidebar's open/closed state.
+   Raised specifically past common laptop widths (1366px, 1400px) — those
+   were exactly wide enough to look "desktop", but not wide enough to give
+   up 280px to a pushed sidebar without .top-header's fixed-width calendar/
+   logo columns overflowing (the logo going invisible/half-cut-off bug). */
+@media (max-width: 1404.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        max-width: 85vw;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(0);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-collapsed .sidebar {
+        transform: translateX(-100%);
+    }
+
+    /* left: 280px by default (open state) hugs the sidebar's right edge, same
+       as the desktop push-mode button below — was hard-coded to left: 0
+       always here, which put it at the screen's edge, under/behind the open
+       sidebar, instead of at a sensible "close" position on its visible
+       edge. .sidebar-collapsed drops it back to 0 once the drawer's closed. */
+    .sidebar-toggle-btn {
+        position: fixed;
+        left: 280px;
+        top: 8px;
+        width: 22px;
+        height: 36px;
+        background-color: #ffffff;
+        border: 1px solid #d3d3d3;
+        border-left: none;
+        border-radius: 0 4px 4px 0;
+        z-index: 1001;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #5f6368;
+        outline: none;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0;
+    }
+
+    .sidebar-collapsed .sidebar-toggle-btn {
+        left: 0;
+    }
+}
+
+/* Sticky top-row / article padding — unrelated to the sidebar push-vs-overlay
+   split above, kept at its original narrower threshold. */
 @media (min-width: 641px) {
+    .top-row {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row.auth ::deep a:first-child {
+        flex: 1;
+        text-align: right;
+        width: 0;
+    }
+
+    .top-row, article {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+/* Desktop "push" sidebar: always visible, collapses via negative margin-left,
+   shares the row with main via .page { flex-direction: row }. Raised from
+   ≥1100px to ≥1405px — below that, the overlay query above takes over,
+   since those widths don't reliably have 280px of surplus room to give up
+   without squeezing .top-header's fixed-width columns. */
+@media (min-width: 1405px) {
     .page {
         flex-direction: row;
     }
@@ -73,9 +159,16 @@ main {
         min-width: 0;
     }
 
+    /* position: fixed (was absolute, anchored to main — which scrolls with
+       the page, so the button scrolled away with the content instead of
+       staying put like it does on mobile). Being fixed means "left" is now
+       relative to the viewport instead of main's own edge, so it needs the
+       same .sidebar-collapsed-driven toggle the sidebar itself already
+       uses: hug the sidebar's right edge (280px) when it's open, hug the
+       viewport's left edge (0) once the sidebar's pushed out of view. */
     .sidebar-toggle-btn {
-        position: absolute;
-        left: 0;
+        position: fixed;
+        left: 280px;
         top: 8px;
         width: 22px;
         height: 36px;
@@ -91,30 +184,17 @@ main {
         color: #5f6368;
         outline: none;
         box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-        transition: background-color 0.15s, color 0.15s;
+        transition: background-color 0.15s, color 0.15s, left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 0;
+    }
+
+    .sidebar-collapsed .sidebar-toggle-btn {
+        left: 0;
     }
 
     .sidebar-toggle-btn:hover {
         background-color: #e8f0fe;
         color: #1a73e8;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
     }
 }
 
