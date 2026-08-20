@@ -55,6 +55,13 @@
                 <div class="toolbar-icon"><i class="bi bi-printer"></i></div>
                 <div class="toolbar-text">Print Card</div>
             </button>
+        </div>
+
+        <div class="toolbar-group hotel-group">
+            <HotelDropdown @bind-selectedHotel="selectedHotel" />
+        </div>
+
+        <div class="toolbar-group">
             <button class="toolbar-btn toolbar-close" @onclick="CloseWindow">
                 <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
                 <div class="toolbar-text">Close</div>
@@ -582,6 +589,12 @@
         flex-wrap: wrap;
     }
 
+    .hotel-group {
+        border-left: 1px solid #ddd;
+        padding: 0 10px;
+        margin: 0 5px;
+    }
+
     .toolbar-btn {
         background: transparent !important;
         border: none !important;
@@ -606,7 +619,7 @@
     }
 
     .toolbar-btn.toolbar-close {
-        margin-left: auto;
+        margin-left: 0;
     }
 
     .toolbar-icon {
@@ -1119,6 +1132,7 @@
     public EventCallback OnClose { get; set; }
 
     string ReservationNo = "REG-00156-17";
+    string? selectedHotel = "1";
 
     // Basic Info
     int? selectedGuestId;

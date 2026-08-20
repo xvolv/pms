@@ -53,6 +53,16 @@
                     <div class="toolbar-text">Comments</div>
                 </button>
             }
+        </div>
+
+        @if (HotelContent != null)
+        {
+            <div class="toolbar-group hotel-group">
+                @HotelContent
+            </div>
+        }
+
+        <div class="toolbar-group">
             @if (OnClose.HasDelegate)
             {
                 <button class="toolbar-btn toolbar-close" @onclick="OnClose">
@@ -245,6 +255,7 @@
     [Parameter] public ToolbarContextType ToolbarContext { get; set; } = ToolbarContextType.Default;
     [Parameter] public RenderFragment? StateContent { get; set; }
     [Parameter] public RenderFragment? CustomContent { get; set; }
+    [Parameter] public RenderFragment? HotelContent { get; set; }
 
     [Parameter] public EventCallback OnNew { get; set; }
     [Parameter] public EventCallback OnEdit { get; set; }
@@ -298,6 +309,12 @@
         font-size: 12px;
         color: #555;
         margin-right: 5px;
+    }
+
+    .hotel-group {
+        border-left: 1px solid #ddd;
+        padding: 0 10px;
+        margin: 0 5px;
     }
 
     .toolbar-btn {

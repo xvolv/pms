@@ -25,6 +25,9 @@
         <StateContent>
             <DxComboBox CssClass="erp-combobox" Data="@reservationStates" @bind-Value="selectedState" Width="110px" SizeMode="SizeMode.Small" />
         </StateContent>
+        <HotelContent>
+            <HotelDropdown @bind-selectedHotel="selectedHotel" />
+        </HotelContent>
     </RegistrationToolbar>
 
     <!-- ===================== MAIN FORM + RED COMMENT BAR ===================== -->
@@ -972,6 +975,7 @@
 
 @code {
     string ReservationNo = "REG-00040-17";
+    string? selectedHotel = "1";
     string selectedState = "6PM";
     string[] reservationStates = { "6PM", "Confirmed", "Tentative", "Cancelled", "No Show", "Checked In", "Checked Out" };
 
