@@ -16,11 +16,12 @@
     </div>
 
     <div class="dashboard-content">
-        <DxTabs @bind-ActiveTabIndex="activeTabIndex" CssClass="hk-tabs">
+        <DxTabs ActiveTabIndex="@activeTabIndex" ActiveTabIndexChanged="@OnTabChanged" CssClass="hk-tabs">
             <DxTabPage Text="Task Assignment" />
+            <DxTabPage Text="Room Management" />
             <DxTabPage Text="Discrepancy" />
             <DxTabPage Text="Turndown Management" />
-            <DxTabPage Text="Room Management" />
+
         </DxTabs>
 
         @switch (activeTabIndex)
@@ -29,13 +30,13 @@
                 <TaskAssignmentPanel State="@state" OnChanged="Refresh" />
                 break;
             case 1:
-                <DiscrepancyPanel State="@state" OnChanged="Refresh" />
+                <RoomManagementPanel State="@state" OnChanged="Refresh" />
                 break;
             case 2:
-                <TurndownPanel State="@state" OnChanged="Refresh" />
+                <DiscrepancyPanel State="@state" OnChanged="Refresh" />
                 break;
             case 3:
-                <RoomManagementPanel State="@state" OnChanged="Refresh" />
+                <TurndownPanel State="@state" OnChanged="Refresh" />
                 break;
         }
     </div>
@@ -48,9 +49,15 @@
     private HouseKeepingState state = HouseKeepingState.CreateSample();
     private int activeTabIndex;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         activeTabIndex = Tab is >= 0 and <= 3 ? Tab.Value : 0;
+    }
+
+    private void OnTabChanged(int newIndex)
+    {
+        activeTabIndex = newIndex;
+        NavigationManager.NavigateTo($"/housekeeping?tab={newIndex}", replace: true);
     }
 
     private void Refresh() => StateHasChanged();

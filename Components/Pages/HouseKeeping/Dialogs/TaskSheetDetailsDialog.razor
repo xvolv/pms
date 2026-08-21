@@ -13,7 +13,7 @@
 
             <div class="rt-toolbar na-modal-toolbar">
                 <button type="button" class="rt-toolbar-btn" @onclick="Generate">
-                    <i class="bi bi-file-earmark-gear text-secondary"></i>
+                    <i class="bi bi-check-circle text-secondary"></i>
                     <span>Generate</span>
                 </button>
                 <button type="button" class="rt-toolbar-btn" @onclick="Close">
@@ -53,9 +53,10 @@
                         <label>Attendants</label>
                         <div class="hk-attendant-field">
                             <input type="text" class="form-control" value="@selectedAttendantText" readonly />
-                            <button class="btn btn-secondary" style="border-radius:0; background-color:#ffff"
+                            <button class="btn btn-secondary"
+                                    style="border-radius:0; background-color:#6c757d; border-color:#6c757d;"
                                     @onclick="() => showAttendantDropdown = !showAttendantDropdown">
-                                <i class="bi bi-chevron-down"></i>
+                                <i class="bi bi-chevron-down" style="color:white"></i>
                             </button>
                         </div>
                     </div>

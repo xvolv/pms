@@ -24,6 +24,8 @@
         <DxDateEdit @bind-Date="taskDateFilter" CssClass="rt-detail-input" style="width:140px;" />
         <span class="tb-label">Month</span>
         <DxComboBox Data="@State.Months" @bind-Value="selectedMonth" CssClass="rt-detail-input" style="width:120px;" />
+        <span class="tb-label">Hotel</span>
+        <DxComboBox Data="@State.Hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" style="width:120px;" />
     </div>
 </div>
 
@@ -123,6 +125,7 @@
     private TaskAssignmentRow? selectedAssignment;
     private DateTime taskDateFilter = DateTime.Today;
     private string? selectedMonth;
+    private string? selectedHotel;
     private bool showTaskSheetDetails;
     private bool showTaskSheetGrid;
     private bool showPrintPreview;
@@ -132,6 +135,7 @@
     protected override void OnInitialized()
     {
         selectedMonth = State.Months.ElementAtOrDefault(DateTime.Today.Month - 1);
+        selectedHotel = State.Hotels.FirstOrDefault();
         selectedAssignment = State.TaskAssignments.LastOrDefault();
     }
 

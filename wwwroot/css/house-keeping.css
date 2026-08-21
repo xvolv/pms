@@ -33,6 +33,21 @@
     min-height: 24px;
 }
 
+/* Toolbar action buttons (Save..Cancel), boxed with a border like the
+   Housekeeping/Reservation status filter groups next to it. */
+.hk-action-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.hk-check-all {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
 .hk-chk-row {
     display: flex;
     align-items: center;

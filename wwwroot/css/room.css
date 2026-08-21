@@ -1064,3 +1064,9 @@
 .rp-print-body::-webkit-scrollbar-thumb:hover {
     background: #666;
 }
+.dxbs-grid>.card {
+    /* position: static;
+    width: 100%;
+    min-height: 0; */
+    border-radius: 0px !important;
+}

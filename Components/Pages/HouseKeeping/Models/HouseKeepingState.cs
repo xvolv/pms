@@ -40,6 +40,10 @@ public class HouseKeepingState
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December",
     };
+    public List<string> Hotels { get; } = new()
+    {
+        "Test Hotel ", "Hotel B", "Hotel C", "Hotel D", "Hotel E",
+    };
 
     private static int _nextId;
     private static int NextId() => ++_nextId;
