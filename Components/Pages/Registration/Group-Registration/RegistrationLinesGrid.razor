@@ -1,0 +1,180 @@
+@using DevExpress.Blazor
+
+<div class="reglines-grid-wrap">
+    <DxGrid Data="@Lines"
+            CssClass="reglines-grid"
+            ShowFilterRow="false"
+            ShowGroupPanel="false"
+            SelectionMode="GridSelectionMode.Single"
+            @bind-SelectedDataItem="@SelectedLineObj"
+            PageSize="0">
+        <Columns>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.RoomType)" Caption="Room Type" Width="120px" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Room)" Caption="Room" Width="80px" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Guest)" Caption="Guest" Width="140px" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Adult)" Caption="Adult" Width="60px" TextAlignment="GridTextAlignment.Center" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Child)" Caption="Child" Width="60px" TextAlignment="GridTextAlignment.Center" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Arrival)" Caption="Arrival" Width="100px" DisplayFormat="M/d/yyyy" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Departure)" Caption="Departure" Width="100px" DisplayFormat="M/d/yyyy" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.NoOfNight)" Caption="# of Night" Width="80px" TextAlignment="GridTextAlignment.Center" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Rate)" Caption="Rate" Width="100px" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Amount)" Caption="Amount" Width="100px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.TotalAmount)" Caption="Total Amount" Width="110px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+        </Columns>
+    </DxGrid>
+</div>
+
+<div class="reglines-footer">
+    <div class="reglines-navigator">
+        <i class="bi bi-chevron-bar-left reglines-nav-btn" @onclick="GoFirst"></i>
+        <i class="bi bi-chevron-left reglines-nav-btn" @onclick="GoPrev"></i>
+        <span class="reglines-nav-text">Record @(Lines.Count == 0 ? 0 : CurrentIndex + 1) of @Lines.Count</span>
+        <i class="bi bi-chevron-right reglines-nav-btn" @onclick="GoNext"></i>
+        <i class="bi bi-chevron-bar-right reglines-nav-btn" @onclick="GoLast"></i>
+    </div>
+    <div class="reglines-totals">
+        <div class="reglines-total-box" title="Amount total">@Lines.Sum(l => l.Amount).ToString("N2")</div>
+        <div class="reglines-total-box" title="Total Amount total">@Lines.Sum(l => l.TotalAmount).ToString("N2")</div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<RegistrationLine> Lines { get; set; } = new();
+    [Parameter] public RegistrationLine SelectedLine { get; set; }
+    [Parameter] public EventCallback<RegistrationLine> SelectedLineChanged { get; set; }
+
+    object SelectedLineObj
+    {
+        get => SelectedLine;
+        set
+        {
+            SelectedLine = value as RegistrationLine;
+            CurrentIndex = SelectedLine == null ? -1 : Lines.IndexOf(SelectedLine);
+            SelectedLineChanged.InvokeAsync(SelectedLine);
+        }
+    }
+
+    int CurrentIndex { get; set; } = -1;
+
+    void GoFirst()
+    {
+        if (Lines.Count == 0) return;
+        SelectedLineObj = Lines.First();
+    }
+
+    void GoPrev()
+    {
+        if (Lines.Count == 0) return;
+        var idx = Math.Max(0, CurrentIndex - 1);
+        SelectedLineObj = Lines[idx];
+    }
+
+    void GoNext()
+    {
+        if (Lines.Count == 0) return;
+        var idx = Math.Min(Lines.Count - 1, CurrentIndex + 1);
+        SelectedLineObj = Lines[idx];
+    }
+
+    void GoLast()
+    {
+        if (Lines.Count == 0) return;
+        SelectedLineObj = Lines.Last();
+    }
+
+    public class RegistrationLine
+    {
+        public string RoomType { get; set; }
+        public string Room { get; set; }
+        public string Guest { get; set; }
+        public int Adult { get; set; }
+        public int Child { get; set; }
+        public DateTime Arrival { get; set; }
+        public DateTime Departure { get; set; }
+        public int NoOfNight { get; set; }
+        public string Rate { get; set; }
+        public decimal Amount { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
+}
+
+<style>
+    .reglines-grid-wrap {
+        flex: 1;
+        min-height: 200px;
+        overflow: auto;
+    }
+
+    .reglines-grid.dxbl-grid {
+        border: none;
+    }
+
+    .reglines-grid .dxbl-grid-header-cell {
+        background: #eef0f2 !important;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 1px solid #c9c9c9 !important;
+        border-right: 1px solid #dcdcdc !important;
+        padding: 5px 8px !important;
+    }
+
+    .reglines-grid .dxbl-grid-data-cell {
+        padding: 4px 8px !important;
+        border-right: 1px solid #eaeaea !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+    }
+
+    .reglines-grid .dxbl-grid-data-row.dxbl-grid-selected-row .dxbl-grid-data-cell {
+        background: #2f7ed8 !important;
+        color: #ffffff !important;
+    }
+
+    .reglines-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #d6d6d6;
+        background: #f7f7f7;
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
+    .reglines-navigator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #444;
+    }
+
+    .reglines-nav-btn {
+        cursor: pointer;
+        padding: 3px 5px;
+        border: 1px solid transparent;
+        border-radius: 3px;
+    }
+
+    .reglines-nav-btn:hover {
+        background: #dbeaf9;
+        border-color: #a9cdef;
+    }
+
+    .reglines-nav-text {
+        margin: 0 6px;
+        white-space: nowrap;
+    }
+
+    .reglines-totals {
+        display: flex;
+        gap: 6px;
+    }
+
+    .reglines-total-box {
+        min-width: 90px;
+        text-align: right;
+        background: #eceff1;
+        border: 1px solid #cfd4d8;
+        border-radius: 3px;
+        padding: 3px 8px;
+        color: #333;
+    }
+</style>

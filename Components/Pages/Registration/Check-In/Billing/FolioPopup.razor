@@ -1,7 +1,10 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Services
+@inject FolioService FolioService
+@implements IDisposable
 
-<DxPopup @bind-Visible="Visible" HeaderText="Folio" Width="920px"
+<DxPopup Visible="PopupVisible" VisibleChanged="OnPopupVisibleChanged" HeaderText="Folio" Width="920px"
          CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="amend-toolbar">
@@ -108,8 +111,53 @@
     decimal RoomGrand => RoomSubtotal + RoomService + RoomVat;
     decimal TotalExtra => ExtraBills.Sum(x => x.GrandTotal);
 
+    private bool PopupVisible => FolioService.IsVisible || Visible;
+
+    protected override void OnInitialized()
+    {
+        FolioService.OnChange += OnStateChanged;
+    }
+
+    public void Dispose()
+    {
+        FolioService.OnChange -= OnStateChanged;
+    }
+
+    private void OnStateChanged()
+    {
+        LoadState();
+        InvokeAsync(StateHasChanged);
+    }
+
     protected override void OnParametersSet()
     {
+        LoadState();
+    }
+
+    private void LoadState()
+    {
+        if (FolioService.IsVisible)
+        {
+            TargetRegistration = FolioService.TargetRegistration;
+            GuestName = FolioService.GuestName;
+            RegNo = FolioService.RegNo;
+            Company = FolioService.Company;
+            Arrival = FolioService.Arrival;
+            Departure = FolioService.Departure;
+            if (!string.IsNullOrEmpty(FolioService.Window)) Window = FolioService.Window;
+            if (!string.IsNullOrEmpty(FolioService.FsNum)) FsNum = FolioService.FsNum;
+            if (!string.IsNullOrEmpty(FolioService.Tin)) Tin = FolioService.Tin;
+
+            if (FolioService.RoomCharges.Any()) RoomCharges = FolioService.RoomCharges;
+            else RoomCharges = new List<TransferChargeRow>();
+
+            if (FolioService.ExtraBills.Any()) ExtraBills = FolioService.ExtraBills;
+            else ExtraBills = new List<ExtraBillRow>();
+
+            if (FolioService.Payments.Any()) Payments = FolioService.Payments;
+            else Payments = new List<PaymentHistoryRow>();
+        }
+
         if (TargetRegistration != null)
         {
             if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
@@ -119,7 +167,7 @@
             if (!Departure.HasValue) Departure = TargetRegistration.Departure;
         }
 
-        if (Visible)
+        if (PopupVisible)
         {
             if (!RoomCharges.Any())
             {
@@ -152,6 +200,32 @@
         }
     }
 
-    async Task HandleRefresh() => await OnRefresh.InvokeAsync();
-    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+    async Task HandleRefresh()
+    {
+        if (FolioService.IsVisible)
+        {
+            await FolioService.RefreshAsync();
+        }
+        await OnRefresh.InvokeAsync();
+    }
+
+    async Task HandleClose()
+    {
+        if (FolioService.IsVisible)
+        {
+            FolioService.Close();
+        }
+        if (Visible)
+        {
+            await VisibleChanged.InvokeAsync(false);
+        }
+    }
+
+    private async Task OnPopupVisibleChanged(bool value)
+    {
+        if (!value)
+        {
+            await HandleClose();
+        }
+    }
 }

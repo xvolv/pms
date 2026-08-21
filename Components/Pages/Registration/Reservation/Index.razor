@@ -3,6 +3,8 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration
 @using ERP.V7.WebPMS.Components.Shared
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
 
 <PageTitle>Reservation - CNET ERP</PageTitle>
 
@@ -21,10 +23,15 @@
                         OnSave="SaveReservation"
                         OnTravelDetail="OpenTravelDetail"
                         OnComments="OpenComments"
+                        OnReservationDetail="OpenReservationDetail"
+                        IsReservationDetailDisabled="@(!IsFormValid)"
                         OnClose="CloseWindow">
         <StateContent>
             <DxComboBox CssClass="erp-combobox" Data="@reservationStates" @bind-Value="selectedState" Width="110px" SizeMode="SizeMode.Small" />
         </StateContent>
+        <HotelContent>
+            <HotelDropdown @bind-selectedHotel="selectedHotel" />
+        </HotelContent>
     </RegistrationToolbar>
 
     <!-- ===================== MAIN FORM + RED COMMENT BAR ===================== -->
@@ -266,48 +273,10 @@
 </div>
 
 <!-- ===================== ROOM SEARCH POPUP ===================== -->
-<DxPopup @bind-Visible="showRoomSearch"
-         HeaderText="@($"Room Search-{SelectedGuestName}")"
-         Width="min(900px, 95vw)"
-         CloseOnOutsideClick="false" ShowCloseButton="true">
-    <BodyContentTemplate>
-        <RegistrationToolbar ToolbarContext="ToolbarContextType.RoomSearch"
-                            OnSelect="SelectRoom"
-                            OnClose="() => showRoomSearch = false">
-            <CustomContent>
-                <span style="margin-left:12px;">Feature</span>
-                <DxComboBox CssClass="erp-combobox" Data="@roomFeatures" @bind-Value="selectedFeature" Width="140px" SizeMode="SizeMode.Small" />
-                <span style="margin-left:8px;">Room</span>
-                <DxTextBox @bind-Text="roomFilter" Width="100px" SizeMode="SizeMode.Small" />
-            </CustomContent>
-        </RegistrationToolbar>
-
-        <DxTabs @bind-ActiveTabIndex="roomTab">
-            <DxTabPage Text="Rooms">
-                <div class="grid-scroll-wrap">
-                <DxGrid Data="@roomList" KeyFieldName="SN" PageSize="15" ShowPager="false"
-                        SizeMode="SizeMode.Small" Height="390px"
-                        RowClick="OnRoomRowClick"
-                        CustomizeElement="OnRoomCustomizeElement">
-                    <Columns>
-                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
-                        <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
-                        <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
-                        <DxGridDataColumn FieldName="HKStatus" Caption="HK Status" Width="90px" />
-                        <DxGridDataColumn FieldName="FOStatus" Caption="FO Status" Width="90px" />
-                        <DxGridDataColumn FieldName="Floor" Caption="Floor" Width="90px" />
-                        <DxGridDataColumn FieldName="Feature" Caption="Feature" />
-                        <DxGridDataColumn FieldName="Remark" Caption="Remark" />
-                    </Columns>
-                </DxGrid>
-                </div>
-            </DxTabPage>
-            <DxTabPage Text="Pseudo Rooms">
-                <div style="padding:40px; text-align:center; color:#999;">Pseudo Rooms content</div>
-            </DxTabPage>
-        </DxTabs>
-    </BodyContentTemplate>
-</DxPopup>
+<RoomSearchPopup @bind-Visible="showRoomSearch"
+                 GuestName="@SelectedGuestName"
+                 @bind-SelectedRoom="selectedRoom"
+                 OnSelect="SelectRoom" />
 
 <!-- ===================== RATE SEARCH POPUP ===================== -->
 <RateSearchPopup @bind-Visible="showRateSearch"
@@ -422,32 +391,27 @@
 
 <!-- ===================== GUEST SEARCH POPUP ===================== -->
 <DxPopup @bind-Visible="showGuestSearch"
-         HeaderText="Guest Search"
-         Width="min(720px, 95vw)"
+         HeaderText="Guest Profile"
+         Width="min(1100px, 95vw)"
          CloseOnOutsideClick="false" ShowCloseButton="true">
     <BodyContentTemplate>
-        <RegistrationToolbar ToolbarContext="ToolbarContextType.GuestSearch">
-            <CustomContent>
-                <DxTextBox @bind-Text="guestSearchText" Width="280px" SizeMode="SizeMode.Small"
-                           BindValueMode="BindValueMode.OnInput" />
-                <DxButton Text="Find" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="FilterGuests" />
-                <DxButton Text="Clear" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" Click="ClearGuestFilter" />
-            </CustomContent>
-        </RegistrationToolbar>
-        <div class="grid-scroll-wrap">
-        <DxGrid Data="@filteredGuests" KeyFieldName="Id" PageSize="12" ShowPager="true"
-                SizeMode="SizeMode.Small" RowClick="OnGuestRowClick" Height="360px">
-            <Columns>
-                <DxGridDataColumn FieldName="Title" Caption="Title" Width="70px" />
-                <DxGridDataColumn FieldName="FirstName" Caption="First Name" />
-                <DxGridDataColumn FieldName="MiddleName" Caption="Middle Name" />
-                <DxGridDataColumn FieldName="LastName" Caption="Last Name" />
-                <DxGridDataColumn FieldName="Identification" Caption="Identification" Width="120px" />
-            </Columns>
-        </DxGrid>
-        </div>
+        <Guest IsModal="true" OnSaved="OnGuestSavedFromModal" OnClose="() => showGuestSearch = false" />
     </BodyContentTemplate>
 </DxPopup>
+
+<!-- ===================== RESERVATION DETAIL POPUP ===================== -->
+<ReservationDetail @bind-Visible="showReservationDetail"
+                   ReservationId="@ReservationNo"
+                   RoomType="@(roomType ?? "Standard Room")"
+                   ActualRTC="@(rtc ?? roomType ?? "Standard Room")"
+                   RoomNo="@(room ?? "")"
+                   Rate="@(rateCode ?? "")"
+                   Adult="@adults"
+                   Child="@children"
+                   ArrivalDate="@arrivalDate"
+                   DepartureDate="@departureDate"
+                   Market="@market"
+                   Source="@source" />
 
 <style>
     * {
@@ -972,6 +936,7 @@
 
 @code {
     string ReservationNo = "REG-00040-17";
+    string? selectedHotel = "1";
     string selectedState = "6PM";
     string[] reservationStates = { "6PM", "Confirmed", "Tentative", "Cancelled", "No Show", "Checked In", "Checked Out" };
 
@@ -1062,6 +1027,13 @@
     bool showComments = false;
     string commentText = "";
 
+    // Reservation Detail
+    bool showReservationDetail = false;
+    bool IsFormValid => selectedGuestId != null
+                     && !string.IsNullOrWhiteSpace(roomType)
+                     && !string.IsNullOrWhiteSpace(room)
+                     && !string.IsNullOrWhiteSpace(rateCode);
+
     // Guest Search
     bool showGuestSearch = false;
     string guestSearchText = "";
@@ -1128,11 +1100,7 @@
 
     // Room Search
     bool showRoomSearch = false;
-    int roomTab = 0;
-    string? selectedFeature;
-    string roomFilter = "";
     RoomItem? selectedRoom;
-    List<string> roomFeatures = new() { "Select feature", "Sea View", "City View", "Balcony", "Connecting" };
     List<RoomItem> roomList = new()
     {
         new() { SN = 1, Room = "4001", RoomType = "Standard Room", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Abay Block", Feature = "", Remark = "" },
@@ -1184,6 +1152,7 @@
 
     void OpenTravelDetail() => showTravelDetail = true;
     void OpenComments() => showComments = true;
+    void OpenReservationDetail() => showReservationDetail = true;
     
     // Toolbar action handlers
     void SearchRates() { }
@@ -1238,6 +1207,50 @@
     void OnGuestSelected(Guest? g)
     {
         if (g != null) title = g.Title;
+    }
+
+    private void OnGuestSavedFromModal(GuestRow savedGuest)
+    {
+        if (savedGuest == null) return;
+
+        var existing = guestList.FirstOrDefault(g => g.Id == savedGuest.Id || 
+            (!string.IsNullOrEmpty(savedGuest.FirstName) && g.FirstName.Equals(savedGuest.FirstName, StringComparison.OrdinalIgnoreCase) && g.LastName.Equals(savedGuest.LastName, StringComparison.OrdinalIgnoreCase)));
+
+        if (existing != null)
+        {
+            existing.Title = savedGuest.Title ?? "";
+            existing.FirstName = savedGuest.FirstName ?? "";
+            existing.MiddleName = savedGuest.MiddleName ?? "";
+            existing.LastName = savedGuest.LastName ?? "";
+            existing.Identification = savedGuest.PassportNum ?? "";
+            selectedGuestId = existing.Id;
+        }
+        else
+        {
+            var newId = savedGuest.Id > 0 ? savedGuest.Id : (guestList.Any() ? guestList.Max(g => g.Id) + 1 : 1);
+            var newGuest = new Guest
+            {
+                Id = newId,
+                Title = savedGuest.Title ?? "",
+                FirstName = savedGuest.FirstName ?? "",
+                MiddleName = savedGuest.MiddleName ?? "",
+                LastName = savedGuest.LastName ?? "",
+                Identification = savedGuest.PassportNum ?? ""
+            };
+            guestList.Add(newGuest);
+            filteredGuests = guestList.ToList();
+            selectedGuestId = newId;
+        }
+
+        title = savedGuest.Title ?? "";
+        nationality = savedGuest.Nationality ?? "";
+        passport = savedGuest.PassportNum ?? "";
+
+        var addrParts = new List<string?> { savedGuest.Address1, savedGuest.City, savedGuest.Region, savedGuest.Phone1, savedGuest.Email, savedGuest.Website }
+            .Where(s => !string.IsNullOrWhiteSpace(s));
+        address = string.Join(", ", addrParts);
+
+        showGuestSearch = false;
     }
 
     // Lookup
@@ -1396,18 +1409,6 @@
             Name = name;
             IdNumber = id;
         }
-    }
-
-    public class RoomItem
-    {
-        public int SN { get; set; }
-        public string Room { get; set; } = "";
-        public string RoomType { get; set; } = "";
-        public string HKStatus { get; set; } = "";
-        public string FOStatus { get; set; } = "";
-        public string Floor { get; set; } = "";
-        public string Feature { get; set; } = "";
-        public string Remark { get; set; } = "";
     }
 
     public class RateRow

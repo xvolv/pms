@@ -1,0 +1,1135 @@
+@page "/group-registration"
+@using static RegistrationLinesGrid
+@using DevExpress.Blazor
+
+<div class="grpreg-page">
+
+    @* ---------------- Toolbar ---------------- *@
+    <div class="grpreg-toolbar">
+        <div class="grpreg-tbtn" @onclick="OnNew">
+            <i class="bi bi-file-earmark-plus grpreg-icon grpreg-icon-dark"></i>
+            <span>New</span>
+        </div>
+        <div class="grpreg-tbtn" title="Check In" @onclick="OnCheckIn">
+            <i class="bi bi-check-circle-fill grpreg-icon grpreg-icon-green"></i>
+            <span>Check In</span>
+        </div>
+
+        <div class="grpreg-tbsep"></div>
+
+        <div class="grpreg-field-inline">
+            <i class="bi bi-flag-fill grpreg-icon-flag"></i>
+            <label>State</label>
+            <DxComboBox Data="@StateOptions" @bind-Value="@Master.State" CssClass="grpreg-combo-sm" />
+        </div>
+
+        <div class="grpreg-field-inline">
+            <label>Hotel</label>
+            <DxComboBox Data="@HotelOptions" @bind-Value="@Master.Hotel" CssClass="grpreg-combo-md" />
+        </div>
+    </div>
+
+    @* ---------------- Master Information ---------------- *@
+    <div class="grpreg-section-header">Master Information</div>
+
+    <div class="grpreg-master-form">
+        <div class="grpreg-master-col">
+            <div class="grpreg-form-row">
+                <label>Customer</label>
+                <div class="grpreg-lookup-field">
+                    <input class="grpreg-input"
+                           readonly
+                           value="@Master.Customer"
+                           @onclick="() => ShowCustomerLookup = true" />
+                    <i class="bi bi-chevron-down grpreg-lookup-caret" @onclick="() => ShowCustomerLookup = true"></i>
+                </div>
+            </div>
+            <div class="grpreg-form-row">
+                <label>Purpose of Travel</label>
+                <div class="grpreg-lookup-field">
+                    <input class="grpreg-input"
+                           readonly
+                           value="@Master.PurposeOfTravel"
+                           @onclick="() => ShowPurposeLookup = true" />
+                    <i class="bi bi-chevron-down grpreg-lookup-caret" @onclick="() => ShowPurposeLookup = true"></i>
+                </div>
+            </div>
+            <div class="grpreg-form-row">
+                <label>Arrival Date</label>
+                <DxDateEdit @bind-Date="@Master.ArrivalDate" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+            </div>
+            <div class="grpreg-form-row">
+                <label>Departure Date</label>
+                <DxDateEdit @bind-Date="@Master.DepartureDate" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+            </div>
+            <div class="grpreg-form-row">
+                <label>No of Night</label>
+                <DxSpinEdit @bind-Value="@Master.NoOfNight" CssClass="grpreg-input-sm" MinValue="1" />
+            </div>
+        </div>
+
+        <div class="grpreg-master-col">
+            <div class="grpreg-form-row">
+                <label>Group</label>
+                <DxComboBox Data="@GroupOptions" @bind-Value="@Master.Group" CssClass="grpreg-input" />
+            </div>
+            <div class="grpreg-form-row">
+                <label>Date</label>
+                <input class="grpreg-input grpreg-readonly" value="@Master.Date.ToString("M/d/yyyy h:mm:ss tt")" disabled />
+            </div>
+            <div class="grpreg-form-row">
+                <label>Arrival Time</label>
+                <div class="grpreg-time-input">
+                    <input class="grpreg-readonly" value="@Master.ArrivalTime.ToString(@"hh\:mm")" disabled />
+                    <span class="grpreg-time-spinner">
+                        <i class="bi bi-caret-up-fill"></i>
+                        <i class="bi bi-caret-down-fill"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="grpreg-form-row">
+                <label>Departure Time</label>
+                <div class="grpreg-time-input">
+                    <input class="grpreg-readonly" value="@Master.DepartureTime.ToString(@"hh\:mm")" disabled />
+                    <span class="grpreg-time-spinner">
+                        <i class="bi bi-caret-up-fill"></i>
+                        <i class="bi bi-caret-down-fill"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="grpreg-form-row">
+                <label>Payment Method</label>
+                <DxComboBox Data="@PaymentMethodOptions" @bind-Value="@Master.PaymentMethod" CssClass="grpreg-input" />
+            </div>
+        </div>
+    </div>
+
+    @* ---------------- Tabs ---------------- *@
+    <DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" CssClass="grpreg-tabs">
+        <DxTabPage Text="New Registrations" />
+        <DxTabPage Text="Existing Registrations" />
+        <DxTabPage Text="Registations By Room" />
+    </DxTabs>
+
+    <div class="grpreg-tabcontent">
+
+        @if (ActiveTabIndex == 0)
+        {
+            @* -------- New Registrations -------- *@
+            <div class="grpreg-input-row">
+                <div class="grpreg-input-cell">
+                    <label>Guest</label>
+                    <div class="grpreg-lookup-field">
+                        <input class="grpreg-input"
+                               readonly
+                               value="@NewReg.Guest"
+                               @onclick="() => OpenGuestLookup(forCheckIn: false)" />
+                        <i class="bi bi-chevron-down grpreg-lookup-caret" @onclick="() => OpenGuestLookup(forCheckIn: false)"></i>
+                    </div>
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Arrival</label>
+                    <DxDateEdit @bind-Date="@NewReg.Arrival" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Departure</label>
+                    <DxDateEdit @bind-Date="@NewReg.Departure" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+                </div>
+                <div class="grpreg-input-cell grpreg-input-cell-sm">
+                    <label>Adult</label>
+                    <DxSpinEdit @bind-Value="@NewReg.Adult" CssClass="grpreg-input-sm" MinValue="0" />
+                </div>
+                <div class="grpreg-input-cell grpreg-input-cell-sm">
+                    <label>Child</label>
+                    <DxSpinEdit @bind-Value="@NewReg.Child" CssClass="grpreg-input-sm" MinValue="0" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Room</label>
+                    <DxComboBox Data="@RoomOptions" @bind-Value="@NewReg.Room" CssClass="grpreg-input"
+                                NullText="No data to display" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Rate</label>
+                    <DxComboBox Data="@RateOptions" @bind-Value="@NewReg.Rate" CssClass="grpreg-input" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Rate Amount</label>
+                    <input class="grpreg-input grpreg-readonly" value="@NewReg.RateAmount.ToString("N2")" disabled />
+                </div>
+            </div>
+
+            <div class="grpreg-actions-row">
+                <button class="grpreg-action-btn" @onclick="AddNewRegistrationLine">
+                    <i class="bi bi-plus-circle-fill grpreg-icon-green-sm"></i> Add
+                </button>
+                <button class="grpreg-action-btn" @onclick="RemoveSelectedLine">
+                    <i class="bi bi-x-circle-fill grpreg-icon-red-sm"></i> Remove
+                </button>
+            </div>
+
+            <RegistrationLinesGrid Lines="@Lines" @bind-SelectedLine="@SelectedLine" />
+        }
+        else if (ActiveTabIndex == 1)
+        {
+            @* -------- Existing Registrations -------- *@
+            <div class="grpreg-input-row">
+                <div class="grpreg-input-cell grpreg-input-cell-wide">
+                    <label>Registrations</label>
+                    <div class="grpreg-lookup-field">
+                        <input class="grpreg-input"
+                               readonly
+                               value="@(SelectedLookupItem?.Code)"
+                               @onclick="() => ShowRegistrationsLookup = true" />
+                        <i class="bi bi-chevron-down grpreg-lookup-caret" @onclick="() => ShowRegistrationsLookup = true"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grpreg-actions-row">
+                <button class="grpreg-action-btn" @onclick="AddExistingRegistrationLine">
+                    <i class="bi bi-plus-circle-fill grpreg-icon-green-sm"></i> Add
+                </button>
+                <button class="grpreg-action-btn" @onclick="RemoveSelectedLine">
+                    <i class="bi bi-x-circle-fill grpreg-icon-red-sm"></i> Remove
+                </button>
+            </div>
+
+            <RegistrationLinesGrid Lines="@Lines" @bind-SelectedLine="@SelectedLine" />
+        }
+        else
+        {
+            @* -------- Registrations By Room (Check-in) -------- *@
+            <div class="grpreg-input-row">
+                <div class="grpreg-input-cell">
+                    <label>Guest's</label>
+                    <div class="grpreg-lookup-field">
+                        <input class="grpreg-input"
+                               readonly
+                               value="@CheckInReg.Guest"
+                               @onclick="() => OpenGuestLookup(forCheckIn: true)" />
+                        <i class="bi bi-chevron-down grpreg-lookup-caret" @onclick="() => OpenGuestLookup(forCheckIn: true)"></i>
+                    </div>
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Arrival Date</label>
+                    <DxDateEdit @bind-Date="@CheckInReg.Arrival" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Default Rate</label>
+                    <DxComboBox Data="@RateOptions" @bind-Value="@CheckInReg.Rate" CssClass="grpreg-input" />
+                </div>
+                <div class="grpreg-select-rooms-btn" @onclick="OnSelectRooms">
+                    <i class="bi bi-check-circle-fill grpreg-icon grpreg-icon-green"></i>
+                    <span>Select Room's</span>
+                </div>
+            </div>
+
+            <div class="grpreg-input-row">
+                <div class="grpreg-input-cell grpreg-input-cell-sm">
+                    <label>Adult</label>
+                    <DxSpinEdit @bind-Value="@CheckInReg.Adult" CssClass="grpreg-input-sm" MinValue="0" />
+                </div>
+                <div class="grpreg-input-cell grpreg-input-cell-sm">
+                    <label>Child</label>
+                    <DxSpinEdit @bind-Value="@CheckInReg.Child" CssClass="grpreg-input-sm" MinValue="0" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Departure Date</label>
+                    <DxDateEdit @bind-Date="@CheckInReg.Departure" CssClass="grpreg-input" DisplayFormat="M/d/yyyy" />
+                </div>
+                <div class="grpreg-input-cell">
+                    <label>Rate Amount</label>
+                    <input class="grpreg-input grpreg-readonly" value="@CheckInReg.RateAmount.ToString("N2")" disabled />
+                </div>
+            </div>
+
+            <div class="grpreg-actions-row">
+                <button class="grpreg-action-btn" @onclick="AddCheckInRegistrationLine">
+                    <i class="bi bi-plus-circle-fill grpreg-icon-green-sm"></i> Add
+                </button>
+                <button class="grpreg-action-btn" @onclick="RemoveSelectedLine">
+                    <i class="bi bi-x-circle-fill grpreg-icon-red-sm"></i> Remove
+                </button>
+            </div>
+
+            <RegistrationLinesGrid Lines="@Lines" @bind-SelectedLine="@SelectedLine" />
+        }
+    </div>
+
+    @* ============== LOOKUP PANELS ============== *@
+
+    @* Customer Lookup *@
+    @if (ShowCustomerLookup)
+    {
+        <div class="grpreg-lookup-overlay" @onclick="() => ShowCustomerLookup = false">
+            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:520px">
+                <div class="grpreg-lookup-searchrow">
+                    <input class="grpreg-lookup-search" @bind="CustomerSearchText" @bind:event="oninput" placeholder="" />
+                    <button class="grpreg-lookup-find-btn" @onclick="() => { }">Find</button>
+                </div>
+                <div class="grpreg-lookup-gridwrap">
+                    <DxGrid Data="@FilteredCustomers"
+                            CssClass="grpreg-lookup-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            SelectionMode="GridSelectionMode.Single"
+                            SelectedDataItemChanged="@(item => SelectCustomer((CustomerItem?)item))">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Code)" Caption="Code" Width="110px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.FirstName)" Caption="First Name" Width="160px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Tin)" Caption="Tin" Width="100px" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+                <div class="grpreg-lookup-footer">
+                    <button class="grpreg-lookup-clear-btn" @onclick="() => { Master.Customer = null; ShowCustomerLookup = false; }">Clear</button>
+                    <button class="grpreg-lookup-clear-btn" style="margin-left:8px" @onclick="() => ShowCustomerLookup = false">Close</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Purpose of Travel Lookup *@
+    @if (ShowPurposeLookup)
+    {
+        <div class="grpreg-lookup-overlay" @onclick="() => ShowPurposeLookup = false">
+            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:320px">
+                <div class="grpreg-lookup-searchrow">
+                    <input class="grpreg-lookup-search" @bind="PurposeSearchText" @bind:event="oninput" />
+                    <button class="grpreg-lookup-find-btn">Find</button>
+                </div>
+                <div class="grpreg-lookup-gridwrap" style="max-height:280px">
+                    @foreach (var p in FilteredPurposes)
+                    {
+                        <div class="grpreg-lookup-row @(Master.PurposeOfTravel == p ? "selected" : "")"
+                             @onclick="() => { Master.PurposeOfTravel = p; ShowPurposeLookup = false; }">
+                            @p
+                        </div>
+                    }
+                </div>
+                <div class="grpreg-lookup-footer">
+                    <button class="grpreg-lookup-clear-btn" @onclick="() => { Master.PurposeOfTravel = null; ShowPurposeLookup = false; }">Clear</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Guest Lookup *@
+    @if (ShowGuestLookup)
+    {
+        <div class="grpreg-lookup-overlay" @onclick="() => ShowGuestLookup = false">
+            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:420px">
+                <div class="grpreg-lookup-searchrow">
+                    <input class="grpreg-lookup-search" @bind="GuestSearchText" @bind:event="oninput" />
+                    <button class="grpreg-lookup-find-btn">Find</button>
+                </div>
+                <div class="grpreg-lookup-gridwrap">
+                    <DxGrid Data="@FilteredGuests"
+                            CssClass="grpreg-lookup-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            SelectionMode="GridSelectionMode.Single"
+                            SelectedDataItemChanged="@(item => SelectGuest((GuestItem?)item))">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.FirstName)" Caption="First Name" Width="120px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.MiddleName)" Caption="Middle Name" Width="120px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.Tin)" Caption="Tin" Width="100px" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+                <div class="grpreg-lookup-footer">
+                    <button class="grpreg-lookup-clear-btn" @onclick="() => ShowGuestLookup = false">Clear</button>
+                    <button class="grpreg-lookup-clear-btn" style="margin-left:8px" @onclick="AddNewGuest">Add New</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Registrations Lookup (Existing) *@
+    @if (ShowRegistrationsLookup)
+    {
+        <div class="grpreg-lookup-overlay" @onclick="() => ShowRegistrationsLookup = false">
+            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:520px">
+                <div class="grpreg-lookup-searchrow">
+                    <input class="grpreg-lookup-search" @bind="LookupSearchText" @bind:event="oninput" />
+                    <button class="grpreg-lookup-find-btn">Find</button>
+                </div>
+                <div class="grpreg-lookup-gridwrap">
+                    <DxGrid Data="@FilteredLookupItems"
+                            CssClass="grpreg-lookup-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            SelectionMode="GridSelectionMode.Single"
+                            SelectedDataItem="@SelectedLookupItem"
+                            SelectedDataItemChanged="@(item => SelectLookupItem((RegistrationLookupItem?)item))">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Code)" Caption="code" Width="120px" />
+                            <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Guest)" Caption="Guest" Width="120px" />
+                            <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomNumber)" Caption="Room Number" Width="110px" />
+                            <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomType)" Caption="Room Type" Width="110px" />
+                        </Columns>
+                    </DxGrid>
+                </div>
+                <div class="grpreg-lookup-footer">
+                    <button class="grpreg-lookup-clear-btn" @onclick="ClearLookupSelection">Clear</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(ValidationMessage))
+    {
+        <div class="grpreg-validation-msg">@ValidationMessage</div>
+    }
+</div>
+
+@code {
+    int ActiveTabIndex { get; set; }
+    string ValidationMessage { get; set; } = "";
+
+    MasterInfo Master { get; set; } = new()
+    {
+        Date = DateTime.Now,
+        ArrivalDate = DateTime.Today,
+        DepartureDate = DateTime.Today.AddDays(1),
+        NoOfNight = 1,
+        ArrivalTime = TimeSpan.Zero,
+        DepartureTime = TimeSpan.Zero,
+        State = "Inhouse",
+        Hotel = "MAIN TEST HOTEL",
+        PaymentMethod = "Cash"
+    };
+
+    NewRegistrationInput NewReg { get; set; } = new()
+    {
+        Arrival = DateTime.Today,
+        Departure = DateTime.Today.AddDays(1),
+        Adult = 1,
+        Child = 0
+    };
+
+    CheckInRegistrationInput CheckInReg { get; set; } = new()
+    {
+        Arrival = DateTime.Today,
+        Departure = DateTime.Today.AddDays(1),
+        Adult = 1,
+        Child = 0
+    };
+
+    List<RegistrationLine> Lines { get; set; } = new();
+    RegistrationLine? SelectedLine { get; set; }
+
+    // ---- Lookups visibility ----
+    bool ShowCustomerLookup { get; set; }
+    bool ShowPurposeLookup { get; set; }
+    bool ShowGuestLookup { get; set; }
+    bool ShowRegistrationsLookup { get; set; }
+    bool GuestLookupForCheckIn { get; set; }
+
+    string CustomerSearchText { get; set; } = "";
+    string PurposeSearchText { get; set; } = "";
+    string GuestSearchText { get; set; } = "";
+    string LookupSearchText { get; set; } = "";
+    RegistrationLookupItem? SelectedLookupItem { get; set; }
+
+    // ---- Mock data (MVP) ----
+    List<CustomerItem> Customers { get; set; } = new()
+    {
+        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" }
+    };
+
+    List<string> PurposeOptions { get; } = new()
+    {
+        "Business", "Conference", "Education", "Medical", "Pleasure", "Tourism",
+        "Transit", "Vacation", "Wedding", "Holiday", "Shopping"
+    };
+
+    List<GuestItem> Guests { get; set; } = new()
+    {
+        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
+        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
+        new() { FirstName = "TEST", MiddleName = "", Tin = "" }
+    };
+
+    List<RegistrationLookupItem> LookupItems { get; set; } = new()
+    {
+        new() { Code = "REG-00000-26", Guest = "JANE DOE", RoomNumber = "101", RoomType = "Standard" },
+        new() { Code = "REG-00001-26", Guest = "JANE DOE", RoomNumber = "205", RoomType = "Delux" },
+        new() { Code = "REG-00002-26", Guest = "JANE DOE", RoomNumber = "207", RoomType = "Delux" },
+        new() { Code = "REG-00003-26", Guest = "JANE DOE", RoomNumber = "208", RoomType = "Delux" },
+        new() { Code = "REG-00004-26", Guest = "JANE DOE", RoomNumber = "209", RoomType = "Delux" },
+        new() { Code = "REG-00005-26", Guest = "JANE DOE", RoomNumber = "210", RoomType = "Delux" },
+        new() { Code = "REG-00006-26", Guest = "JANE DOE", RoomNumber = "102", RoomType = "Standard" },
+        new() { Code = "REG-00007-26", Guest = "JANE DOE", RoomNumber = "103", RoomType = "Standard" },
+    };
+
+    List<string> StateOptions { get; } = new() { "Inhouse", "Reserved", "Checked Out", "Cancelled" };
+    List<string> HotelOptions { get; } = new() { "MAIN TEST HOTEL", "BRANCH HOTEL" };
+    List<string> GroupOptions { get; } = new() { "ABEBE", "KEBEDE", "OTHER GROUP" };
+    List<string> PaymentMethodOptions { get; } = new() { "Cash", "Credit Card", "Bank Transfer" };
+    List<string> RoomOptions { get; set; } = new(); // empty → "No data to display"
+    List<string> RateOptions { get; } = new() { "RACK", "CORP", "GROUP", "PROMO" };
+
+    IEnumerable<CustomerItem> FilteredCustomers =>
+        string.IsNullOrWhiteSpace(CustomerSearchText)
+            ? Customers
+            : Customers.Where(c =>
+                c.Code.Contains(CustomerSearchText, StringComparison.OrdinalIgnoreCase) ||
+                c.FirstName.Contains(CustomerSearchText, StringComparison.OrdinalIgnoreCase));
+
+    IEnumerable<string> FilteredPurposes =>
+        string.IsNullOrWhiteSpace(PurposeSearchText)
+            ? PurposeOptions
+            : PurposeOptions.Where(p => p.Contains(PurposeSearchText, StringComparison.OrdinalIgnoreCase));
+
+    IEnumerable<GuestItem> FilteredGuests =>
+        string.IsNullOrWhiteSpace(GuestSearchText)
+            ? Guests
+            : Guests.Where(g =>
+                g.FirstName.Contains(GuestSearchText, StringComparison.OrdinalIgnoreCase) ||
+                (g.MiddleName ?? "").Contains(GuestSearchText, StringComparison.OrdinalIgnoreCase));
+
+    IEnumerable<RegistrationLookupItem> FilteredLookupItems =>
+        string.IsNullOrWhiteSpace(LookupSearchText)
+            ? LookupItems
+            : LookupItems.Where(i =>
+                i.Code.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
+                i.Guest.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
+                i.RoomNumber.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
+                i.RoomType.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase));
+
+    void OnNew()
+    {
+        Master = new MasterInfo
+        {
+            Date = DateTime.Now,
+            ArrivalDate = DateTime.Today,
+            DepartureDate = DateTime.Today.AddDays(1),
+            NoOfNight = 1,
+            ArrivalTime = TimeSpan.Zero,
+            DepartureTime = TimeSpan.Zero,
+            State = "Inhouse",
+            Hotel = Master.Hotel,
+            PaymentMethod = "Cash"
+        };
+        Lines.Clear();
+        SelectedLine = null;
+        NewReg = new() { Arrival = DateTime.Today, Departure = DateTime.Today.AddDays(1), Adult = 1 };
+        CheckInReg = new() { Arrival = DateTime.Today, Departure = DateTime.Today.AddDays(1), Adult = 1 };
+        ValidationMessage = "";
+    }
+
+    void OnCheckIn()
+    {
+        if (Lines.Count == 0)
+        {
+            ValidationMessage = "Add at least one registration line before Check In.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(Master.Customer))
+        {
+            ValidationMessage = "Customer is required.";
+            return;
+        }
+        Master.State = "Inhouse";
+        ValidationMessage = $"Check-In successful for {Lines.Count} room(s). State set to Inhouse.";
+        // In a real app you would persist here
+    }
+
+    void OnSelectRooms()
+    {
+        // MVP: populate a couple of rooms so the user can pick
+        if (RoomOptions.Count == 0)
+        {
+            RoomOptions = new() { "101", "102", "103", "205", "207", "208", "209", "210" };
+            StateHasChanged();
+        }
+        ValidationMessage = "Rooms loaded. Select a room from the Room dropdown.";
+    }
+
+    bool ValidateLine(string guest, DateTime arrival, DateTime departure, int adult)
+    {
+        if (string.IsNullOrWhiteSpace(guest))
+        {
+            ValidationMessage = "Guest is required.";
+            return false;
+        }
+        if (departure <= arrival)
+        {
+            ValidationMessage = "Departure must be after Arrival.";
+            return false;
+        }
+        if (adult < 1)
+        {
+            ValidationMessage = "At least 1 Adult is required.";
+            return false;
+        }
+        ValidationMessage = "";
+        return true;
+    }
+
+    void AddNewRegistrationLine()
+    {
+        if (!ValidateLine(NewReg.Guest, NewReg.Arrival, NewReg.Departure, NewReg.Adult)) return;
+
+        var nights = (NewReg.Departure - NewReg.Arrival).Days;
+        Lines.Add(new RegistrationLine
+        {
+            RoomType = "",
+            Room = NewReg.Room ?? "",
+            Guest = NewReg.Guest,
+            Adult = NewReg.Adult,
+            Child = NewReg.Child,
+            Arrival = NewReg.Arrival,
+            Departure = NewReg.Departure,
+            NoOfNight = nights,
+            Rate = NewReg.Rate ?? "",
+            Amount = NewReg.RateAmount,
+            TotalAmount = NewReg.RateAmount * nights
+        });
+    }
+
+    void AddExistingRegistrationLine()
+    {
+        if (SelectedLookupItem == null)
+        {
+            ValidationMessage = "Select a registration first.";
+            return;
+        }
+        Lines.Add(new RegistrationLine
+        {
+            RoomType = SelectedLookupItem.RoomType,
+            Room = SelectedLookupItem.RoomNumber,
+            Guest = SelectedLookupItem.Guest,
+            Adult = 1,
+            Child = 0,
+            Arrival = Master.ArrivalDate,
+            Departure = Master.DepartureDate,
+            NoOfNight = Master.NoOfNight,
+            Rate = "",
+            Amount = 0,
+            TotalAmount = 0
+        });
+        ValidationMessage = "";
+    }
+
+    void AddCheckInRegistrationLine()
+    {
+        if (!ValidateLine(CheckInReg.Guest, CheckInReg.Arrival, CheckInReg.Departure, CheckInReg.Adult)) return;
+
+        var nights = (CheckInReg.Departure - CheckInReg.Arrival).Days;
+        Lines.Add(new RegistrationLine
+        {
+            RoomType = "",
+            Room = "",
+            Guest = CheckInReg.Guest,
+            Adult = CheckInReg.Adult,
+            Child = CheckInReg.Child,
+            Arrival = CheckInReg.Arrival,
+            Departure = CheckInReg.Departure,
+            NoOfNight = nights,
+            Rate = CheckInReg.Rate ?? "",
+            Amount = CheckInReg.RateAmount,
+            TotalAmount = CheckInReg.RateAmount * nights
+        });
+    }
+
+    void RemoveSelectedLine()
+    {
+        if (SelectedLine == null) return;
+        Lines.Remove(SelectedLine);
+        SelectedLine = null;
+    }
+
+    void OpenGuestLookup(bool forCheckIn)
+    {
+        GuestLookupForCheckIn = forCheckIn;
+        ShowGuestLookup = true;
+    }
+
+    void SelectCustomer(CustomerItem? item)
+    {
+        if (item == null) return;
+        Master.Customer = item.FirstName;
+        ShowCustomerLookup = false;
+    }
+
+    void SelectGuest(GuestItem? item)
+    {
+        if (item == null) return;
+        var name = string.IsNullOrWhiteSpace(item.MiddleName)
+            ? item.FirstName
+            : $"{item.FirstName} {item.MiddleName}";
+        if (GuestLookupForCheckIn)
+            CheckInReg.Guest = name;
+        else
+            NewReg.Guest = name;
+        ShowGuestLookup = false;
+    }
+
+    void SelectLookupItem(RegistrationLookupItem? item)
+    {
+        if (item == null) return;
+        SelectedLookupItem = item;
+        ShowRegistrationsLookup = false;
+    }
+
+    void ClearLookupSelection()
+    {
+        SelectedLookupItem = null;
+        LookupSearchText = "";
+    }
+
+    void AddNewGuest()
+    {
+        // Simple MVP: just close; in real app open a guest entry form
+        ShowGuestLookup = false;
+        ValidationMessage = "Add New Guest form not implemented in this MVP.";
+    }
+
+    // ---- Models ----
+    public class MasterInfo
+    {
+        public string? Customer { get; set; }
+        public string? Group { get; set; }
+        public string? PurposeOfTravel { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime ArrivalDate { get; set; }
+        public TimeSpan ArrivalTime { get; set; }
+        public DateTime DepartureDate { get; set; }
+        public TimeSpan DepartureTime { get; set; }
+        public int NoOfNight { get; set; }
+        public string? PaymentMethod { get; set; }
+        public string? State { get; set; }
+        public string? Hotel { get; set; }
+    }
+
+    public class NewRegistrationInput
+    {
+        public string? Guest { get; set; }
+        public DateTime Arrival { get; set; }
+        public DateTime Departure { get; set; }
+        public int Adult { get; set; }
+        public int Child { get; set; }
+        public string? Room { get; set; }
+        public string? Rate { get; set; }
+        public decimal RateAmount { get; set; }
+    }
+
+    public class CheckInRegistrationInput
+    {
+        public string? Guest { get; set; }
+        public DateTime Arrival { get; set; }
+        public DateTime Departure { get; set; }
+        public int Adult { get; set; }
+        public int Child { get; set; }
+        public string? Rate { get; set; }
+        public decimal RateAmount { get; set; }
+    }
+
+    public class RegistrationLookupItem
+    {
+        public string Code { get; set; } = "";
+        public string Guest { get; set; } = "";
+        public string RoomNumber { get; set; } = "";
+        public string RoomType { get; set; } = "";
+    }
+
+    public class CustomerItem
+    {
+        public string Code { get; set; } = "";
+        public string FirstName { get; set; } = "";
+        public string MiddleName { get; set; } = "";
+        public string Tin { get; set; } = "";
+    }
+
+    public class GuestItem
+    {
+        public string FirstName { get; set; } = "";
+        public string? MiddleName { get; set; }
+        public string Tin { get; set; } = "";
+    }
+}
+
+<style>
+    /* Full-page form – no modal / window chrome */
+    .grpreg-page {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100vh;
+        background: #ffffff;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        font-size: 12.5px;
+        color: #222;
+    }
+
+    /* Toolbar */
+    .grpreg-toolbar {
+        display: flex;
+        align-items: center;
+        background: #f2f2f2;
+        border-bottom: 1px solid #d6d6d6;
+        padding: 6px 12px;
+        gap: 4px;
+    }
+
+    .grpreg-tbtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 58px;
+        padding: 4px 6px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #333;
+        text-align: center;
+    }
+    .grpreg-tbtn:hover {
+        background: #dbeaf9;
+        outline: 1px solid #a9cdef;
+    }
+    .grpreg-tbtn span {
+        font-size: 11px;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+
+    .grpreg-icon { font-size: 22px; line-height: 1; }
+    .grpreg-icon-green { color: #4caf50; }
+    .grpreg-icon-dark { color: #2c3e50; }
+    .grpreg-icon-flag { color: #4caf50; font-size: 13px; margin-right: 2px; }
+    .grpreg-icon-green-sm { color: #4caf50; font-size: 14px; }
+    .grpreg-icon-red-sm { color: #d9271e; font-size: 14px; }
+
+    .grpreg-tbsep {
+        width: 1px;
+        height: 38px;
+        background: #cfcfcf;
+        margin: 0 8px;
+    }
+
+    .grpreg-field-inline {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-right: 16px;
+    }
+    .grpreg-field-inline label {
+        font-size: 12px;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .grpreg-combo-sm { width: 110px !important; }
+    .grpreg-combo-md { width: 220px !important; }
+
+    /* Master Information */
+    .grpreg-section-header {
+        background: #e7e7e7;
+        border-bottom: 1px solid #cfcfcf;
+        padding: 5px 12px;
+        font-weight: 600;
+        font-size: 12.5px;
+        color: #333;
+    }
+
+    .grpreg-master-form {
+        display: flex;
+        gap: 40px;
+        padding: 12px 20px;
+        background: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .grpreg-master-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .grpreg-form-row {
+        display: grid;
+        grid-template-columns: 130px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+    }
+    .grpreg-form-row label {
+        text-align: right;
+        color: #1a5da8;
+        font-size: 12px;
+    }
+
+    /* Clean single-border inputs (matches original UI) */
+    .grpreg-input,
+    .grpreg-input-sm {
+        width: 100%;
+        box-sizing: border-box;
+        height: 26px;
+        border: 1px solid #b9c2cc;
+        border-radius: 2px;
+        padding: 2px 6px;
+        font-size: 12.5px;
+        background: #fff;
+        outline: none;
+    }
+    .grpreg-input:focus,
+    .grpreg-input-sm:focus {
+        border-color: #4a90d9;
+        box-shadow: 0 0 0 1px rgba(74,144,217,0.25);
+    }
+    .grpreg-input-sm { width: 70px; }
+
+    .grpreg-readonly {
+        background: #eceff1 !important;
+        color: #555;
+        cursor: default;
+    }
+
+    /* Remove extra borders that DevExpress sometimes adds */
+    .grpreg-input.dxbl-text-edit,
+    .grpreg-input .dxbl-text-edit-input,
+    .dxbl-date-edit .dxbl-text-edit-input,
+    .dxbl-spin-edit .dxbl-text-edit-input,
+    .dxbl-combo-box .dxbl-text-edit-input {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        height: 24px !important;
+        padding: 0 4px !important;
+    }
+    .dxbl-date-edit,
+    .dxbl-spin-edit,
+    .dxbl-combo-box {
+        border: 1px solid #b9c2cc !important;
+        border-radius: 2px !important;
+        height: 26px !important;
+        background: #fff !important;
+    }
+    .dxbl-date-edit:focus-within,
+    .dxbl-spin-edit:focus-within,
+    .dxbl-combo-box:focus-within {
+        border-color: #4a90d9 !important;
+        box-shadow: 0 0 0 1px rgba(74,144,217,0.25) !important;
+    }
+
+    .grpreg-time-input {
+        display: flex;
+        align-items: center;
+        border: 1px solid #b9c2cc;
+        border-radius: 2px;
+        height: 26px;
+        overflow: hidden;
+        background: #fff;
+    }
+    .grpreg-time-input input {
+        border: none;
+        flex: 1;
+        padding: 2px 6px;
+        height: 100%;
+        box-sizing: border-box;
+        background: transparent;
+    }
+    .grpreg-time-spinner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-left: 1px solid #b9c2cc;
+        background: #eceff1;
+        padding: 0 4px;
+        font-size: 7px;
+        line-height: 1;
+        color: #666;
+    }
+
+    /* Lookup field (input + caret) */
+    .grpreg-lookup-field {
+        position: relative;
+        width: 100%;
+    }
+    .grpreg-lookup-field .grpreg-input {
+        padding-right: 22px;
+        cursor: pointer;
+    }
+    .grpreg-lookup-caret {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        cursor: pointer;
+        font-size: 12px;
+        pointer-events: auto;
+    }
+
+    /* Tabs */
+    .grpreg-tabs.dxbl-tabs {
+        border-bottom: 1px solid #d6d6d6;
+        padding: 0 12px;
+        background: #fafafa;
+    }
+
+    .grpreg-tabcontent {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 320px;
+        padding: 12px 16px;
+        gap: 10px;
+    }
+
+    .grpreg-input-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-end;
+    }
+    .grpreg-input-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 130px;
+    }
+    .grpreg-input-cell-sm { width: 70px; }
+    .grpreg-input-cell-wide { width: 320px; }
+    .grpreg-input-cell label {
+        font-size: 11.5px;
+        color: #1a5da8;
+    }
+
+    .grpreg-actions-row {
+        display: flex;
+        gap: 8px;
+    }
+    .grpreg-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid #b9c2cc;
+        background: #f7f7f7;
+        border-radius: 3px;
+        padding: 4px 12px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .grpreg-action-btn:hover {
+        background: #e9f1fb;
+        border-color: #a9cdef;
+    }
+
+    .grpreg-select-rooms-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #b9c2cc;
+        background: #f7f7f7;
+        border-radius: 4px;
+        padding: 8px 16px;
+        cursor: pointer;
+        margin-left: 12px;
+    }
+    .grpreg-select-rooms-btn:hover {
+        background: #e9f1fb;
+        border-color: #a9cdef;
+    }
+    .grpreg-select-rooms-btn span {
+        font-size: 12.5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    /* Lookup overlay + panel */
+    .grpreg-lookup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.25);
+        z-index: 2000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 120px;
+    }
+    .grpreg-lookup-panel {
+        background: #ffffff;
+        border: 1px solid #b9c2cc;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        z-index: 2001;
+        resize: both;
+        overflow: auto;
+        min-width: 300px;
+    }
+    .grpreg-lookup-searchrow {
+        display: flex;
+        gap: 6px;
+        padding: 8px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .grpreg-lookup-search {
+        flex: 1;
+        height: 26px;
+        border: 1px solid #b9c2cc;
+        border-radius: 2px;
+        padding: 2px 6px;
+    }
+    .grpreg-lookup-find-btn {
+        border: 1px solid #b9c2cc;
+        background: #f7f7f7;
+        border-radius: 2px;
+        padding: 2px 14px;
+        cursor: pointer;
+    }
+    .grpreg-lookup-find-btn:hover { background: #e9f1fb; }
+
+    .grpreg-lookup-gridwrap {
+        max-height: 260px;
+        overflow: auto;
+    }
+    .grpreg-lookup-grid .dxbl-grid-header-cell {
+        background: #eef0f2 !important;
+        font-weight: 600;
+        padding: 5px 8px !important;
+    }
+
+    .grpreg-lookup-row {
+        cursor: pointer;
+        padding: 6px 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .grpreg-lookup-row:hover,
+    .grpreg-lookup-row.selected {
+        background: #dbeaf9;
+    }
+
+    .grpreg-lookup-footer {
+        display: flex;
+        justify-content: flex-start;
+        padding: 6px 8px;
+        border-top: 1px solid #e0e0e0;
+    }
+    .grpreg-lookup-clear-btn {
+        border: 1px solid #b9c2cc;
+        background: #f7f7f7;
+        border-radius: 2px;
+        padding: 3px 16px;
+        cursor: pointer;
+    }
+    .grpreg-lookup-clear-btn:hover { background: #e9f1fb; }
+
+    .grpreg-validation-msg {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 8px 18px;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 3000;
+        font-size: 13px;
+    }
+</style>

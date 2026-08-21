@@ -5,12 +5,15 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Profile - Guest</PageTitle>
-<div class="top-tab-header">
-    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
-        Guest
-        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+@if (!IsModal)
+{
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Guest
+            <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
     </div>
-</div>
+}
 
 
 <div class="profile-page-wrapper">
@@ -358,6 +361,10 @@
 </DxPopup>
 
 @code {
+    [Parameter] public bool IsModal { get; set; } = false;
+    [Parameter] public EventCallback<GuestRow> OnSaved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private GuestRow guest = new();
     private List<GuestRow> searchResults = new();
     private int? editingId;
@@ -452,7 +459,7 @@
         RequestConfirm("Save Guest", $"Are you sure you want to {verb} this guest?", false, SaveGuestConfirmed);
     }
 
-    private Task SaveGuestConfirmed()
+    private async Task SaveGuestConfirmed()
     {
         if (editingId is int id)
         {
@@ -468,7 +475,11 @@
         }
 
         statusMessage = "Guest saved.";
-        return Task.CompletedTask;
+
+        if (OnSaved.HasDelegate)
+        {
+            await OnSaved.InvokeAsync(guest);
+        }
     }
 
     private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
@@ -628,8 +639,15 @@
     }
 
 
-    private void Close()
+    private async Task Close()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        if (IsModal && OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }

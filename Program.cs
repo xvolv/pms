@@ -12,6 +12,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<PackageDetailService>();
 builder.Services.AddScoped<PackageHeaderService>();
+builder.Services.AddScoped<FolioService>();
 
 var app = builder.Build();
 

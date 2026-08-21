@@ -3,6 +3,7 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 @inject NavigationManager Navigation
+@inject FolioService FolioService
 
 <PageTitle>Registration Browser - CNET ERP</PageTitle>
 
@@ -413,12 +414,6 @@
     @bind-Visible="showBtGuestFind"
     OnOk="@(() => showBtGuestFind = false)" />
 
-<FolioPopup
-    @bind-Visible="showFolio"
-    GuestName="@(selectedReg?.Guest ?? "")" RegNo="@(selectedReg?.Registration ?? "")" Company="@(selectedReg?.Company ?? "")"
-    Arrival="@selectedReg?.Arrival" Departure="@selectedReg?.Departure"
-    OnRefresh="OpenFolio" />
-
 <ShareCheckInPopup
     @bind-Visible="showShareCheckIn"
     TargetRegistration="@selectedReg"
@@ -604,7 +599,7 @@
 <RoomSearchPopup
     @bind-Visible="showRoomSearch"
     SelectedRoom="@selectedRoomItem"
-    SelectedRoomChanged="@((RoomSearchItem? r) => selectedRoomItem = r)"
+    SelectedRoomChanged="@((RoomItem? r) => selectedRoomItem = r as RoomSearchItem)"
     FilterText="@roomFilterText"
     OnSelect="SelectRoom" />
 
@@ -674,7 +669,6 @@
     bool showConfirmUser = false;
     bool showArticleFind = false;
     bool showForeignCurrency = false;
-    bool showFolio = false;
     bool showOverdueError = false;
     string confirmUserPassword = "";
     string pendingBillingAction = "";
@@ -949,7 +943,7 @@
         showConfirmUser = true;
     }
 
-    void OpenFolio() => showFolio = true;
+    void OpenFolio() => FolioService.Open(selectedReg);
     void OpenBillTransfer() => showBillTransfer = true;
 
     void OnOption(string option)

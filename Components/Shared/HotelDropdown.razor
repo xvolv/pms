@@ -1,0 +1,69 @@
+@rendermode InteractiveServer
+@using DevExpress.Blazor
+
+<div class="hotel-dropdown-wrapper">
+    <span class="hotel-label">Hotel</span>
+    <DxComboBox CssClass="erp-combobox hotel-dropdown" 
+                Data="@hotels" 
+                @bind-Value="currentHotel" 
+                TextFieldName="Name"
+                ValueFieldName="Id"
+                NullText="Select Hotel"
+                Width="150px" 
+                SizeMode="SizeMode.Small" />
+</div>
+
+@code {
+    [Parameter]
+    public string? selectedHotel { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> selectedHotelChanged { get; set; }
+
+    private string? currentHotel
+    {
+        get => selectedHotel;
+        set
+        {
+            if (selectedHotel != value)
+            {
+                selectedHotel = value;
+                selectedHotelChanged.InvokeAsync(value);
+            }
+        }
+    }
+
+    private List<Hotel> hotels = new()
+    {
+        new Hotel { Id = "1", Name = "Main Hotel" },
+        new Hotel { Id = "2", Name = "Beach Resort" },
+        new Hotel { Id = "3", Name = "City Center" },
+        new Hotel { Id = "4", Name = "Airport Hotel" }
+    };
+
+    public class Hotel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+<style>
+    .hotel-dropdown-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .hotel-label {
+        font-size: 12px;
+        color: #555;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .hotel-dropdown {
+        min-width: 120px;
+    }
+</style>

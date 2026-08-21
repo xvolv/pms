@@ -1,0 +1,355 @@
+<DxPopup @bind-Visible="@Visible"
+         HeaderVisible="false"
+         ShowCloseButton="false"
+         Width="1100px"
+         Height="80vh"
+         AllowResize="true"
+         AllowDrag="true"
+         CssClass="resdetail-popup">
+    <BodyContentTemplate>
+        <div class="resdetail-container">
+
+            @* ---------------- Title bar ---------------- *@
+            <div class="resdetail-titlebar">
+                <i class="bi bi-arrow-90deg-left resdetail-title-icon"></i>
+                <span class="resdetail-title-text">Reservation Detail - @ReservationId</span>
+                <i class="bi bi-x-lg resdetail-title-close" @onclick="CloseDialog"></i>
+            </div>
+
+            @* ---------------- Toolbar ---------------- *@
+            <div class="resdetail-toolbar">
+
+                <div class="resdetail-tbtn" @onclick="OnRefresh">
+                    <i class="bi bi-arrow-repeat resdetail-icon resdetail-icon-green"></i>
+                    <span>Refresh</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="OnEdit">
+                    <i class="bi bi-pencil-square resdetail-icon resdetail-icon-orange"></i>
+                    <span>Edit</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="OnToPdf">
+                    <i class="bi bi-filetype-pdf resdetail-icon resdetail-icon-red"></i>
+                    <span>To PDF</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="OnToExcel">
+                    <i class="bi bi-filetype-xls resdetail-icon resdetail-icon-green"></i>
+                    <span>To Excel</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="OnPrint">
+                    <i class="bi bi-printer resdetail-icon resdetail-icon-dark"></i>
+                    <span>Print</span>
+                </div>
+
+                <div class="resdetail-tbsep"></div>
+
+                <div class="resdetail-expandall">
+                    <i class="bi bi-arrows-angle-expand resdetail-icon resdetail-icon-green"></i>
+                    <span>Expand All</span>
+                    <DxCheckBox @bind-Checked="@ExpandAll" CssClass="resdetail-expand-checkbox" />
+                </div>
+
+                <div class="resdetail-tbsep"></div>
+
+                <div class="resdetail-tbtn" @onclick="CloseDialog">
+                    <i class="bi bi-x-circle-fill resdetail-icon resdetail-icon-red-lg"></i>
+                    <span>Close</span>
+                </div>
+
+            </div>
+
+            @* ---------------- Grid ---------------- *@
+            <div class="resdetail-gridwrap">
+                <DxGrid Data="@Rows"
+                        CssClass="resdetail-grid"
+                        ShowFilterRow="false"
+                        ShowGroupPanel="false"
+                        ShowAllRows="true"
+                        SelectionMode="GridSelectionMode.Single"
+                        @bind-SelectedDataItem="@SelectedRow">
+                    <Columns>
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Date)" Caption="Date" DisplayFormat="M/d/yyyy" Width="100px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.WeekDay)" Caption="Week Day" Width="100px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Adult)" Caption="Adult" Width="70px" TextAlignment="GridTextAlignment.Center" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Child)" Caption="Child" Width="70px" TextAlignment="GridTextAlignment.Center" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomConfig)" Caption="Room Co..." Width="100px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomType)" Caption="Room Type" Width="120px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.ActualRTC)" Caption="Actual RTC" Width="110px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomNo)" Caption="Ro..." Width="60px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Rate)" Caption="Rate" Width="90px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RateAmount)" Caption="Rate Amount" Width="110px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Market)" Caption="Market" Width="130px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Source)" Caption="Source" Width="130px" />
+                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.IsFixed)" Caption="Is Fixed" Width="80px" TextAlignment="GridTextAlignment.Center" />
+                    </Columns>
+                </DxGrid>
+            </div>
+
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; } = false;
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string ReservationId { get; set; } = "REG-00008-26";
+    [Parameter] public string RoomType { get; set; } = "Standard Room";
+    [Parameter] public string ActualRTC { get; set; } = "Standard Room";
+    [Parameter] public string RoomNo { get; set; } = "103";
+    [Parameter] public int Adult { get; set; } = 1;
+    [Parameter] public int Child { get; set; } = 0;
+    [Parameter] public string Rate { get; set; } = "Standard Rate";
+    [Parameter] public decimal RateAmount { get; set; } = 100.00m;
+    [Parameter] public DateTime? ArrivalDate { get; set; }
+    [Parameter] public DateTime? DepartureDate { get; set; }
+    [Parameter] public string Market { get; set; } = "Reserved Tran...";
+    [Parameter] public string Source { get; set; } = "Membership M...";
+
+    bool ExpandAll { get; set; }
+    object? SelectedRow { get; set; }
+
+    List<ReservationDetailRow> Rows { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        GenerateRows();
+    }
+
+    void GenerateRows()
+    {
+        Rows.Clear();
+        var start = ArrivalDate ?? DateTime.Today;
+        var end = DepartureDate ?? start.AddDays(1);
+        int dayCount = Math.Max(1, (int)(end - start).TotalDays);
+
+        decimal parsedRate = RateAmount > 0 ? RateAmount : 100.00m;
+
+        for (int i = 0; i < dayCount; i++)
+        {
+            var curDate = start.AddDays(i);
+            Rows.Add(new ReservationDetailRow
+            {
+                Date = curDate,
+                WeekDay = curDate.DayOfWeek.ToString(),
+                Adult = Adult > 0 ? Adult : 1,
+                Child = Child,
+                RoomConfig = 1,
+                RoomType = !string.IsNullOrWhiteSpace(RoomType) ? RoomType : "Standard Room",
+                ActualRTC = !string.IsNullOrWhiteSpace(ActualRTC) ? ActualRTC : (!string.IsNullOrWhiteSpace(RoomType) ? RoomType : "Standard Room"),
+                RoomNo = !string.IsNullOrWhiteSpace(RoomNo) ? RoomNo : "103",
+                Rate = !string.IsNullOrWhiteSpace(Rate) ? Rate : "Standard Rate",
+                RateAmount = parsedRate,
+                Market = !string.IsNullOrWhiteSpace(Market) ? Market : "Reserved Tran...",
+                Source = !string.IsNullOrWhiteSpace(Source) ? Source : "Membership M...",
+                IsFixed = false
+            });
+        }
+    }
+
+    async Task CloseDialog()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(Visible);
+    }
+
+    void OnRefresh()
+    {
+        // TODO: reload reservation detail rows from the server
+    }
+
+    void OnEdit()
+    {
+        // TODO: switch grid/row into edit mode
+    }
+
+    void OnToPdf()
+    {
+        // TODO: export grid to PDF
+    }
+
+    void OnToExcel()
+    {
+        // TODO: export grid to Excel
+    }
+
+    void OnPrint()
+    {
+        // TODO: print current view
+    }
+
+    public class ReservationDetailRow
+    {
+        public DateTime Date { get; set; }
+        public string WeekDay { get; set; }
+        public int Adult { get; set; }
+        public int Child { get; set; }
+        public int RoomConfig { get; set; }
+        public string RoomType { get; set; }
+        public string ActualRTC { get; set; }
+        public string RoomNo { get; set; }
+        public string Rate { get; set; }
+        public decimal RateAmount { get; set; }
+        public string Market { get; set; }
+        public string Source { get; set; }
+        public bool IsFixed { get; set; }
+    }
+}
+
+<style>
+    /* ================= Popup shell ================= */
+    .resdetail-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+    }
+
+    .resdetail-popup .dxbl-popup {
+        border-radius: 0;
+    }
+
+    .resdetail-container {
+        display: flex;
+        flex-direction: column;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        font-size: 12.5px;
+        color: #222;
+        background: #ffffff;
+    }
+
+    /* ================= Title bar ================= */
+    .resdetail-titlebar {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 10px;
+        background: #ffffff;
+        border-top: 3px solid #4a90d9;
+        border-bottom: 1px solid #d6d6d6;
+    }
+
+    .resdetail-title-icon {
+        color: #c0392b;
+        font-size: 13px;
+        margin-right: 8px;
+    }
+
+    .resdetail-title-text {
+        flex: 1;
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+    }
+
+    .resdetail-title-close {
+        cursor: pointer;
+        color: #555;
+        font-size: 14px;
+        padding: 4px;
+    }
+
+    .resdetail-title-close:hover {
+        color: #d9271e;
+    }
+
+    /* ================= Toolbar ================= */
+    .resdetail-toolbar {
+        display: flex;
+        align-items: center;
+        background: #f2f2f2;
+        border-bottom: 1px solid #d6d6d6;
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .resdetail-tbtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 62px;
+        padding: 4px 2px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #333;
+        text-align: center;
+    }
+
+    .resdetail-tbtn:hover {
+        background: #dbeaf9;
+        outline: 1px solid #a9cdef;
+    }
+
+    .resdetail-tbtn span {
+        font-size: 11px;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+
+    .resdetail-icon {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .resdetail-icon-green   { color: #4caf50; }
+    .resdetail-icon-orange  { color: #ef8b1e; }
+    .resdetail-icon-red     { color: #d9271e; }
+    .resdetail-icon-red-lg  { color: #d9271e; font-size: 24px; }
+    .resdetail-icon-dark    { color: #2c3e50; }
+
+    .resdetail-tbsep {
+        width: 1px;
+        height: 38px;
+        background: #cfcfcf;
+        margin: 0 8px;
+    }
+
+    .resdetail-expandall {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 6px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .resdetail-expandall .resdetail-icon {
+        font-size: 18px;
+    }
+
+    .resdetail-expand-checkbox {
+        margin-left: 2px;
+    }
+
+    /* ================= Grid ================= */
+    .resdetail-gridwrap {
+        padding: 0;
+    }
+
+    .resdetail-grid.dxbl-grid {
+        border: none;
+        border-radius: 0;
+    }
+
+    .resdetail-grid .dxbl-grid-header-cell {
+        background: #eef0f2 !important;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 1px solid #c9c9c9 !important;
+        border-right: 1px solid #dcdcdc !important;
+        padding: 6px 8px !important;
+    }
+
+    .resdetail-grid .dxbl-grid-data-cell {
+        padding: 5px 8px !important;
+        border-right: 1px solid #eaeaea !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+    }
+
+    /* Selected row styling to match the highlighted blue row in the reference */
+    .resdetail-grid .dxbl-grid-data-row.dxbl-grid-selected-row .dxbl-grid-data-cell {
+        background: #2f7ed8 !important;
+        color: #ffffff !important;
+        border-right: 1px solid #1f66bc !important;
+    }
+</style>
