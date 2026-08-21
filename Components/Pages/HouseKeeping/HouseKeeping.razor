@@ -42,8 +42,16 @@
 </div>
 
 @code {
+    [SupplyParameterFromQuery(Name = "tab")]
+    public int? Tab { get; set; }
+
     private HouseKeepingState state = HouseKeepingState.CreateSample();
     private int activeTabIndex;
+
+    protected override void OnInitialized()
+    {
+        activeTabIndex = Tab is >= 0 and <= 3 ? Tab.Value : 0;
+    }
 
     private void Refresh() => StateHasChanged();
 

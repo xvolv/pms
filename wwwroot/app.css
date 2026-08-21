@@ -780,7 +780,7 @@ select.form-control-custom.select-custom {
 .main-menu-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     color: #333333;
     font-family:
         'Segoe UI',
@@ -797,7 +797,7 @@ select.form-control-custom.select-custom {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 18px;
+    padding: 10px 18px;
     border-bottom: 1px solid #e5e7eb;
     background-color: #ffffff;
 }
@@ -819,7 +819,7 @@ select.form-control-custom.select-custom {
     display: flex;
     align-items: center;
     padding: 4px 10px;
-    border-radius: 4px;
+    border-radius: 0px;
     transition: background-color 0.15s, color 0.15s;
 }
 
@@ -971,6 +971,130 @@ a.menu-item.active .item-icon {
     margin-right: 12px;
     display: flex;
     align-items: center;
+}
+
+/* Sidebar rail: narrow vertical strip of section selectors to the left of
+   the sidebar's content panel. Takes its width out of the sidebar's own
+   280px budget instead of adding to it, so it never pushes main content. */
+.sidebar-shell {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.sidebar-rail {
+    flex: 0 0 38px;
+    width: 38px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: #eef0f2;
+    border-right: 1px solid #e5e7eb;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.rail-item {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    color: #6b7280;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.rail-item:hover {
+    background-color: #e2e5e9;
+    color: #374151;
+}
+
+.rail-item.active {
+    background-color: #ffffff;
+    color: #1d73d4;
+}
+
+.rail-item-icon-only {
+    flex: 0 0 auto;
+    padding: 10px 0;
+    border-bottom: none;
+}
+
+.rail-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.rail-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.sidebar-panel {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Flat (non-nested) item list used by sidebar panels that don't have
+   collapsible groups, e.g. House Keeping. */
+.group-items-flat {
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+}
+
+.sidebar-placeholder {
+    padding: 48px 24px;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.sidebar-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.sidebar-placeholder p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.sidebar-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 14px 10px;
+    padding: 6px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+.sidebar-search-box i {
+    color: #9ca3af;
+}
+
+.sidebar-search-box input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 0.85rem;
+    min-width: 0;
 }
 
 /* ToolBar style */

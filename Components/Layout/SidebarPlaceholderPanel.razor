@@ -1,0 +1,18 @@
+<div class="main-menu-container">
+    <div class="menu-header">
+        <span class="menu-title">@Title</span>
+    </div>
+
+    <div class="menu-scrollable">
+        <div class="sidebar-placeholder">
+            <i class="bi @Icon"></i>
+            <p>@Message</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Icon { get; set; } = "bi-inbox";
+    [Parameter] public string Message { get; set; } = "Nothing here yet.";
+}

@@ -1,0 +1,72 @@
+<div class="sidebar-shell">
+    <div class="sidebar-rail">
+        <button type="button" class="rail-item @(activeSection == SidebarSection.MainMenu ? "active" : "")"
+                title="Main Menu" @onclick="() => Select(SidebarSection.MainMenu)">
+     
+            <span class="rail-label">Main Menu</span>
+        </button>
+        <button type="button" class="rail-item @(activeSection == SidebarSection.HouseKeeping ? "active" : "")"
+                title="House Keeping" @onclick="() => Select(SidebarSection.HouseKeeping)">
+
+            <span class="rail-label">House Keeping</span>
+        </button>
+        <button type="button" class="rail-item @(activeSection == SidebarSection.EventManagement ? "active" : "")"
+                title="Event Management" @onclick="() => Select(SidebarSection.EventManagement)">
+           
+            <span class="rail-label">Event Management</span>
+        </button>
+        <button type="button" class="rail-item @(activeSection == SidebarSection.Favorites ? "active" : "")"
+                title="Favorites" @onclick="() => Select(SidebarSection.Favorites)">
+  
+            <span class="rail-label">Favorites</span>
+        </button>
+        <button type="button" class="rail-item rail-item-icon-only @(activeSection == SidebarSection.Search ? "active" : "")"
+                title="Search" @onclick="() => Select(SidebarSection.Search)">
+            <i class="bi bi-search rail-icon"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-panel">
+        @switch (activeSection)
+        {
+            case SidebarSection.HouseKeeping:
+                <HouseKeepingNav />
+                break;
+            case SidebarSection.EventManagement:
+                <SidebarPlaceholderPanel Title="Event Management" Icon="bi-calendar-event"
+                                          Message="Event management isn't set up yet." />
+                break;
+            case SidebarSection.Favorites:
+                <SidebarPlaceholderPanel Title="Favorites" Icon="bi-star"
+                                          Message="Star items to pin them here." />
+                break;
+            case SidebarSection.Search:
+                <SidebarSearchPanel />
+                break;
+            default:
+                <NavMenu />
+                break;
+        }
+    </div>
+</div>
+
+@code {
+    private enum SidebarSection
+    {
+        MainMenu,
+        HouseKeeping,
+        EventManagement,
+        Favorites,
+        Search,
+    }
+
+    [Parameter] public EventCallback OnSectionActivated { get; set; }
+
+    private SidebarSection activeSection = SidebarSection.MainMenu;
+
+    private async Task Select(SidebarSection section)
+    {
+        activeSection = section;
+        await OnSectionActivated.InvokeAsync();
+    }
+}

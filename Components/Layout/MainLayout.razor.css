@@ -66,20 +66,25 @@ main {
         max-width: 85vw;
         height: 100vh;
         z-index: 1000;
-        transform: translateX(0);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
     }
 
+    /* Collapsing no longer slides the sidebar fully off-screen — the rail
+       (section selector strip) has to stay visible and clickable even when
+       "closed", so collapsing just shrinks the sidebar's width down to the
+       rail's own width (38px). The rail is a fixed-width flex child inside
+       .sidebar-shell, so the panel next to it is squeezed to 0 automatically
+       once the sidebar itself is only as wide as the rail. */
     .sidebar-collapsed .sidebar {
-        transform: translateX(-100%);
+        width: 38px;
     }
 
     /* left: 280px by default (open state) hugs the sidebar's right edge, same
-       as the desktop push-mode button below — was hard-coded to left: 0
-       always here, which put it at the screen's edge, under/behind the open
-       sidebar, instead of at a sensible "close" position on its visible
-       edge. .sidebar-collapsed drops it back to 0 once the drawer's closed. */
+       as the desktop push-mode button below. .sidebar-collapsed pulls it in
+       to the collapsed sidebar's new (rail-only) width instead of the old
+       "slide fully away" position, since the rail itself is still showing. */
     .sidebar-toggle-btn {
         position: fixed;
         left: 280px;
@@ -103,7 +108,7 @@ main {
     }
 
     .sidebar-collapsed .sidebar-toggle-btn {
-        left: 0;
+        left: 38px;
     }
 }
 
@@ -143,14 +148,17 @@ main {
         height: 100vh;
         position: sticky;
         top: 0;
-        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 100;
         flex-shrink: 0;
         overflow: hidden;
     }
 
+    /* Collapsing shrinks the sidebar down to just the rail's width (38px)
+       instead of pushing it fully off-screen via margin-left, so the rail
+       (section selector strip) stays visible and clickable while "closed". */
     .sidebar-collapsed .sidebar {
-        margin-left: -281px;
+        width: 38px;
     }
 
     main {
@@ -165,7 +173,7 @@ main {
        relative to the viewport instead of main's own edge, so it needs the
        same .sidebar-collapsed-driven toggle the sidebar itself already
        uses: hug the sidebar's right edge (280px) when it's open, hug the
-       viewport's left edge (0) once the sidebar's pushed out of view. */
+       collapsed (rail-only) width (38px) once the panel's collapsed. */
     .sidebar-toggle-btn {
         position: fixed;
         left: 280px;
@@ -189,7 +197,7 @@ main {
     }
 
     .sidebar-collapsed .sidebar-toggle-btn {
-        left: 0;
+        left: 38px;
     }
 
     .sidebar-toggle-btn:hover {

@@ -1,0 +1,24 @@
+<div class="main-menu-container">
+    <div class="menu-header">
+        <span class="menu-title">Search</span>
+    </div>
+
+    <div class="menu-scrollable">
+        <div class="sidebar-search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Search menu..." @bind="query" @bind:event="oninput" />
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(query))
+        {
+            <div class="sidebar-placeholder">
+                <i class="bi bi-search"></i>
+                <p>No results for "@query".</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string query = "";
+}

@@ -2,7 +2,7 @@
 
 <div class="page @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
     <div class="sidebar">
-        <NavMenu />
+        <AppSidebar OnSectionActivated="ExpandSidebar" />
     </div>
 
     <main>
@@ -28,5 +28,10 @@
     private void ToggleSidebar()
     {
         isSidebarCollapsed = !isSidebarCollapsed;
+    }
+
+    private void ExpandSidebar()
+    {
+        isSidebarCollapsed = false;
     }
 }
