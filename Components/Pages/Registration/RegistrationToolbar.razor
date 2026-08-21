@@ -53,6 +53,13 @@
                     <div class="toolbar-text">Comments</div>
                 </button>
             }
+            @if (OnReservationDetail.HasDelegate)
+            {
+                <button class="toolbar-btn" disabled="@IsReservationDetailDisabled" @onclick="OnReservationDetail">
+                    <div class="toolbar-icon" style="@(IsReservationDetailDisabled ? "opacity:.4;" : "")"><i class="bi bi-list-ul"></i></div>
+                    <div class="toolbar-text" style="@(IsReservationDetailDisabled ? "opacity:.4;" : "")">Reservation Detail</div>
+                </button>
+            }
         </div>
 
         @if (HotelContent != null)
@@ -272,6 +279,8 @@
     [Parameter] public EventCallback OnClear { get; set; }
     [Parameter] public EventCallback OnSearch { get; set; }
     [Parameter] public EventCallback OnRateInfo { get; set; }
+    [Parameter] public EventCallback OnReservationDetail { get; set; }
+    [Parameter] public bool IsReservationDetailDisabled { get; set; }
 }
 
 

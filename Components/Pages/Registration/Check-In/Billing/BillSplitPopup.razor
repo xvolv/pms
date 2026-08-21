@@ -1,5 +1,6 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@inject FolioService FolioService
 
 <DxPopup @bind-Visible="Visible" HeaderText="Bill Split" Width="960px"
          CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
@@ -183,7 +184,7 @@
     }
 
     async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleViewFolio() => await OnViewFolio.InvokeAsync();
+    async Task HandleViewFolio() { FolioService.Open(TargetRegistration); await OnViewFolio.InvokeAsync(); }
     async Task HandleCheckOut() { await OnCheckOut.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
