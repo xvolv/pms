@@ -14,6 +14,10 @@
         <i class="bi bi-printer text-secondary"></i>
         <span>Print</span>
     </button>
+    <div class="hk-toolbar-filters">
+        <span class="tb-label">Hotel</span>
+        <DxComboBox Data="@State.Hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" style="width:150px;" />
+    </div>
     <button type="button" class="rt-toolbar-btn" @onclick="ClearFilters">
         <i class="bi bi-x-circle text-secondary"></i>
         <span>Cancel</span>
@@ -87,10 +91,16 @@
 
     private bool sleeps, skips, person, sleepPerson, skipPerson, dueOutOnly;
     private string? floor, room, roomType;
+    private string? selectedHotel;
     private DateTime date = DateTime.Today;
     private bool showNewDiscrepancy;
     private bool showPrintPreview;
     private bool showInfoPopup;
+
+    protected override void OnInitialized()
+    {
+        selectedHotel = State.Hotels.FirstOrDefault();
+    }
 
     private List<DiscrepancyRow> FilteredDiscrepancies
     {

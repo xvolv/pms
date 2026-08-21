@@ -1,11 +1,7 @@
 @using DevExpress.Blazor
 
-<DxPopup @bind-Visible="Visible"
-         HeaderText="Room Search"
-         Width="min(950px, 95vw)"
-         CloseOnOutsideClick="false"
-         ShowCloseButton="true"
-         CssClass="global-room-search-popup">
+<DxPopup @bind-Visible="Visible" HeaderText="Room Search" Width="min(950px, 95vw)" CloseOnOutsideClick="false"
+         ShowCloseButton="true" CssClass="global-room-search-popup">
     <BodyContentTemplate>
         <div class="rs-container">
 
@@ -25,19 +21,13 @@
                     <div class="rs-filter-col">
                         <div class="rs-field-row">
                             <label class="rs-label">Feature</label>
-                            <DxComboBox CssClass="erp-combobox"
-                                        Data="@roomFeatures"
-                                        @bind-Value="selectedFeature"
-                                        Width="150px"
-                                        SizeMode="SizeMode.Small" />
+                            <DxComboBox CssClass="erp-combobox" Data="@roomFeatures" @bind-Value="selectedFeature"
+                                        Width="150px" SizeMode="SizeMode.Small" />
                         </div>
                         <div class="rs-field-row">
                             <label class="rs-label">Room Type</label>
-                            <DxComboBox CssClass="erp-combobox"
-                                        Data="@roomTypes"
-                                        @bind-Value="selectedRoomType"
-                                        Width="150px"
-                                        SizeMode="SizeMode.Small" />
+                            <DxComboBox CssClass="erp-combobox" Data="@roomTypes" @bind-Value="selectedRoomType"
+                                        Width="150px" SizeMode="SizeMode.Small" />
                         </div>
                     </div>
 
@@ -46,9 +36,7 @@
                     <div class="rs-filter-col rs-center-col">
                         <div class="rs-field-row">
                             <label class="rs-label">Room</label>
-                            <DxTextBox @bind-Text="roomFilter"
-                                       Width="110px"
-                                       SizeMode="SizeMode.Small"
+                            <DxTextBox @bind-Text="roomFilter" Width="110px" SizeMode="SizeMode.Small"
                                        BindValueMode="BindValueMode.OnInput" />
                         </div>
                     </div>
@@ -68,17 +56,12 @@
             <DxTabs @bind-ActiveTabIndex="roomTab" CssClass="rs-tabs">
                 <DxTabPage Text="Rooms">
                     <div class="grid-scroll-wrap">
-                        <DxGrid Data="@FilteredRooms"
-                                KeyFieldName="SN"
-                                PageSize="20"
-                                ShowPager="false"
-                                SizeMode="SizeMode.Small"
-                                Height="380px"
-                                RowClick="OnRoomRowClick"
-                                CustomizeElement="OnRoomCustomizeElement"
-                                CssClass="rs-grid">
+                        <DxGrid Data="@FilteredRooms" KeyFieldName="SN" PageSize="20" ShowPager="false"
+                                SizeMode="SizeMode.Small" Height="380px" RowClick="OnRoomRowClick"
+                                CustomizeElement="OnRoomCustomizeElement" CssClass="rs-grid">
                             <Columns>
-                                <DxGridDataColumn FieldName="SN" Caption="SN" Width="45px" TextAlignment="GridTextAlignment.Center" />
+                                <DxGridDataColumn FieldName="SN" Caption="SN" Width="45px"
+                                                  TextAlignment="GridTextAlignment.Center" />
                                 <DxGridDataColumn FieldName="Room" Caption="Room" Width="80px" />
                                 <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
                                 <DxGridDataColumn FieldName="HKStatus" Caption="HK Status" Width="100px" />
@@ -122,26 +105,43 @@
 
     private static readonly List<RoomItem> MasterRoomList = new()
     {
-        new() { SN = 1,  Room = "204", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 2,  Room = "205", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Due Out", Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 3,  Room = "206", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 4,  Room = "207", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 5,  Room = "208", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 6,  Room = "209", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 7,  Room = "210", RoomType = "Delux",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 2", Feature = "", Remark = "" },
-        new() { SN = 8,  Room = "101", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 9,  Room = "102", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 10, Room = "103", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 11, Room = "104", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 12, Room = "105", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 13, Room = "106", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 14, Room = "107", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 15, Room = "108", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 16, Room = "109", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 17, Room = "110", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 1", Feature = "", Remark = "" },
-        new() { SN = 18, Room = "301", RoomType = "Suite",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 3", Feature = "", Remark = "" },
-        new() { SN = 19, Room = "302", RoomType = "Suite",    HKStatus = "Clean", FOStatus = "Vacant",  Floor = "Floor - 3", Feature = "", Remark = "" },
-        new() { SN = 20, Room = "4001",RoomType = "Standard", HKStatus = "Dirty", FOStatus = "Vacant",  Floor = "Abay Block",Feature = "", Remark = "" },
+        new() { SN = 1, Room = "204", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 2, Room = "205", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Due Out", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 3, Room = "206", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 4, Room = "207", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 5, Room = "208", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 6, Room = "209", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 7, Room = "210", RoomType = "Delux", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 2", Feature
+= "", Remark = "" },
+        new() { SN = 8, Room = "101", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",Feature = "", Remark = "" },
+        new() { SN = 9, Room = "102", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",Feature = "", Remark = "" },
+        new() { SN = 10, Room = "103", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 11, Room = "104", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 12, Room = "105", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 13, Room = "106", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 14, Room = "107", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 15, Room = "108", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 16, Room = "109", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 17, Room = "110", RoomType = "Standard", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 1",
+Feature = "", Remark = "" },
+        new() { SN = 18, Room = "301", RoomType = "Suite", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature
+= "", Remark = "" },
+        new() { SN = 19, Room = "302", RoomType = "Suite", HKStatus = "Clean", FOStatus = "Vacant", Floor = "Floor - 3", Feature
+= "", Remark = "" },
+        new() { SN = 20, Room = "4001",RoomType = "Standard", HKStatus = "Dirty", FOStatus = "Vacant", Floor = "Floor - 2",Feature = "", Remark = "" },
     };
 
     IEnumerable<RoomItem> FilteredRooms
