@@ -181,7 +181,7 @@
 
 @code {
     [Parameter] public List<RegistrationLine> Lines { get; set; } = new();
-    [Parameter] public RegistrationLine SelectedLine { get; set; }
+    [Parameter] public RegistrationLine? SelectedLine { get; set; }
     [Parameter] public EventCallback<RegistrationLine> SelectedLineChanged { get; set; }
     [Parameter] public bool AllowGuestModal { get; set; } = false;
     [Parameter] public bool AllowFullEdit { get; set; } = false;
@@ -247,15 +247,15 @@
 
     public class RegistrationLine
     {
-        public string RoomType { get; set; }
-        public string Room { get; set; }
-        public string Guest { get; set; }
+        public string RoomType { get; set; } = string.Empty;
+        public string Room { get; set; } = string.Empty;
+        public string Guest { get; set; } = string.Empty;
         public int Adult { get; set; }
         public int Child { get; set; }
         public DateTime Arrival { get; set; }
         public DateTime Departure { get; set; }
         public int NoOfNight { get; set; }
-        public string Rate { get; set; }
+        public string Rate { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal TotalAmount { get; set; }
     }

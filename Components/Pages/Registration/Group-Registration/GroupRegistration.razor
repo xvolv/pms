@@ -288,179 +288,27 @@
     </div>
 
     @* ============== LOOKUP PANELS ============== *@
+    <!-- ===================== LOOKUP POPUP MODALS ===================== -->
+    <CompanySearchPopup @bind-Visible="ShowCustomerLookup"
+                        Customers="@Customers"
+                        OnSelect="SelectCustomer"
+                        OnClear="ClearCustomer" />
 
-    @* Customer Lookup *@
-    @if (ShowCustomerLookup)
-    {
-        <div class="grpreg-lookup-overlay" @onclick="() => ShowCustomerLookup = false">
-            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:520px">
-                <div class="grpreg-lookup-searchrow">
-                    <input class="grpreg-lookup-search" @bind="CustomerSearchText" @bind:event="oninput" placeholder="" />
-                    <button type="button" class="grpreg-lookup-find-btn" @onclick="() => { }">Find</button>
-                </div>
-                <div class="grpreg-lookup-gridwrap">
-                    <DxGrid @ref="CustomerGridRef" Data="@FilteredCustomers" CssClass="grpreg-lookup-grid"
-                            ShowFilterRow="false" ShowGroupPanel="false" CustomizeElement="OnCustomizeCustomerElement"
-                            RowClick="OnCustomerRowClick">
-                        <Columns>
-                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Code)" Caption="Code" Width="110px" />
-                            <DxGridDataColumn FieldName="@nameof(CustomerItem.FirstName)" Caption="First Name"
-                                              Width="160px" />
-                            <DxGridDataColumn FieldName="@nameof(CustomerItem.MiddleName)" Caption="Middle Name"
-                                              Width="140px" />
-                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Tin)" Caption="Tin" Width="100px" />
-                        </Columns>
-                    </DxGrid>
-                </div>
-                <div class="grpreg-lookup-footer">
-                    <button type="button" class="grpreg-lookup-clear-btn"
-                            @onclick="() => { Master.Customer = null; ShowCustomerLookup = false; }">Clear</button>
-                    <button type="button" class="grpreg-lookup-clear-btn" style="margin-left:8px"
-                            @onclick="() => ShowCustomerLookup = false">Close</button>
-                </div>
-            </div>
-        </div>
-    }
+    <GuestSearchPopup @bind-Visible="ShowGuestLookup"
+                       Guests="@Guests"
+                       OnSelect="SelectGuest"
+                       OnAddNew="AddNewGuest"
+                       OnClear="ClearGuest" />
 
-    @* Purpose of Travel Lookup *@
-    @if (ShowPurposeLookup)
-    {
-        <div class="grpreg-lookup-overlay" @onclick="() => ShowPurposeLookup = false">
-            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:320px">
-                <div class="grpreg-lookup-searchrow">
-                    <input class="grpreg-lookup-search" @bind="PurposeSearchText" @bind:event="oninput" />
-                    <button type="button" class="grpreg-lookup-find-btn">Find</button>
-                </div>
-                <div class="grpreg-lookup-gridwrap" style="max-height:280px">
-                    @foreach (var p in FilteredPurposes)
-                    {
-                        <div class="grpreg-lookup-row @(Master.PurposeOfTravel == p ? "selected" : "")"
-                             @onclick="() => { Master.PurposeOfTravel = p; ShowPurposeLookup = false; }">
-                            @p
-                        </div>
-                    }
-                </div>
-                <div class="grpreg-lookup-footer">
-                    <button type="button" class="grpreg-lookup-clear-btn"
-                            @onclick="() => { Master.PurposeOfTravel = null; ShowPurposeLookup = false; }">Clear</button>
-                </div>
-            </div>
-        </div>
-    }
+    <GroupSearchPopup @bind-Visible="ShowGroupLookup"
+                      OnSelect="SelectGroup"
+                      OnAddNew="AddNewGroup"
+                      OnClear="ClearGroup" />
 
-    @* Guest Lookup *@
-    @if (ShowGuestLookup)
-    {
-        <div class="grpreg-lookup-overlay" @onclick="() => ShowGuestLookup = false">
-            <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:420px">
-                <div class="grpreg-lookup-searchrow">
-                    <input class="grpreg-lookup-search" @bind="GuestSearchText" @bind:event="oninput" />
-                    <button type="button" class="grpreg-lookup-find-btn">Find</button>
-                </div>
-                <div class="grpreg-lookup-gridwrap">
-                    <DxGrid @ref="GuestGridRef" Data="@FilteredGuests" CssClass="grpreg-lookup-grid" ShowFilterRow="false"
-                            ShowGroupPanel="false" CustomizeElement="OnCustomizeGuestElement" RowClick="OnGuestRowClick">
-                        <Columns>
-                            <DxGridDataColumn FieldName="@nameof(GuestItem.FirstName)" Caption="First Name" Width="120px" />
-                            <DxGridDataColumn FieldName="@nameof(GuestItem.MiddleName)" Caption="Middle Name"
-                                              Width="120px" />
-                            <DxGridDataColumn FieldName="@nameof(GuestItem.Tin)" Caption="Tin" Width="100px" />
-                        </Columns>
-                    </DxGrid>
-                </div>
-                <div class="grpreg-lookup-footer">
-                    <button type="button" class="grpreg-lookup-clear-btn"
-                            @onclick="() => ShowGuestLookup = false">Clear</button>
-                    <button type="button" class="grpreg-lookup-clear-btn" style="margin-left:8px" @onclick="AddNewGuest">Add
-                        New</button>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @* Group Lookup *@
-        @if (ShowGroupLookup)
-        {
-            <div class="grpreg-lookup-overlay" @onclick="() => ShowGroupLookup = false">
-                <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:320px">
-                    <div class="grpreg-lookup-searchrow">
-                        <input class="grpreg-lookup-search" @bind="GroupSearchText" @bind:event="oninput" />
-                        <button type="button" class="grpreg-lookup-find-btn">Find</button>
-                    </div>
-                    <div class="grpreg-lookup-gridwrap" style="max-height:280px">
-                        @foreach (var g in FilteredGroups)
-                        {
-                            <div class="grpreg-lookup-row @(Master.Group == g ? "selected" : "")"
-                                 @onclick="() => { Master.Group = g; ShowGroupLookup = false; }">
-                                @g
-                            </div>
-                        }
-                    </div>
-                    <div class="grpreg-lookup-footer">
-                        <button type="button" class="grpreg-lookup-clear-btn"
-                                @onclick="() => { Master.Group = null; ShowGroupLookup = false; }">Clear</button>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @* Payment Method Lookup *@
-        @if (ShowPaymentMethodLookup)
-        {
-            <div class="grpreg-lookup-overlay" @onclick="() => ShowPaymentMethodLookup = false">
-                <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:320px">
-                    <div class="grpreg-lookup-searchrow">
-                        <input class="grpreg-lookup-search" @bind="PaymentMethodSearchText" @bind:event="oninput" />
-                        <button type="button" class="grpreg-lookup-find-btn">Find</button>
-                    </div>
-                    <div class="grpreg-lookup-gridwrap" style="max-height:280px">
-                        @foreach (var pm in FilteredPaymentMethods)
-                        {
-                            <div class="grpreg-lookup-row @(Master.PaymentMethod == pm ? "selected" : "")"
-                                 @onclick="() => { Master.PaymentMethod = pm; ShowPaymentMethodLookup = false; }">
-                                @pm
-                            </div>
-                        }
-                    </div>
-                    <div class="grpreg-lookup-footer">
-                        <button type="button" class="grpreg-lookup-clear-btn"
-                                @onclick="() => { Master.PaymentMethod = null; ShowPaymentMethodLookup = false; }">Clear</button>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @* Registrations Lookup (Existing) *@
-        @if (ShowRegistrationsLookup)
-        {
-            <div class="grpreg-lookup-overlay" @onclick="() => ShowRegistrationsLookup = false">
-                <div class="grpreg-lookup-panel" @onclick:stopPropagation="true" style="width:520px">
-                    <div class="grpreg-lookup-searchrow">
-                        <input class="grpreg-lookup-search" @bind="LookupSearchText" @bind:event="oninput" />
-                        <button type="button" class="grpreg-lookup-find-btn">Find</button>
-                    </div>
-                    <div class="grpreg-lookup-gridwrap">
-                        <DxGrid @ref="LookupGridRef" Data="@FilteredLookupItems" CssClass="grpreg-lookup-grid"
-                                ShowFilterRow="false" ShowGroupPanel="false" CustomizeElement="OnCustomizeLookupElement"
-                                RowClick="OnLookupRowClick">
-                            <Columns>
-                                <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Code)" Caption="code"
-                                                  Width="120px" />
-                                <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Guest)" Caption="Guest"
-                                                  Width="120px" />
-                                <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomNumber)" Caption="Room Number"
-                                                  Width="110px" />
-                                <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomType)" Caption="Room Type"
-                                                  Width="110px" />
-                            </Columns>
-                        </DxGrid>
-                    </div>
-                    <div class="grpreg-lookup-footer">
-                        <button type="button" class="grpreg-lookup-clear-btn" @onclick="ClearLookupSelection">Clear</button>
-                    </div>
-                </div>
-            </div>
-        }
+    <RegistrationSearchPopup @bind-Visible="ShowRegistrationsLookup"
+                             Items="@LookupItems"
+                             OnSelect="SelectRegistrationLookup"
+                             OnClear="ClearRegistrationsLookup" />
 
         <DxPopup @bind-Visible="ShowErrorPopup" HeaderText="Information" Width="420px" CloseOnOutsideClick="true"
                  ShowCloseButton="true" CloseOnEscape="true">
@@ -506,10 +354,7 @@
         }
     }
 
-    // ---- Grid refs (needed for GetDataItem lookups on RowClick) ----
-    IGrid? CustomerGridRef;
-    IGrid? GuestGridRef;
-    IGrid? LookupGridRef;
+
 
     // ---- Global Components State ----
     // Room Search
@@ -627,27 +472,26 @@
     }
 
     // ---- Mock data (MVP) ----
-    List<CustomerItem> Customers { get; set; } = new()
+    List<CustomerItem> Customers { get; set; } = new List<CustomerItem>()
     {
-        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin =
-"0076217301" }
+        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" }
     };
 
-    List<string> PurposeOptions { get; } = new()
+    List<string> PurposeOptions { get; set; } = new List<string>()
     {
         "Business", "Conference", "Education", "Medical", "Pleasure", "Tourism",
         "Transit", "Vacation", "Wedding", "Holiday", "Shopping"
     };
 
-    List<GuestItem> Guests { get; set; } = new()
+    List<GuestItem> Guests { get; set; } = new List<GuestItem>()
     {
         new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
         new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
         new() { FirstName = "TEST", MiddleName = "", Tin = "" }
     };
 
-    List<RegistrationLookupItem> LookupItems { get; set; } = new() {
-        
+    List<RegistrationLookupItem> LookupItems { get; set; } = new List<RegistrationLookupItem>()
+    {
         new() { Code = "REG-00000-26", Guest = "JANE DOE", RoomNumber = "101", RoomType = "Standard" },
         new() { Code = "REG-00001-26", Guest = "JANE DOE", RoomNumber = "205", RoomType = "Delux" },
         new() { Code = "REG-00002-26", Guest = "JANE DOE", RoomNumber = "207", RoomType = "Delux" },
@@ -655,52 +499,15 @@
         new() { Code = "REG-00004-26", Guest = "JANE DOE", RoomNumber = "209", RoomType = "Delux" },
         new() { Code = "REG-00005-26", Guest = "JANE DOE", RoomNumber = "210", RoomType = "Delux" },
         new() { Code = "REG-00006-26", Guest = "JANE DOE", RoomNumber = "102", RoomType = "Standard" },
-        new() { Code = "REG-00007-26", Guest = "JANE DOE", RoomNumber = "103", RoomType = "Standard" },
-    
+        new() { Code = "REG-00007-26", Guest = "JANE DOE", RoomNumber = "103", RoomType = "Standard" }
     };
 
-    List<string> StateOptions { get; } = new() { "Waiting List", "6PM", "Guaranteed", "Inhouse" };
-    List<string> GroupOptions { get; } = new() { "JANE", "ABEBE", "KEBEDE", "OTHER GROUP" };
-    List<string> PaymentMethodOptions { get; } = new() { "Cash", "Credit Card", "Bank Transfer" };
-    List<string> RateOptions { get; } = new() { "RACK", "CORP", "GROUP", "PROMO", "Rate 1" };
+    List<string> StateOptions { get; set; } = new List<string>() { "Waiting List", "6PM", "Guaranteed", "Inhouse" };
+    List<string> GroupOptions { get; set; } = new List<string>() { "JANE", "ABEBE", "KEBEDE", "OTHER GROUP" };
+    List<string> PaymentMethodOptions { get; set; } = new List<string>() { "Cash", "Credit Card", "Bank Transfer" };
+    List<string> RateOptions { get; set; } = new List<string>() { "RACK", "CORP", "GROUP", "PROMO", "Rate 1" };
 
-    IEnumerable<CustomerItem> FilteredCustomers =>
-        string.IsNullOrWhiteSpace(CustomerSearchText)
-            ? Customers
-            : Customers.Where(c =>
-                c.Code.Contains(CustomerSearchText, StringComparison.OrdinalIgnoreCase) ||
-                c.FirstName.Contains(CustomerSearchText, StringComparison.OrdinalIgnoreCase));
 
-    IEnumerable<string> FilteredPurposes =>
-        string.IsNullOrWhiteSpace(PurposeSearchText)
-            ? PurposeOptions
-            : PurposeOptions.Where(p => p.Contains(PurposeSearchText, StringComparison.OrdinalIgnoreCase));
-
-    IEnumerable<GuestItem> FilteredGuests =>
-        string.IsNullOrWhiteSpace(GuestSearchText)
-            ? Guests
-            : Guests.Where(g =>
-                g.FirstName.Contains(GuestSearchText, StringComparison.OrdinalIgnoreCase) ||
-                (g.MiddleName ?? "").Contains(GuestSearchText, StringComparison.OrdinalIgnoreCase));
-
-    IEnumerable<RegistrationLookupItem> FilteredLookupItems =>
-        string.IsNullOrWhiteSpace(LookupSearchText)
-            ? LookupItems
-            : LookupItems.Where(i =>
-                i.Code.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
-                i.Guest.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
-                i.RoomNumber.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase) ||
-                i.RoomType.Contains(LookupSearchText, StringComparison.OrdinalIgnoreCase));
-
-    IEnumerable<string> FilteredGroups =>
-        string.IsNullOrWhiteSpace(GroupSearchText)
-            ? GroupOptions
-            : GroupOptions.Where(g => g.Contains(GroupSearchText, StringComparison.OrdinalIgnoreCase));
-
-    IEnumerable<string> FilteredPaymentMethods =>
-        string.IsNullOrWhiteSpace(PaymentMethodSearchText)
-            ? PaymentMethodOptions
-            : PaymentMethodOptions.Where(pm => pm.Contains(PaymentMethodSearchText, StringComparison.OrdinalIgnoreCase));
 
     void OnNew()
     {
@@ -797,26 +604,7 @@
         return true;
     }
 
-    bool ValidateLine(string? guest, DateTime arrival, DateTime departure, int adult)
-    {
-        if (string.IsNullOrWhiteSpace(guest))
-        {
-            ValidationMessage = "Guest is required.";
-            return false;
-        }
-        if (departure <= arrival)
-        {
-            ValidationMessage = "Departure must be after Arrival.";
-            return false;
-        }
-        if (adult < 1)
-        {
-            ValidationMessage = "At least 1 Adult is required.";
-            return false;
-        }
-        ValidationMessage = "";
-        return true;
-    }
+
 
     void AddNewRegistrationLine()
     {
@@ -910,50 +698,26 @@ CheckInReg.Rate)) return;
     // highlights it manually via CustomizeElement.
     // =====================================================
 
-    void OnCustomerRowClick(GridRowClickEventArgs e)
+    void SelectCustomer(CustomerItem customer)
     {
-        var item = (CustomerItem)e.Grid.GetDataItem(e.VisibleIndex);
-        SelectCustomer(item);
-    }
-
-    void OnCustomizeCustomerElement(GridCustomizeElementEventArgs e)
-    {
-        if (e.ElementType != GridElementType.DataRow) return;
-        var item = (CustomerItem)e.Grid.GetDataItem(e.VisibleIndex);
-        if (item != null && item.Code == Master.SelectedCustomerCode)
-            e.CssClass = "grpreg-row-selected";
-    }
-
-    void SelectCustomer(CustomerItem? item)
-    {
-        if (item == null) return;
-        Master.Customer = item.FirstName;
-        Master.SelectedCustomerCode = item.Code;
+        Master.Customer = customer.FirstName;
+        Master.SelectedCustomerCode = customer.Code;
         ShowCustomerLookup = false;
     }
 
-    void OnGuestRowClick(GridRowClickEventArgs e)
+    void ClearCustomer()
     {
-        var item = (GuestItem)e.Grid.GetDataItem(e.VisibleIndex);
-        SelectGuest(item);
-    }
-
-    void OnCustomizeGuestElement(GridCustomizeElementEventArgs e)
-    {
-        if (e.ElementType != GridElementType.DataRow) return;
-        var item = (GuestItem)e.Grid.GetDataItem(e.VisibleIndex);
-        var current = GuestLookupForCheckIn ? CheckInReg.Guest : NewReg.Guest;
-        if (item != null && FormatGuestName(item) == current)
-            e.CssClass = "grpreg-row-selected";
+        Master.Customer = null;
+        Master.SelectedCustomerCode = null;
+        ShowCustomerLookup = false;
     }
 
     string FormatGuestName(GuestItem item) =>
         string.IsNullOrWhiteSpace(item.MiddleName) ? item.FirstName : $"{item.FirstName} {item.MiddleName}";
 
-    void SelectGuest(GuestItem? item)
+    void SelectGuest(GuestItem guest)
     {
-        if (item == null) return;
-        var name = FormatGuestName(item);
+        var name = FormatGuestName(guest);
         if (activeLineForGuestLookup != null)
         {
             activeLineForGuestLookup.Guest = name;
@@ -966,43 +730,60 @@ CheckInReg.Rate)) return;
         ShowGuestLookup = false;
     }
 
+    void ClearGuest()
+    {
+        if (activeLineForGuestLookup != null)
+        {
+            activeLineForGuestLookup.Guest = "";
+            activeLineForGuestLookup = null;
+        }
+        else if (GuestLookupForCheckIn)
+            CheckInReg.Guest = "";
+        else
+            NewReg.Guest = "";
+        ShowGuestLookup = false;
+    }
+
     void OpenLineGuestLookup(RegistrationLine line)
     {
         activeLineForGuestLookup = line;
         ShowGuestLookup = true;
     }
 
-    void OnLookupRowClick(GridRowClickEventArgs e)
-    {
-        var item = (RegistrationLookupItem)e.Grid.GetDataItem(e.VisibleIndex);
-        SelectLookupItem(item);
-    }
-
-    void OnCustomizeLookupElement(GridCustomizeElementEventArgs e)
-    {
-        if (e.ElementType != GridElementType.DataRow) return;
-        var item = (RegistrationLookupItem)e.Grid.GetDataItem(e.VisibleIndex);
-        if (item != null && item == SelectedLookupItem)
-            e.CssClass = "grpreg-row-selected";
-    }
-
-    void SelectLookupItem(RegistrationLookupItem? item)
-    {
-        if (item == null) return;
-        SelectedLookupItem = item;
-        ShowRegistrationsLookup = false;
-    }
-
-    void ClearLookupSelection()
-    {
-        SelectedLookupItem = null;
-        LookupSearchText = "";
-    }
-
     void AddNewGuest()
     {
         ShowGuestLookup = false;
         ValidationMessage = "Add New Guest form not implemented in this MVP.";
+    }
+
+    void SelectGroup(GroupItem group)
+    {
+        Master.Group = group.Name;
+        ShowGroupLookup = false;
+    }
+
+    void ClearGroup()
+    {
+        Master.Group = null;
+        ShowGroupLookup = false;
+    }
+
+    void AddNewGroup()
+    {
+        ShowGroupLookup = false;
+        ValidationMessage = "Add New Group form not implemented in this MVP.";
+    }
+
+    void SelectRegistrationLookup(RegistrationLookupItem item)
+    {
+        SelectedLookupItem = item;
+        ShowRegistrationsLookup = false;
+    }
+
+    void ClearRegistrationsLookup()
+    {
+        SelectedLookupItem = null;
+        ShowRegistrationsLookup = false;
     }
 
     // ---- Room Search Methods ----
@@ -1190,28 +971,7 @@ CheckInReg.Rate)) return;
         public decimal RateAmount { get; set; }
     }
 
-    public class RegistrationLookupItem
-    {
-        public string Code { get; set; } = "";
-        public string Guest { get; set; } = "";
-        public string RoomNumber { get; set; } = "";
-        public string RoomType { get; set; } = "";
-    }
 
-    public class CustomerItem
-    {
-        public string Code { get; set; } = "";
-        public string FirstName { get; set; } = "";
-        public string MiddleName { get; set; } = "";
-        public string Tin { get; set; } = "";
-    }
-
-    public class GuestItem
-    {
-        public string FirstName { get; set; } = "";
-        public string? MiddleName { get; set; }
-        public string Tin { get; set; } = "";
-    }
 }
 
 <style>
