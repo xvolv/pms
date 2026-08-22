@@ -304,7 +304,6 @@
     private bool isBlockModalOpen;
     private bool isBlockNewEntry;
     private BlockDraft? editingBlockDraft;
-    private string? blocksStatusMessage;
     private int? selectedBlockId;
 
     private FloorRow? currentFloor => blocks.SelectMany(b => b.Floors).FirstOrDefault(f => f.Id == currentFloorId);
@@ -573,7 +572,6 @@ RefreshBlocks) },
 
     private void OpenAddBlockModal()
     {
-        blocksStatusMessage = null;
         editingBlockDraft = new BlockDraft
         {
             Code = GenerateNextBlockCode(),
@@ -597,7 +595,6 @@ RefreshBlocks) },
         if (block == null)
             return;
 
-        blocksStatusMessage = null;
         editingBlockDraft = new BlockDraft
         {
             Id = block.Id,
@@ -642,7 +639,6 @@ RefreshBlocks) },
             selectedTileIds.Clear();
         }
 
-        blocksStatusMessage = "Block deleted.";
         return Task.CompletedTask;
     }
 
@@ -683,7 +679,6 @@ RefreshBlocks) },
 
             isBlockModalOpen = false;
             editingBlockDraft = null;
-            blocksStatusMessage = "Block updated.";
             return;
         }
 
@@ -732,7 +727,6 @@ RefreshBlocks) },
         currentFloorId = null;
         isBlockModalOpen = false;
         editingBlockDraft = null;
-        blocksStatusMessage = "Block added.";
     }
 
     private void SaveBlocks()
@@ -744,7 +738,6 @@ RefreshBlocks) },
     private Task SaveBlocksConfirmed()
     {
         // TODO: persist blocks/floors via ApiService once the Property API endpoint is available.
-        blocksStatusMessage = "Changes saved.";
         return Task.CompletedTask;
     }
 
@@ -752,7 +745,6 @@ RefreshBlocks) },
     {
         blocks = CreateSampleBlocks();
         selectedTileIds.Clear();
-        blocksStatusMessage = null;
 
         currentFloorId = null;
         var firstBlock = blocks.FirstOrDefault();

@@ -64,6 +64,7 @@ public class DiscrepancyRow
 public class RoomStatusRow
 {
     public int Id { get; set; }
+    public bool Checked { get; set; } = true;
     public int Sn { get; set; }
     public string Room { get; set; } = "";
     public string RoomType { get; set; } = "";

@@ -17,7 +17,7 @@ public class HouseKeepingState
 
     public List<string> RoomTypes { get; } = new() { "Standard Room", "Executive" };
 
-    public List<string> Floors { get; } = new() { "Abay Block", "Floor - 1", "Floor - 3" };
+    public List<string> Floors { get; } = new() { "Floor - 2", "Floor - 1", "Floor - 3" };
 
     public List<string> HkStatuses { get; } = new()
     {
@@ -39,6 +39,10 @@ public class HouseKeepingState
     {
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December",
+    };
+    public List<string> Hotels { get; } = new()
+    {
+        "Test Hotel ", "Hotel B", "Hotel C", "Hotel D", "Hotel E",
     };
 
     private static int _nextId;
@@ -147,7 +151,7 @@ public class HouseKeepingState
     {
         var rooms = new[]
         {
-            ("103", "Abay Block", "Clean"),
+            ("103", "Floor - 2", "Clean"),
             ("101", "Floor - 1", "Clean"),
             ("102", "Floor - 1", "Clean"),
             ("301", "Floor - 3", "Dirty"),
