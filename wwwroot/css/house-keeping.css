@@ -126,6 +126,7 @@
     align-items: stretch;
     gap: 0;
     padding: 2px 12px;
+    margin-bottom :2px;
 }
 
 .hk-filter-subgroup {
