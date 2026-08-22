@@ -1,0 +1,315 @@
+@page "/source"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.Profile.Source.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
+@inject NavigationManager NavigationManager
+
+<PageTitle>Profile - Source</PageTitle>
+<div class="top-tab-header">
+    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+        Source
+        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+    </div>
+</div>
+
+<div class="profile-page-wrapper">
+    <EditForm Model="@source" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+
+        <div>
+            <div class="rt-toolbar">
+                <button type="button" class="rt-toolbar-btn" @onclick="NewSource">
+                    <i class="bi bi-file-earmark-plus text-secondary"></i>
+                    <span>New</span>
+                </button>
+                <button type="submit" class="rt-toolbar-btn">
+                    <i class="bi bi-floppy text-secondary"></i>
+                    <span>Save</span>
+                </button>
+
+                <div class="profile-toolbar-code no-push">
+                    <label>Code</label>
+                    <DxTextBox @bind-Text="@source.Code" CssClass="rt-form-input" />
+                    <ValidationMessage For="@(() => source.Code)" class="rt-validation-message" />
+                </div>
+
+                <button type="button" class="rt-toolbar-btn" @onclick="OpenNote">
+                    <i class="bi bi-sticky text-secondary"></i>
+                    <span>Note</span>
+                </button>
+                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                    <i class="bi bi-x-circle text-secondary"></i>
+                    <span>Close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="rt-modal-body rt-modal-labeled" style="padding:0px;">
+            <ValidationSummary class="rt-validation-summary" />
+            <div class="profile-body-columns">
+                <div class="profile-main-col">
+                    <fieldset class="rt-form-fieldset" style="margin-bottom: 1rem;">
+                        <legend>Basic Information</legend>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Source ID</label>
+                                <DxTextBox @bind-Text="@source.SourceId" ReadOnly="true" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Name</label>
+                                <DxTextBox @bind-Text="@source.Name" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => source.Name)" class="rt-validation-message" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field">
+                                <label>Source Type</label>
+                                <DxComboBox Data="@sourceTypes" @bind-Value="@source.SourceType" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => source.SourceType)" class="rt-validation-message" />
+                            </div>
+                            <div class="rt-form-field rt-form-field-inline">
+                                <DxCheckBox @bind-Checked="@source.IsActive">Is Active</DxCheckBox>
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Category</label>
+                                <DxComboBox Data="@categories" @bind-Value="@source.Category" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => source.Category)" class="rt-validation-message" />
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="rt-form-fieldset" style="margin-bottom: 1rem;">
+                        <legend>Additional Information</legend>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Account No.</label>
+                                <DxComboBox Data="@accountNos" @bind-Value="@source.AccountNo" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Tax Type</label>
+                                <DxComboBox Data="@taxTypes" @bind-Value="@source.TaxType" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Rate Code</label>
+                                <DxComboBox Data="@rateCodes" @bind-Value="@source.RateCode" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Status</label>
+                                <DxComboBox Data="@statuses" @bind-Value="@source.Status" NullText="-- Select --"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Mailing Action</label>
+                                <DxComboBox Data="@mailingActions" @bind-Value="@source.MailingAction"
+                                            NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Currency</label>
+                                <DxComboBox Data="@currencies" @bind-Value="@source.Currency" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Owner</label>
+                                <DxComboBox Data="@owners" @bind-Value="@source.Owner" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="profile-side-col">
+                    <fieldset class="rt-form-fieldset">
+                        <legend>Address</legend>
+
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Phone 1</label>
+                                <DxTextBox @bind-Text="@source.Phone1" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Phone 2</label>
+                                <DxTextBox @bind-Text="@source.Phone2" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Email</label>
+                                <DxTextBox @bind-Text="@source.Email" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => source.Email)" class="rt-validation-message" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Website</label>
+                                <DxTextBox @bind-Text="@source.Website" CssClass="rt-form-input" />
+                                <ValidationMessage For="@(() => source.Website)" class="rt-validation-message" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Kebele</label>
+                                <DxTextBox @bind-Text="@source.Kebele" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Street</label>
+                                <DxTextBox @bind-Text="@source.Street" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Address 1</label>
+                                <DxTextBox @bind-Text="@source.Address1" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>PoBox.</label>
+                                <DxTextBox @bind-Text="@source.POBox" CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Region</label>
+                                <DxComboBox Data="@regions" @bind-Value="@source.Region" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>City</label>
+                                <DxComboBox Data="@cities" @bind-Value="@source.City" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>SubCity</label>
+                                <DxComboBox Data="@subCities" @bind-Value="@source.SubCity" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                        <div class="rt-form-row">
+                            <div class="rt-form-field rt-form-field-wide">
+                                <label>Wereda</label>
+                                <DxComboBox Data="@weredas" @bind-Value="@source.Wereda" NullText="-- Select --"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            CssClass="rt-form-input" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-status-bar">@statusMessage</div>
+
+    </EditForm>
+</div>
+
+@code {
+    private SourceRow source = new();
+    private string? statusMessage;
+
+    private List<string> sourceTypes = new() { "OTA", "Direct", "Walk-In", "Corporate", "Travel Agent", "GDS",
+"Wholesaler", "Other" };
+    private List<string> categories = new() { "Business", "Leisure", "Group", "Government", "Corporate", "VIP" };
+    private List<string> accountNos = new() { "AR-001", "AR-002", "AR-003", "AR-004" };
+    private List<string> taxTypes = new() { "VAT", "TOT", "Exempt" };
+    private List<string> rateCodes = new() { "CORP-001", "CORP-002", "GOV-001", "AGENT-001", "GROUP-001" };
+    private List<string> statuses = new() { "Active", "Inactive" };
+    private List<string> mailingActions = new() { "Email", "Post", "SMS", "Phone", "Fax", "None" };
+    private List<string> currencies = new() { "ETB", "USD", "EUR", "GBP", "AED" };
+    private List<string> owners = new() { "John Doe", "Jane Smith", "Robert Williams" };
+
+    private List<string> regions = AddressLookup.Regions;
+    private List<string> cities = AddressLookup.Cities;
+    private List<string> subCities = AddressLookup.SubCities;
+    private List<string> weredas = AddressLookup.Weredas;
+
+    protected override void OnInitialized()
+    {
+        source = CreateBlankSource();
+    }
+
+    private SourceRow CreateBlankSource()
+    {
+        return new SourceRow
+        {
+            SourceId = GenerateSourceId(),
+        };
+    }
+
+    private string GenerateSourceId()
+    {
+        var sequence = new Random().Next(1, 99999);
+        return $"OSC-{sequence:D5}-{DateTime.Now:yy}";
+    }
+
+    private void NewSource()
+    {
+        source = CreateBlankSource();
+        statusMessage = null;
+    }
+
+    private void HandleValidSubmit()
+    {
+        statusMessage = "Source saved.";
+    }
+
+    private void OpenNote()
+    {
+    }
+
+    private void Close()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}
