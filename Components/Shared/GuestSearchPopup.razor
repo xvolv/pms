@@ -1,0 +1,150 @@
+@using DevExpress.Blazor
+
+<DxPopup Visible="@Visible"
+         VisibleChanged="@HandleVisibleChanged"
+         HeaderText="Guest Search"
+         Width="520px"
+         CloseOnOutsideClick="true"
+         ShowCloseButton="true"
+         CloseOnEscape="true"
+         CssClass="global-lookup-popup">
+    <BodyContentTemplate>
+        <div class="lookup-modal-container">
+            <div class="lookup-modal-searchrow">
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search guest name..." />
+                <button type="button" class="lookup-modal-find-btn">Find</button>
+            </div>
+            <div class="lookup-modal-gridwrap">
+                <DxGrid @ref="gridRef"
+                        Data="@FilteredGuests"
+                        CssClass="lookup-modal-grid"
+                        ShowFilterRow="false"
+                        ShowGroupPanel="false"
+                        CustomizeElement="OnCustomizeElement"
+                        RowClick="OnRowClick"
+                        RowDoubleClick="OnRowDoubleClick">
+                    <Columns>
+                        <DxGridDataColumn FieldName="@nameof(GuestItem.FirstName)" Caption="First Name" Width="140px" />
+                        <DxGridDataColumn FieldName="@nameof(GuestItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                        <DxGridDataColumn FieldName="@nameof(GuestItem.Tin)" Caption="Tin" Width="100px" />
+                    </Columns>
+                </DxGrid>
+            </div>
+            <div class="lookup-modal-footer">
+                <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleAddNew">Add New</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public List<GuestItem>? Guests { get; set; }
+    [Parameter] public GuestItem? SelectedGuest { get; set; }
+    [Parameter] public EventCallback<GuestItem?> SelectedGuestChanged { get; set; }
+    [Parameter] public EventCallback<GuestItem> OnSelect { get; set; }
+    [Parameter] public EventCallback OnAddNew { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    string SearchText { get; set; } = "";
+    GuestItem? selectedRow;
+    IGrid? gridRef;
+
+    List<GuestItem> DefaultGuests { get; } = new()
+    {
+        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
+        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
+        new() { FirstName = "JOHN", MiddleName = "SMITH", Tin = "" },
+        new() { FirstName = "TEST", MiddleName = "", Tin = "" },
+        new() { FirstName = "Solomon", MiddleName = "Tuffa Bereket", Tin = "" },
+        new() { FirstName = "miskir", MiddleName = "engida engida", Tin = "" }
+    };
+
+    List<GuestItem> DataList => (Guests != null && Guests.Count > 0) ? Guests : DefaultGuests;
+
+    IEnumerable<GuestItem> FilteredGuests =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? DataList
+            : DataList.Where(g => (g.FirstName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (g.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (g.Tin?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedGuest != null)
+        {
+            selectedRow = SelectedGuest;
+        }
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as GuestItem;
+        if (item != null)
+        {
+            selectedRow = item;
+        }
+    }
+
+    async Task OnRowDoubleClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as GuestItem;
+        if (item != null)
+        {
+            selectedRow = item;
+            await HandleSelect();
+        }
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as GuestItem;
+            if (item != null && item.FirstName == selectedRow.FirstName && item.MiddleName == selectedRow.MiddleName)
+            {
+                e.CssClass = "lookup-modal-row-selected";
+            }
+        }
+    }
+
+    async Task HandleSelect()
+    {
+        if (selectedRow != null)
+        {
+            await SelectedGuestChanged.InvokeAsync(selectedRow);
+            await OnSelect.InvokeAsync(selectedRow);
+        }
+        await HandleClose();
+    }
+
+    async Task HandleAddNew()
+    {
+        await OnAddNew.InvokeAsync();
+    }
+
+    async Task HandleClear()
+    {
+        selectedRow = null;
+        await SelectedGuestChanged.InvokeAsync(null);
+        await OnClear.InvokeAsync();
+        await HandleClose();
+    }
+
+    async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleVisibleChanged(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
+}

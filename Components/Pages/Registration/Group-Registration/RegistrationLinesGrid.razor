@@ -1,98 +1,261 @@
 @using DevExpress.Blazor
 
 <div class="reglines-grid-wrap">
-    <DxGrid Data="@Lines"
+    <DxGrid @ref="GridRef"
+            Data="@Lines"
             CssClass="reglines-grid"
             ShowFilterRow="false"
             ShowGroupPanel="false"
-            SelectionMode="GridSelectionMode.Single"
-            @bind-SelectedDataItem="@SelectedLineObj"
-            PageSize="0">
+            CustomizeElement="OnCustomizeElement"
+            RowClick="OnRowClick"
+            PageSize="5"
+            @bind-PageIndex="@CurrentPageIndex"
+            ShowPager="false">
         <Columns>
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.RoomType)" Caption="Room Type" Width="120px" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Room)" Caption="Room" Width="80px" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Guest)" Caption="Guest" Width="140px" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Adult)" Caption="Adult" Width="60px" TextAlignment="GridTextAlignment.Center" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Child)" Caption="Child" Width="60px" TextAlignment="GridTextAlignment.Center" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Arrival)" Caption="Arrival" Width="100px" DisplayFormat="M/d/yyyy" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Departure)" Caption="Departure" Width="100px" DisplayFormat="M/d/yyyy" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.NoOfNight)" Caption="# of Night" Width="80px" TextAlignment="GridTextAlignment.Center" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Rate)" Caption="Rate" Width="100px" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Amount)" Caption="Amount" Width="100px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-            <DxGridDataColumn FieldName="@nameof(RegistrationLine.TotalAmount)" Caption="Total Amount" Width="110px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.RoomType)" Caption="Room Type" Width="10%" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Room)" Caption="Room" Width="8%" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Guest)" Caption="Guest" Width="18%">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{
+                        var line = (RegistrationLine)gridCellContext.DataItem;
+                    }
+                    @if (AllowGuestModal)
+                    {
+                        <div class="lookup-field" style="width:100%; margin:0;" @onclick:stopPropagation="true">
+                            <DxTextBox Text="@line.Guest"
+                                       ReadOnly="true"
+                                       Width="100%"
+                                       CssClass="erp-combobox lookup-input"
+                                       Click="@(() => OnGuestLookupClick.InvokeAsync(line))" />
+                            <button type="button" class="lookup-toggle-btn"
+                                    @onclick="@(() => OnGuestLookupClick.InvokeAsync(line))">▾</button>
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Guest
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Adult)" Caption="Adult" Width="6%" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div @onclick:stopPropagation="true">
+                            <DxSpinEdit Value="@line.Adult"
+                                        ValueChanged="@((int v) => { line.Adult = v; _ = LineChanged(line); })"
+                                        MinValue="0"
+                                        SizeMode="SizeMode.Small"
+                                        CssClass="dx-input-num w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Adult
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Child)" Caption="Child" Width="6%" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div @onclick:stopPropagation="true">
+                            <DxSpinEdit Value="@line.Child"
+                                        ValueChanged="@((int v) => { line.Child = v; _ = LineChanged(line); })"
+                                        MinValue="0"
+                                        SizeMode="SizeMode.Small"
+                                        CssClass="dx-input-num w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Child
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Arrival)" Caption="Arrival" Width="11%" DisplayFormat="M/d/yyyy">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div @onclick:stopPropagation="true">
+                            <DxDateEdit Date="@line.Arrival"
+                                        DateChanged="@((DateTime d) => { line.Arrival = d; UpdateLineNights(line); _ = LineChanged(line); })"
+                                        DisplayFormat="M/d/yyyy"
+                                        SizeMode="SizeMode.Small"
+                                        CssClass="erp-combobox w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Arrival.ToString("M/d/yyyy")
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Departure)" Caption="Departure" Width="11%" DisplayFormat="M/d/yyyy">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div @onclick:stopPropagation="true">
+                            <DxDateEdit Date="@line.Departure"
+                                        DateChanged="@((DateTime d) => { line.Departure = d; UpdateLineNights(line); _ = LineChanged(line); })"
+                                        DisplayFormat="M/d/yyyy"
+                                        SizeMode="SizeMode.Small"
+                                        CssClass="erp-combobox w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Departure.ToString("M/d/yyyy")
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.NoOfNight)" Caption="# of Night" Width="7%" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div @onclick:stopPropagation="true">
+                            <DxSpinEdit Value="@line.NoOfNight"
+                                        ValueChanged="@((int n) => { line.NoOfNight = n; line.Departure = line.Arrival.AddDays(n); line.TotalAmount = line.Amount * n; _ = LineChanged(line); })"
+                                        MinValue="1"
+                                        SizeMode="SizeMode.Small"
+                                        CssClass="dx-input-num w-100" />
+                        </div>
+                    }
+                    else
+                    {
+                        @line.NoOfNight
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Rate)" Caption="Rate" Width="11%">
+                <CellDisplayTemplate Context="gridCellContext">
+                    @{ var line = (RegistrationLine)gridCellContext.DataItem; }
+                    @if (AllowFullEdit)
+                    {
+                        <div class="lookup-field" style="width:100%; margin:0;" @onclick:stopPropagation="true">
+                            <DxTextBox Text="@line.Rate"
+                                       ReadOnly="true"
+                                       Width="100%"
+                                       CssClass="erp-combobox lookup-input"
+                                       Click="@(() => OnRateLookupClick.InvokeAsync(line))" />
+                            <button type="button" class="lookup-toggle-btn"
+                                    @onclick="@(() => OnRateLookupClick.InvokeAsync(line))">▾</button>
+                        </div>
+                    }
+                    else
+                    {
+                        @line.Rate
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.Amount)" Caption="Amount" Width="7%" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
+            <DxGridDataColumn FieldName="@nameof(RegistrationLine.TotalAmount)" Caption="Total Amount" Width="7%" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
         </Columns>
     </DxGrid>
 </div>
 
-<div class="reglines-footer">
-    <div class="reglines-navigator">
-        <i class="bi bi-chevron-bar-left reglines-nav-btn" @onclick="GoFirst"></i>
-        <i class="bi bi-chevron-left reglines-nav-btn" @onclick="GoPrev"></i>
-        <span class="reglines-nav-text">Record @(Lines.Count == 0 ? 0 : CurrentIndex + 1) of @Lines.Count</span>
-        <i class="bi bi-chevron-right reglines-nav-btn" @onclick="GoNext"></i>
-        <i class="bi bi-chevron-bar-right reglines-nav-btn" @onclick="GoLast"></i>
-    </div>
-    <div class="reglines-totals">
+<!-- Totals summary bar ABOVE pagination -->
+<div class="reglines-totals-bar">
+    <div class="reglines-totals-right">
+        <span class="reglines-totals-title">Totals:</span>
         <div class="reglines-total-box" title="Amount total">@Lines.Sum(l => l.Amount).ToString("N2")</div>
         <div class="reglines-total-box" title="Total Amount total">@Lines.Sum(l => l.TotalAmount).ToString("N2")</div>
     </div>
 </div>
 
+<!-- Pagination bar BELOW totals summary -->
+<div class="reglines-pager-bar">
+    <div class="reglines-navigator">
+        <i class="bi bi-chevron-bar-left reglines-nav-btn @(CurrentPageIndex == 0 ? "disabled" : "")" @onclick="GoFirstPage"></i>
+        <i class="bi bi-chevron-left reglines-nav-btn @(CurrentPageIndex == 0 ? "disabled" : "")" @onclick="GoPrevPage"></i>
+        <span class="reglines-nav-text">Page @(TotalPages == 0 ? 0 : CurrentPageIndex + 1) of @TotalPages (Record @(Lines.Count == 0 ? 0 : CurrentIndex + 1) of @Lines.Count)</span>
+        <i class="bi bi-chevron-right reglines-nav-btn @(CurrentPageIndex >= TotalPages - 1 ? "disabled" : "")" @onclick="GoNextPage"></i>
+        <i class="bi bi-chevron-bar-right reglines-nav-btn @(CurrentPageIndex >= TotalPages - 1 ? "disabled" : "")" @onclick="GoLastPage"></i>
+    </div>
+</div>
+
 @code {
     [Parameter] public List<RegistrationLine> Lines { get; set; } = new();
-    [Parameter] public RegistrationLine SelectedLine { get; set; }
+    [Parameter] public RegistrationLine? SelectedLine { get; set; }
     [Parameter] public EventCallback<RegistrationLine> SelectedLineChanged { get; set; }
+    [Parameter] public bool AllowGuestModal { get; set; } = false;
+    [Parameter] public bool AllowFullEdit { get; set; } = false;
+    [Parameter] public List<string> GuestOptions { get; set; } = new() { "JANE", "JANE DOE", "ABEBE KEBEDE", "JOHN SMITH", "Solomon Tuffa Bereket", "TEST" };
+    [Parameter] public EventCallback<RegistrationLine> OnGuestLookupClick { get; set; }
+    [Parameter] public EventCallback<RegistrationLine> OnRateLookupClick { get; set; }
+    [Parameter] public EventCallback<RegistrationLine> OnLineChanged { get; set; }
 
-    object SelectedLineObj
+    void UpdateLineNights(RegistrationLine line)
     {
-        get => SelectedLine;
-        set
-        {
-            SelectedLine = value as RegistrationLine;
-            CurrentIndex = SelectedLine == null ? -1 : Lines.IndexOf(SelectedLine);
-            SelectedLineChanged.InvokeAsync(SelectedLine);
-        }
+        int nights = (line.Departure - line.Arrival).Days;
+        if (nights < 1) nights = 1;
+        line.NoOfNight = nights;
+        line.TotalAmount = line.Amount * nights;
     }
 
+    async Task LineChanged(RegistrationLine line)
+    {
+        await OnLineChanged.InvokeAsync(line);
+    }
+
+    async Task LineGuestChanged(RegistrationLine line)
+    {
+        await LineChanged(line);
+    }
+
+    IGrid? GridRef;
     int CurrentIndex { get; set; } = -1;
+    int CurrentPageIndex { get; set; } = 0;
+    int PageSize { get; set; } = 5;
 
-    void GoFirst()
+    int TotalPages => Lines.Count == 0 ? 1 : (int)Math.Ceiling((double)Lines.Count / PageSize);
+
+    async Task OnRowClick(GridRowClickEventArgs e)
     {
-        if (Lines.Count == 0) return;
-        SelectedLineObj = Lines.First();
+        var item = (RegistrationLine)e.Grid.GetDataItem(e.VisibleIndex);
+        await SelectLine(item);
     }
 
-    void GoPrev()
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
     {
-        if (Lines.Count == 0) return;
-        var idx = Math.Max(0, CurrentIndex - 1);
-        SelectedLineObj = Lines[idx];
+        if (e.ElementType != GridElementType.DataRow) return;
+        var item = (RegistrationLine)e.Grid.GetDataItem(e.VisibleIndex);
+        if (item != null && item == SelectedLine)
+            e.CssClass = "reglines-row-selected";
     }
 
-    void GoNext()
+    async Task SelectLine(RegistrationLine? line)
     {
-        if (Lines.Count == 0) return;
-        var idx = Math.Min(Lines.Count - 1, CurrentIndex + 1);
-        SelectedLineObj = Lines[idx];
+        SelectedLine = line;
+        CurrentIndex = SelectedLine == null ? -1 : Lines.IndexOf(SelectedLine);
+        if (CurrentIndex >= 0)
+        {
+            CurrentPageIndex = CurrentIndex / PageSize;
+        }
+        await SelectedLineChanged.InvokeAsync(SelectedLine);
     }
 
-    void GoLast()
-    {
-        if (Lines.Count == 0) return;
-        SelectedLineObj = Lines.Last();
-    }
+    void GoFirstPage() => CurrentPageIndex = 0;
+    void GoPrevPage() { if (CurrentPageIndex > 0) CurrentPageIndex--; }
+    void GoNextPage() { if (CurrentPageIndex < TotalPages - 1) CurrentPageIndex++; }
+    void GoLastPage() => CurrentPageIndex = TotalPages - 1;
 
     public class RegistrationLine
     {
-        public string RoomType { get; set; }
-        public string Room { get; set; }
-        public string Guest { get; set; }
+        public string RoomType { get; set; } = string.Empty;
+        public string Room { get; set; } = string.Empty;
+        public string Guest { get; set; } = string.Empty;
         public int Adult { get; set; }
         public int Child { get; set; }
         public DateTime Arrival { get; set; }
         public DateTime Departure { get; set; }
         public int NoOfNight { get; set; }
-        public string Rate { get; set; }
+        public string Rate { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal TotalAmount { get; set; }
     }
@@ -100,41 +263,87 @@
 
 <style>
     .reglines-grid-wrap {
+        width: 100%;
+        min-height: 180px;
         flex: 1;
-        min-height: 200px;
-        overflow: auto;
     }
 
     .reglines-grid.dxbl-grid {
-        border: none;
+        width: 100% !important;
+        border: 1px solid #c9d2d9;
+        border-radius: 2px;
+        min-height: 170px;
     }
 
     .reglines-grid .dxbl-grid-header-cell {
-        background: #eef0f2 !important;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 1px solid #c9c9c9 !important;
-        border-right: 1px solid #dcdcdc !important;
-        padding: 5px 8px !important;
+        background: #e9ecef !important;
+        font-weight: 700;
+        color: #2b3e50;
+        border-bottom: 1px solid #b0bec5 !important;
+        border-right: 1px solid #cfd8dc !important;
+        padding: 6px 8px !important;
     }
 
     .reglines-grid .dxbl-grid-data-cell {
-        padding: 4px 8px !important;
-        border-right: 1px solid #eaeaea !important;
-        border-bottom: 1px solid #f0f0f0 !important;
+        padding: 5px 8px !important;
+        border-right: 1px solid #e0e0e0 !important;
+        border-bottom: 1px solid #eeeeee !important;
+        height: 28px !important;
     }
 
-    .reglines-grid .dxbl-grid-data-row.dxbl-grid-selected-row .dxbl-grid-data-cell {
-        background: #2f7ed8 !important;
-        color: #ffffff !important;
+    .reglines-grid .dxbl-grid-data-row {
+        cursor: pointer;
+        height: 28px !important;
     }
 
-    .reglines-footer {
+    /* Selection highlight */
+    .reglines-grid .reglines-row-selected .dxbl-grid-data-cell,
+    .reglines-grid .reglines-row-selected td {
+        background: #bbdefb !important;
+        color: #000000 !important;
+    }
+
+    .reglines-totals-bar {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        border-top: 1px solid #d6d6d6;
-        background: #f7f7f7;
+        justify-content: flex-end;
+        background: #f8f9fa;
+        border: 1px solid #c9d2d9;
+        border-top: none;
+        padding: 4px 10px;
+    }
+
+    .reglines-totals-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .reglines-totals-title {
+        font-weight: 600;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .reglines-total-box {
+        min-width: 90px;
+        text-align: right;
+        background: #eceff1;
+        border: 1px solid #b8c4ce;
+        border-radius: 2px;
+        padding: 3px 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .reglines-pager-bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        background: #ececec;
+        border: 1px solid #c9d2d9;
+        border-top: none;
         padding: 4px 10px;
         font-size: 12px;
     }
@@ -148,33 +357,24 @@
 
     .reglines-nav-btn {
         cursor: pointer;
-        padding: 3px 5px;
-        border: 1px solid transparent;
+        padding: 3px 6px;
         border-radius: 3px;
+        font-size: 13px;
     }
 
-    .reglines-nav-btn:hover {
-        background: #dbeaf9;
-        border-color: #a9cdef;
+    .reglines-nav-btn:hover:not(.disabled) {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .reglines-nav-btn.disabled {
+        opacity: 0.4;
+        cursor: default;
     }
 
     .reglines-nav-text {
         margin: 0 6px;
         white-space: nowrap;
-    }
-
-    .reglines-totals {
-        display: flex;
-        gap: 6px;
-    }
-
-    .reglines-total-box {
-        min-width: 90px;
-        text-align: right;
-        background: #eceff1;
-        border: 1px solid #cfd4d8;
-        border-radius: 3px;
-        padding: 3px 8px;
-        color: #333;
+        font-weight: 500;
     }
 </style>

@@ -183,17 +183,17 @@
     public class ReservationDetailRow
     {
         public DateTime Date { get; set; }
-        public string WeekDay { get; set; }
+        public string WeekDay { get; set; } = string.Empty;
         public int Adult { get; set; }
         public int Child { get; set; }
         public int RoomConfig { get; set; }
-        public string RoomType { get; set; }
-        public string ActualRTC { get; set; }
-        public string RoomNo { get; set; }
-        public string Rate { get; set; }
+        public string RoomType { get; set; } = string.Empty;
+        public string ActualRTC { get; set; } = string.Empty;
+        public string RoomNo { get; set; } = string.Empty;
+        public string Rate { get; set; } = string.Empty;
         public decimal RateAmount { get; set; }
-        public string Market { get; set; }
-        public string Source { get; set; }
+        public string Market { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty;
         public bool IsFixed { get; set; }
     }
 }

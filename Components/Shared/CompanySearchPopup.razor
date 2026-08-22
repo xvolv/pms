@@ -1,0 +1,250 @@
+@using DevExpress.Blazor
+
+<DxPopup Visible="@Visible"
+         VisibleChanged="@HandleVisibleChanged"
+         HeaderText="Company / Customer Search"
+         Width="550px"
+         CloseOnOutsideClick="true"
+         ShowCloseButton="true"
+         CloseOnEscape="true"
+         CssClass="global-lookup-popup">
+    <BodyContentTemplate>
+        <div class="lookup-modal-container">
+            <div class="lookup-modal-searchrow">
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search company or customer..." />
+                <button type="button" class="lookup-modal-find-btn">Find</button>
+            </div>
+            <div class="lookup-modal-gridwrap">
+                <DxGrid @ref="gridRef"
+                        Data="@FilteredCustomers"
+                        CssClass="lookup-modal-grid"
+                        ShowFilterRow="false"
+                        ShowGroupPanel="false"
+                        CustomizeElement="OnCustomizeElement"
+                        RowClick="OnRowClick"
+                        RowDoubleClick="OnRowDoubleClick">
+                    <Columns>
+                        <DxGridDataColumn FieldName="@nameof(CustomerItem.Code)" Caption="Code" Width="110px" />
+                        <DxGridDataColumn FieldName="@nameof(CustomerItem.FirstName)" Caption="First Name" Width="160px" />
+                        <DxGridDataColumn FieldName="@nameof(CustomerItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                        <DxGridDataColumn FieldName="@nameof(CustomerItem.Tin)" Caption="Tin" Width="100px" />
+                    </Columns>
+                </DxGrid>
+            </div>
+            <div class="lookup-modal-footer">
+                <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public List<CustomerItem>? Customers { get; set; }
+    [Parameter] public CustomerItem? SelectedCustomer { get; set; }
+    [Parameter] public EventCallback<CustomerItem?> SelectedCustomerChanged { get; set; }
+    [Parameter] public EventCallback<CustomerItem> OnSelect { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    string SearchText { get; set; } = "";
+    CustomerItem? selectedRow;
+    IGrid? gridRef;
+
+    List<CustomerItem> DefaultCustomers { get; } = new()
+    {
+        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" },
+        new() { Code = "PCU00001", FirstName = "ETHIO TELECOM", MiddleName = "HEAD OFFICE", Tin = "0000012345" },
+        new() { Code = "PCU00002", FirstName = "COMMERCIAL BANK OF ETHIOPIA", MiddleName = "CBE MAIN", Tin = "0000054321" },
+        new() { Code = "PCU00003", FirstName = "ETHIOPIAN AIRLINES", MiddleName = "EAL HEADQUARTERS", Tin = "0000098765" }
+    };
+
+    List<CustomerItem> DataList => (Customers != null && Customers.Count > 0) ? Customers : DefaultCustomers;
+
+    IEnumerable<CustomerItem> FilteredCustomers =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? DataList
+            : DataList.Where(c => (c.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.FirstName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.Tin?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedCustomer != null)
+        {
+            selectedRow = SelectedCustomer;
+        }
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as CustomerItem;
+        if (item != null)
+        {
+            selectedRow = item;
+        }
+    }
+
+    async Task OnRowDoubleClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as CustomerItem;
+        if (item != null)
+        {
+            selectedRow = item;
+            await HandleSelect();
+        }
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as CustomerItem;
+            if (item != null && item.Code == selectedRow.Code)
+            {
+                e.CssClass = "lookup-modal-row-selected";
+            }
+        }
+    }
+
+    async Task HandleSelect()
+    {
+        if (selectedRow != null)
+        {
+            await SelectedCustomerChanged.InvokeAsync(selectedRow);
+            await OnSelect.InvokeAsync(selectedRow);
+        }
+        await HandleClose();
+    }
+
+    async Task HandleClear()
+    {
+        selectedRow = null;
+        await SelectedCustomerChanged.InvokeAsync(null);
+        await OnClear.InvokeAsync();
+        await HandleClose();
+    }
+
+    async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleVisibleChanged(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
+}
+
+<style>
+    .global-lookup-popup .dxbl-popup-content {
+        padding: 0 !important;
+    }
+
+    .lookup-modal-container {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    .lookup-modal-searchrow {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #c9d2d9;
+        background: #f8f9fa;
+    }
+
+    .lookup-modal-search-input {
+        flex: 1;
+        height: 26px;
+        border: 1px solid #b8c4ce;
+        border-radius: 2px;
+        padding: 0 8px;
+        font-size: 12px;
+        outline: none;
+    }
+
+    .lookup-modal-search-input:focus {
+        border-color: #4a90d9;
+    }
+
+    .lookup-modal-find-btn {
+        border: 1px solid #b8c4ce;
+        background: #ffffff;
+        border-radius: 2px;
+        padding: 0 12px;
+        height: 26px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .lookup-modal-find-btn:hover {
+        background: #e3f2fd;
+    }
+
+    .lookup-modal-gridwrap {
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .lookup-modal-grid .dxbl-grid-header-cell {
+        background: #eef0f2 !important;
+        font-weight: 600;
+        font-size: 12px;
+        color: #333;
+        border-bottom: 1px solid #c9d2d9 !important;
+        padding: 6px 8px !important;
+    }
+
+    .lookup-modal-grid .dxbl-grid-data-cell {
+        padding: 5px 8px !important;
+        font-size: 12px;
+    }
+
+    .lookup-modal-grid .lookup-modal-row-selected td {
+        background: #bbdefb !important;
+        color: #000 !important;
+    }
+
+    .lookup-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 8px 10px;
+        border-top: 1px solid #c9d2d9;
+        background: #f8f9fa;
+    }
+
+    .lookup-modal-btn {
+        border: 1px solid #b8c4ce;
+        background: #ffffff;
+        border-radius: 2px;
+        padding: 3px 14px;
+        font-size: 12px;
+        height: 26px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .lookup-modal-btn:hover {
+        background: #e3f2fd;
+    }
+
+    .lookup-modal-btn-select {
+        background: #1976d2;
+        color: #ffffff;
+        border-color: #1565c0;
+    }
+
+    .lookup-modal-btn-select:hover {
+        background: #1565c0;
+    }
+</style>
