@@ -1,0 +1,28 @@
+@using DevExpress.Blazor
+
+<div class="db-pr-tabs-wrapper">
+    <DxTabs @bind-ActiveTabIndex="ActiveProfileTab" CssClass="db-pr-sub-tabs">
+        <DxTabPage Text="Guest">
+            <GuestContactGrid IsGuest="true" ProfileType="Guest" />
+        </DxTabPage>
+        <DxTabPage Text="Contact">
+            <GuestContactGrid IsGuest="false" ProfileType="Contact" />
+        </DxTabPage>
+        <DxTabPage Text="Company">
+            <GuestContactGrid IsGuest="false" ProfileType="Company" />
+        </DxTabPage>
+        <DxTabPage Text="Travel Agent">
+            <GuestContactGrid IsGuest="false" ProfileType="TravelAgent" />
+        </DxTabPage>
+        <DxTabPage Text="Group">
+            <GuestContactGrid IsGuest="false" ProfileType="Group" />
+        </DxTabPage>
+        <DxTabPage Text="Source">
+            <GuestContactGrid IsGuest="false" ProfileType="Source" />
+        </DxTabPage>
+    </DxTabs>
+</div>
+
+@code {
+    int ActiveProfileTab = 0;
+}

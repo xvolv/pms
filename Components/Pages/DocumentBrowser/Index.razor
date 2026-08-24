@@ -1,0 +1,35 @@
+@page "/document-browser"
+
+@using DevExpress.Blazor
+
+@using System.Collections.ObjectModel
+
+@using ERP.V7.WebPMS.Components.Pages.DocumentBrowser.Transactions
+
+@using ERP.V7.WebPMS.Components.Pages.DocumentBrowser.Profiles
+
+
+
+<div class="document-browser">
+
+    <!-- Top toolbar (Profiles / Transactions / Others) -->
+    <div class="db-pr-tabs-wrapper">
+        <DxTabs @bind-ActiveTabIndex="ActiveMainTabIndex" CssClass="db-pr-sub-tabs">
+            <DxTabPage Text="Profiles">
+                <ProfilesTab />
+            </DxTabPage>
+            <DxTabPage Text="Transactions">
+                <TransactionsTab />
+            </DxTabPage>
+            <DxTabPage Text="Others">
+                <div class="p-4 text-muted">Others tab (POS Charges, Travel Details, Package Audit) – to be implemented later</div>
+            </DxTabPage>
+        </DxTabs>
+    </div>
+</div>
+
+
+
+@code {
+    int ActiveMainTabIndex = 0;
+}
