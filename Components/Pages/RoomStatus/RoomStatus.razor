@@ -1,0 +1,145 @@
+@page "/room-status"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.RoomStatus.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Room Status</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Room Status
+            <i class="bi bi-x fs-4" @onclick="ClosePage"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="rst-toolbar">
+            <button type="button" class="rt-toolbar-btn" @onclick="Show">
+                <i class="bi bi-eye text-secondary"></i>
+                <span>Show</span>
+            </button>
+
+            <div class="rst-filters">
+                <div class="rst-filter-row">
+                    <span class="tb-label" style="width: 65px;">Hotel</span>
+                    <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" />
+                    @* <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox> *@
+
+
+                </div>
+                <div class="rst-filter-row">
+                    <span class="tb-label">Group by</span>
+                    <DxComboBox Data="@groupByOptions" @bind-Value="groupBy" CssClass="rt-detail-input" />
+                    <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox>
+                    <span class="tb-label">Date</span>
+                    <DxDateEdit @bind-Date="selectedDate" CssClass="rt-detail-input" style="width:130px;" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rst-legend">
+            @foreach (var status in reservationStatuses)
+            {
+                <div class="rst-legend-item">
+                    <span>@status (@CountByStatus(status))</span>
+                    <span class="rst-legend-swatch" style="background-color:@StatusColor(status);"></span>
+                </div>
+            }
+        </div>
+
+        @foreach (var group in GroupedTiles)
+        {
+            <div class="rst-group-title">@group.Key</div>
+            <div class="room-tiles-grid">
+                @foreach (var tile in group)
+                {
+                    <div class="room-tile" style="background-color:@StatusColor(tile.ReservationStatus);">
+                        <div class="room-tile-number">@tile.Room</div>
+                        @if (showRoomStatus)
+                        {
+                            <div class="room-tile-type">@tile.HkStatus</div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<string> hotels = new() { "MAIN TEST HOTEL" };
+    private string? selectedHotel;
+    private DateTime? selectedDate = DateTime.Today;
+
+    private List<string> groupByOptions = new() { "By Room Type", "By Location" };
+    private string groupBy = "By Room Type";
+    private bool showRoomStatus = true;
+
+    private List<string> reservationStatuses = new()
+    {
+        "Inhouse", "Checked Out", "SIX PM", "WaitingList", "Cancelled", "Gauranteed", "NoShow",
+    };
+
+    private List<RoomStatusTile> tiles = new();
+
+    private IEnumerable<IGrouping<string, RoomStatusTile>> GroupedTiles =>
+        groupBy == "By Location"
+            ? tiles.GroupBy(t => t.Location)
+            : tiles.GroupBy(t => t.RoomType);
+
+    protected override void OnInitialized()
+    {
+        selectedHotel = hotels.FirstOrDefault();
+        GenerateTiles();
+    }
+
+    private void GenerateTiles()
+    {
+        tiles = new List<RoomStatusTile>
+        {
+            Tile("101", "Standard", "Floor - 1", "Clean"),
+            Tile("102", "Standard", "Floor - 1", "Clean"),
+            Tile("103", "Standard", "Floor - 1", "Clean"),
+            Tile("104", "Standard", "Floor - 1", "Clean"),
+            Tile("105", "Standard", "Floor - 1", "Clean"),
+            Tile("106", "Standard", "Floor - 1", "Clean"),
+            Tile("107", "Standard", "Floor - 1", "Clean"),
+            Tile("204", "Delux", "Floor - 2", "Clean"),
+            Tile("205", "Delux", "Floor - 2", "Clean"),
+            Tile("206", "Delux", "Floor - 2", "Clean"),
+            Tile("207", "Delux", "Floor - 2", "Clean"),
+            Tile("208", "Delux", "Floor - 2", "Clean"),
+            Tile("209", "Delux", "Floor - 2", "Clean"),
+            Tile("210", "Delux", "Floor - 2", "Clean"),
+        };
+    }
+
+    private RoomStatusTile Tile(string room, string roomType, string location, string hkStatus) => new()
+    {
+        Room = room,
+        RoomType = roomType,
+        Location = location,
+        HkStatus = hkStatus,
+        ReservationStatus = "Checked Out",
+    };
+
+    private int CountByStatus(string status) => tiles.Count(t => t.ReservationStatus == status);
+
+    private string StatusColor(string status) => status switch
+    {
+        "Inhouse" => "#0d6efd",
+        "Checked Out" => "#6c757d",
+        "SIX PM" => "#fd7e14",
+        "WaitingList" => "#c9a227",
+        "Cancelled" => "#dc3545",
+        "Gauranteed" => "#198754",
+        "NoShow" => "#6b6b23",
+        _ => "#6c757d",
+    };
+
+    private void Show() => GenerateTiles();
+
+    private void ClosePage() => NavigationManager.NavigateTo("/dashboard");
+}
