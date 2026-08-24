@@ -20,6 +20,16 @@
                     </div>
                 </div>
 
+                @if (MultiSelect)
+                {
+                    <div class="rs-btn-group" @onclick="HandleSelectAll">
+                        <div class="rs-btn-content">
+                            <i class="bi bi-check-all rs-icon-select"></i>
+                            <span class="rs-btn-text">Select All</span>
+                        </div>
+                    </div>
+                }
+
                 <!-- FILTER INPUTS GROUP -->
                 <div class="rs-filter-group">
                     <div class="rs-filter-col">
@@ -64,6 +74,19 @@
                                 SizeMode="SizeMode.Small" Height="380px" RowClick="OnRoomRowClick"
                                 CustomizeElement="OnRoomCustomizeElement" CssClass="rs-grid">
                             <Columns>
+                                @if (MultiSelect)
+                                {
+                                    <DxGridDataColumn Caption="Select" Width="50px" TextAlignment="GridTextAlignment.Center">
+                                        <CellDisplayTemplate Context="cellContext">
+                                            @if (cellContext.DataItem is RoomItem room)
+                                            {
+                                                bool isSelected = IsRoomSelected(room);
+                                                bool isDirty = room.HKStatus.Equals("Dirty", StringComparison.OrdinalIgnoreCase);
+                                                <input type="checkbox" checked="@isSelected" @onchange="(ChangeEventArgs args) => ToggleRoomSelection(room, args.Value as bool? ?? false)" disabled="@isDirty" />
+                                            }
+                                        </CellDisplayTemplate>
+                                    </DxGridDataColumn>
+                                }
                                 <DxGridDataColumn FieldName="SN" Caption="SN" Width="45px" TextAlignment="GridTextAlignment.Center" />
                                 <DxGridDataColumn FieldName="Room" Caption="Room" Width="80px" />
                                 <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
@@ -241,6 +264,33 @@
         Visible = false;
         await VisibleChanged.InvokeAsync(false);
         await OnClose.InvokeAsync();
+    }
+
+    void HandleSelectAll()
+    {
+        bool allSelected = IsAllSelected();
+        var selectable = FilteredRooms.Where(r => !r.HKStatus.Equals("Dirty", StringComparison.OrdinalIgnoreCase)).ToList();
+        
+        if (allSelected)
+        {
+            // Deselect all
+            foreach (var r in selectable)
+            {
+                SelectedRooms.RemoveAll(x => x.SN == r.SN || x.Room == r.Room);
+            }
+        }
+        else
+        {
+            // Select all
+            foreach (var r in selectable)
+            {
+                if (!IsRoomSelected(r))
+                {
+                    SelectedRooms.Add(r);
+                }
+            }
+        }
+        _ = SelectedRoomsChanged.InvokeAsync(SelectedRooms);
     }
 
     async Task OnRoomRowClick(GridRowClickEventArgs e)
@@ -479,5 +529,18 @@
         cursor: not-allowed !important;
         background-color: #fff5f5 !important;
         opacity: 0.8;
+    }
+
+    /* Checkbox column styling */
+    .rs-grid input[type="checkbox"] {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        accent-color: #0d6efd;
+    }
+
+    .rs-grid input[type="checkbox"]:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
     }
 </style>

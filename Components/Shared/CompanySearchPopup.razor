@@ -33,6 +33,7 @@
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleAddNew">Add New</button>
                 <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
                 <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
             </div>
@@ -48,6 +49,7 @@
     [Parameter] public CustomerItem? SelectedCustomer { get; set; }
     [Parameter] public EventCallback<CustomerItem?> SelectedCustomerChanged { get; set; }
     [Parameter] public EventCallback<CustomerItem> OnSelect { get; set; }
+    [Parameter] public EventCallback OnAddNew { get; set; }
     [Parameter] public EventCallback OnClear { get; set; }
 
     string SearchText { get; set; } = "";
@@ -127,6 +129,11 @@
         await SelectedCustomerChanged.InvokeAsync(null);
         await OnClear.InvokeAsync();
         await HandleClose();
+    }
+
+    async Task HandleAddNew()
+    {
+        await OnAddNew.InvokeAsync();
     }
 
     async Task HandleClose()

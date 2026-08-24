@@ -2,6 +2,12 @@
 @using static RegistrationLinesGrid
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Shared
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest
 
 <div class="grpreg-page">
 
@@ -292,6 +298,7 @@
     <CompanySearchPopup @bind-Visible="ShowCustomerLookup"
                         Customers="@Customers"
                         OnSelect="SelectCustomer"
+                        OnAddNew="AddNewCompany"
                         OnClear="ClearCustomer" />
 
     <GuestSearchPopup @bind-Visible="ShowGuestLookup"
@@ -301,6 +308,7 @@
                        OnClear="ClearGuest" />
 
     <GroupSearchPopup @bind-Visible="ShowGroupLookup"
+                      Groups="@Groups"
                       OnSelect="SelectGroup"
                       OnAddNew="AddNewGroup"
                       OnClear="ClearGroup" />
@@ -334,6 +342,28 @@
         <RateSearchPopup @bind-Visible="showRateSearch" StartDate="rateStartDate" EndDate="rateEndDate"
                          RateSearchRows="rateSearchRows" OnSelect="SelectRate" OnSearch="SearchRates" OnRateInfo="ShowRateInfo"
                          OnRowClick="OnRateRowClick" OnCustomizeElement="OnRateCustomizeElement" />
+
+        <!-- ===================== FORM MODALS ===================== -->
+        <DxPopup @bind-Visible="ShowCompanyModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+                 HeaderText="Add New Company" CloseOnEscape="true">
+            <BodyContentTemplate>
+                <Company IsModal="true" OnSaved="HandleCompanySaved" OnClose="() => ShowCompanyModal = false" />
+            </BodyContentTemplate>
+        </DxPopup>
+
+        <DxPopup @bind-Visible="ShowGroupModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+                 HeaderText="Add New Group" CloseOnEscape="true">
+            <BodyContentTemplate>
+                <Group IsModal="true" OnSaved="HandleGroupSaved" OnClose="() => ShowGroupModal = false" />
+            </BodyContentTemplate>
+        </DxPopup>
+
+        <DxPopup @bind-Visible="ShowGuestModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+                 HeaderText="Add New Guest" CloseOnEscape="true">
+            <BodyContentTemplate>
+                <Guest IsModal="true" OnSaved="HandleGuestSaved" OnClose="() => ShowGuestModal = false" />
+            </BodyContentTemplate>
+        </DxPopup>
     </div>
 
 @code {
@@ -425,6 +455,11 @@
     bool ShowPaymentMethodLookup { get; set; }
     bool GuestLookupForCheckIn { get; set; }
 
+    // ---- Form modals visibility ----
+    bool ShowCompanyModal { get; set; }
+    bool ShowGroupModal { get; set; }
+    bool ShowGuestModal { get; set; }
+
     string CustomerSearchText { get; set; } = "";
     string PurposeSearchText { get; set; } = "";
     string GuestSearchText { get; set; } = "";
@@ -488,6 +523,12 @@
         new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
         new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
         new() { FirstName = "TEST", MiddleName = "", Tin = "" }
+    };
+
+    List<GroupItem> Groups { get; set; } = new List<GroupItem>()
+    {
+        new() { Code = "GRP-001", Name = "JANE", Description = "Jane Tour Group" },
+        new() { Code = "GRP-002", Name = "ABEBE", Description = "Abebe Corporate Group" }
     };
 
     List<RegistrationLookupItem> LookupItems { get; set; } = new List<RegistrationLookupItem>()
@@ -712,6 +753,12 @@ CheckInReg.Rate)) return;
         ShowCustomerLookup = false;
     }
 
+    void AddNewCompany()
+    {
+        ShowCustomerLookup = false;
+        ShowCompanyModal = true;
+    }
+
     string FormatGuestName(GuestItem item) =>
         string.IsNullOrWhiteSpace(item.MiddleName) ? item.FirstName : $"{item.FirstName} {item.MiddleName}";
 
@@ -753,7 +800,7 @@ CheckInReg.Rate)) return;
     void AddNewGuest()
     {
         ShowGuestLookup = false;
-        ValidationMessage = "Add New Guest form not implemented in this MVP.";
+        ShowGuestModal = true;
     }
 
     void SelectGroup(GroupItem group)
@@ -771,7 +818,93 @@ CheckInReg.Rate)) return;
     void AddNewGroup()
     {
         ShowGroupLookup = false;
-        ValidationMessage = "Add New Group form not implemented in this MVP.";
+        ShowGroupModal = true;
+    }
+
+    // ---- Form Modal Save Handlers ----
+    void HandleCompanySaved(CompanyRow company)
+    {
+        // Create a CustomerItem from the saved company
+        var newCustomer = new CustomerItem
+        {
+            Code = company.CorpId,
+            FirstName = company.Name,
+            MiddleName = company.Name.Length > 30 ? company.Name.Substring(0, 30) + "..." : company.Name,
+            Tin = company.TinNo
+        };
+
+        // Add to the Customers list if it exists
+        if (Customers == null)
+        {
+            Customers = new List<CustomerItem>();
+        }
+        Customers.Add(newCustomer);
+
+        // Select the newly created customer
+        Master.Customer = company.Name;
+        Master.SelectedCustomerCode = company.CorpId;
+
+        ShowCompanyModal = false;
+    }
+
+    void HandleGroupSaved(GroupRow group)
+    {
+        // Create a GroupItem from the saved group
+        var newGroup = new GroupItem
+        {
+            Code = group.GroupId,
+            Name = group.Name,
+            Description = group.GroupType
+        };
+
+        // Add to the Groups list if it exists
+        if (Groups == null)
+        {
+            Groups = new List<GroupItem>();
+        }
+        Groups.Add(newGroup);
+
+        // Select the newly created group
+        Master.Group = group.Name;
+
+        ShowGroupModal = false;
+    }
+
+    void HandleGuestSaved(GuestRow guest)
+    {
+        // Create a GuestItem from the saved guest
+        var newGuest = new GuestItem
+        {
+            FirstName = guest.FirstName,
+            MiddleName = guest.MiddleName,
+            Tin = guest.PassportNum
+        };
+
+        // Add to the Guests list if it exists
+        if (Guests == null)
+        {
+            Guests = new List<GuestItem>();
+        }
+        Guests.Add(newGuest);
+
+        // Select the newly created guest based on context
+        var guestName = string.IsNullOrWhiteSpace(guest.MiddleName) ? guest.FirstName : $"{guest.FirstName} {guest.MiddleName}";
+
+        if (activeLineForGuestLookup != null)
+        {
+            activeLineForGuestLookup.Guest = guestName;
+            activeLineForGuestLookup = null;
+        }
+        else if (GuestLookupForCheckIn)
+        {
+            CheckInReg.Guest = guestName;
+        }
+        else
+        {
+            NewReg.Guest = guestName;
+        }
+
+        ShowGuestModal = false;
     }
 
     void SelectRegistrationLookup(RegistrationLookupItem item)

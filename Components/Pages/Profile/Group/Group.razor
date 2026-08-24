@@ -5,12 +5,15 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Profile - Group</PageTitle>
-<div class="top-tab-header">
-    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
-        Group
-        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+@if (!IsModal)
+{
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Group
+            <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
     </div>
-</div>
+}
 
 <div class="profile-page-wrapper">
     <EditForm Model="@group" OnValidSubmit="HandleValidSubmit">
@@ -37,7 +40,7 @@
                     <i class="bi bi-sticky text-secondary"></i>
                     <span>Note</span>
                 </button>
-                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                <button type="button" class="rt-toolbar-btn" @onclick="CloseAsync">
                     <i class="bi bi-x-circle text-secondary"></i>
                     <span>Close</span>
                 </button>
@@ -255,6 +258,10 @@
 </div>
 
 @code {
+    [Parameter] public bool IsModal { get; set; } = false;
+    [Parameter] public EventCallback<GroupRow> OnSaved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private GroupRow group = new();
     private string? statusMessage;
 
@@ -299,17 +306,29 @@
         statusMessage = null;
     }
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
         statusMessage = "Group saved.";
+
+        if (OnSaved.HasDelegate)
+        {
+            await OnSaved.InvokeAsync(group);
+        }
     }
 
     private void OpenNote()
     {
     }
 
-    private void Close()
+    private async Task CloseAsync()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        if (IsModal && OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }

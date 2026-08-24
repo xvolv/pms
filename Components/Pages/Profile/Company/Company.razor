@@ -6,12 +6,15 @@
 
 
 <PageTitle>Profile - Company</PageTitle>
-<div class="top-tab-header">
-    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
-        Company
-        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+@if (!IsModal)
+{
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Company
+            <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
     </div>
-</div>
+}
 
 <div class="profile-page-wrapper">
     <EditForm Model="@company" OnValidSubmit="HandleValidSubmit">
@@ -38,7 +41,7 @@
                     <i class="bi bi-sticky text-secondary"></i>
                     <span>Note</span>
                 </button>
-                <button type="button" class="rt-toolbar-btn" @onclick="Close">
+                <button type="button" class="rt-toolbar-btn" @onclick="CloseAsync">
                     <i class="bi bi-x-circle text-secondary"></i>
                     <span>Close</span>
                 </button>
@@ -279,6 +282,10 @@
 </div>
 
 @code {
+    [Parameter] public bool IsModal { get; set; } = false;
+    [Parameter] public EventCallback<CompanyRow> OnSaved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private CompanyRow company = new();
     private string? statusMessage;
 
@@ -324,18 +331,30 @@
         statusMessage = null;
     }
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
         statusMessage = "Company saved.";
+
+        if (OnSaved.HasDelegate)
+        {
+            await OnSaved.InvokeAsync(company);
+        }
     }
 
     private void OpenNote()
     {
     }
 
-    private void Close()
+    private async Task CloseAsync()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        if (IsModal && OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }
 
