@@ -149,8 +149,8 @@
 .na-step {
     background-color: #ffffff;
     border: 1px solid #d3d3d3;
-    border-radius: 6px;
-    padding: 16px 20px;
+    border-radius: 0px;
+    padding: 16px 10px;
 }
 
 .na-step-card .rt-grid-area,

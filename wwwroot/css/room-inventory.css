@@ -1,0 +1,108 @@
+/* Room Inventory */
+.ri-tabs {
+    margin: 8px 0 4px;
+}
+
+.ri-table-wrap {
+    overflow-x: auto;
+    padding: 0;
+}
+/* here */
+ .ri-table-wrap::-webkit-scrollbar {
+    height: 6px;
+}
+
+.ri-table-wrap::-webkit-scrollbar-thumb {
+    background: hsl(0, 2%, 35%);
+    border-radius: 2px;
+}
+
+.ri-table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ri-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.ri-table th,
+.ri-table td {
+    border-right: 1px solid #eef0f2;
+    border-bottom: 1px solid #eef0f2;
+    padding: 4px 6px;
+    text-align: center;
+}
+
+.ri-table thead th {
+    background-color: #eef1f4;
+    font-weight: 700;
+    color: #4f5d73;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.ri-table tbody tr:hover td {
+    background-color: #f7f8f9;
+}
+
+.ri-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #ffffff;
+    text-align: left;
+    font-weight: 600;
+    color: #202124;
+    min-width: 140px;
+}
+
+.ri-table thead .ri-sticky-col {
+    background-color: #eef1f4;
+    z-index: 2;
+}
+
+.ri-cell-input {
+    width: 44px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    text-align: center;
+    font-size: 0.82rem;
+    padding: 2px;
+}
+
+.ri-remarks-row .ri-cell-input {
+    width: 60px;
+}
+
+.ri-cell-input:hover {
+    border-color: #d8dce1;
+}
+
+.ri-cell-input:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: #8fb8e0;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.12);
+}
+
+.ri-remarks-row td {
+    background-color: #fafbfc;
+    color: #5f6368;
+}
+
+.ri-total-row td {
+    background-color: #eef1f4;
+    font-weight: 700;
+    color: #202124;
+}
+
+.ri-chart-card {
+    background-color: #ffffff;
+    border: 1px solid #d3d3d3;
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 10px;
+}

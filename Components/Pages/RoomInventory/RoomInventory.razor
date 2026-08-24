@@ -1,0 +1,207 @@
+@page "/room-inventory"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.RoomInventory.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Room Inventory</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Room Inventory
+            <i class="bi bi-x fs-4" @onclick="ClosePage"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="rt-toolbar hk-toolbar">
+            <button type="button" class="rt-toolbar-btn" @onclick="Refresh">
+                <i class="bi bi-arrow-clockwise text-secondary"></i>
+                <span>Refresh</span>
+            </button>
+
+            <div class="hk-filter-group hk-filter-group-stack">
+                <div class="hk-filter-subgroup">
+                    <span class="tb-label">Hotel</span>
+                    <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input"
+                                style="width:170px;" />
+                </div>
+                <div class="hk-filter-subgroup">
+                    <span class="tb-label">Month</span>
+                    <DxComboBox Data="@months" @bind-Value="selectedMonth" @bind-Value:after="GenerateInventory"
+                                CssClass="rt-detail-input" style="width:410px; margin-bottom:2px;" />
+                    <span class="tb-label">Year</span>
+                    <DxComboBox Data="@years" @bind-Value="selectedYear" @bind-Value:after="GenerateInventory"
+                                CssClass="rt-detail-input" style="width:90px;" />
+                </div>
+            </div>
+
+            <button type="button" class="rt-toolbar-btn" @onclick="OpenPrintPreview">
+                <i class="bi bi-printer text-secondary"></i>
+                <span>Print Preview</span>
+            </button>
+        </div>
+
+        <DxTabs @bind-ActiveTabIndex="activeTabIndex" CssClass="ri-tabs">
+            <DxTabPage Text="Monthly Room Inventory" />
+            <DxTabPage Text="Daily Room Inventory" />
+        </DxTabs>
+
+        @if (activeTabIndex == 0)
+        {
+            <div class="na-step-card">
+                <div class="rt-grid-area ri-table-wrap">
+                    <table class="ri-table">
+                        <thead>
+                            <tr>
+                                <th class="ri-sticky-col">Room Type</th>
+                                @for (int d = 1; d <= DaysInMonth; d++)
+                                {
+                                    <th>@d</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in inventoryRows)
+                            {
+                                <tr>
+                                    <td class="ri-sticky-col">@row.RoomType</td>
+                                    @for (int d = 1; d <= DaysInMonth; d++)
+                                    {
+                                        var day = d;
+                                        <td>
+                                            <input type="number" class="ri-cell-input" value="@row.DailyCounts[day]"
+                                                   @onchange="@(e => UpdateCount(row, day, e.Value))" />
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                            @* <tr class="ri-remarks-row">
+                                <td class="ri-sticky-col">Remarks</td>
+                                @for (int d = 1; d <= DaysInMonth; d++)
+                                {
+                                    var day = d;
+                                    <td>
+                                        <input type="text" class="ri-cell-input" value="@GetRemark(day)"
+                                               @onchange="@(e => SetRemark(day, e.Value?.ToString() ?? ""))" />
+                                    </td>
+                                }
+                            </tr> *@
+                        </tbody>
+                        <tfoot>
+                            <tr class="ri-total-row">
+                                <td class="ri-sticky-col">Total</td>
+                                @for (int d = 1; d <= DaysInMonth; d++)
+                                {
+                                    <td>@GetTotal(d)</td>
+                                }
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="ri-chart-card">
+                <DxChart Data="@ChartData" Height="320px" Width="100%">
+                    <DxChartArgumentAxis>
+                        <DxChartAxisLabel />
+                    </DxChartArgumentAxis>
+                    <DxChartAreaSeries T="RoomInventoryChartPoint" TArgument="int" TValue="int"
+                                       ArgumentField="@(x => x.Day)" ValueField="@(x => x.Total)" Name="Total Room Inventory"
+                                       Color="@chartColor">
+                        <DxChartSeriesPoint Visible="true" />
+                    </DxChartAreaSeries>
+                </DxChart>
+            </div>
+        }
+        else
+        {
+            <div class="rt-placeholder">Daily Room Inventory isn't set up yet.</div>
+        }
+    </div>
+</div>
+
+<InfoDialog Visible="@showPrintInfo" Title="Information" Message="Print preview isn't set up yet."
+            OnOk="() => showPrintInfo = false" />
+
+@code {
+    private int activeTabIndex = 0;
+
+    private List<string> hotels = new() { "MAIN TEST HOTEL" };
+    private string? selectedHotel;
+
+    private List<string> months = new()
+    {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    };
+    private string? selectedMonth;
+
+    private List<int> years = new();
+    private int selectedYear;
+
+    private List<RoomInventoryRow> inventoryRows = new();
+    private Dictionary<int, string> remarks = new();
+    private bool showPrintInfo;
+    private System.Drawing.Color chartColor = System.Drawing.Color.FromArgb(0x44, 0x72, 0xc4);
+
+    private int SelectedMonthNumber => months.IndexOf(selectedMonth ?? "January") + 1;
+    private int DaysInMonth => DateTime.DaysInMonth(selectedYear, SelectedMonthNumber);
+
+    private List<RoomInventoryChartPoint> ChartData =>
+        Enumerable.Range(1, DaysInMonth).Select(d => new RoomInventoryChartPoint { Day = d, Total = GetTotal(d) }).ToList();
+
+    protected override void OnInitialized()
+    {
+        selectedHotel = hotels.FirstOrDefault();
+        selectedYear = DateTime.Today.Year;
+        selectedMonth = months[DateTime.Today.Month - 1];
+        years = Enumerable.Range(DateTime.Today.Year - 1, 4).ToList();
+        GenerateInventory();
+    }
+
+    private void GenerateInventory()
+    {
+        var newRows = new List<RoomInventoryRow>();
+        foreach (var (type, count) in new (string, int)[] { ("Standard", 10), ("Delux", 10) })
+        {
+            var row = new RoomInventoryRow { RoomType = type };
+            for (int d = 1; d <= DaysInMonth; d++)
+                row.DailyCounts[d] = count;
+            newRows.Add(row);
+        }
+        inventoryRows = newRows;
+        remarks.Clear();
+    }
+
+    private void UpdateCount(RoomInventoryRow row, int day, object? value)
+    {
+        if (int.TryParse(value?.ToString(), out var count))
+            row.DailyCounts[day] = count;
+    }
+
+    private int GetTotal(int day) => inventoryRows.Sum(r => r.DailyCounts.TryGetValue(day, out var c) ? c : 0);
+
+    private string GetRemark(int day) => remarks.TryGetValue(day, out var r) ? r : "";
+
+    private void SetRemark(int day, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            remarks.Remove(day);
+        else
+            remarks[day] = value;
+    }
+
+    private void Refresh() => GenerateInventory();
+
+    private void OpenPrintPreview() => showPrintInfo = true;
+
+    private void ClosePage() => NavigationManager.NavigateTo("/dashboard");
+
+    private class RoomInventoryChartPoint
+    {
+        public int Day { get; set; }
+        public int Total { get; set; }
+    }
+}
