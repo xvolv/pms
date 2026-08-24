@@ -1,0 +1,811 @@
+@using DevExpress.Blazor
+
+<div class="db-pr-container">
+    <!-- Filter bar -->
+    <div class="db-pr-filter-bar">
+        <div class="db-pr-toolbar-row">
+            <button class="db-pr-toolbar-btn" type="button" title="Show">
+                <i class="bi bi-eye"></i>
+                <span>Show</span>
+            </button>
+            <button class="db-pr-toolbar-btn" type="button" title="Export">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <span>Export</span>
+            </button>
+
+            <div class="db-pr-search-by-col">
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Search By</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="SearchBy" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="Search By" />
+                        <button type="button" class="lookup-toggle-btn"
+                                @onclick="ToggleSearchByPopup">▾</button>
+                    </div>
+                    @if (ShowSearchByPopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input" @bind="SearchByPopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                </div>
+                                <div class="db-pr-dropdown-list">
+                                    <div class="db-pr-dropdown-list-header">Search By</div>
+                                    @foreach (var item in SearchByListItems.Where(MatchesFilter(SearchByPopupFilter)))
+                                    {
+                                        <div class="db-pr-dropdown-list-item @(SearchBy == item ? "db-pr-selected" : "")"
+                                             @onclick="() => SelectSearchBy(item)">
+                                            @item
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn" @onclick="@(() => SearchByPopupFilter = string.Empty)">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowSearchByPopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (SearchBy == "Business Type")
+                {
+                    <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                        <label>Business Type</label>
+                        <div class="lookup-field db-pr-w-150">
+                            <DxTextBox @bind-Text="BusinessType" ReadOnly="true" Width="100%"
+                                       CssClass="erp-combobox lookup-input" NullText="" />
+                            <button type="button" class="lookup-toggle-btn"
+                                    @onclick="ToggleBusinessTypePopup">▾</button>
+                        </div>
+                        @if (ShowBusinessTypePopup)
+                        {
+                            <div class="db-pr-dropdown-popup">
+                                <div class="db-pr-dropdown-body">
+                                    <div class="db-pr-dropdown-search-row">
+                                        <input class="db-pr-dropdown-search-input" @bind="BusinessTypePopupFilter" @bind:event="oninput" />
+                                        <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                    </div>
+                                    <div class="db-pr-dropdown-list">
+                                        <div class="db-pr-dropdown-list-header">Business Type</div>
+                                        @foreach (var item in BusinessTypeListItems.Where(MatchesFilter(BusinessTypePopupFilter)))
+                                        {
+                                            <div class="db-pr-dropdown-list-item @(BusinessType == item ? "db-pr-selected" : "")"
+                                                 @onclick="() => SelectBusinessType(item)">
+                                                @item
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="db-pr-dropdown-clear-row">
+                                    <button type="button" class="db-pr-dropdown-clear-btn" @onclick="@(() => BusinessTypePopupFilter = string.Empty)">Clear</button>
+                                </div>
+                                <div class="db-pr-dropdown-footer-bar">
+                                    <i class="bi bi-x-lg" @onclick="() => ShowBusinessTypePopup = false"></i>
+                                    <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (SearchBy == "Address")
+                {
+                    <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                        <label>Address</label>
+                        <div class="lookup-field db-pr-w-150">
+                            <DxTextBox @bind-Text="Address" ReadOnly="true" Width="100%"
+                                       CssClass="erp-combobox lookup-input" NullText="" />
+                            <button type="button" class="lookup-toggle-btn"
+                                    @onclick="ToggleAddressPopup">▾</button>
+                        </div>
+                        @if (ShowAddressPopup)
+                        {
+                            <div class="db-pr-dropdown-popup">
+                                <div class="db-pr-dropdown-body">
+                                    <div class="db-pr-dropdown-search-row">
+                                        <input class="db-pr-dropdown-search-input" @bind="AddressPopupFilter" @bind:event="oninput" />
+                                        <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                    </div>
+                                    <div class="db-pr-dropdown-list">
+                                        <div class="db-pr-dropdown-list-header">Address</div>
+                                        @foreach (var item in AddressListItems.Where(MatchesFilter(AddressPopupFilter)))
+                                        {
+                                            <div class="db-pr-dropdown-list-item @(Address == item ? "db-pr-selected" : "")"
+                                                 @onclick="() => SelectAddress(item)">
+                                                @item
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="db-pr-dropdown-clear-row">
+                                    <button type="button" class="db-pr-dropdown-clear-btn" @onclick="@(() => AddressPopupFilter = string.Empty)">Clear</button>
+                                </div>
+                                <div class="db-pr-dropdown-footer-bar">
+                                    <i class="bi bi-x-lg" @onclick="() => ShowAddressPopup = false"></i>
+                                    <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="db-pr-filter-row w-100">
+                        <label>Text Edit</label>
+                        <DxTextBox @bind-Text="AddressTextEditValue" CssClass="w-100" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="db-pr-filter-fields">
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Consignee Code</label>
+                    <DxTextBox NullText="Consignee Code" @bind-Text="ConsigneeCode" CssClass="w-100" />
+                </div>
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Preference</label>
+                    <div class="lookup-field db-pr-w-130">
+                        <DxTextBox @bind-Text="Preference" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn"
+                                @onclick="TogglePreferencePopup">▾</button>
+                    </div>
+                    @if (ShowPreferencePopup)
+                    {
+                        <div class="db-pr-dropdown-popup db-pr-dropdown-popup-wide">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input" @bind="PreferencePopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="FindPreference">Find</button>
+                                </div>
+                                <table class="db-pr-dropdown-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>TIN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (!PreferenceLookupData.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="db-pr-text-muted">No records</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var row in PreferenceLookupData)
+                                            {
+                                                <tr @onclick="() => SelectPreference(row)">
+                                                    <td>@row.Code</td>
+                                                    <td>@row.Name</td>
+                                                    <td>@row.TIN</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn" @onclick="ClearPreference">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowPreferencePopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Object State</label>
+                    <div class="lookup-field db-pr-w-130">
+                        <DxTextBox Text="@ObjectStateDisplay" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn"
+                                @onclick="ToggleObjectStatePopup">▾</button>
+                    </div>
+                    @if (ShowObjectStatePopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <label class="db-pr-dropdown-checkbox-item db-pr-select-all">
+                                    <input type="checkbox" checked="@IsAllObjectStatesSelected" @onchange="ToggleSelectAllObjectStates" />
+                                    <span>(Select All)</span>
+                                </label>
+                                @foreach (var item in ObjectStateListItems)
+                                {
+                                    <label class="db-pr-dropdown-checkbox-item">
+                                        <input type="checkbox" checked="@PendingObjectStates.Contains(item)"
+                                               @onchange="e => ToggleObjectState(item, (bool)(e.Value ?? false))" />
+                                        <span>@item</span>
+                                    </label>
+                                }
+                            </div>
+                            <div class="db-pr-checkbox-popup-footer">
+                                <button type="button" class="db-pr-dropdown-ok-btn" @onclick="ApplyObjectStateSelection">OK</button>
+                                <button type="button" class="db-pr-dropdown-cancel-btn" @onclick="() => ShowObjectStatePopup = false">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Date Criteria</label>
+                    <DxComboBox NullText="Date Criteria" Data="@DateCriteriaOptions" @bind-Value="DateCriteria" CssClass="erp-combobox" />
+                </div>
+                @if (DateCriteria == "Daily")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>Current Date</label>
+                        <DxDateEdit @bind-Date="CurrentDate" CssClass="db-pr-w-130" />
+                    </div>
+                }
+                else if (DateCriteria == "At the day of")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>At the day of</label>
+                        <DxDateEdit @bind-Date="AtTheDayOf" CssClass="db-pr-w-130" />
+                    </div>
+                }
+                else if (DateCriteria == "Weekly" || DateCriteria == "Monthly" || DateCriteria == "Annually" || DateCriteria == "Date Range")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>From</label>
+                        <DxDateEdit @bind-Date="FromDate" CssClass="db-pr-w-130" />
+                    </div>
+                    <div class="db-pr-filter-row">
+                        <label>To</label>
+                        <DxDateEdit @bind-Date="ToDate" CssClass="db-pr-w-130" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button class="db-pr-clear-btn" type="button" @onclick="ClearFilters">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Clear Search History</span>
+        </button>
+    </div>
+
+    <div class="db-pr-main-content">
+        <div class="db-pr-grid-area">
+            <DxGrid Data="@Data"
+                    KeyFieldName="Code"
+                    ShowFilterRow="false"
+                    PageSize="20"
+                    CssClass="db-pr-grid"
+                    Height="100vh"
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItem="@SelectedItem"
+                    SelectedDataItemChanged="@(e => SelectedItem = (UnifiedProfileModel?)e)">
+                <Columns>
+                    <DxGridDataColumn FieldName="Code" Caption="Code" Width="100" />
+                    <DxGridDataColumn FieldName="FullName" Caption="Full Name" Width="150" />
+                    
+                    @if (ProfileType == "Guest" || ProfileType == "Contact")
+                    {
+                        <DxGridDataColumn FieldName="DOB" Caption="DOB" Width="110" DisplayFormat="d" />
+                        <DxGridDataColumn FieldName="Nationality" Caption="Nationality" Width="110" />
+                        <DxGridDataColumn FieldName="NationalID" Caption="National ID" Width="130" />
+                        <DxGridDataColumn FieldName="Gender" Caption="Gender" Width="80" />
+                    }
+                    else
+                    {
+                        <DxGridDataColumn FieldName="TIN" Caption="TIN" Width="120" />
+                        <DxGridDataColumn FieldName="BusinessType" Caption="Business Type" Width="130" />
+                    }
+                    
+                    <DxGridDataColumn FieldName="Category" Caption="Category" Width="100" />
+                    <DxGridDataColumn FieldName="State" Caption="State" Width="100" />
+                    <DxGridDataColumn FieldName="Phone" Caption="Phone" Width="120" />
+                    <DxGridDataColumn FieldName="City" Caption="City" Width="120" />
+                </Columns>
+            </DxGrid>
+            <div class="db-pr-record-info">Record @(Data.Count == 0 ? 0 : 1) of @Data.Count</div>
+        </div>
+
+        <!-- Right detail panel — collapsible, closed by default -->
+        <div class="db-pr-detail-panel @(IsDetailCollapsed ? "db-pr-collapsed" : "")">
+            <div class="db-pr-detail-header">
+                @if (!IsDetailCollapsed)
+                {
+                    <span class="db-pr-panel-title">@GetDetailTitle()</span>
+                    <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                        <button type="button" title="Collapse" @onclick="() => IsDetailCollapsed = true">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <span class="db-pr-panel-title" @onclick="() => IsDetailCollapsed = false">@GetDetailTitle()</span>
+                }
+            </div>
+            <div class="db-pr-detail-body">
+                @if (SelectedItem != null)
+                {
+                    <p><strong>Code:</strong> @SelectedItem.Code</p>
+                    <p><strong>Name:</strong> @SelectedItem.FullName</p>
+                    
+                    @if (ProfileType == "Guest" || ProfileType == "Contact")
+                    {
+                        <p><strong>DOB:</strong> @SelectedItem.DOB?.ToString("d")</p>
+                        <p><strong>Nationality:</strong> @SelectedItem.Nationality</p>
+                        <p><strong>National ID:</strong> @SelectedItem.NationalID</p>
+                        <p><strong>Gender:</strong> @SelectedItem.Gender</p>
+                    }
+                    else
+                    {
+                        <p><strong>TIN:</strong> @SelectedItem.TIN</p>
+                        <p><strong>Business Type:</strong> @SelectedItem.BusinessType</p>
+                    }
+                    
+                    <p><strong>Category:</strong> @SelectedItem.Category</p>
+                    <p><strong>State:</strong> @SelectedItem.State</p>
+                    <p><strong>Phone:</strong> @SelectedItem.Phone</p>
+                    <p><strong>City:</strong> @SelectedItem.City</p>
+                }
+                else
+                {
+                    <span class="db-pr-text-muted">Select a record</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Requested Services — collapsible, closed by default -->
+    <div class="db-pr-requested-services @(IsServicesCollapsed ? "db-pr-collapsed" : "")">
+        <div class="db-pr-rs-header" @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+            <span>Requested Services</span>
+            <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                <button type="button" title="Pin"><i class="bi bi-pin-angle"></i></button>
+                <button type="button" title="@(IsServicesCollapsed ? "Expand" : "Collapse")"
+                        @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+                    <i class="bi @(IsServicesCollapsed ? "bi-chevron-up" : "bi-chevron-down")"></i>
+                </button>
+            </div>
+        </div>
+        @if (!IsServicesCollapsed)
+        {
+            <DxGrid Data="@RequestedServices" PageSize="5" CssClass="db-pr-grid-small">
+                <Columns>
+                    <DxGridDataColumn FieldName="Service" Caption="Service" />
+                    <DxGridDataColumn FieldName="TargetTime" Caption="Target Time" Width="140" />
+                </Columns>
+            </DxGrid>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsGuest { get; set; } = true;
+    
+    [Parameter] public string ProfileType { get; set; } = "Guest"; // Guest, Contact, Company, TravelAgent, Group, Source
+
+    // Sample data – replace with real service
+    List<UnifiedProfileModel> Data = new();
+    UnifiedProfileModel? SelectedItem;
+    List<RequestedServiceModel> RequestedServices = new();
+
+    // Both panels are closed by default
+    bool IsDetailCollapsed = true;
+    bool IsServicesCollapsed = true;
+
+    string GetDetailTitle()
+    {
+        if (ProfileType == "Source")
+        {
+            return "Business source Detail";
+        }
+        return $"{ProfileType} Detail";
+    }
+
+    string? SearchBy, ConsigneeCode, Preference, DateCriteria = "Daily";
+    DateTime CurrentDate = new DateTime(2026, 8, 24);
+    DateTime AtTheDayOf = DateTime.Today;
+    DateTime FromDate = DateTime.Today;
+    DateTime ToDate = DateTime.Today;
+
+    string[] DateCriteriaOptions = { "Daily", "Weekly", "Monthly", "At the day of", "Annually", "Date Range", "Period Code", "Period Range", "None", "Show All" };
+
+    // ---- Search By popup ----
+    // Options that add no extra row: "Show Filter Panel", "Tin", "Is Active".
+    // "Business Type" adds a Business Type row; "Address" adds Address + Text Edit rows.
+    string[] SearchByListItems = { "Show Filter Panel", "Business Type", "Tin", "Address", "Is Active" };
+    bool ShowSearchByPopup;
+    string SearchByPopupFilter = "";
+
+    void ToggleSearchByPopup()
+    {
+        CloseAllPopups(except: nameof(ShowSearchByPopup));
+        ShowSearchByPopup = !ShowSearchByPopup;
+    }
+
+    void SelectSearchBy(string item)
+    {
+        SearchBy = item;
+        ShowSearchByPopup = false;
+        if (item != "Business Type")
+        {
+            BusinessType = null;
+        }
+        if (item != "Address")
+        {
+            Address = null;
+            AddressTextEditValue = string.Empty;
+        }
+    }
+
+    // ---- Business Type popup (shown when Search By == "Business Type") ----
+    string[] BusinessTypeListItems = { "Domain Based", "Governmental", "Liablity Limited Company (LLC)", "None Governmental", "Private", "Private Limited Company (PLC)", "Share Company (S.C.)", "Sole Proprites" };
+    string? BusinessType;
+    bool ShowBusinessTypePopup;
+    string BusinessTypePopupFilter = "";
+
+    void ToggleBusinessTypePopup()
+    {
+        CloseAllPopups(except: nameof(ShowBusinessTypePopup));
+        ShowBusinessTypePopup = !ShowBusinessTypePopup;
+    }
+
+    void SelectBusinessType(string item)
+    {
+        BusinessType = item;
+        ShowBusinessTypePopup = false;
+    }
+
+    // ---- Address popup + Text Edit (shown when Search By == "Address") ----
+    string[] AddressListItems = { "Phone", "Email" };
+    string? Address;
+    bool ShowAddressPopup;
+    string AddressPopupFilter = "";
+    string AddressTextEditValue = "";
+
+    void ToggleAddressPopup()
+    {
+        CloseAllPopups(except: nameof(ShowAddressPopup));
+        ShowAddressPopup = !ShowAddressPopup;
+    }
+
+    void SelectAddress(string item)
+    {
+        Address = item;
+        ShowAddressPopup = false;
+    }
+
+    // ---- Preference popup (Code / Name / TIN lookup) ----
+    bool ShowPreferencePopup;
+    string PreferencePopupFilter = "";
+    List<PreferenceLookupModel> PreferenceLookupData = new(); // TODO: load real data
+
+    void TogglePreferencePopup()
+    {
+        CloseAllPopups(except: nameof(ShowPreferencePopup));
+        ShowPreferencePopup = !ShowPreferencePopup;
+    }
+
+    void FindPreference()
+    {
+        // TODO: wire up to a real lookup service using PreferencePopupFilter
+    }
+
+    void SelectPreference(PreferenceLookupModel row)
+    {
+        Preference = $"{row.Code} - {row.Name}";
+        ShowPreferencePopup = false;
+    }
+
+    void ClearPreference()
+    {
+        Preference = null;
+        PreferencePopupFilter = string.Empty;
+    }
+
+    // ---- Object State popup (multi-select checkboxes) ----
+    string[] ObjectStateListItems = { "maintained", "Attendance Exempted", "variable session", "Variable Session" };
+    HashSet<string> SelectedObjectStates = new();
+    HashSet<string> PendingObjectStates = new();
+    bool ShowObjectStatePopup;
+
+    string ObjectStateDisplay => SelectedObjectStates.Count == 0 ? "" : string.Join(", ", SelectedObjectStates);
+
+    bool IsAllObjectStatesSelected => PendingObjectStates.Count == ObjectStateListItems.Length;
+
+    void ToggleObjectStatePopup()
+    {
+        if (!ShowObjectStatePopup)
+        {
+            PendingObjectStates = new HashSet<string>(SelectedObjectStates);
+            CloseAllPopups(except: nameof(ShowObjectStatePopup));
+        }
+        ShowObjectStatePopup = !ShowObjectStatePopup;
+    }
+
+    void ToggleSelectAllObjectStates(ChangeEventArgs e)
+    {
+        var isChecked = (bool)(e.Value ?? false);
+        PendingObjectStates = isChecked ? new HashSet<string>(ObjectStateListItems) : new HashSet<string>();
+    }
+
+    void ToggleObjectState(string item, bool isChecked)
+    {
+        if (isChecked)
+        {
+            PendingObjectStates.Add(item);
+        }
+        else
+        {
+            PendingObjectStates.Remove(item);
+        }
+    }
+
+    void ApplyObjectStateSelection()
+    {
+        SelectedObjectStates = new HashSet<string>(PendingObjectStates);
+        ShowObjectStatePopup = false;
+    }
+
+    // ---- shared helpers ----
+    void CloseAllPopups(string except)
+    {
+        if (except != nameof(ShowSearchByPopup)) ShowSearchByPopup = false;
+        if (except != nameof(ShowBusinessTypePopup)) ShowBusinessTypePopup = false;
+        if (except != nameof(ShowAddressPopup)) ShowAddressPopup = false;
+        if (except != nameof(ShowPreferencePopup)) ShowPreferencePopup = false;
+        if (except != nameof(ShowObjectStatePopup)) ShowObjectStatePopup = false;
+    }
+
+    Func<string, bool> MatchesFilter(string filterText) =>
+        item => string.IsNullOrEmpty(filterText) || item.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        // TODO: load real data based on ProfileType
+        // For Guest/Contact: load guest/contact data with DOB, Nationality, etc.
+        // For Company/TravelAgent/Group/Source: load company data with TIN, BusinessType, etc.
+        Data = new List<UnifiedProfileModel>(); // empty like screenshots
+    }
+
+    void ClearFilters()
+    {
+        SearchBy = ConsigneeCode = Preference = null;
+        BusinessType = null;
+        Address = null;
+        AddressTextEditValue = string.Empty;
+        SelectedObjectStates.Clear();
+        PendingObjectStates.Clear();
+        DateCriteria = "Daily";
+        CurrentDate = DateTime.Today;
+        AtTheDayOf = DateTime.Today;
+        FromDate = DateTime.Today;
+        ToDate = DateTime.Today;
+        CloseAllPopups(except: "");
+    }
+
+    public class UnifiedProfileModel
+    {
+        public string Code { get; set; } = "";
+        public string FullName { get; set; } = "";
+        
+        // Guest/Contact specific fields
+        public DateTime? DOB { get; set; }
+        public string Nationality { get; set; } = "";
+        public string NationalID { get; set; } = "";
+        public string Gender { get; set; } = "";
+        
+        // Company specific fields
+        public string TIN { get; set; } = "";
+        public string BusinessType { get; set; } = "";
+        
+        // Common fields
+        public string Category { get; set; } = "";
+        public string State { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string City { get; set; } = "";
+    }
+
+    public class RequestedServiceModel
+    {
+        public string Service { get; set; } = "";
+        public string TargetTime { get; set; } = "";
+    }
+
+    public class PreferenceLookupModel
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string TIN { get; set; } = "";
+    }
+}
+
+
+
+<style>
+    .db-pr-dropdown-anchor {
+        position: relative;
+    }
+
+    .db-pr-dropdown-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #999;
+        background: #fff;
+        padding: 2px 4px 2px 6px;
+        cursor: pointer;
+        font-size: 13px;
+        height: 22px;
+        box-sizing: border-box;
+    }
+
+    .db-pr-dropdown-trigger i {
+        color: #555;
+        font-size: 11px;
+    }
+
+    .db-pr-dropdown-value {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .db-pr-dropdown-popup {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #888;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        width: 420px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .db-pr-dropdown-popup-wide {
+        width: 500px;
+    }
+
+    .db-pr-dropdown-body {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .db-pr-dropdown-search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .db-pr-dropdown-search-input {
+        flex: 1;
+        border: 1px solid #999;
+        padding: 3px 5px;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-find-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-list {
+        min-height: 250px;
+        overflow-y: auto;
+    }
+
+    .db-pr-dropdown-list-header {
+        color: #555;
+        padding: 3px 2px 5px 2px;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-list-item {
+        padding: 3px 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-list-item:hover {
+        background: #f0f4fa;
+    }
+
+    .db-pr-dropdown-list-item.db-pr-selected {
+        background: #cce4f7;
+        border: 1px solid #99c2e8;
+    }
+
+    .db-pr-dropdown-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 4px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-checkbox-item.db-pr-select-all {
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 2px;
+        color: #333;
+    }
+
+    .db-pr-dropdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-table th {
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+        padding: 3px 4px;
+    }
+
+    .db-pr-dropdown-table td {
+        padding: 3px 4px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-clear-row {
+        border-top: 1px solid #ccc;
+        padding: 6px 8px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .db-pr-dropdown-clear-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-footer-bar {
+        background: #ececec;
+        border-top: 1px solid #ccc;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 6px;
+    }
+
+    .db-pr-dropdown-footer-bar i {
+        color: #555;
+        font-size: 11px;
+    }
+
+    .db-pr-dropdown-resize-handle {
+        transform: rotate(45deg);
+    }
+
+    .db-pr-checkbox-popup-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        padding: 8px;
+        border-top: 1px solid #ccc;
+    }
+
+    .db-pr-dropdown-ok-btn,
+    .db-pr-dropdown-cancel-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 14px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+</style>

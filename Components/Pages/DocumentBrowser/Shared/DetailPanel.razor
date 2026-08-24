@@ -1,0 +1,19 @@
+<div class="detail-panel">
+    <div class="detail-header">@Title</div>
+    <div class="detail-body">
+        @if (HasSelection)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <span class="text-muted">Select a record</span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Detail";
+    [Parameter] public bool HasSelection { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

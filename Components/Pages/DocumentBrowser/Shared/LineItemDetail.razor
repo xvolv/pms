@@ -1,0 +1,22 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.DocumentBrowser.Models
+
+<div class="line-item-detail">
+    <div class="rs-header">Line Item Detail</div>
+    <DxGrid Data="@Data"
+            PageSize="5"
+            CssClass="db-grid-small"
+            ShowFilterRow="false">
+        <Columns>
+            <DxGridDataColumn FieldName="Code" Caption="Code" Width="90" />
+            <DxGridDataColumn FieldName="Description" Caption="Description" />
+            <DxGridDataColumn FieldName="Quantity" Caption="Qty" Width="70" DisplayFormat="n2" />
+            <DxGridDataColumn FieldName="UnitPrice" Caption="Unit Price" Width="100" DisplayFormat="n2" />
+            <DxGridDataColumn FieldName="Amount" Caption="Amount" Width="100" DisplayFormat="n2" />
+        </Columns>
+    </DxGrid>
+</div>
+
+@code {
+    [Parameter] public IEnumerable<LineItemModel> Data { get; set; } = Enumerable.Empty<LineItemModel>();
+}

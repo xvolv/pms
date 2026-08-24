@@ -1,0 +1,19 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.DocumentBrowser.Models
+
+<div class="requested-services">
+    <div class="rs-header">Requested Services</div>
+    <DxGrid Data="@Data"
+            PageSize="5"
+            CssClass="db-grid-small"
+            ShowFilterRow="false">
+        <Columns>
+            <DxGridDataColumn FieldName="Service" Caption="Service" />
+            <DxGridDataColumn FieldName="TargetTime" Caption="Target Time" Width="140" />
+        </Columns>
+    </DxGrid>
+</div>
+
+@code {
+    [Parameter] public IEnumerable<RequestedServiceModel> Data { get; set; } = Enumerable.Empty<RequestedServiceModel>();
+}

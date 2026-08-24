@@ -1,0 +1,33 @@
+@using DevExpress.Blazor
+
+<div class="db-filter-bar">
+    <DxToolbar>
+        <Items>
+            <DxToolbarItem IconCssClass="oi oi-eye" Text="Show" Click="@OnShow" />
+            <DxToolbarItem IconCssClass="oi oi-data-transfer-download" Text="Export" Click="@OnExport" />
+            @if (ShowPrint)
+            {
+                <DxToolbarItem IconCssClass="oi oi-print" Text="Print" Click="@OnPrint" />
+            }
+        </Items>
+    </DxToolbar>
+
+    <div class="filter-fields">
+        @ChildContent
+    </div>
+
+    <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+              IconCssClass="oi oi-reload"
+              Text="Clear Search History"
+              Click="@OnClear" />
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool ShowPrint { get; set; } = false;
+
+    [Parameter] public EventCallback OnShow { get; set; }
+    [Parameter] public EventCallback OnExport { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+}

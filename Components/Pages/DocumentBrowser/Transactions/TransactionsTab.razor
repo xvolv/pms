@@ -1,0 +1,35 @@
+@using DevExpress.Blazor
+
+<div class="transactions-tab">
+    <DxTabs @bind-ActiveTabIndex="ActiveTxTab" CssClass="db-sub-tabs">
+        <DxTabPage Text="Cash Receipt">
+            <CashReceiptLikeGrid Title="Cash Receipt" />
+        </DxTabPage>
+        <DxTabPage Text="Credit Sales">
+            <CashReceiptLikeGrid Title="Credit Sales" />
+        </DxTabPage>
+        <DxTabPage Text="Cash Sales">
+            <CashSalesGrid />
+        </DxTabPage>
+        <DxTabPage Text="Rebate">
+            <CashReceiptLikeGrid Title="Rebate" />
+        </DxTabPage>
+        <!-- add the rest of the tabs the same way -->
+        <DxTabPage Text="Debit Note"><CashReceiptLikeGrid Title="Debit Note" /></DxTabPage>
+        <DxTabPage Text="Paid Out"><CashReceiptLikeGrid Title="Paid Out" /></DxTabPage>
+        <DxTabPage Text="Refund"><CashReceiptLikeGrid Title="Refund" /></DxTabPage>
+        <DxTabPage Text="Daily Room Charge"><CashReceiptLikeGrid Title="Daily Room Charge" /></DxTabPage>
+        <DxTabPage Text="Cash Sales Summary"><CashReceiptLikeGrid Title="Cash Sales Summary" /></DxTabPage>
+        <DxTabPage Text="Event Requirement"><CashReceiptLikeGrid Title="Event Requirement" /></DxTabPage>
+        <DxTabPage Text="Service Request"><CashReceiptLikeGrid Title="Service Request" /></DxTabPage>
+        <DxTabPage Text="Lost and Found"><CashReceiptLikeGrid Title="Lost and Found" /></DxTabPage>
+        <DxTabPage Text="Daily Resident Summary"><CashReceiptLikeGrid Title="Daily Resident Summary" /></DxTabPage>
+        <DxTabPage Text="Check Out"><CashReceiptLikeGrid Title="Check Out" /></DxTabPage>
+        <DxTabPage Text="Package Consumption"><CashReceiptLikeGrid Title="Package Consumption" /></DxTabPage>
+        <DxTabPage Text="Log Book"><CashReceiptLikeGrid Title="Log Book" /></DxTabPage>
+    </DxTabs>
+</div>
+
+@code {
+    int ActiveTxTab = 2; // Cash Sales as example
+}

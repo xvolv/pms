@@ -1,0 +1,472 @@
+.document-browser {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.db-main-toolbar {
+    background: #fff;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 4px 8px;
+}
+
+.db-sub-tabs .dxbl-tabs-header {
+    background: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.db-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #e9e9e9;
+    border-bottom: 1px solid #ccc;
+    flex-wrap: wrap;
+}
+
+.filter-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.w-150 { width: 150px; }
+.w-140 { width: 140px; }
+.w-130 { width: 130px; }
+.w-120 { width: 120px; }
+
+.main-content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.grid-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.db-grid {
+    flex: 1;
+}
+
+.detail-panel {
+    width: 260px;
+    border-left: 1px solid #ccc;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-header {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    background: #e0e0e0;
+    padding: 8px 4px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.detail-body {
+    padding: 12px;
+    overflow: auto;
+    flex: 1;
+}
+
+.requested-services, .line-item-detail {
+    border-top: 1px solid #ccc;
+    background: #f8f8f8;
+    max-height: 180px;
+}
+
+.rs-header {
+    padding: 4px 10px;
+    font-weight: 600;
+    background: #eef3f9;
+    border-bottom: 1px solid #ccc;
+}
+
+.record-info {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #f0f0f0;
+    border-top: 1px solid #ddd;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   profile-grid.css
+   Shared styles for Guest/Contact/Company/Travel Agent/Group/Source
+   grids in the Document Browser > Profiles tab.
+   All custom classes are prefixed db-pr- (Document Browser - Profiles)
+   to avoid clashing with DevExpress or other app styles.
+   Icons use Bootstrap Icons (bi bi-*) — make sure the Bootstrap
+   Icons stylesheet is referenced in the host page.
+   ============================================================ */
+
+.db-pr-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff;
+    font-size: 13px;
+    color: #1f1f1f;
+}
+
+/* ---------------- Filter / toolbar bar ---------------- */
+
+.db-pr-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    background: #eef0ef;
+    border-bottom: 1px solid #c9c9c9;
+    padding: 6px 14px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+/* Show / Export — plain buttons, icon on top / label below,
+   no dropdown/overflow behavior */
+.db-pr-toolbar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.db-pr-toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 48px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-size: 11px;
+    padding: 2px 4px;
+}
+
+.db-pr-toolbar-btn i {
+    font-size: 26px;
+    line-height: 1;
+}
+
+.db-pr-toolbar-btn:hover {
+    color: #1568c1;
+}
+
+/* Search By sits beside the Show/Export buttons, same row */
+.db-pr-search-by-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 6px;
+}
+
+.db-pr-search-by-col label {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Filter fields laid out as a compact 2-column label/input form */
+.db-pr-filter-fields {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+.db-pr-filter-col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.db-pr-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.db-pr-filter-row label {
+    width: 82px;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #333;
+    text-align: left;
+}
+
+.db-pr-w-120 { width: 100%; }
+.db-pr-w-130 { width: 100%; }
+.db-pr-w-150 { width: 100%; }
+
+/* Clear Search History button — icon over two-line text */
+.db-pr-clear-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 66px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-size: 11px;
+    line-height: 1.15;
+    text-align: center;
+    margin-left: 8px;
+}
+
+.db-pr-clear-btn i {
+    font-size: 26px;
+    color: #4caf50;
+    margin-bottom: 2px;
+}
+
+.db-pr-clear-btn:hover {
+    color: #1568c1;
+}
+
+/* ---------------- Main content: grid + detail panel ---------------- */
+
+.db-pr-main-content {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    border-bottom: 1px solid #c9c9c9;
+}
+
+.db-pr-grid-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.db-pr-grid {
+    flex: 1 1 auto;
+    font-size: 12px;
+}
+
+.db-pr-grid ::deep .dxbl-grid-header-cell {
+    background: #f4f4f4;
+    font-weight: 600;
+    font-size: 12px;
+    border-color: #d5d5d5;
+}
+
+.db-pr-grid ::deep .dxbl-grid-data-row {
+    border-color: #eaeaea;
+}
+
+.db-pr-record-info {
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #555;
+    background: #f7f7f7;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+/* ---------------- Collapsible right detail panel ---------------- */
+
+.db-pr-detail-panel {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border-left: 1px solid #c9c9c9;
+    transition: width 0.15s ease;
+}
+
+.db-pr-detail-panel.db-pr-collapsed {
+    width: 28px;
+}
+
+.db-pr-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f1f1f;
+    border-bottom: 1px solid #c9c9c9;
+    flex-shrink: 0;
+}
+
+.db-pr-detail-panel.db-pr-collapsed .db-pr-detail-header {
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-start;
+    padding: 8px 4px;
+    cursor: pointer;
+}
+
+.db-pr-panel-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.db-pr-detail-panel.db-pr-collapsed .db-pr-panel-title {
+    writing-mode: vertical-rl;
+    transform: rotate(0deg);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.db-pr-panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.db-pr-panel-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 13px;
+    padding: 2px;
+    line-height: 1;
+}
+
+.db-pr-panel-actions button:hover {
+    color: #1568c1;
+}
+
+.db-pr-detail-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.db-pr-detail-panel.db-pr-collapsed .db-pr-detail-body {
+    display: none;
+}
+
+.db-pr-detail-body p {
+    margin: 0 0 6px 0;
+}
+
+.db-pr-text-muted {
+    color: #888;
+}
+
+/* ---------------- Collapsible bottom "Requested Services" panel ---------------- */
+
+.db-pr-requested-services {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    flex-shrink: 0;
+    max-height: 220px;
+    transition: max-height 0.15s ease;
+}
+
+.db-pr-requested-services.db-pr-collapsed {
+    max-height: 30px;
+    overflow: hidden;
+}
+
+.db-pr-rs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px solid #c9c9c9;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+
+.db-pr-grid-small {
+    font-size: 12px;
+}
+
+.db-pr-grid-small ::deep .dxbl-grid-header-cell {
+    background: #f4f4f4;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* ---------------- Tabs wrapper (ProfilesTab.razor) ---------------- */
+
+.db-pr-tabs-wrapper {
+    height: 100%;
+}
+
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+    .db-pr-filter-fields {
+        gap: 16px;
+    }
+
+    .db-pr-detail-panel:not(.db-pr-collapsed) {
+        width: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .db-pr-main-content {
+        flex-direction: column;
+    }
+
+    .db-pr-grid-area {
+        border-right: none;
+        border-bottom: 1px solid #c9c9c9;
+    }
+
+    .db-pr-detail-panel:not(.db-pr-collapsed) {
+        width: 100%;
+        max-height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .db-pr-filter-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .db-pr-filter-row label {
+        width: 76px;
+    }
+}
+
+.db-pr-tabs-wrapper {
+    height: 100%;
+}
