@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models;
+namespace ERP.V7.WebPMS.Components.Pages.Profile.Shared;
 
-public class GuestRow
+public class PersonProfileRow
 {
     public int Id { get; set; }
     public string Code { get; set; } = "";
