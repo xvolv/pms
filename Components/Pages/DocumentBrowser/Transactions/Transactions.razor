@@ -1,0 +1,1109 @@
+@using DevExpress.Blazor
+
+<div class="db-pr-container">
+
+    <!-- ===================== FILTER BAR ===================== -->
+    <div class="db-pr-filter-bar">
+        <div class="db-pr-toolbar-row">
+            <button class="db-pr-toolbar-btn" type="button" title="Show" @onclick="OnShow">
+                <i class="bi bi-eye"></i>
+                <span>Show</span>
+            </button>
+            <button class="db-pr-toolbar-btn" type="button" title="Export" @onclick="OnExport">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <span>Export</span>
+            </button>
+            <button class="db-pr-toolbar-btn" type="button" title="Print" @onclick="OnPrint">
+                <i class="bi bi-printer"></i>
+                <span>Print</span>
+            </button>
+
+            <!-- Search By -->
+            <div class="db-pr-search-by-col">
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Search By</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="SearchBy" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="Search By" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleSearchByPopup">▾</button>
+                    </div>
+
+                    @if (ShowSearchByPopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input"
+                                           @bind="SearchByPopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn"
+                                            @onclick="@(() => { })">Find</button>
+                                </div>
+                                <div class="db-pr-dropdown-list">
+                                    <div class="db-pr-dropdown-list-header">Search By</div>
+                                    @foreach (var item in SearchByListItems.Where(MatchesFilter(SearchByPopupFilter)))
+                                    {
+                                        <div class="db-pr-dropdown-list-item @(SearchBy == item ? "db-pr-selected" : "")"
+                                             @onclick="() => SelectSearchBy(item)">
+                                            @item
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn"
+                                        @onclick="@(() => SearchByPopupFilter = string.Empty)">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowSearchByPopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(SearchBy) && SearchBy != "Show Filter Panel")
+                {
+                    <div class="db-pr-filter-row ">
+                        <label>@SearchBy</label>
+                        <DxTextBox @bind-Text="SearchByValue" CssClass="w-100" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Filter fields -->
+        <div class="db-pr-filter-fields">
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Voucher Code</label>
+                    <DxTextBox NullText="Voucher Code" @bind-Text="VoucherCode" CssClass="w-100" />
+                </div>
+
+                <!-- Consignee -->
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Consignee</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="ConsigneeDisplay" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleConsigneePopup">▾</button>
+                    </div>
+
+                    @if (ShowConsigneePopup)
+                    {
+                        <div class="db-pr-dropdown-popup db-pr-dropdown-popup-wide">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input"
+                                           @bind="ConsigneePopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="FindConsignee">Find</button>
+                                </div>
+                                <table class="db-pr-dropdown-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>TIN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (!FilteredConsigneeData.Any())
+                                        {
+                                            <tr><td colspan="3" class="db-pr-text-muted">No records</td></tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var row in FilteredConsigneeData)
+                                            {
+                                                <tr @onclick="() => SelectConsignee(row)">
+                                                    <td>@row.Code</td>
+                                                    <td>@row.Name</td>
+                                                    <td>@row.TIN</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn" @onclick="ClearConsignee">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowConsigneePopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Object State -->
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Object State</label>
+                    <div class="lookup-field db-pr-w-130">
+                        <DxTextBox Text="@ObjectStateDisplay" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleObjectStatePopup">▾</button>
+                    </div>
+
+                    @if (ShowObjectStatePopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <label class="db-pr-dropdown-checkbox-item db-pr-select-all">
+                                    <input type="checkbox" checked="@IsAllObjectStatesSelected"
+                                           @onchange="ToggleSelectAllObjectStates" />
+                                    <span>(Select All)</span>
+                                </label>
+                                @foreach (var item in ObjectStateListItems)
+                                {
+                                    <label class="db-pr-dropdown-checkbox-item">
+                                        <input type="checkbox"
+                                               checked="@PendingObjectStates.Contains(item)"
+                                               @onchange="e => ToggleObjectState(item, (bool)(e.Value ?? false))" />
+                                        <span>@item</span>
+                                    </label>
+                                }
+                            </div>
+                            <div class="db-pr-checkbox-popup-footer">
+                                <button type="button" class="db-pr-dropdown-ok-btn" @onclick="ApplyObjectStateSelection">OK</button>
+                                <button type="button" class="db-pr-dropdown-cancel-btn"
+                                        @onclick="() => ShowObjectStatePopup = false">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="db-pr-filter-col">
+                <!-- Consignee Unit -->
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Consignee Unit</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="ConsigneeUnit" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleConsigneeUnitPopup">▾</button>
+                    </div>
+
+                    @if (ShowConsigneeUnitPopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input"
+                                           @bind="ConsigneeUnitPopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                </div>
+                                <div class="db-pr-dropdown-list">
+                                    <div class="db-pr-dropdown-list-header">Consignee Unit</div>
+                                    @foreach (var item in ConsigneeUnitListItems.Where(MatchesFilter(ConsigneeUnitPopupFilter)))
+                                    {
+                                        <div class="db-pr-dropdown-list-item @(ConsigneeUnit == item ? "db-pr-selected" : "")"
+                                             @onclick="() => SelectConsigneeUnit(item)">
+                                            @item
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn"
+                                        @onclick="@(() => ConsigneeUnitPopupFilter = string.Empty)">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowConsigneeUnitPopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Device -->
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>Device</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="Device" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleDevicePopup">▾</button>
+                    </div>
+
+                    @if (ShowDevicePopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input"
+                                           @bind="DevicePopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                </div>
+                                <div class="db-pr-dropdown-list">
+                                    <div class="db-pr-dropdown-list-header">Device</div>
+                                    @foreach (var item in DeviceListItems.Where(MatchesFilter(DevicePopupFilter)))
+                                    {
+                                        <div class="db-pr-dropdown-list-item @(Device == item ? "db-pr-selected" : "")"
+                                             @onclick="() => SelectDevice(item)">
+                                            @item
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn"
+                                        @onclick="@(() => DevicePopupFilter = string.Empty)">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowDevicePopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- User -->
+                <div class="db-pr-filter-row db-pr-dropdown-anchor">
+                    <label>User</label>
+                    <div class="lookup-field db-pr-w-150">
+                        <DxTextBox @bind-Text="User" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" NullText="" />
+                        <button type="button" class="lookup-toggle-btn" @onclick="ToggleUserPopup">▾</button>
+                    </div>
+
+                    @if (ShowUserPopup)
+                    {
+                        <div class="db-pr-dropdown-popup">
+                            <div class="db-pr-dropdown-body">
+                                <div class="db-pr-dropdown-search-row">
+                                    <input class="db-pr-dropdown-search-input"
+                                           @bind="UserPopupFilter" @bind:event="oninput" />
+                                    <button type="button" class="db-pr-dropdown-find-btn" @onclick="@(() => { })">Find</button>
+                                </div>
+                                <div class="db-pr-dropdown-list">
+                                    <div class="db-pr-dropdown-list-header">User Name</div>
+                                    @foreach (var item in UserListItems.Where(MatchesFilter(UserPopupFilter)))
+                                    {
+                                        <div class="db-pr-dropdown-list-item @(User == item ? "db-pr-selected" : "")"
+                                             @onclick="() => SelectUser(item)">
+                                            @item
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="db-pr-dropdown-clear-row">
+                                <button type="button" class="db-pr-dropdown-clear-btn"
+                                        @onclick="@(() => UserPopupFilter = string.Empty)">Clear</button>
+                            </div>
+                            <div class="db-pr-dropdown-footer-bar">
+                                <i class="bi bi-x-lg" @onclick="() => ShowUserPopup = false"></i>
+                                <i class="bi bi-grip-horizontal db-pr-dropdown-resize-handle"></i>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Date Criteria -->
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Date Criteria</label>
+                    <DxComboBox NullText="Date Criteria"
+                                Data="@DateCriteriaOptions"
+                                @bind-Value="DateCriteria"
+                                CssClass="erp-combobox" />
+                </div>
+
+                @if (DateCriteria == "Daily")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>Current Date</label>
+                        <DxDateEdit @bind-Date="CurrentDate" CssClass="db-pr-w-130" />
+                    </div>
+                }
+                else if (DateCriteria == "At the day of")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>At the day of</label>
+                        <DxDateEdit @bind-Date="AtTheDayOf" CssClass="db-pr-w-130" />
+                    </div>
+                }
+                else if (DateCriteria is "Weekly" or "Monthly" or "Annually" or "Date Range")
+                {
+                    <div class="db-pr-filter-row">
+                        <label>From</label>
+                        <DxDateEdit @bind-Date="FromDate" CssClass="db-pr-w-130" />
+                    </div>
+                    <div class="db-pr-filter-row">
+                        <label>To</label>
+                        <DxDateEdit @bind-Date="ToDate" CssClass="db-pr-w-130" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button class="db-pr-clear-btn" type="button" @onclick="ClearFilters">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Clear Search History</span>
+        </button>
+    </div>
+
+    <!-- ===================== MAIN GRID + DETAIL ===================== -->
+    <div class="db-pr-main-content">
+        <div class="db-pr-grid-area">
+            <DxGrid Data="@Data"
+                    KeyFieldName="Code"
+                    ShowFilterRow="false"
+                    PageSize="20"
+                    CssClass="db-pr-grid"
+                    Height="100%"
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItem="@SelectedItem"
+                    SelectedDataItemChanged="@(e => SelectedItem = (TransactionModel?)e)">
+               <Columns>
+    <DxGridDataColumn FieldName="Code" Caption="Code" Width="100" />
+    <DxGridDataColumn FieldName="CustomerName" Caption="Customer Name" MinWidth="130" Visible="@(TransactionType != "CashSales")" />
+    <DxGridDataColumn FieldName="TIN" Caption="TIN" Width="110" Visible="@(TransactionType != "CashSales")" />
+
+    <DxGridDataColumn FieldName="IssuedDate" Caption="Issued Date" Width="110" DisplayFormat="d" />
+    <DxGridDataColumn FieldName="OriginBranch" Caption="Origin Branch" Width="130" />
+    <DxGridDataColumn FieldName="GrandTotal" Caption="Grand Total" Width="110" DisplayFormat="n2" />
+    <DxGridDataColumn FieldName="UserName" Caption="User Name" Width="120" />
+    <DxGridDataColumn FieldName="DeviceName" Caption="Device Name" Width="130" />
+    <DxGridDataColumn FieldName="LastState" Caption="Last State" Width="110" />
+</Columns>
+            </DxGrid>
+            <div class="db-pr-record-info">
+                Record @(Data.Count == 0 ? 0 : 1) of @Data.Count
+            </div>
+        </div>
+
+        <!-- Right detail panel -->
+        <div class="db-pr-detail-panel @(IsDetailCollapsed ? "db-pr-collapsed" : "")">
+            <div class="db-pr-detail-header">
+                @if (!IsDetailCollapsed)
+                {
+                    <span class="db-pr-panel-title">@Title Detail</span>
+                    <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                        <button type="button" title="Collapse" @onclick="() => IsDetailCollapsed = true">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <span class="db-pr-panel-title" @onclick="() => IsDetailCollapsed = false">
+                        @Title Detail
+                    </span>
+                }
+            </div>
+            <div class="db-pr-detail-body">
+                @if (SelectedItem != null)
+                {
+                    <p><strong>Code:</strong> @SelectedItem.Code</p>
+                    @if (!string.IsNullOrEmpty(SelectedItem.CustomerName))
+                    {
+                        <p><strong>Customer:</strong> @SelectedItem.CustomerName</p>
+                        <p><strong>TIN:</strong> @SelectedItem.TIN</p>
+                    }
+                    <p><strong>Issued Date:</strong> @SelectedItem.IssuedDate?.ToString("d")</p>
+                    <p><strong>Origin Branch:</strong> @SelectedItem.OriginBranch</p>
+                    <p><strong>Grand Total:</strong> @SelectedItem.GrandTotal.ToString("n2")</p>
+                    <p><strong>User:</strong> @SelectedItem.UserName</p>
+                    <p><strong>Device:</strong> @SelectedItem.DeviceName</p>
+                    <p><strong>Last State:</strong> @SelectedItem.LastState</p>
+                }
+                else
+                {
+                    <span class="db-pr-text-muted">Select a record</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LINE ITEM DETAIL ===================== -->
+    <div class="db-pr-requested-services @(IsLineItemCollapsed ? "db-pr-collapsed" : "")">
+        <div class="db-pr-rs-header" @onclick="() => IsLineItemCollapsed = !IsLineItemCollapsed">
+            <span>Line Item Detail</span>
+            <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                <button type="button" title="Pin"><i class="bi bi-pin-angle"></i></button>
+                <button type="button" title="@(IsLineItemCollapsed ? "Expand" : "Collapse")"
+                        @onclick="() => IsLineItemCollapsed = !IsLineItemCollapsed">
+                    <i class="bi @(IsLineItemCollapsed ? "bi-chevron-up" : "bi-chevron-down")"></i>
+                </button>
+            </div>
+        </div>
+        @if (!IsLineItemCollapsed)
+        {
+            <DxGrid Data="@LineItems" PageSize="5" CssClass="db-pr-grid-small">
+                <Columns>
+                    <DxGridDataColumn FieldName="ItemCode" Caption="Item Code" Width="110" />
+                    <DxGridDataColumn FieldName="Description" Caption="Description" />
+                    <DxGridDataColumn FieldName="Qty" Caption="Qty" Width="70" />
+                    <DxGridDataColumn FieldName="UnitPrice" Caption="Unit Price" Width="100" DisplayFormat="n2" />
+                    <DxGridDataColumn FieldName="LineTotal" Caption="Line Total" Width="100" DisplayFormat="n2" />
+                </Columns>
+            </DxGrid>
+        }
+    </div>
+
+    <!-- ===================== REQUESTED SERVICES ===================== -->
+    <div class="db-pr-requested-services @(IsServicesCollapsed ? "db-pr-collapsed" : "")">
+        <div class="db-pr-rs-header" @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+            <span>Requested Services</span>
+            <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                <button type="button" title="Pin"><i class="bi bi-pin-angle"></i></button>
+                <button type="button" title="@(IsServicesCollapsed ? "Expand" : "Collapse")"
+                        @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+                    <i class="bi @(IsServicesCollapsed ? "bi-chevron-up" : "bi-chevron-down")"></i>
+                </button>
+            </div>
+        </div>
+        @if (!IsServicesCollapsed)
+        {
+            <DxGrid Data="@RequestedServices" PageSize="5" CssClass="db-pr-grid-small">
+                <Columns>
+                    <DxGridDataColumn FieldName="Service" Caption="Service" />
+                    <DxGridDataColumn FieldName="TargetTime" Caption="Target Time" Width="140" />
+                </Columns>
+            </DxGrid>
+        }
+    </div>
+</div>
+
+@code {
+    // ============================================================
+    // Parameters
+    // ============================================================
+    [Parameter] public string Title { get; set; } = "Cash Sales";
+    [Parameter] public string TransactionType { get; set; } = "CashSales";
+
+    // ============================================================
+    // Data
+    // ============================================================
+    List<TransactionModel> Data = new();
+    TransactionModel? SelectedItem;
+    List<LineItemModel> LineItems = new();
+    List<RequestedServiceModel> RequestedServices = new();
+
+    bool IsDetailCollapsed = true;
+    bool IsLineItemCollapsed = true;
+    bool IsServicesCollapsed = true;
+
+    // ============================================================
+    // Filter fields
+    // ============================================================
+    string? SearchBy;
+    string SearchByValue = "";
+    string? VoucherCode;
+    string? ConsigneeDisplay;
+    string? ConsigneeCode;
+    string? ConsigneeUnit;
+    string? Device;
+    string? User;
+    string DateCriteria = "Daily";
+
+    DateTime CurrentDate = new DateTime(2026, 8, 24);
+    DateTime AtTheDayOf = DateTime.Today;
+    DateTime FromDate = DateTime.Today;
+    DateTime ToDate = DateTime.Today;
+
+    string[] DateCriteriaOptions =
+    {
+        "Daily", "Weekly", "Monthly", "At the day of",
+        "Annually", "Date Range", "Period Code", "Period Range",
+        "None", "Show All"
+    };
+
+    // ============================================================
+    // Search By
+    // ============================================================
+    string[] SearchByListItems =
+    {
+        "Show Filter Panel",
+        "From Store", "To Store",
+        "Is Issued", "Is Void",
+        "Grand Total", "Additional Charge", "Discount",
+        "Sub Total", "VAT",
+        "FS Number", "MRC Number",
+        "Extension 1"
+    };
+
+    bool ShowSearchByPopup;
+    string SearchByPopupFilter = "";
+
+    void ToggleSearchByPopup()
+    {
+        CloseAllPopups(except: nameof(ShowSearchByPopup));
+        ShowSearchByPopup = !ShowSearchByPopup;
+    }
+
+    void SelectSearchBy(string item)
+    {
+        SearchBy = item;
+        ShowSearchByPopup = false;
+        if (item == "Show Filter Panel") SearchByValue = string.Empty;
+    }
+
+    // ============================================================
+    // Consignee
+    // ============================================================
+    List<ConsigneeLookupModel> ConsigneeLookupData = new()
+    {
+        new() { Code = "PCU00000", Name = "RED CLOUD ICT SOLUTIONS P...", TIN = "0076217301" },
+        new() { Code = "PCU00001", Name = "New Company New Company", TIN = "" },
+        new() { Code = "PCU00002", Name = "SIDIST KILO REAL ESTATE SH...", TIN = "0058318321" },
+        new() { Code = "PCU00003", Name = "WUBESHET TEKLE WAKJIRA ...", TIN = "0004888555" },
+        new() { Code = "PCU00004", Name = "CRAVE CAFE AND RESTURAN...", TIN = "0068508880" },
+        new() { Code = "CNET_ADMIN", Name = "CNET ADMINISTRATOR", TIN = "" },
+        new() { Code = "PGU00000", Name = "JANE DOE", TIN = "" },
+        new() { Code = "PGU00001", Name = "ABEBE KEBEDE DEBALKE", TIN = "" },
+        new() { Code = "PGU00002", Name = "TEST SALA", TIN = "" }
+    };
+
+    bool ShowConsigneePopup;
+    string ConsigneePopupFilter = "";
+
+    IEnumerable<ConsigneeLookupModel> FilteredConsigneeData =>
+        string.IsNullOrWhiteSpace(ConsigneePopupFilter)
+            ? ConsigneeLookupData
+            : ConsigneeLookupData.Where(r =>
+                r.Code.Contains(ConsigneePopupFilter, StringComparison.OrdinalIgnoreCase) ||
+                r.Name.Contains(ConsigneePopupFilter, StringComparison.OrdinalIgnoreCase) ||
+                r.TIN.Contains(ConsigneePopupFilter, StringComparison.OrdinalIgnoreCase));
+
+    void ToggleConsigneePopup()
+    {
+        CloseAllPopups(except: nameof(ShowConsigneePopup));
+        ShowConsigneePopup = !ShowConsigneePopup;
+    }
+
+    void FindConsignee() { }
+
+    void SelectConsignee(ConsigneeLookupModel row)
+    {
+        ConsigneeCode = row.Code;
+        ConsigneeDisplay = $"{row.Code} - {row.Name}";
+        ShowConsigneePopup = false;
+    }
+
+    void ClearConsignee()
+    {
+        ConsigneeCode = null;
+        ConsigneeDisplay = null;
+        ConsigneePopupFilter = string.Empty;
+    }
+
+    // ============================================================
+    // Consignee Unit / Device / User
+    // ============================================================
+    string[] ConsigneeUnitListItems = { "MAIN TEST HOTEL" };
+    bool ShowConsigneeUnitPopup;
+    string ConsigneeUnitPopupFilter = "";
+
+    void ToggleConsigneeUnitPopup()
+    {
+        CloseAllPopups(except: nameof(ShowConsigneeUnitPopup));
+        ShowConsigneeUnitPopup = !ShowConsigneeUnitPopup;
+    }
+
+    void SelectConsigneeUnit(string item)
+    {
+        ConsigneeUnit = item;
+        ShowConsigneeUnitPopup = false;
+    }
+
+    string[] DeviceListItems =
+    {
+        "DESKTOP-JDV9NWL",
+        "DESKTOP-DND1SE2",
+        "DESKTOP-OP05VH4"
+    };
+    bool ShowDevicePopup;
+    string DevicePopupFilter = "";
+
+    void ToggleDevicePopup()
+    {
+        CloseAllPopups(except: nameof(ShowDevicePopup));
+        ShowDevicePopup = !ShowDevicePopup;
+    }
+
+    void SelectDevice(string item)
+    {
+        Device = item;
+        ShowDevicePopup = false;
+    }
+
+    string[] UserListItems = { "CNET ADMIN" };
+    bool ShowUserPopup;
+    string UserPopupFilter = "";
+
+    void ToggleUserPopup()
+    {
+        CloseAllPopups(except: nameof(ShowUserPopup));
+        ShowUserPopup = !ShowUserPopup;
+    }
+
+    void SelectUser(string item)
+    {
+        User = item;
+        ShowUserPopup = false;
+    }
+
+    // ============================================================
+    // Object State
+    // ============================================================
+    string[] ObjectStateListItems =
+    {
+        "Approved", "Assigned", "Audited", "Checked",
+        "Delivered", "Done"
+    };
+
+    HashSet<string> SelectedObjectStates = new();
+    HashSet<string> PendingObjectStates = new();
+    bool ShowObjectStatePopup;
+
+    string ObjectStateDisplay =>
+        SelectedObjectStates.Count == 0 ? "" : string.Join(", ", SelectedObjectStates);
+
+    bool IsAllObjectStatesSelected =>
+        PendingObjectStates.Count == ObjectStateListItems.Length;
+
+    void ToggleObjectStatePopup()
+    {
+        if (!ShowObjectStatePopup)
+        {
+            PendingObjectStates = new HashSet<string>(SelectedObjectStates);
+            CloseAllPopups(except: nameof(ShowObjectStatePopup));
+        }
+        ShowObjectStatePopup = !ShowObjectStatePopup;
+    }
+
+    void ToggleSelectAllObjectStates(ChangeEventArgs e)
+    {
+        var isChecked = (bool)(e.Value ?? false);
+        PendingObjectStates = isChecked
+            ? new HashSet<string>(ObjectStateListItems)
+            : new HashSet<string>();
+    }
+
+    void ToggleObjectState(string item, bool isChecked)
+    {
+        if (isChecked) PendingObjectStates.Add(item);
+        else PendingObjectStates.Remove(item);
+    }
+
+    void ApplyObjectStateSelection()
+    {
+        SelectedObjectStates = new HashSet<string>(PendingObjectStates);
+        ShowObjectStatePopup = false;
+    }
+
+    // ============================================================
+    // Helpers
+    // ============================================================
+    void CloseAllPopups(string except)
+    {
+        if (except != nameof(ShowSearchByPopup)) ShowSearchByPopup = false;
+        if (except != nameof(ShowConsigneePopup)) ShowConsigneePopup = false;
+        if (except != nameof(ShowConsigneeUnitPopup)) ShowConsigneeUnitPopup = false;
+        if (except != nameof(ShowDevicePopup)) ShowDevicePopup = false;
+        if (except != nameof(ShowUserPopup)) ShowUserPopup = false;
+        if (except != nameof(ShowObjectStatePopup)) ShowObjectStatePopup = false;
+    }
+
+    Func<string, bool> MatchesFilter(string filterText) =>
+        item => string.IsNullOrEmpty(filterText) ||
+                item.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+
+    // ============================================================
+    // Lifecycle
+    // ============================================================
+    protected override void OnInitialized()
+    {
+        ApplyDefaultSearchBy();
+        LoadData();
+    }
+
+    void ApplyDefaultSearchBy()
+    {
+        SearchBy = TransactionType switch
+        {
+            "CreditSales" => "FS Number",
+            "CashSales" or "CashReceipt" => "Sub Total",
+            _ => null
+        };
+        SearchByValue = string.Empty;
+    }
+
+    void LoadData()
+    {
+        // TODO: call your real service based on ActiveTab
+        Data = new List<TransactionModel>();
+        LineItems = new List<LineItemModel>();
+        RequestedServices = new List<RequestedServiceModel>();
+    }
+
+    void ClearFilters()
+    {
+        ApplyDefaultSearchBy();
+        VoucherCode = null;
+        ConsigneeCode = ConsigneeDisplay = null;
+        ConsigneeUnit = Device = User = null;
+        SelectedObjectStates.Clear();
+        PendingObjectStates.Clear();
+        DateCriteria = "Daily";
+        CurrentDate = DateTime.Today;
+        AtTheDayOf = DateTime.Today;
+        FromDate = DateTime.Today;
+        ToDate = DateTime.Today;
+        CloseAllPopups(except: "");
+    }
+
+    void OnShow() { }
+    void OnExport() { }
+    void OnPrint() { }
+
+    // ============================================================
+    // Models
+    // ============================================================
+    public class TransactionModel
+    {
+        public string Code { get; set; } = "";
+        public string CustomerName { get; set; } = "";
+        public string TIN { get; set; } = "";
+        public DateTime? IssuedDate { get; set; }
+        public string OriginBranch { get; set; } = "";
+        public decimal GrandTotal { get; set; }
+        public string UserName { get; set; } = "";
+        public string DeviceName { get; set; } = "";
+        public string LastState { get; set; } = "";
+    }
+
+    public class LineItemModel
+    {
+        public string ItemCode { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Qty { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal LineTotal { get; set; }
+    }
+
+    public class RequestedServiceModel
+    {
+        public string Service { get; set; } = "";
+        public string TargetTime { get; set; } = "";
+    }
+
+    public class ConsigneeLookupModel
+    {
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string TIN { get; set; } = "";
+    }
+}
+
+<style>
+    /* ===== Container & Filter bar (same as profile) ===== */
+    .db-pr-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+    }
+
+    .db-pr-filter-bar {
+        background: #f5f5f5;
+        border-bottom: 1px solid #ccc;
+        padding: 6px 10px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .db-pr-toolbar-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .db-pr-search-by-col {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .db-pr-filter-fields {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+    }
+
+    .db-pr-filter-col {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 180px;
+    }
+
+    .db-pr-filter-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .db-pr-filter-row label {
+        min-width: 95px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .db-pr-w-130 { width: 100%; }
+    .db-pr-w-150 { width: 100%; }
+
+    /* Dropdowns */
+    .db-pr-dropdown-anchor { position: relative; }
+
+    .db-pr-dropdown-popup {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #888;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        width: 420px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .db-pr-dropdown-popup-wide { width: 500px; }
+
+    .db-pr-dropdown-body {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .db-pr-dropdown-search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .db-pr-dropdown-search-input {
+        flex: 1;
+        border: 1px solid #999;
+        padding: 3px 5px;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-find-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-list {
+        min-height: 180px;
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .db-pr-dropdown-list-header {
+        color: #555;
+        padding: 3px 2px 5px 2px;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-list-item {
+        padding: 3px 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-list-item:hover { background: #f0f4fa; }
+
+    .db-pr-dropdown-list-item.db-pr-selected {
+        background: #cce4f7;
+        border: 1px solid #99c2e8;
+    }
+
+    .db-pr-dropdown-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 4px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-checkbox-item.db-pr-select-all {
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 2px;
+    }
+
+    .db-pr-dropdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .db-pr-dropdown-table th {
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+        padding: 3px 4px;
+    }
+
+    .db-pr-dropdown-table td {
+        padding: 3px 4px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-clear-row {
+        border-top: 1px solid #ccc;
+        padding: 6px 8px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .db-pr-dropdown-clear-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-footer-bar {
+        background: #ececec;
+        border-top: 1px solid #ccc;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 6px;
+    }
+
+    .db-pr-dropdown-footer-bar i {
+        color: #555;
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+    .db-pr-dropdown-resize-handle { transform: rotate(45deg); }
+
+    .db-pr-checkbox-popup-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        padding: 8px;
+        border-top: 1px solid #ccc;
+    }
+
+    .db-pr-dropdown-ok-btn,
+    .db-pr-dropdown-cancel-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 14px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    /* Main content */
+    .db-pr-main-content {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        min-height: 280px;
+    }
+
+    .db-pr-grid-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .db-pr-record-info {
+        padding: 4px 8px;
+        font-size: 12px;
+        background: #f0f0f0;
+        border-top: 1px solid #ccc;
+    }
+
+    /* Detail panel */
+    .db-pr-detail-panel {
+        width: 280px;
+        border-left: 1px solid #ccc;
+        background: #fafafa;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.2s;
+    }
+
+    .db-pr-detail-panel.db-pr-collapsed { width: 36px; }
+
+    .db-pr-detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 8px;
+        background: #e8e8e8;
+        border-bottom: 1px solid #ccc;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .db-pr-panel-title {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .db-pr-panel-actions button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        padding: 2px 4px;
+    }
+
+    .db-pr-detail-body {
+        padding: 10px;
+        overflow-y: auto;
+        flex: 1;
+        font-size: 13px;
+    }
+
+    .db-pr-detail-body p { margin: 4px 0; }
+
+    .db-pr-text-muted {
+        color: #888;
+        font-style: italic;
+    }
+
+    /* Bottom panels */
+    .db-pr-requested-services {
+        border-top: 1px solid #ccc;
+        background: #f9f9f9;
+    }
+
+    .db-pr-rs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 10px;
+        background: #e8e8e8;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .db-pr-grid-small {
+        max-height: 180px;
+    }
+</style>
