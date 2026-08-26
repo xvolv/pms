@@ -1021,6 +1021,28 @@ a.menu-item.active .item-icon {
     color: #1d73d4;
 }
 
+.rail-item-home {
+    background-color: #1d73d4 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border-bottom: 2px solid #0d6efd !important;
+}
+
+.rail-item-home:hover {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+.rail-item-home .rail-icon {
+    color: #ffffff !important;
+    font-size: 1.2rem;
+}
+
+.rail-item-home .rail-label {
+    font-weight: 800 !important;
+    font-size: 0.75rem;
+}
+
 .rail-item-icon-only {
     flex: 0 0 auto;
     padding: 10px 0;
