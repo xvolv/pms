@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components
 @using ERP.V7.WebPMS.Components.Shared
 @using ERP.V7.WebPMS.Components.Pages.Profile.Guest
-@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @inject NavigationManager Navigation
 
 <PageTitle>Check-In - CNET ERP</PageTitle>
@@ -1400,7 +1400,7 @@
         if (g != null) title = g.Title;
     }
 
-    private void OnGuestSavedFromModal(GuestRow savedGuest)
+    private void OnGuestSavedFromModal(PersonProfileRow savedGuest)
     {
         if (savedGuest == null) return;
 

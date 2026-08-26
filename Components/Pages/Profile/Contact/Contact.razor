@@ -1,6 +1,5 @@
 @page "/contact"
 @rendermode InteractiveServer
-@using ERP.V7.WebPMS.Components.Pages.Profile.Contact.Models
 @using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @inject NavigationManager NavigationManager
 
@@ -356,8 +355,8 @@
 </DxPopup>
 
 @code {
-    private ContactRow contact = new();
-    private List<ContactRow> searchResults = new();
+    private PersonProfileRow contact = new();
+    private List<PersonProfileRow> searchResults = new();
     private int? editingId;
     private string searchQuery = "";
     private IGrid? searchGrid;
@@ -370,7 +369,7 @@
     private int searchTabIndex = 0;
     private string? statusMessage = "passport scanner device is not detected!";
 
-    private IEnumerable<ContactRow> FilteredSearchResults =>
+    private IEnumerable<PersonProfileRow> FilteredSearchResults =>
         string.IsNullOrWhiteSpace(searchQuery)
             ? searchResults
             : searchResults.Where(c =>
@@ -408,9 +407,9 @@
         searchResults = CreateMockSearchResults();
     }
 
-    private List<ContactRow> CreateMockSearchResults()
+    private List<PersonProfileRow> CreateMockSearchResults()
     {
-        return new List<ContactRow>
+        return new List<PersonProfileRow>
         {
             new() { Id = 1, Code = "PCN-00123-26", FirstName = "Abebe", MiddleName = "Kebede", LastName = "Tesfaye" },
             new() { Id = 2, Code = "PCN-00124-26", FirstName = "Sara", MiddleName = "Yohannes", LastName = "Girma" },
@@ -420,9 +419,9 @@
         };
     }
 
-    private ContactRow CreateBlankContact()
+    private PersonProfileRow CreateBlankContact()
     {
-        return new ContactRow
+        return new PersonProfileRow
         {
             Code = GenerateContactCode(),
             Gender = "Male",
@@ -528,7 +527,7 @@
 
     private void OnSearchRowClick(GridRowClickEventArgs e)
     {
-        var row = (ContactRow)searchGrid!.GetDataItem(e.VisibleIndex);
+        var row = (PersonProfileRow)searchGrid!.GetDataItem(e.VisibleIndex);
         if (editingId == row.Id)
         {
             NewContact();
@@ -545,12 +544,12 @@
         if (e.ElementType != GridElementType.DataRow || searchGrid == null)
             return;
 
-        var row = (ContactRow)searchGrid.GetDataItem(e.VisibleIndex);
+        var row = (PersonProfileRow)searchGrid.GetDataItem(e.VisibleIndex);
         if (editingId == row.Id)
             e.CssClass = "rt-row-selected";
     }
 
-    private static ContactRow CloneContact(ContactRow source) => new()
+    private static PersonProfileRow CloneContact(PersonProfileRow source) => new()
     {
         Id = source.Id,
         Code = source.Code,
@@ -588,7 +587,7 @@
         Note = source.Note,
     };
 
-    private static void CopyContact(ContactRow source, ContactRow target)
+    private static void CopyContact(PersonProfileRow source, PersonProfileRow target)
     {
         target.Code = source.Code;
         target.LastName = source.LastName;

@@ -4,7 +4,7 @@
 @using ERP.V7.WebPMS.Components.Pages.Registration
 @using ERP.V7.WebPMS.Components.Shared
 @using ERP.V7.WebPMS.Components.Pages.Profile.Guest
-@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 
 <PageTitle>Reservation - CNET ERP</PageTitle>
 
@@ -1209,7 +1209,7 @@
         if (g != null) title = g.Title;
     }
 
-    private void OnGuestSavedFromModal(GuestRow savedGuest)
+    private void OnGuestSavedFromModal(PersonProfileRow savedGuest)
     {
         if (savedGuest == null) return;
 

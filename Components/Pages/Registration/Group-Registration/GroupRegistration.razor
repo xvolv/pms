@@ -4,7 +4,7 @@
 @using ERP.V7.WebPMS.Components.Shared
 @using ERP.V7.WebPMS.Components.Pages.Profile.Company.Models
 @using ERP.V7.WebPMS.Components.Pages.Profile.Group.Models
-@using ERP.V7.WebPMS.Components.Pages.Profile.Guest.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @using ERP.V7.WebPMS.Components.Pages.Profile.Company
 @using ERP.V7.WebPMS.Components.Pages.Profile.Group
 @using ERP.V7.WebPMS.Components.Pages.Profile.Guest
@@ -870,7 +870,7 @@ CheckInReg.Rate)) return;
         ShowGroupModal = false;
     }
 
-    void HandleGuestSaved(GuestRow guest)
+    void HandleGuestSaved(PersonProfileRow guest)
     {
         // Create a GuestItem from the saved guest
         var newGuest = new GuestItem
