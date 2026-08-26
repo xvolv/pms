@@ -6,5 +6,4 @@ obj/
 appsettings.json
 ERP.V7.WebPMS.slnx
 .claude
-z/
-.vscode/
+vscode/
