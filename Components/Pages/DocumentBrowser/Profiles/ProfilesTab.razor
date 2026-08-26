@@ -3,22 +3,22 @@
 <div class="db-pr-tabs-wrapper">
     <DxTabs @bind-ActiveTabIndex="ActiveProfileTab" CssClass="db-pr-sub-tabs">
         <DxTabPage Text="Guest">
-            <GuestContactGrid IsGuest="true" ProfileType="Guest" />
+            <Profiles IsGuest="true" ProfileType="Guest" />
         </DxTabPage>
         <DxTabPage Text="Contact">
-            <GuestContactGrid IsGuest="false" ProfileType="Contact" />
+            <Profiles IsGuest="false" ProfileType="Contact" />
         </DxTabPage>
         <DxTabPage Text="Company">
-            <GuestContactGrid IsGuest="false" ProfileType="Company" />
+            <Profiles IsGuest="false" ProfileType="Company" />
         </DxTabPage>
         <DxTabPage Text="Travel Agent">
-            <GuestContactGrid IsGuest="false" ProfileType="TravelAgent" />
+            <Profiles IsGuest="false" ProfileType="TravelAgent" />
         </DxTabPage>
         <DxTabPage Text="Group">
-            <GuestContactGrid IsGuest="false" ProfileType="Group" />
+            <Profiles IsGuest="false" ProfileType="Group" />
         </DxTabPage>
         <DxTabPage Text="Source">
-            <GuestContactGrid IsGuest="false" ProfileType="Source" />
+            <Profiles IsGuest="false" ProfileType="Source" />
         </DxTabPage>
     </DxTabs>
 </div>

@@ -3,33 +3,56 @@
 <div class="transactions-tab">
     <DxTabs @bind-ActiveTabIndex="ActiveTxTab" CssClass="db-sub-tabs">
         <DxTabPage Text="Cash Receipt">
-            <CashReceiptLikeGrid Title="Cash Receipt" />
+            <Transactions Title="Cash Receipt" TransactionType="CashReceipt" />
         </DxTabPage>
         <DxTabPage Text="Credit Sales">
-            <CashReceiptLikeGrid Title="Credit Sales" />
+            <Transactions Title="Credit Sales" TransactionType="CreditSales" />
         </DxTabPage>
         <DxTabPage Text="Cash Sales">
-            <CashSalesGrid />
+            <Transactions Title="Cash Sales" TransactionType="CashSales" />
         </DxTabPage>
         <DxTabPage Text="Rebate">
-            <CashReceiptLikeGrid Title="Rebate" />
+            <Transactions Title="Rebate" TransactionType="Rebate" />
         </DxTabPage>
-        <!-- add the rest of the tabs the same way -->
-        <DxTabPage Text="Debit Note"><CashReceiptLikeGrid Title="Debit Note" /></DxTabPage>
-        <DxTabPage Text="Paid Out"><CashReceiptLikeGrid Title="Paid Out" /></DxTabPage>
-        <DxTabPage Text="Refund"><CashReceiptLikeGrid Title="Refund" /></DxTabPage>
-        <DxTabPage Text="Daily Room Charge"><CashReceiptLikeGrid Title="Daily Room Charge" /></DxTabPage>
-        <DxTabPage Text="Cash Sales Summary"><CashReceiptLikeGrid Title="Cash Sales Summary" /></DxTabPage>
-        <DxTabPage Text="Event Requirement"><CashReceiptLikeGrid Title="Event Requirement" /></DxTabPage>
-        <DxTabPage Text="Service Request"><CashReceiptLikeGrid Title="Service Request" /></DxTabPage>
-        <DxTabPage Text="Lost and Found"><CashReceiptLikeGrid Title="Lost and Found" /></DxTabPage>
-        <DxTabPage Text="Daily Resident Summary"><CashReceiptLikeGrid Title="Daily Resident Summary" /></DxTabPage>
-        <DxTabPage Text="Check Out"><CashReceiptLikeGrid Title="Check Out" /></DxTabPage>
-        <DxTabPage Text="Package Consumption"><CashReceiptLikeGrid Title="Package Consumption" /></DxTabPage>
-        <DxTabPage Text="Log Book"><CashReceiptLikeGrid Title="Log Book" /></DxTabPage>
+        <DxTabPage Text="Debit Note">
+            <Transactions Title="Debit Note" TransactionType="DebitNote" />
+        </DxTabPage>
+        <DxTabPage Text="Paid Out">
+            <Transactions Title="Paid Out" TransactionType="PaidOut" />
+        </DxTabPage>
+        <DxTabPage Text="Refund">
+            <Transactions Title="Refund" TransactionType="Refund" />
+        </DxTabPage>
+        <DxTabPage Text="Daily Room Charge">
+            <Transactions Title="Daily Room Charge" TransactionType="DailyRoomCharge" />
+        </DxTabPage>
+        <DxTabPage Text="Cash Sales Summary">
+            <Transactions Title="Cash Sales Summary" TransactionType="CashSalesSummary" />
+        </DxTabPage>
+        <DxTabPage Text="Event Requirement">
+            <Transactions Title="Event Requirement" TransactionType="EventRequirement" />
+        </DxTabPage>
+        <DxTabPage Text="Service Request">
+            <Transactions Title="Service Request" TransactionType="ServiceRequest" />
+        </DxTabPage>
+        <DxTabPage Text="Lost and Found">
+            <Transactions Title="Lost and Found" TransactionType="LostAndFound" />
+        </DxTabPage>
+        <DxTabPage Text="Daily Resident Summary">
+            <Transactions Title="Daily Resident Summary" TransactionType="DailyResidentSummary" />
+        </DxTabPage>
+        <DxTabPage Text="Check Out">
+            <Transactions Title="Check Out" TransactionType="CheckOut" />
+        </DxTabPage>
+        <DxTabPage Text="Package Consumption">
+            <Transactions Title="Package Consumption" TransactionType="PackageConsumption" />
+        </DxTabPage>
+        <DxTabPage Text="Log Book">
+            <Transactions Title="Log Book" TransactionType="LogBook" />
+        </DxTabPage>
     </DxTabs>
 </div>
 
 @code {
-    int ActiveTxTab = 2; // Cash Sales as example
+    int ActiveTxTab = 0; // Cash Receipt as default
 }
