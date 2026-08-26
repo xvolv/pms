@@ -1,0 +1,227 @@
+@page "/density-chart"
+@rendermode InteractiveServer
+@using ERP.V7.WebPMS.Components.Pages.DensityChart.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Density Chart</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Density Chart
+            <i class="bi bi-x fs-4" @onclick="ClosePage"
+               style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
+    </div>
+    <div class="dashboard-content dc-page-body">
+        <div class="rst-toolbar">
+            <button type="button" class="rt-toolbar-btn" @onclick="Show">
+                <i class="bi bi-eye text-secondary"></i>
+                <span>Show</span>
+            </button>
+
+            <div class="rst-filters">
+                <div class="rst-filter-row">
+                    <span class="tb-label" style="width: 65px;">Hotel</span>
+                    <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" />
+                </div>
+                <div class="rst-filter-row">
+                    <span class="tb-label" style="width: 65px;">Year</span>
+                    <DxComboBox Data="@years" @bind-Value="selectedYear" CssClass="rt-detail-input"
+                                style="width:90px;" />
+                    <span class="tb-label" style="width: 65px;">Month</span>
+                    <DxComboBox Data="@months" @bind-Value="selectedMonth" CssClass="rt-detail-input"
+                                style="width:130px;" />
+                </div>
+            </div>
+        </div>
+
+        <div class="dc-date-nav">
+            <button type="button" class="dc-nav-btn" @onclick="GoToPreviousRange">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button type="button" class="dc-nav-btn" @onclick="GoToNextRange">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <span class="dc-date-range-label">@DateRangeLabel</span>
+        </div>
+
+        <div class="dc-grid-wrap">
+            <table class="dc-table">
+                <colgroup>
+                    <col class="dc-sticky-col-def" />
+                    @foreach (DateTime day in VisibleDays)
+                    {
+                        <col class="dc-day-col-def" />
+                    }
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="dc-sticky-col" rowspan="2">Room Number</th>
+                        @foreach ((string Label, int DayCount) group in MonthGroups)
+                        {
+                            <th colspan="@group.DayCount">@group.Label</th>
+                        }
+                    </tr>
+                    <tr>
+                        @foreach (DateTime day in VisibleDays)
+                        {
+                            <th class="dc-day-col @(day == DateTime.Today ? "dc-today-col" : "")">
+                                <span class="dc-day-num">@day.Day</span>
+                                <span class="dc-day-dow">@day.ToString(format: "ddd")</span>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (string room in roomNumbers)
+                    {
+                        List<DateTime>? days = VisibleDays;
+                        <tr>
+                            <td class="dc-sticky-col">Room @room</td>
+                            @foreach (DensityRowSegment segment in BuildRowSegments(room))
+                            {
+                                IEnumerable<DateTime>? segmentDays = days.Skip(segment.StartDayIndex).Take(segment.Span);
+                                bool isToday = segmentDays.Any(d => d == DateTime.Today);
+                                @if (segment.Reservation is { } reservation)
+                                {
+                                    <td class="dc-cell dc-res-cell @(isToday ? "dc-today-col" : "")" colspan="@segment.Span">
+                                        <div class="dc-res-bar-wrap">
+                                            <div class="dc-res-bar">@reservation.GuestName</div>
+                                            <div class="dc-res-popup">
+                                                <div class="dc-res-popup-header">@reservation.GuestName</div>
+                                                <div class="dc-res-popup-row">
+                                                    <span class="dc-res-popup-label">Start:</span>
+                                                    @reservation.Start.ToString(format: "M/d/yyyy  h:mm tt")
+                                                </div>
+                                                <div class="dc-res-popup-row">
+                                                    <span class="dc-res-popup-label">End:</span>
+                                                    @reservation.End.ToString(format: "M/d/yyyy  h:mm tt")
+                                                </div>
+                                                <div class="dc-res-popup-row">
+                                                    <span class="dc-res-popup-label">Reminder:</span>
+                                                    @(string.IsNullOrWhiteSpace(reservation.Reminder) ? "None" :
+                                        reservation.Reminder)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="dc-cell @(isToday ? "dc-today-col" : "")"></td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private const int VisibleDayCount = 33;
+    private const int NavigationStepDays = 20;
+
+    private List<string> hotels = new List<string>() { "MAIN TEST HOTEL" };
+    private string? selectedHotel;
+
+    private List<int> years = Enumerable.Range(DateTime.Today.Year - 1, count: 4).ToList();
+    private int selectedYear = DateTime.Today.Year;
+
+    private List<string> months = new List<string>()
+    {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    };
+    private string? selectedMonth;
+
+    private List<string> roomNumbers = new List<string>() { "101", "102", "103", "104", "105", "106", "107","108", "109",
+"110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120" ,"200", "201", "202", "203", "204", "205",
+"206", "207", "208", "209",
+"210", "211", "212", "213", "214", "215", "216", "217", "218", "219", "220" ,"300", "301", "302", "303", "304", "305",
+"306", "307", "308", "309",
+"310", "311", "312", "313", "314", "315", "316", "317", "318", "319", "320" ,"400", "401", "402", "403", "404", "405",
+"406", "407", "408", "409",
+"410", "411", "412", "413", "414", "415", "416", "417", "418", "419", "420" };
+
+    private List<DensityReservation> reservations = new List<DensityReservation>()
+    {
+        new DensityReservation() { RoomNumber = "101", GuestName = "JANE DOE", Start = new DateTime(2026, 8, 19, 17, 15, 0), End
+= new DateTime(2026, 8, 20, 12, 0, 0) },
+        new DensityReservation() { RoomNumber = "102", GuestName = "JANE DOE", Start = new DateTime(2026, 8, 19, 14, 0, 0), End
+= new DateTime(2026, 8, 20, 12, 0, 0) },
+        new DensityReservation() { RoomNumber = "103", GuestName = "JANE DOE", Start = new DateTime(2026, 8, 19, 14, 0, 0), End
+= new DateTime(2026, 8, 20, 12, 0, 0) },
+        new DensityReservation() { RoomNumber = "104", GuestName = "JOHN SMITH", Start = new DateTime(2026, 8, 22, 15, 0, 0),
+End = new DateTime(2026, 8, 26, 12, 0, 0), Reminder = "Late checkout requested" },
+    };
+
+    private DateTime viewStartDate;
+
+    private List<DateTime> VisibleDays =>
+        Enumerable.Range(start: 0, VisibleDayCount).Select(i => viewStartDate.AddDays(i)).ToList();
+
+    private IEnumerable<(string Label, int DayCount)> MonthGroups =>
+        VisibleDays
+            .GroupBy(d => new { d.Year, d.Month })
+            .Select(g => (Label: g.First().ToString("MMMM"), DayCount: g.Count()));
+
+    private List<DensityRowSegment> BuildRowSegments(string room)
+    {
+        List<DateTime>? days = VisibleDays;
+        List<DensityReservation>? roomReservations = reservations.Where(r => r.RoomNumber == room).ToList();
+        List<DensityRowSegment>? segments = new List<DensityRowSegment>();
+        int i = 0;
+        while (i < days.Count)
+        {
+            DensityReservation? reservation = roomReservations.FirstOrDefault(r => r.Occupies(days[i]));
+            if (reservation is null)
+            {
+                segments.Add(new DensityRowSegment(i, 1, null));
+                i++;
+                continue;
+            }
+
+            int span = 0;
+            while (i + span < days.Count && reservation.Occupies(days[i + span]))
+                span++;
+            segments.Add(new DensityRowSegment(i, span, reservation));
+            i += span;
+        }
+        return segments;
+    }
+
+    private string DateRangeLabel
+    {
+        get
+        {
+            DateTime end = viewStartDate.AddDays(VisibleDayCount - 1);
+            return viewStartDate.Month == end.Month && viewStartDate.Year == end.Year
+                ? $"{viewStartDate:MMMM d} - {end:d, yyyy}"
+                : $"{viewStartDate:MMMM d} - {end:MMMM d, yyyy}";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        selectedHotel = hotels.FirstOrDefault();
+        selectedMonth = months[DateTime.Today.Month - 1];
+        Show();
+    }
+
+    public void Show()
+    {
+        int monthNumber = months.IndexOf(selectedMonth ?? "") + 1;
+        if (monthNumber < 1)
+            monthNumber = DateTime.Today.Month;
+        viewStartDate = new DateTime(selectedYear, monthNumber, day: 1);
+    }
+
+    private void GoToPreviousRange() => viewStartDate = viewStartDate.AddDays(-NavigationStepDays);
+
+    private void GoToNextRange() => viewStartDate = viewStartDate.AddDays(NavigationStepDays);
+
+    public void ClosePage() => NavigationManager.NavigateTo(uri: "/dashboard");
+}
