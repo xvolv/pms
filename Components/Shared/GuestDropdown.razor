@@ -1,0 +1,252 @@
+@using DevExpress.Blazor
+
+<div class="guest-dropdown-wrapper">
+    <label>Guests</label>
+    <div class="lookup-field">
+        <DxTextBox @bind-Text="SelectedGuestDisplay" ReadOnly="true"
+                   CssClass="erp-combobox lookup-input" NullText="" />
+        <button type="button" class="lookup-toggle-btn" @onclick="ToggleGuestPopup">▾</button>
+
+        @if (ShowGuestPopup)
+        {
+            <div class="global-dropdown-popup global-dropdown-popup-wide">
+            <div class="global-dropdown-body">
+                <div class="global-dropdown-search-row">
+                    <input class="global-dropdown-search-input"
+                           @bind="GuestPopupFilter" @bind:event="oninput" />
+                    <button type="button" class="global-dropdown-find-btn" @onclick="FindGuest">Find</button>
+                </div>
+                <table class="global-dropdown-table">
+                    <thead>
+                        <tr>
+                            <th>Registration</th>
+                            <th>Guest</th>
+                            <th>Room Type</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!FilteredGuestData.Any())
+                        {
+                            <tr><td colspan="4" class="global-text-muted">No records</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var row in FilteredGuestData)
+                            {
+                                <tr @onclick="() => SelectGuest(row)">
+                                    <td>@row.Registration</td>
+                                    <td>@row.Guest</td>
+                                    <td>@row.RoomType</td>
+                                    <td>@row.Room</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="global-dropdown-clear-row">
+                <button type="button" class="global-dropdown-clear-btn" @onclick="ClearGuest">Clear</button>
+            </div>
+            <div class="global-dropdown-footer-bar">
+                <i class="bi bi-x-lg" @onclick="() => ShowGuestPopup = false"></i>
+                <i class="bi bi-grip-horizontal global-dropdown-resize-handle"></i>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? SelectedGuestDisplay { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> SelectedGuestDisplayChanged { get; set; }
+
+    [Parameter]
+    public string? SelectedGuestCode { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> SelectedGuestCodeChanged { get; set; }
+
+    [Parameter]
+    public List<GuestLookupModel>? GuestData { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = "";
+
+    private bool ShowGuestPopup;
+    private string GuestPopupFilter = "";
+
+    private List<GuestLookupModel> GuestLookupData => GuestData ?? new List<GuestLookupModel>();
+
+    private IEnumerable<GuestLookupModel> FilteredGuestData =>
+        string.IsNullOrWhiteSpace(GuestPopupFilter)
+            ? GuestLookupData
+            : GuestLookupData.Where(r =>
+                r.Registration.Contains(GuestPopupFilter, StringComparison.OrdinalIgnoreCase) ||
+                r.Guest.Contains(GuestPopupFilter, StringComparison.OrdinalIgnoreCase) ||
+                r.RoomType.Contains(GuestPopupFilter, StringComparison.OrdinalIgnoreCase) ||
+                r.Room.Contains(GuestPopupFilter, StringComparison.OrdinalIgnoreCase));
+
+    void ToggleGuestPopup()
+    {
+        ShowGuestPopup = !ShowGuestPopup;
+    }
+
+    void FindGuest() { /* already filtered live */ }
+
+    async Task SelectGuest(GuestLookupModel row)
+    {
+        SelectedGuestCode = row.Registration;
+        SelectedGuestDisplay = $"{row.Guest} ({row.Room})";
+        await SelectedGuestCodeChanged.InvokeAsync(SelectedGuestCode);
+        await SelectedGuestDisplayChanged.InvokeAsync(SelectedGuestDisplay);
+        ShowGuestPopup = false;
+    }
+
+    async Task ClearGuest()
+    {
+        SelectedGuestCode = null;
+        SelectedGuestDisplay = null;
+        GuestPopupFilter = string.Empty;
+        await SelectedGuestCodeChanged.InvokeAsync(null);
+        await SelectedGuestDisplayChanged.InvokeAsync(null);
+    }
+
+    public class GuestLookupModel
+    {
+        public string Registration { get; set; } = "";
+        public string Guest { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string Room { get; set; } = "";
+    }
+}
+
+<style>
+    .guest-dropdown-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .guest-dropdown-wrapper label {
+        font-size: 12px;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .global-dropdown-anchor {
+        position: relative;
+    }
+
+    .global-dropdown-popup {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #888;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        width: 420px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .global-dropdown-popup-wide {
+        width: 560px;
+    }
+
+    .global-dropdown-body {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .global-dropdown-search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .global-dropdown-search-input {
+        flex: 1;
+        border: 1px solid #999;
+        padding: 3px 5px;
+        font-size: 13px;
+    }
+
+    .global-dropdown-find-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .global-dropdown-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .global-dropdown-table th {
+        text-align: left;
+        border-bottom: 1px solid #ccc;
+        padding: 4px 6px;
+        background: #f8f8f8;
+    }
+
+    .global-dropdown-table td {
+        padding: 4px 6px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+
+    .global-dropdown-table tr:hover td {
+        background: #f0f4fa;
+    }
+
+    .global-dropdown-clear-row {
+        border-top: 1px solid #ccc;
+        padding: 6px 8px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .global-dropdown-clear-btn {
+        border: 1px solid #888;
+        background: #fff;
+        padding: 3px 16px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .global-dropdown-footer-bar {
+        background: #ececec;
+        border-top: 1px solid #ccc;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 6px;
+    }
+
+    .global-dropdown-footer-bar i {
+        color: #555;
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+    .global-dropdown-resize-handle {
+        transform: rotate(45deg);
+    }
+
+    .global-text-muted {
+        color: #888;
+        font-style: italic;
+        text-align: center;
+        padding: 12px;
+    }
+</style>
