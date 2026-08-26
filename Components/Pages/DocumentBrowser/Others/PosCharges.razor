@@ -1,0 +1,138 @@
+@using DevExpress.Blazor
+
+<div class="rst-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="OnShow">
+        <i class="bi bi-eye text-secondary"></i>
+        <span>Show</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnTransfer">
+        <i class="bi bi-arrow-left-right text-secondary"></i>
+        <span>Transfer</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnRemove">
+        <i class="bi bi-eraser text-secondary"></i>
+        <span>Remove</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnPrint">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+
+    <div class="rst-filters rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 45px;">Date</span>
+            <DxDateEdit @bind-Date="SelectedDate" CssClass="rt-detail-input" style="width:130px;" />
+        </div>
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 45px;">Hotel</span>
+            <DxComboBox Data="@Hotels" @bind-Value="SelectedHotel" CssClass="rt-detail-input" style="width:170px;" />
+        </div>
+    </div>
+</div>
+
+<div class="rt-grid-area">
+    <div class="ri-table-wrap">
+        <table class="ri-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Registration</th>
+                    <th>Voucher Code</th>
+                    <th>Guest</th>
+                    <th>Room Type</th>
+                    <th>Room</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Data.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7"><div class="rt-placeholder">No data to display</div></td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var row in Data)
+                    {
+                        <tr class="@(SelectedItem == row ? "rt-row-selected" : "")" @onclick="() => SelectedItem = row">
+                            <td>@row.SN</td>
+                            <td>@row.Registration</td>
+                            <td>@row.VoucherCode</td>
+                            <td>@row.Guest</td>
+                            <td>@row.RoomType</td>
+                            <td>@row.Room</td>
+                            <td>@row.Amount.ToString("n2")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="rt-footer" style="text-align: right;">
+        SUM = @(Data.Count == 0 ? "" : Sum.ToString("n2"))
+    </div>
+</div>
+
+@code {
+    // ============================================================
+    // Toolbar fields
+    // ============================================================
+    DateTime SelectedDate = DateTime.Today;
+    List<string> Hotels = new() { "MAIN TEST HOTEL" };
+    string? SelectedHotel;
+
+    // ============================================================
+    // Grid Data
+    // ============================================================
+    List<PosChargeModel> Data = new();
+    PosChargeModel? SelectedItem;
+
+    decimal Sum => Data.Sum(d => d.Amount);
+
+    // ============================================================
+    // Lifecycle
+    // ============================================================
+    protected override void OnInitialized()
+    {
+        SelectedHotel = Hotels.FirstOrDefault();
+    }
+
+    // ============================================================
+    // Actions
+    // ============================================================
+    void OnShow()
+    {
+        // TODO: call your real service using SelectedHotel and SelectedDate
+        Data = new List<PosChargeModel>();
+    }
+
+    void OnTransfer()
+    {
+        // TODO: transfer SelectedItem to another folio
+    }
+
+    void OnRemove()
+    {
+        // TODO: remove SelectedItem
+    }
+
+    void OnPrint()
+    {
+        // TODO: print logic
+    }
+
+    // ============================================================
+    // Models
+    // ============================================================
+    public class PosChargeModel
+    {
+        public int SN { get; set; }
+        public string Registration { get; set; } = "";
+        public string VoucherCode { get; set; } = "";
+        public string Guest { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string Room { get; set; } = "";
+        public decimal Amount { get; set; }
+    }
+}

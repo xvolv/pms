@@ -1,0 +1,133 @@
+@using DevExpress.Blazor
+
+<div class="rst-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="OnShow">
+        <i class="bi bi-eye text-secondary"></i>
+        <span>Show</span>
+    </button>
+
+    <div class="rst-filters rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 60px;">Date</span>
+            <DxDateEdit @bind-Date="SelectedDate" CssClass="rt-detail-input" style="width:130px;" />
+        </div>
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 60px;">Package</span>
+            <DxComboBox Data="@Packages" @bind-Value="SelectedPackage" CssClass="rt-detail-input" style="width:170px;" />
+        </div>
+    </div>
+
+    <div class="rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 45px;">Hotel</span>
+            <DxComboBox Data="@Hotels" @bind-Value="SelectedHotel" CssClass="rt-detail-input" style="width:170px;" />
+        </div>
+    </div>
+
+    <button type="button" class="rt-toolbar-btn" @onclick="OnClearFilter">
+        <i class="bi bi-x-circle text-secondary"></i>
+        <span>Clear Filter</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnPrint">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+</div>
+
+<div class="rt-grid-area">
+    <div class="ri-table-wrap">
+        <table class="ri-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Code</th>
+                    <th>Package</th>
+                    <th>Room Type</th>
+                    <th>Room</th>
+                    <th>Reg. No</th>
+                    <th>Guest</th>
+                    <th># of Adult</th>
+                    <th># of Child</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Data.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10"><div class="rt-placeholder">No data to display</div></td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var row in Data)
+                    {
+                        <tr class="@(SelectedItem == row ? "rt-row-selected" : "")" @onclick="() => SelectedItem = row">
+                            <td>@row.SN</td>
+                            <td>@row.Code</td>
+                            <td>@row.Package</td>
+                            <td>@row.RoomType</td>
+                            <td>@row.Room</td>
+                            <td>@row.RegNo</td>
+                            <td>@row.Guest</td>
+                            <td>@row.NoOfAdult</td>
+                            <td>@row.NoOfChild</td>
+                            <td>@row.Amount.ToString("n2")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="rt-footer" style="text-align: right;">
+        SUM = @(Data.Count == 0 ? "" : Sum.ToString("n2"))
+    </div>
+</div>
+
+@code {
+    DateTime SelectedDate = DateTime.Today;
+    List<string> Packages = new();
+    string? SelectedPackage;
+    List<string> Hotels = new() { "MAIN TEST HOTEL" };
+    string? SelectedHotel;
+    List<PackageAuditRowModel> Data = new();
+    PackageAuditRowModel? SelectedItem;
+
+    decimal Sum => Data.Sum( d => d.Amount);
+
+
+    protected override void OnInitialized()
+    {
+        SelectedHotel = Hotels.FirstOrDefault();
+    }
+
+
+    void OnShow()
+    {
+        Data = new List<PackageAuditRowModel>();
+    }
+
+    void OnClearFilter()
+    {
+        SelectedPackage = null;
+        SelectedDate = DateTime.Today;
+    }
+
+    void OnPrint()
+    {
+    }
+
+    public class PackageAuditRowModel
+    {
+        public int SN { get; set; }
+        public string Code { get; set; } = "";
+        public string Package { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string Room { get; set; } = "";
+        public string RegNo { get; set; } = "";
+        public string Guest { get; set; } = "";
+        public int NoOfAdult { get; set; }
+        public int NoOfChild { get; set; }
+        public decimal Amount { get; set; }
+    }
+}

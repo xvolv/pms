@@ -3,57 +3,58 @@
 <div class="guest-dropdown-wrapper">
     <label>Guests</label>
     <div class="lookup-field">
-        <DxTextBox @bind-Text="SelectedGuestDisplay" ReadOnly="true"
-                   CssClass="erp-combobox lookup-input" NullText="" />
+        <DxTextBox @bind-Text="SelectedGuestDisplay" ReadOnly="true" CssClass="erp-combobox lookup-input" NullText="" />
         <button type="button" class="lookup-toggle-btn" @onclick="ToggleGuestPopup">▾</button>
 
         @if (ShowGuestPopup)
         {
             <div class="global-dropdown-popup global-dropdown-popup-wide">
-            <div class="global-dropdown-body">
-                <div class="global-dropdown-search-row">
-                    <input class="global-dropdown-search-input"
-                           @bind="GuestPopupFilter" @bind:event="oninput" />
-                    <button type="button" class="global-dropdown-find-btn" @onclick="FindGuest">Find</button>
-                </div>
-                <table class="global-dropdown-table">
-                    <thead>
-                        <tr>
-                            <th>Registration</th>
-                            <th>Guest</th>
-                            <th>Room Type</th>
-                            <th>Room</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!FilteredGuestData.Any())
-                        {
-                            <tr><td colspan="4" class="global-text-muted">No records</td></tr>
-                        }
-                        else
-                        {
-                            @foreach (var row in FilteredGuestData)
+                <div class="global-dropdown-body">
+                    <div class="global-dropdown-search-row">
+                        <input class="global-dropdown-search-input" @bind="GuestPopupFilter" @bind:event="oninput" />
+                        <button type="button" class="global-dropdown-find-btn" @onclick="FindGuest">Find</button>
+                    </div>
+                    <table class="global-dropdown-table">
+                        <thead>
+                            <tr>
+                                <th>Registration</th>
+                                <th>Guest</th>
+                                <th>Room Type</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!FilteredGuestData.Any())
                             {
-                                <tr @onclick="() => SelectGuest(row)">
-                                    <td>@row.Registration</td>
-                                    <td>@row.Guest</td>
-                                    <td>@row.RoomType</td>
-                                    <td>@row.Room</td>
+                                <tr>
+                                    <td colspan="4" class="global-text-muted">No records</td>
                                 </tr>
                             }
-                        }
-                    </tbody>
-                </table>
+                            else
+                            {
+                                @foreach (var row in FilteredGuestData)
+                                {
+                                    <tr @onclick="() => SelectGuest(row)">
+                                        <td>@row.Registration</td>
+                                        <td>@row.Guest</td>
+                                        <td>@row.RoomType</td>
+                                        <td>@row.Room</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="global-dropdown-clear-row">
+                    <button type="button" class="global-dropdown-clear-btn" @onclick="ClearGuest">Clear</button>
+                </div>
+                <div class="global-dropdown-footer-bar">
+                    <i class="bi bi-x-lg" @onclick="() => ShowGuestPopup = false"></i>
+                    <i class="bi bi-grip-horizontal global-dropdown-resize-handle"></i>
+                </div>
             </div>
-            <div class="global-dropdown-clear-row">
-                <button type="button" class="global-dropdown-clear-btn" @onclick="ClearGuest">Clear</button>
-            </div>
-            <div class="global-dropdown-footer-bar">
-                <i class="bi bi-x-lg" @onclick="() => ShowGuestPopup = false"></i>
-                <i class="bi bi-grip-horizontal global-dropdown-resize-handle"></i>
-            </div>
-        </div>
-    }
+        }
+    </div>
 </div>
 
 @code {
@@ -148,7 +149,7 @@
         z-index: 1000;
         background: #fff;
         border: 1px solid #888;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
         width: 420px;
         display: flex;
         flex-direction: column;
