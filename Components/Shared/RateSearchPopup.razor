@@ -6,7 +6,9 @@
          CloseOnOutsideClick="false"
          ShowCloseButton="true"
          CssClass="rate-search-popup">
+
     <BodyContentTemplate>
+
         <div class="rate-search-modal-body">
 
             <!-- ================= RIBBON TOOLBAR ================= -->
@@ -15,130 +17,242 @@
                 <!-- Select -->
                 <div class="ribbon-group ribbon-group-select">
                     <div class="ribbon-group-body">
-                        <button type="button" class="ribbon-iconbtn" @onclick="OnSelect">
-                            <span class="ribbon-glyph ribbon-glyph-check"><i class="bi bi-check-lg"></i></span>
+                        <button type="button"
+                                class="ribbon-iconbtn"
+                                @onclick="OnSelect">
+                            <span class="ribbon-glyph ribbon-glyph-check">
+                                <i class="bi bi-check-lg"></i>
+                            </span>
                         </button>
                     </div>
-                    <div class="ribbon-group-caption">Select</div>
+
+                    <div class="ribbon-group-caption">
+                        Select
+                    </div>
                 </div>
 
                 <div class="ribbon-sep"></div>
 
                 <!-- Date -->
                 <div class="ribbon-group ribbon-group-date">
+
                     <div class="ribbon-group-body ribbon-group-body-stack">
+
                         <div class="ribbon-field-row">
                             <label>Start Date</label>
-                            <DxDateEdit @bind-Date="StartDate" Width="112px" SizeMode="SizeMode.Small" />
+
+                            <DxDateEdit @bind-Date="StartDate"
+                                        Width="112px"
+                                        SizeMode="SizeMode.Small" />
                         </div>
+
                         <div class="ribbon-field-row">
                             <label>End Date</label>
-                            <DxDateEdit @bind-Date="EndDate" Width="112px" SizeMode="SizeMode.Small" />
+
+                            <DxDateEdit @bind-Date="EndDate"
+                                        Width="112px"
+                                        SizeMode="SizeMode.Small" />
                         </div>
+
                     </div>
-                    <div class="ribbon-group-caption">Date</div>
+
+                    <div class="ribbon-group-caption">
+                        Date
+                    </div>
                 </div>
 
                 <div class="ribbon-sep"></div>
 
                 <!-- Rate Search Key -->
                 <div class="ribbon-group ribbon-group-key">
+
                     <div class="ribbon-group-body ribbon-group-body-inline">
+
                         <div class="ribbon-side-label">
-                            <span class="ribbon-glyph ribbon-glyph-bulb"><i class="bi bi-lightbulb"></i></span>
+
+                            <span class="ribbon-glyph ribbon-glyph-bulb">
+                                <i class="bi bi-lightbulb"></i>
+                            </span>
+
                             <span>Rate</span>
+
                         </div>
+
                         <div class="ribbon-key-content">
+
                             <div class="ribbon-radio-group">
+
                                 <label>
-                                    <input type="radio" name="rateType"
+                                    <input type="radio"
+                                           name="rateType"
                                            checked="@(SearchType == "Average")"
                                            @onchange="@(() => SearchType = "Average")" />
+
                                     <span>Average Rate</span>
                                 </label>
+
                                 <label>
-                                    <input type="radio" name="rateType"
+                                    <input type="radio"
+                                           name="rateType"
                                            checked="@(SearchType == "Total")"
                                            @onchange="@(() => SearchType = "Total")" />
+
                                     <span>Total Rate</span>
                                 </label>
+
                             </div>
+
                             <div class="ribbon-field-row">
+
                                 <label>Rate Code</label>
-                                <DxTextBox @bind-Text="RateCode" Width="90px" SizeMode="SizeMode.Small" />
+
+                                <DxTextBox @bind-Text="RateCode"
+                                           Width="90px"
+                                           SizeMode="SizeMode.Small" />
+
                             </div>
+
                         </div>
+
                     </div>
-                    <div class="ribbon-group-caption">Rate Search Key</div>
+
+                    <div class="ribbon-group-caption">
+                        Rate Search Key
+                    </div>
+
                 </div>
 
                 <div class="ribbon-sep"></div>
 
                 <!-- Status -->
                 <div class="ribbon-group ribbon-group-status">
+
                     <div class="ribbon-group-body ribbon-group-body-inline">
+
                         <div class="ribbon-side-label">
-                            <span class="ribbon-glyph ribbon-glyph-flag"><i class="bi bi-flag-fill"></i></span>
+
+                            <span class="ribbon-glyph ribbon-glyph-flag">
+                                <i class="bi bi-flag-fill"></i>
+                            </span>
+
                             <span>Status</span>
+
                         </div>
+
                         <div class="ribbon-radio-group">
+
                             <label>
-                                <input type="radio" name="rateStatus"
+                                <input type="radio"
+                                       name="rateStatus"
                                        checked="@(Status == "Closed")"
                                        @onchange="@(() => Status = "Closed")" />
+
                                 <span>Closed</span>
                             </label>
+
                             <label>
-                                <input type="radio" name="rateStatus"
+                                <input type="radio"
+                                       name="rateStatus"
                                        checked="@(Status == "Negotiated")"
                                        @onchange="@(() => Status = "Negotiated")" />
+
                                 <span>Negotiated</span>
                             </label>
+
                             <label>
-                                <input type="radio" name="rateStatus"
+                                <input type="radio"
+                                       name="rateStatus"
                                        checked="@(Status == "DayUse")"
                                        @onchange="@(() => Status = "DayUse")" />
+
                                 <span>Day Use</span>
                             </label>
+
                         </div>
+
                     </div>
-                    <div class="ribbon-group-caption">Status</div>
+
+                    <div class="ribbon-group-caption">
+                        Status
+                    </div>
+
                 </div>
 
                 <!-- Search -->
                 <div class="ribbon-group ribbon-group-search">
+
                     <div class="ribbon-group-body">
-                        <button type="button" class="ribbon-iconbtn" @onclick="OnSearch">
-                            <span class="ribbon-glyph ribbon-glyph-search"><i class="bi bi-search"></i></span>
+
+                        <button type="button"
+                                class="ribbon-iconbtn"
+                                @onclick="OnSearch">
+
+                            <span class="ribbon-glyph ribbon-glyph-search">
+                                <i class="bi bi-search"></i>
+                            </span>
+
                         </button>
+
                     </div>
-                    <div class="ribbon-group-caption">Search</div>
+
+                    <div class="ribbon-group-caption">
+                        Search
+                    </div>
+
                 </div>
 
                 <!-- Rate Info -->
                 <div class="ribbon-group ribbon-group-rateinfo">
+
                     <div class="ribbon-group-body">
-                        <button type="button" class="ribbon-iconbtn" @onclick="OnRateInfo">
-                            <span class="ribbon-glyph "><i class="bi bi-percent text-secondary"></i></span>
+
+                        <button type="button"
+                                class="ribbon-iconbtn"
+                                @onclick="OnRateInfo">
+
+                            <span class="ribbon-glyph">
+                                <i class="bi bi-percent text-secondary"></i>
+                            </span>
+
                         </button>
+
                     </div>
-                    <div class="ribbon-group-caption">Rate Info</div>
+
+                    <div class="ribbon-group-caption">
+                        Rate Info
+                    </div>
+
                 </div>
 
                 <!-- Close -->
                 <div class="ribbon-group ribbon-group-close">
+
                     <div class="ribbon-group-body">
-                        <div  class="ribbon-iconbtn" @onclick="ClosePopup">
-                            <span class="ribbon-glyph "><i class="bi bi-x-circle"></i></span>
+
+                        <div class="ribbon-iconbtn"
+                             @onclick="ClosePopup">
+
+                            <span class="ribbon-glyph">
+                                <i class="bi bi-x-circle"></i>
+                            </span>
+
                         </div>
+
                     </div>
-                    <div class="ribbon-group-caption">&nbsp;</div>
+
+                    <div class="ribbon-group-caption">
+                        &nbsp;
+                    </div>
+
                 </div>
 
             </div>
 
+
             <!-- ================= GRID ================= -->
+
             <div class="rate-search-grid-container">
+
                 <DxGrid Data="@RateSearchRows"
                         KeyFieldName="Name"
                         PageSize="10"
@@ -149,34 +263,52 @@
                         CustomizeElement="OnCustomizeElement"
                         CssClass="rate-search-grid"
                         Width="100%">
+
                     <Columns>
+
+                        <!-- NAME -->
                         <DxGridDataColumn FieldName="Name"
                                           Caption="Name"
                                           Width="30%" />
+
+                        <!-- STANDARD -->
                         <DxGridDataColumn FieldName="StandardRoom"
-                                          Caption="Standard Room"
-                                          Width="25%" />
+                                          Caption="Standard"
+                                          Width="35%" />
+
+                        <!-- DELUX -->
                         <DxGridDataColumn FieldName="Executive"
-                                          Caption="Executive"
-                                          Width="25%" />
-                        <DxGridDataColumn FieldName="PseudoRooms"
-                                          Caption="Pseudo Rooms"
-                                          Width="20%" />
+                                          Caption="Delux"
+                                          Width="35%" />
+
                     </Columns>
+
                 </DxGrid>
+
             </div>
 
+
             <!-- ================= BOTTOM BAR ================= -->
+
             <div class="rate-search-bottom-bar"></div>
 
         </div>
+
     </BodyContentTemplate>
+
 </DxPopup>
 
+
 <style>
+
+    /* ================================================================
+       POPUP
+       ================================================================ */
+
     .rate-search-popup {
         font-family: "Segoe UI", Tahoma, Arial, sans-serif;
     }
+
 
     .rate-search-popup .dxbl-popup {
         border: 1px solid #aeb4bb !important;
@@ -185,241 +317,389 @@
         overflow: hidden;
     }
 
+
     .rate-search-popup .dxbl-popup-header {
         height: 42px;
         min-height: 42px;
         padding: 7px 10px !important;
+
         background: #ffffff !important;
+
         border-bottom: 1px solid #bfc4c9 !important;
+
         color: #1596d1 !important;
+
         font-weight: 500 !important;
+
         display: flex;
         align-items: center;
     }
+
 
     .rate-search-popup .dxbl-popup-header::before {
         content: "✱";
+
         color: #e60000;
+
         font-weight: bold;
+
         margin-right: 5px;
     }
 
+
     .rate-search-popup .dxbl-popup-content {
         padding: 0 !important;
+
         background: #ffffff !important;
+
         overflow: hidden !important;
     }
 
+
+    /* ================================================================
+       MAIN BODY
+       ================================================================ */
+
     .rate-search-modal-body {
         display: flex;
+
         flex-direction: column;
+
         height: 500px;
+
         min-height: 400px;
+
         max-height: 70vh;
+
         background: #ffffff;
+
         overflow: hidden;
     }
 
-    /* ----------------------------------------------------------------
-       RIBBON TOOLBAR (matches classic CNET rate-search ribbon)
-       ---------------------------------------------------------------- */
+
+    /* ================================================================
+       RIBBON TOOLBAR
+       ================================================================ */
 
     .ribbon-toolbar {
         display: flex;
+
         align-items: stretch;
+
         width: 100%;
+
         background: #ffffff;
+
         border-bottom: 2px solid #c8c8c8;
+
         overflow-x: auto;
+
         overflow-y: hidden;
+
         padding: 4px 6px 0;
+
         flex-shrink: 0;
+
         min-height: 82px;
     }
 
+
     .ribbon-group {
         display: flex;
+
         flex-direction: column;
+
         flex-shrink: 0;
+
         min-width: 62px;
     }
 
+
     .ribbon-group-body {
         display: flex;
+
         align-items: center;
+
         justify-content: center;
 
         flex: 1;
+
         min-height: 66px;
+
         padding: 4px 10px;
+
         border: 1px lightgray solid;
     }
 
+
     .ribbon-group-body-stack {
         flex-direction: column;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 3px;
 
+        justify-content: center;
+
+        align-items: flex-end;
+
+        gap: 3px;
     }
+
 
     .ribbon-group-body-inline {
         gap: 10px;
+
         justify-content: flex-start;
+
         align-items: center;
     }
+
 
     .ribbon-side-label {
         display: flex;
+
         flex-direction: column;
+
         align-items: center;
+
         justify-content: center;
+
         gap: 2px;
+
         flex-shrink: 0;
+
         min-width: 36px;
+
         text-align: center;
+
         color: #333;
+
         font-size: 12px;
+
         line-height: 1.2;
     }
 
+
     .ribbon-side-label .ribbon-glyph {
         display: flex;
+
         align-items: center;
+
         justify-content: start;
     }
 
+
     .ribbon-group-caption {
         text-align: center;
+
         color: #444;
+
         padding: 2px 4px 4px;
+
         white-space: nowrap;
     }
 
+
     .ribbon-sep {
         width: 0;
+
         border-left: 1px solid #d5d5d5;
+
         margin: 4px 8px 0;
+
         flex-shrink: 0;
     }
 
+
+    /* ================================================================
+       RIBBON BUTTON
+       ================================================================ */
+
     .ribbon-iconbtn {
         background: transparent;
+
         border: 1px solid transparent;
+
         border-radius: 3px;
+
         width: 46px;
+
         height: 46px;
+
         font-size: 28px;
+
         display: flex;
+
         align-items: center;
+
         justify-content: center;
+
         cursor: pointer;
     }
 
+
     .ribbon-glyph {
         line-height: 1;
+
         display: inline-flex;
+
         align-items: center;
+
         justify-content: center;
     }
 
+
     .ribbon-glyph i {
         font-size: 28px;
+
         line-height: 28px;
+
         font-weight: 500;
+
         color: #555;
     }
 
+
     .ribbon-glyph-check {
         width: 34px;
+
         height: 34px;
+
         border-radius: 50%;
+
         border: 2px solid #b9bec4;
+
         color: #b9bec4;
+
         font-size: 18px;
     }
 
+
     .ribbon-glyph-search {
         color: #666;
+
         font-size: 22px;
     }
+
 
     .ribbon-glyph-bulb,
     .ribbon-glyph-flag {
         font-size: 20px;
+
         flex-shrink: 0;
     }
+
 
     .ribbon-glyph-bulb {
         color: #f5b400;
     }
 
+
     .ribbon-glyph-flag {
         color: #2e7d32;
     }
 
+
+    /* ================================================================
+       RATE SEARCH KEY
+       ================================================================ */
+
     .ribbon-key-content {
         display: flex;
+
         flex-direction: column;
+
         gap: 4px;
     }
+
 
     .ribbon-field-row {
         display: flex;
+
         align-items: center;
+
         gap: 6px;
     }
 
+
     .ribbon-field-row label {
         color: #333;
+
         white-space: nowrap;
+
         min-width: 60px;
+
         margin: 0;
+
         text-align: left;
     }
 
+
     .ribbon-radio-group {
         display: flex;
+
         flex-direction: column;
+
         gap: 4px;
+
         padding: 8px;
+
         border: 1px lightgray solid;
     }
 
+
     .ribbon-radio-group label {
         display: flex;
+
         align-items: center;
+
         gap: 5px;
+
         height: 17px;
+
         margin: 0;
+
         color: #333;
+
         white-space: nowrap;
+
         cursor: pointer;
     }
 
+
     .ribbon-radio-group input[type="radio"] {
         width: 13px;
+
         height: 13px;
+
         margin: 0;
+
         accent-color: #1976b9;
+
         cursor: pointer;
     }
+
 
     .ribbon-group-key .ribbon-group-body {
         min-width: 190px;
     }
 
+
     .ribbon-group-status .ribbon-group-body {
         min-width: 110px;
     }
+
 
     .ribbon-group-close {
         margin-left: auto;
     }
 
+
     .ribbon-group-select .ribbon-group-caption {
         color: #b9bec4;
     }
+
+
+    /* ================================================================
+       DEVEXPRESS INPUTS
+       ================================================================ */
 
     .rate-search-popup .dxbl-text-edit,
     .rate-search-popup .dxbl-combobox,
@@ -427,171 +707,263 @@
         border-radius: 0 !important;
     }
 
+
+    /* ================================================================
+       GRID CONTAINER
+       ================================================================ */
+
     .rate-search-grid-container {
         flex: 1;
+
         min-height: 0;
+
         width: 100%;
+
         overflow: hidden;
+
         padding: 8px;
+
         background: #ffffff;
+
         display: flex;
+
         flex-direction: column;
     }
 
+
+    /* ================================================================
+       GRID
+       ================================================================ */
+
     .rate-search-grid {
         width: 100%;
+
         height: 100%;
+
         border: 1px solid #bfc4c9;
+
         flex: 1;
+
         min-height: 0;
     }
+
 
     .rate-search-grid .dxbl-grid-header-row {
         background: #eeeeee !important;
     }
 
+
     .rate-search-grid .dxbl-grid-header-cell {
         background: #eeeeee !important;
+
         color: #222 !important;
+
         font-weight: 600 !important;
+
         border-right: 1px solid #c8c8c8 !important;
+
         border-bottom: 1px solid #b7b7b7 !important;
+
         padding: 4px 6px !important;
+
         width: 100% !important;
     }
+
 
     .rate-search-grid .dxbl-grid-data-cell {
         padding: 3px 6px !important;
+
         height: 22px;
+
         border-right: 1px solid #d0d0d0 !important;
+
         border-bottom: 1px solid #dedede !important;
+
         width: 100% !important;
     }
 
+
     .rate-search-grid .dxbl-grid {
         width: 100% !important;
+
         table-layout: fixed !important;
     }
+
 
     .rate-search-grid table {
         width: 100% !important;
     }
 
+
+    /* ================================================================
+       ROW COLORS
+       ================================================================ */
+
     .rate-search-grid .dxbl-grid-data-row:nth-child(even) {
         background: #eeeeee;
     }
+
 
     .rate-search-grid .dxbl-grid-data-row:nth-child(odd) {
         background: #ffffff;
     }
 
+
     .rate-search-grid .dxbl-grid-data-row:hover td {
         background: #dceaf7 !important;
     }
+
+
+    /* ================================================================
+       SELECTED ROW
+       ================================================================ */
 
     .rate-search-grid .rate-row-selected,
     .rate-search-grid .rate-row-selected td,
     .rate-row-selected,
     .rate-row-selected td {
         background: #0878c9 !important;
+
         color: #ffffff !important;
     }
 
+
+    /* ================================================================
+       BOTTOM BAR
+       ================================================================ */
+
     .rate-search-bottom-bar {
         height: 38px;
+
         margin-top: 8px;
+
         background: #f1eeee;
+
         border-top: 1px solid #c8c8c8;
+
         flex-shrink: 0;
     }
 
+
     /* ================================================================
-       RATE SEARCH RESPONSIVE RULES
+       RESPONSIVE
        ================================================================ */
 
     @@media (max-width: 850px) {
+
         .ribbon-toolbar {
             overflow-x: auto;
         }
+
 
         .rate-search-grid-container {
             overflow-x: auto;
         }
 
+
         .rate-search-modal-body {
             height: 450px;
+
             min-height: 350px;
         }
+
     }
 
+
     @@media (max-width: 600px) {
+
         .rate-search-popup {
             width: 96vw !important;
         }
+
 
         .ribbon-toolbar {
             flex-wrap: wrap;
         }
 
+
         .ribbon-group {
             min-width: 0;
         }
+
 
         .rate-search-bottom-bar {
             height: 25px;
         }
 
+
         .rate-search-modal-body {
             height: 400px;
+
             min-height: 300px;
+
             max-height: 80vh;
         }
+
     }
+
 </style>
 
+
 @code {
+
     [Parameter]
     public bool Visible { get; set; }
+
 
     [Parameter]
     public EventCallback<bool> VisibleChanged { get; set; }
 
+
     [Parameter]
     public DateTime? StartDate { get; set; }
+
 
     [Parameter]
     public DateTime? EndDate { get; set; }
 
+
     [Parameter]
     public string SearchType { get; set; } = "Average";
+
 
     [Parameter]
     public string RateCode { get; set; } = "";
 
+
     [Parameter]
     public string Status { get; set; } = "Closed";
+
 
     [Parameter]
     public object RateSearchRows { get; set; } = new List<object>();
 
+
     [Parameter]
     public EventCallback OnSelect { get; set; }
+
 
     [Parameter]
     public EventCallback OnSearch { get; set; }
 
+
     [Parameter]
     public EventCallback OnRateInfo { get; set; }
+
 
     [Parameter]
     public EventCallback<GridRowClickEventArgs> OnRowClick { get; set; }
 
+
     [Parameter]
     public Action<GridCustomizeElementEventArgs>? OnCustomizeElement { get; set; }
+
 
     private void ClosePopup()
     {
         Visible = false;
+
         VisibleChanged.InvokeAsync(false);
     }
+
 }
