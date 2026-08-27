@@ -38,8 +38,9 @@
 
     .filter-columns {
         display: flex;
-        gap: 24px;
         align-items: center;
+        flex-direction: row;
+        gap: 24px;
         flex: 1 1 320px;
         min-width: 260px;
         padding: 0 16px;
@@ -92,11 +93,11 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-width: 56px;
-        padding: 3px 10px;
+        min-width: 48px;
+        padding: 2px 8px;
         cursor: pointer;
         border-radius: 4px;
-        height: 48px;
+        height: 42px;
     }
 
     .toolbar-btn:hover,
@@ -105,18 +106,18 @@
     }
 
     .toolbar-icon {
-        font-size: 28px;
-        line-height: 28px;
+        font-size: 24px;
+        line-height: 24px;
         color: #555;
     }
 
     .toolbar-icon i {
-        font-size: 28px;
+        font-size: 24px;
     }
 
     .toolbar-text {
-        margin-top: 2px;
-        font-size: 10px;
+        margin-top: 1px;
+        font-size: 9px;
         color: #444;
         font-weight: 500;
         line-height: 1.1;
@@ -176,11 +177,20 @@
         margin-left: 8px;
     }
 
-    .search-criteria {
-        font-size: 11px;
+    .search-criteria-label {
+        font-size: 13px;
+        color: #555;
+        margin-right: 4px;
+        white-space: nowrap;
+    }
+
+    .search-criteria-textbox {
+        font-size: 13px;
         color: #555;
         margin-right: 8px;
-        white-space: nowrap;
+        resize: none !important;
+        border: 1px solid lightgray;
+        
     }
 
     /* Scroll wrapper keeps the fixed-width DxGrid usable on narrow screens
@@ -610,6 +620,18 @@
         .filter-columns {
             flex: 1 1 100%;
             padding: 0;
+        }
+    }
+
+    /* Ensure filter columns stay in row layout on big screens regardless of sidebar state.
+       This fixes the issue where opening the sidebar causes filter columns to stack vertically. */
+    @media (min-width: 993px) {
+        .filter-columns {
+            flex-direction: row !important;
+        }
+
+        .filter-col {
+            flex-direction: column !important;
         }
     }
 

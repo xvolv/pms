@@ -203,7 +203,12 @@
         </div>
 
         <div class="toolbar-group" style="margin-left:auto;">
-            <!-- <div class="search-criteria">@GetSearchCriteria()</div> -->
+            <span class="search-criteria-label">Search Criteria:</span>
+            <textarea class="search-criteria-textbox"
+          readonly
+          style="width: 200px; height: 100px; resize: none;">
+    @GetSearchCriteria()
+</textarea>
             <button type="button" class="toolbar-btn" @onclick="ApplyFilters">
                 <div class="toolbar-icon"><i class="bi bi-search"></i></div>
                 <div class="toolbar-text">Advanced<br />Search ▾</div>
@@ -883,14 +888,14 @@
         }
     }
 
-    //string GetSearchCriteria()
-    //{
-    //    var parts = new List<string>();
-    //    if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
-    //    if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
-    //    if (parts.Count == 0) return "";
-    //    return "Search Criteria: " + string.Join(", ", parts);
-    //}
+    string GetSearchCriteria()
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
+        if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
+        if (parts.Count == 0) return "";
+        return string.Join(", ", parts);
+    }
 
     bool IsActivityEnabled(string activity)
     {
