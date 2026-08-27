@@ -1,1 +1,28 @@
-<div> others </div>
+@using DevExpress.Blazor
+
+<div class="db-pr-tabs-wrapper">
+    <DxTabs @bind-ActiveTabIndex="ActiveOthersTab" CssClass="db-pr-sub-tabs">
+        <DxTabPage Text="POS Charges">
+            <OthersContent Title="POS Charges" ContentType="POSCharges" />
+        </DxTabPage>
+        <DxTabPage Text="Travel Details">
+            <OthersContent Title="Travel Details" ContentType="TravelDetails" />
+        </DxTabPage>
+        <DxTabPage Text="Package Audit">
+            <OthersContent Title="Package Audit" ContentType="PackageAudit" />
+        </DxTabPage>
+        <DxTabPage Text="Wakeup Calls">
+            <OthersContent Title="Wakeup Calls" ContentType="WakeupCalls" />
+        </DxTabPage>
+        <DxTabPage Text="Messages">
+            <OthersContent Title="Messages" ContentType="Messages" />
+        </DxTabPage>
+        <DxTabPage Text="Log Book">
+            <OthersContent Title="Log Book" ContentType="LogBook" />
+        </DxTabPage>
+    </DxTabs>
+</div>
+
+@code {
+    int ActiveOthersTab = 0;
+}

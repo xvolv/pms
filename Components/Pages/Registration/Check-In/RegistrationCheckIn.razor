@@ -113,10 +113,33 @@
                 }
             </div>
 
-            <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-file-earmark-text"></i></div>
-                <div class="toolbar-text">Preview ▾</div>
-            </button>
+            <div class="toolbar-dropdown">
+                <button type="button" class="toolbar-btn @(showPreviewMenu ? "active" : "")"
+                        @onclick="TogglePreview">
+                    <div class="toolbar-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div class="toolbar-text">Preview ▾</div>
+                </button>
+                @if (showPreviewMenu)
+                {
+                    <ul class="dropdown-menu show" style="min-width:190px;">
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("Folio"))">
+                            <i class="bi bi-receipt me-2"></i>Folio
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("ProformaFolio"))">
+                            <i class="bi bi-file-earmark-ruled me-2"></i>Proforma Folio
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("RateSummary"))">
+                            <i class="bi bi-bar-chart-line me-2"></i>Rate Summary
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("RegistrationCard"))">
+                            <i class="bi bi-card-heading me-2"></i>Registration Card
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("ConfirmationCard"))">
+                            <i class="bi bi-check2-square me-2"></i>Confirmation Card
+                        </li>
+                    </ul>
+                }
+            </div>
         </div>
 
         <div class="filter-columns">
@@ -292,14 +315,15 @@
     OnSelect="@((name) => { accompanyGuests.Add(new AccompanyGuestRow { Guest = name }); showGuestFind = false; })"
     OnAddNew="@(() => { showGuestFind = false; ShowInfo("Guest registration opened."); })" />
 
-<AttachmentPopup
+<AttachmentPopup @ref="attachmentPopup"
     @bind-Visible="showAttachment"
     RegistrationNo="@selectedReg?.Registration"
     OnNew="@(() => showNewAttachment = true)" />
 
 <NewAttachmentPopup
     @bind-Visible="showNewAttachment"
-    OnSave="@(() => { showNewAttachment = false; ShowInfo("Attachment saved."); })" />
+    Category="@attachmentPopup?.selectedCategory"
+    OnSaved="OnAttachmentSaved" />
 
 <WakeupCallPopup
     @bind-Visible="showWakeupCall"
@@ -603,6 +627,61 @@
     FilterText="@roomFilterText"
     OnSelect="SelectRoom" />
 
+<!-- ========== PREVIEW POPUPS ========== -->
+
+<FolioPopup
+    @bind-Visible="showFolioPreview"
+    TargetRegistration="@selectedReg"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    RegNo="@(selectedReg?.Registration ?? "")"
+    Company="@(selectedReg?.Company ?? "")"
+    Arrival="@selectedReg?.Arrival"
+    Departure="@selectedReg?.Departure"
+    OnRefresh="@(() => StateHasChanged())" />
+
+<ProformaFolioPopup
+    @bind-Visible="showProformaFolioPreview"
+    TargetRegistration="@selectedReg"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    RegNo="@(selectedReg?.Registration ?? "")"
+    Company="@(selectedReg?.Company ?? "")"
+    Arrival="@selectedReg?.Arrival"
+    Departure="@selectedReg?.Departure" />
+
+<RateSummaryPopup
+    @bind-Visible="showRateSummaryPreview"
+    TargetRegistration="@selectedReg"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    RegNo="@(selectedReg?.Registration ?? "")"
+    Company="@(selectedReg?.Company ?? "")"
+    Arrival="@selectedReg?.Arrival"
+    Departure="@selectedReg?.Departure"
+    Room="@(selectedReg?.Room?.Replace("#","") ?? "")"
+    RoomType="@(selectedReg?.RoomType ?? "")" />
+
+<RegistrationCardPopup
+    @bind-Visible="showRegistrationCardPreview"
+    TargetRegistration="@selectedReg"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    RegNo="@(selectedReg?.Registration ?? "")"
+    Company="@(selectedReg?.Company ?? "")"
+    Arrival="@selectedReg?.Arrival"
+    Departure="@selectedReg?.Departure"
+    Room="@(selectedReg?.Room?.Replace("#","") ?? "")"
+    RoomType="@(selectedReg?.RoomType ?? "")" />
+
+<ConfirmationCardPopup
+    @bind-Visible="showConfirmationCardPreview"
+    TargetRegistration="@selectedReg"
+    GuestName="@(selectedReg?.Guest ?? "")"
+    RegNo="@(selectedReg?.Registration ?? "")"
+    Company="@(selectedReg?.Company ?? "")"
+    Arrival="@selectedReg?.Arrival"
+    Departure="@selectedReg?.Departure"
+    Room="@(selectedReg?.Room?.Replace("#","") ?? "")"
+    RoomType="@(selectedReg?.RoomType ?? "")"
+    PaymentMethod="@(selectedReg?.Payment ?? "Cash")" />
+
 @code {
     string filterRoom = "";
     string? filterGuest;
@@ -623,6 +702,7 @@
     bool showAmendmentMenu = false;
     bool showOptionsMenu = false;
     bool showBillingMenu = false;
+    bool showPreviewMenu = false;
     bool showStateConfirm = false;
     bool showArrivalError = false;
     bool showValidationError = false;
@@ -659,6 +739,8 @@
     bool showNewAttachment = false;
     bool showShareCheckIn = false;
 
+    AttachmentPopup? attachmentPopup;
+
     bool showManualCharge = false;
     bool showRoomCharge = false;
     bool showBillSplit = false;
@@ -672,6 +754,13 @@
     bool showOverdueError = false;
     string confirmUserPassword = "";
     string pendingBillingAction = "";
+
+    // Preview popup visibility
+    bool showFolioPreview = false;
+    bool showProformaFolioPreview = false;
+    bool showRateSummaryPreview = false;
+    bool showRegistrationCardPreview = false;
+    bool showConfirmationCardPreview = false;
 
     List<AccompanyGuestRow> accompanyGuests = new();
     AccompanyGuestRow? selectedAccompanyGuest;
@@ -759,11 +848,26 @@
     }
 
     void NoOp() { }
-    void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
-    void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
-    void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; }
-    void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; }
-    void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; }
+    void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
+    void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
+    void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
+    void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; showPreviewMenu = false; }
+    void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showPreviewMenu = false; }
+    void TogglePreview() { showPreviewMenu = !showPreviewMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
+
+    void OnPreview(string preview)
+    {
+        showPreviewMenu = false;
+        if (selectedReg == null) { showNoSelection = true; return; }
+        switch (preview)
+        {
+            case "Folio": showFolioPreview = true; break;
+            case "ProformaFolio": showProformaFolioPreview = true; break;
+            case "RateSummary": showRateSummaryPreview = true; break;
+            case "RegistrationCard": showRegistrationCardPreview = true; break;
+            case "ConfirmationCard": showConfirmationCardPreview = true; break;
+        }
+    }
 
     //string GetSearchCriteria()
     //{
@@ -984,6 +1088,16 @@
         infoMessage = message;
         showSuccessInfo = true;
         StateHasChanged();
+    }
+
+    void OnAttachmentSaved(AttachmentPopup.AttachmentItem item)
+    {
+        if (attachmentPopup != null)
+        {
+            attachmentPopup.OnAttachmentSaved(item);
+        }
+        showNewAttachment = false;
+        ShowInfo("Attachment saved.");
     }
 
     void ConfirmRoomAssignment()

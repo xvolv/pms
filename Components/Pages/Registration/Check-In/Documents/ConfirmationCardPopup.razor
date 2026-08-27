@@ -1,0 +1,409 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup Visible="@Visible" VisibleChanged="OnPopupVisibleChanged"
+         HeaderText="Confirmation Card" Width="820px"
+         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
+    <BodyContentTemplate>
+
+        <!-- Toolbar -->
+        <div class="pf-toolbar">
+            <button type="button" class="pf-btn" @onclick="@(() => {})">
+                <div class="pf-btn-icon"><i class="bi bi-printer"></i></div>
+                <div class="pf-btn-text">Print</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="@(() => {})">
+                <div class="pf-btn-icon"><i class="bi bi-filetype-pdf"></i></div>
+                <div class="pf-btn-text">PDF</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="@(() => {})">
+                <div class="pf-btn-icon"><i class="bi bi-envelope"></i></div>
+                <div class="pf-btn-text">Email</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="HandleClose">
+                <div class="pf-btn-icon pf-icon-red"><i class="bi bi-x-lg"></i></div>
+                <div class="pf-btn-text">Close</div>
+            </button>
+        </div>
+
+        <!-- ========== CONFIRMATION CARD (Letter Style) ========== -->
+        <div class="conf-card">
+
+            <!-- Top header: Hotel name + contact box -->
+            <div class="conf-top-header">
+                <div class="conf-hotel-left">
+                    <div class="conf-hotel-name">@HotelName</div>
+                    <div class="conf-tin-vat">
+                        TIN: @Tin &nbsp;&nbsp;&nbsp; VAT: @Vat
+                    </div>
+                </div>
+                <div class="conf-contact-box">
+                    <div class="conf-contact-title">@HotelName</div>
+                    <div>Tel: @HotelTel</div>
+                    <div>Fax: @HotelFax</div>
+                    <div>Web: @HotelWeb</div>
+                    <div>Email: @HotelEmail</div>
+                    <div>P.O.Box: @HotelPoBox</div>
+                </div>
+            </div>
+
+            <hr class="conf-hr" />
+
+            <!-- Title -->
+            <div class="conf-main-title">RESERVATION CONFIRMATION</div>
+
+            <!-- To / From address block -->
+            <div class="conf-address-block">
+                <div class="conf-addr-left">
+                    <div><span class="conf-lbl">To :-</span> @GuestName</div>
+                    <div><span class="conf-lbl">Company :-</span> @Company</div>
+                    <div><span class="conf-lbl">Agent :-</span> @Agent</div>
+                    <div><span class="conf-lbl">Tel. No. :-</span> @GuestTel</div>
+                </div>
+                <div class="conf-addr-right">
+                    <div><span class="conf-lbl">From :-</span> @HotelName</div>
+                    <div><span class="conf-lbl">Hotel :-</span> @HotelBranch</div>
+                    <div><span class="conf-lbl">Reservation Tel :-</span> @ReservationTel</div>
+                    <div><span class="conf-lbl">Date. :-</span> @IssuedDate.ToString("dd-MMM-yyyy")</div>
+                </div>
+            </div>
+
+            <hr class="conf-hr" />
+
+            <!-- Intro text -->
+            <div class="conf-intro">
+                Thank you very much for your interest in the @HotelName. We are pleased to confirm your reservation as follows:
+            </div>
+
+            <!-- Guarantee status -->
+            <div class="conf-guarantee">@GuaranteeStatus</div>
+
+            <!-- Details grid (two-column label:value) -->
+            <div class="conf-details">
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">Guest Name :</span>
+                        <span class="conf-val">@GuestName</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Confirmation No.</span>
+                        <span class="conf-val">@ConfirmationNo</span>
+                    </div>
+                </div>
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">Arrival Date :</span>
+                        <span class="conf-val">@(Arrival?.ToString("dd-MMM-yy HH:mm") ?? "")</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Arrival Transfer By :</span>
+                        <span class="conf-val">@ArrivalTransferBy</span>
+                    </div>
+                </div>
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">Departure Date :</span>
+                        <span class="conf-val">@(Departure?.ToString("dd-MMM-yy HH:mm") ?? "")</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Flight Arrival Time :</span>
+                        <span class="conf-val">@FlightArrivalTime</span>
+                    </div>
+                </div>
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">No. &amp; Type of Room :</span>
+                        <span class="conf-val">@RoomCount / @RoomType</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Departure Flight Time :</span>
+                        <span class="conf-val">@DepartureFlightTime</span>
+                    </div>
+                </div>
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">No. Adult/Child :</span>
+                        <span class="conf-val">@Adults / @Children</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Check In Time :</span>
+                        <span class="conf-val">@CheckInTime</span>
+                    </div>
+                </div>
+                <div class="conf-row">
+                    <div class="conf-col">
+                        <span class="conf-lbl">Daily Rate :</span>
+                        <span class="conf-val">@RatePerNight.ToString("N2") @Currency</span>
+                    </div>
+                    <div class="conf-col">
+                        <span class="conf-lbl">Check Out Time :</span>
+                        <span class="conf-val">@CheckOutTime</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spacer -->
+            <div style="height: 40px;"></div>
+
+            <!-- Closing -->
+            <div class="conf-closing">
+                <div>Best Regards</div>
+                <div class="conf-closing-hotel">@HotelName</div>
+                <div class="conf-closing-hotel">@HotelName</div>
+                <div class="conf-for">For: General Manager</div>
+            </div>
+
+            <!-- Footer notice -->
+            <div class="conf-footer-note">
+                Our team looks forward to welcoming you at @HotelName and trust you will have an enjoyable stay with us.
+                Should you require any further information, Please don't hesitate to contact our reservation team.
+            </div>
+
+        </div>
+
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    /* ===== Toolbar (kept same) ===== */
+    .pf-toolbar {
+        display: flex; align-items: flex-start; gap: 4px;
+        padding: 6px 8px 8px; border-bottom: 1px solid #d0d4da; background: #f5f5f5;
+    }
+    .pf-btn {
+        display: flex; flex-direction: column; align-items: center;
+        background: #fff; border: 1px solid #c0c4ca; border-radius: 3px;
+        padding: 4px 10px 3px; cursor: pointer; min-width: 56px; gap: 2px;
+        transition: background .12s;
+    }
+    .pf-btn:hover { background: #e8eaf0; }
+    .pf-btn-icon  { font-size: 22px; line-height: 1; color: #444; }
+    .pf-icon-red  { color: #c62828; }
+    .pf-btn-text  { font-size: 11px; color: #222; white-space: nowrap; }
+
+    /* ===== Letter-style Confirmation Card ===== */
+    .conf-card {
+        border: 1px solid #333;
+        padding: 18px 22px 16px;
+        background: #fff;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 12.5px;
+        color: #000;
+        margin: 6px 0 2px;
+        line-height: 1.35;
+    }
+
+    /* Top header */
+    .conf-top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 4px;
+    }
+    .conf-hotel-left {
+        flex: 1;
+    }
+    .conf-hotel-name {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-align: center;
+        margin-bottom: 18px;
+    }
+    .conf-tin-vat {
+        font-size: 11px;
+        margin-top: 4px;
+    }
+    .conf-contact-box {
+        border: 1px solid #000;
+        padding: 6px 10px 8px;
+        min-width: 160px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+    .conf-contact-title {
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .conf-hr {
+        border: none;
+        border-top: 1px solid #000;
+        margin: 8px 0;
+    }
+
+    /* Main title */
+    .conf-main-title {
+        text-align: center;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        margin: 10px 0 14px;
+        text-transform: uppercase;
+    }
+
+    /* Address block (To / From) */
+    .conf-address-block {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+    .conf-addr-left, .conf-addr-right {
+        width: 48%;
+    }
+    .conf-addr-left div, .conf-addr-right div {
+        margin-bottom: 3px;
+    }
+    .conf-lbl {
+        font-weight: 700;
+        display: inline-block;
+        min-width: 110px;
+    }
+
+    /* Intro */
+    .conf-intro {
+        font-size: 12px;
+        margin: 10px 0 12px;
+        text-align: justify;
+    }
+
+    /* Guarantee status */
+    .conf-guarantee {
+        text-align: center;
+        font-weight: 700;
+        font-size: 13px;
+        margin: 8px 0 14px;
+    }
+
+    /* Details rows */
+    .conf-details {
+        margin-top: 4px;
+    }
+    .conf-row {
+        display: flex;
+        margin-bottom: 6px;
+    }
+    .conf-col {
+        width: 50%;
+        font-size: 12px;
+    }
+    .conf-col .conf-lbl {
+        min-width: 140px;
+    }
+    .conf-val {
+        font-weight: normal;
+    }
+
+    /* Closing */
+    .conf-closing {
+        margin-top: 20px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    .conf-closing-hotel {
+        font-weight: 700;
+        margin-top: 2px;
+    }
+    .conf-for {
+        margin-top: 6px;
+    }
+
+    /* Footer note */
+    .conf-footer-note {
+        margin-top: 28px;
+        font-size: 11.5px;
+        line-height: 1.45;
+        text-align: justify;
+    }
+</style>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+
+    // Guest / Reservation
+    [Parameter] public string  GuestName       { get; set; } = "";
+    [Parameter] public string  RegNo           { get; set; } = "";
+    [Parameter] public string  Company         { get; set; } = "";
+    [Parameter] public string  Agent           { get; set; } = "";
+    [Parameter] public string  GuestTel        { get; set; } = "";
+    [Parameter] public DateTime? Arrival       { get; set; }
+    [Parameter] public DateTime? Departure     { get; set; }
+    [Parameter] public string  Room            { get; set; } = "";
+    [Parameter] public string  RoomType        { get; set; } = "Standard";
+    [Parameter] public int     RoomCount       { get; set; } = 1;
+    [Parameter] public string  RateCode        { get; set; } = "BUSINESS RATE";
+    [Parameter] public decimal RatePerNight    { get; set; } = 100.00m;
+    [Parameter] public string  Currency        { get; set; } = "USD";
+    [Parameter] public int     Adults          { get; set; } = 1;
+    [Parameter] public int     Children        { get; set; } = 0;
+    [Parameter] public string  PaymentMethod   { get; set; } = "Cash";
+    [Parameter] public string  SpecialRequests { get; set; } = "";
+    [Parameter] public string  CheckInTime     { get; set; } = "";
+    [Parameter] public string  CheckOutTime    { get; set; } = "";
+    [Parameter] public string  GuaranteeStatus { get; set; } = "Non - Guaranteed";
+
+    // Transfer / Flight
+    [Parameter] public string  ArrivalTransferBy   { get; set; } = "";
+    [Parameter] public string  FlightArrivalTime   { get; set; } = "";
+    [Parameter] public string  DepartureFlightTime { get; set; } = "";
+
+    // Hotel info (can be bound from settings later)
+    [Parameter] public string  HotelName       { get; set; } = "TEST HOTEL";
+    [Parameter] public string  HotelBranch     { get; set; } = "Head Office";
+    [Parameter] public string  HotelTel        { get; set; } = "";
+    [Parameter] public string  HotelFax        { get; set; } = "";
+    [Parameter] public string  HotelWeb        { get; set; } = "";
+    [Parameter] public string  HotelEmail      { get; set; } = "";
+    [Parameter] public string  HotelPoBox      { get; set; } = "";
+    [Parameter] public string  ReservationTel  { get; set; } = "";
+    [Parameter] public string  Tin             { get; set; } = "0000000000-01";
+    [Parameter] public string  Vat             { get; set; } = "";
+
+    [Parameter] public List<string> Inclusions { get; set; } = new();
+
+    string ConfirmationNo => string.IsNullOrEmpty(RegNo)
+        ? "REG-00000"
+        : RegNo;
+
+    DateTime IssuedDate => DateTime.Today;
+
+    int Nights => (Arrival.HasValue && Departure.HasValue)
+        ? Math.Max(1, (int)(Departure.Value - Arrival.Value).TotalDays)
+        : 1;
+
+    decimal TotalEstimated
+    {
+        get
+        {
+            var sub = RatePerNight * Nights;
+            var svc = Math.Round(sub * 0.10m, 2);
+            var vat = Math.Round((sub + svc) * 0.15m, 2);
+            return sub + svc + vat;
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName))    GuestName    = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo))        RegNo        = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Company))      Company      = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue)                  Arrival      = TargetRegistration.Arrival;
+            if (!Departure.HasValue)                Departure    = TargetRegistration.Departure;
+            if (string.IsNullOrEmpty(Room))         Room         = TargetRegistration.Room?.Replace("#", "") ?? "";
+            if (string.IsNullOrEmpty(RoomType))     RoomType     = TargetRegistration.RoomType ?? "Standard";
+            if (string.IsNullOrEmpty(PaymentMethod)) PaymentMethod = TargetRegistration.Payment ?? "Cash";
+        }
+    }
+
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+
+    private async Task OnPopupVisibleChanged(bool value)
+    {
+        if (!value) await HandleClose();
+    }
+}

@@ -1,0 +1,248 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup Visible="@Visible" VisibleChanged="OnPopupVisibleChanged" HeaderText="Proforma Folio" Width="760px"
+         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
+    <BodyContentTemplate>
+
+        <!-- Toolbar: Refresh | Print | Close -->
+        <div class="pf-toolbar">
+            <button type="button" class="pf-btn" @onclick="HandleRefresh">
+                <div class="pf-btn-icon pf-icon-green"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="pf-btn-text">Refresh</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="HandlePrint">
+                <div class="pf-btn-icon"><i class="bi bi-printer"></i></div>
+                <div class="pf-btn-text">Print</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="HandleClose">
+                <div class="pf-btn-icon pf-icon-red"><i class="bi bi-x-lg"></i></div>
+                <div class="pf-btn-text">Close</div>
+            </button>
+        </div>
+
+        <!-- Header info grid: 3 rows × 2 columns -->
+        <div class="pf-header-grid">
+            <span class="pf-lbl">Guest Name</span>
+            <DxTextBox Text="@GuestName" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Arrival Date</span>
+            <DxTextBox Text="@(Arrival?.ToString("dddd, MMMM dd, yyyy") ?? "")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+
+            <span class="pf-lbl">Reg. No</span>
+            <DxTextBox Text="@RegNo" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Departure Date</span>
+            <DxTextBox Text="@(Departure?.ToString("dddd, MMMM dd, yyyy") ?? "")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+
+            <span class="pf-lbl">Company</span>
+            <DxTextBox Text="@Company" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">TIN</span>
+            <DxTextBox @bind-Text="Tin" SizeMode="SizeMode.Small" CssClass="pf-input" />
+        </div>
+
+        <!-- Main charges grid -->
+        <DxGrid Data="@Rows"
+                CssClass="pf-grid"
+                ShowFilterRow="false"
+                ShowGroupPanel="false"
+                PageSize="20"
+                ShowPager="false"
+                SizeMode="SizeMode.Small">
+            <Columns>
+                <DxGridDataColumn FieldName="SN"         Caption="SN"          Width="50px" />
+                <DxGridDataColumn FieldName="Date"       Caption="Date"         Width="90px"  DisplayFormat="M/d/yyyy" />
+                <DxGridDataColumn FieldName="RateCode"   Caption="Rate Code"    Width="80px" />
+                <DxGridDataColumn FieldName="Rate"       Caption="Rate"         Width="60px" />
+                <DxGridDataColumn FieldName="Package"    Caption="Package"      MinWidth="100" />
+                <DxGridDataColumn FieldName="PersonCount" Caption="# of Person" Width="90px" />
+                <DxGridDataColumn FieldName="Amount"     Caption="Amount"       Width="100px" DisplayFormat="N2" />
+            </Columns>
+        </DxGrid>
+
+        <!-- Totals (right-aligned, label + readonly textbox) -->
+        <div class="pf-totals">
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">Subtotal</span>
+                <DxTextBox Text="@Subtotal.ToString("N2")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">Service Charge</span>
+                <DxTextBox Text="@ServiceCharge.ToString("N2")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">VAT</span>
+                <DxTextBox Text="@Vat.ToString("N2")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">GrandTotal</span>
+                <DxTextBox Text="@GrandTotal.ToString("N2")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+        </div>
+
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    /* ── Toolbar ───────────────────────────────────────────── */
+    .pf-toolbar {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 6px 8px 8px;
+        border-bottom: 1px solid #d0d4da;
+        background: #f5f5f5;
+    }
+
+    .pf-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #c0c4ca;
+        border-radius: 3px;
+        padding: 4px 10px 3px;
+        cursor: pointer;
+        min-width: 56px;
+        gap: 2px;
+        transition: background .12s;
+    }
+    .pf-btn:hover { background: #e8eaf0; }
+
+    .pf-btn-icon {
+        font-size: 22px;
+        line-height: 1;
+        color: #444;
+    }
+    .pf-icon-green { color: #2e7d32; }
+    .pf-icon-red   { color: #c62828; }
+
+    .pf-btn-text {
+        font-size: 11px;
+        color: #222;
+        white-space: nowrap;
+    }
+
+    /* ── Header grid ───────────────────────────────────────── */
+    .pf-header-grid {
+        display: grid;
+        grid-template-columns: 100px 1fr 110px 1fr;
+        align-items: center;
+        gap: 5px 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #d0d4da;
+    }
+
+    .pf-lbl {
+        font-size: 12px;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .pf-input {
+        width: 100%;
+    }
+
+    /* ── Totals ────────────────────────────────────────────── */
+    .pf-totals {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 3px;
+        padding: 6px 12px 8px;
+    }
+
+    .pf-total-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pf-total-lbl {
+        font-size: 12px;
+        color: #333;
+        text-align: right;
+        min-width: 100px;
+    }
+
+    .pf-total-input {
+        width: 110px;
+    }
+</style>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+    [Parameter] public string GuestName { get; set; } = "";
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Company { get; set; } = "";
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public string Tin { get; set; } = "";
+
+    List<ProformaRow> Rows { get; set; } = new();
+
+    // Totals — computed from Rows using the same back-calculation as the image:
+    // GrandTotal = Rows.Sum(Amount); Subtotal = GrandTotal / 1.15 (VAT inclusive), VAT = GrandTotal - Subtotal, ServiceCharge = 0
+    decimal GrandTotal     => Rows.Sum(r => r.Amount);
+    decimal Subtotal       => Math.Round(GrandTotal / 1.15m, 2);
+    decimal ServiceCharge  => 0m;
+    decimal Vat            => Math.Round(GrandTotal - Subtotal, 2);
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo))     RegNo     = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Company))   Company   = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue)   Arrival   = TargetRegistration.Arrival;
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+        }
+
+        if (Visible)
+            BuildRows();
+    }
+
+    void BuildRows()
+    {
+        if (!Arrival.HasValue) return;
+        Rows = new List<ProformaRow>();
+        var arr = Arrival.Value;
+        int nights = Departure.HasValue ? Math.Max(1, (int)(Departure.Value - arr).TotalDays) : 1;
+
+        for (int i = 0; i < nights; i++)
+        {
+            Rows.Add(new ProformaRow
+            {
+                SN          = i + 1,
+                Date        = arr.AddDays(i),
+                RateCode    = TargetRegistration?.RoomType ?? "Rate 1",
+                Rate        = i + 1,          // sequential rate slot number matching the image pattern
+                Package     = "",
+                PersonCount = 1,
+                Amount      = 100.00m         // placeholder — replace with real rate lookup
+            });
+        }
+    }
+
+    void HandleRefresh() => BuildRows();
+    void HandlePrint()   { /* wire up JS print / report viewer */ }
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+
+    private async Task OnPopupVisibleChanged(bool value)
+    {
+        if (!value) await HandleClose();
+    }
+
+    // ── Local model ───────────────────────────────────────────
+    class ProformaRow
+    {
+        public int      SN          { get; set; }
+        public DateTime Date        { get; set; }
+        public string   RateCode    { get; set; } = "";
+        public int      Rate        { get; set; }
+        public string   Package     { get; set; } = "";
+        public int      PersonCount { get; set; }
+        public decimal  Amount      { get; set; }
+    }
+}
