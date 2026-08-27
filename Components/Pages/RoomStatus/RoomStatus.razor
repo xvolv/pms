@@ -26,8 +26,6 @@
                     <span class="tb-label" style="width: 65px;">Hotel</span>
                     <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" />
                     @* <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox> *@
-
-
                 </div>
                 <div class="rst-filter-row">
                     <span class="tb-label">Group by</span>
@@ -40,7 +38,7 @@
         </div>
 
         <div class="rst-legend">
-            @foreach (var status in reservationStatuses)
+            @foreach (string status in reservationStatuses)
             {
                 <div class="rst-legend-item">
                     <span>@status (@CountByStatus(status))</span>

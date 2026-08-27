@@ -23,6 +23,17 @@
     gap: 10px;
 }
 
+.rst-field-group {
+    border: 1px solid #e0e0e0;
+    border-radius: 0px;
+    padding: 4px 10px;
+    flex-shrink: 0;
+}
+
+.rst-toolbar > .rt-toolbar-btn {
+    flex-shrink: 0;
+}
+
 .rst-show-status-check {
     margin-left: 6px;
 }

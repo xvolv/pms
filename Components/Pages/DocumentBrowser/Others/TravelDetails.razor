@@ -1,0 +1,221 @@
+@using DevExpress.Blazor
+
+<div class="rst-toolbar">
+    <button type="button" class="rt-toolbar-btn" @onclick="OnShow">
+        <i class="bi bi-eye text-secondary"></i>
+        <span>Show</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnPrint">
+        <i class="bi bi-printer text-secondary"></i>
+        <span>Print</span>
+    </button>
+    <button type="button" class="rt-toolbar-btn" @onclick="OnPrintPickupCard">
+        <i class="bi bi-credit-card-2-front text-secondary"></i>
+        <span>Print Pickup Card</span>
+    </button>
+
+    <div class="rst-filters rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 45px;">Date</span>
+            <DxDateEdit @bind-Date="SelectedDate" CssClass="rt-detail-input" style="width:130px;" />
+        </div>
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 45px;">Hotel</span>
+            <DxComboBox Data="@Hotels" @bind-Value="SelectedHotel" CssClass="rt-detail-input" style="width:170px;" />
+        </div>
+    </div>
+
+    <div class="rst-filters rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 90px;">Room Type</span>
+            <DxComboBox Data="@RoomTypes" @bind-Value="SelectedRoomType" CssClass="rt-detail-input"
+                        style="width:150px;" />
+        </div>
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 90px;">Company</span>
+            <DxComboBox Data="@Companies" @bind-Value="SelectedCompany" CssClass="rt-detail-input"
+                        style="width:150px;" />
+        </div>
+    </div>
+
+    <div class="rst-filters rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 65px;">Station</span>
+            <DxComboBox Data="@Stations" @bind-Value="SelectedStation" CssClass="rt-detail-input"
+                        style="width:150px;" />
+        </div>
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 65px;">Carrier</span>
+            <DxComboBox Data="@Carriers" @bind-Value="SelectedCarrier" CssClass="rt-detail-input"
+                        style="width:150px;" />
+        </div>
+    </div>
+
+    <div class="rst-field-group">
+        <div class="rst-filter-row">
+            <span class="tb-label" style="width: 100px; white-space: nowrap;">Transportation</span>
+            <DxComboBox Data="@Transportations" @bind-Value="SelectedTransportation" CssClass="rt-detail-input"
+                        style="width:150px;" />
+        </div>
+    </div>
+
+    <button type="button" class="rt-toolbar-btn" @onclick="OnClearCriteria"  >
+        <i class="bi bi-x-circle text-secondary"></i>
+         <span>Clear Criteria</span> 
+    </button>
+</div>
+
+<DxTabs @bind-ActiveTabIndex="ActiveDirectionTab" CssClass="db-pr-sub-tabs">
+    <DxTabPage Text="Pick Up"></DxTabPage>
+    <DxTabPage Text="Drop Off"></DxTabPage>
+</DxTabs>
+
+<div class="rt-grid-area">
+    <div class="ri-table-wrap">
+        <table class="ri-table">
+            <thead>
+                <tr>
+                    <th class="ri-sticky-col">Name</th>
+                    <th>Room Type</th>
+                    <th>Room</th>
+                    <th>Company</th>
+                    <th>Tran. No.</th>
+                    <th>From Station</th>
+                    <th>To Station</th>
+                    <th>Transportation</th>
+                    <th>Carrier</th>
+                    <th>Travel Date</th>
+                    <th>From City</th>
+                    <th>Distance</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!FilteredData.Any())
+                {
+                    <tr>
+                        <td colspan="13">
+                            <div class="rt-placeholder">No data to display</div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var row in FilteredData)
+                    {
+                        <tr class="@(SelectedItem == row ? "rt-row-selected" : "")" @onclick="() => SelectedItem = row">
+                            <td class="ri-sticky-col">@row.Name</td>
+                            <td>@row.RoomType</td>
+                            <td>@row.Room</td>
+                            <td>@row.Company</td>
+                            <td>@row.TranNo</td>
+                            <td>@row.FromStation</td>
+                            <td>@row.ToStation</td>
+                            <td>@row.Transportation</td>
+                            <td>@row.Carrier</td>
+                            <td>@row.TravelDate?.ToString("d")</td>
+                            <td>@row.FromCity</td>
+                            <td>@row.Distance.ToString("n1")</td>
+                            <td>@row.Duration</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    // ============================================================
+    // Toolbar / filter fields
+    // ============================================================
+    DateTime SelectedDate = DateTime.Today;
+    List<string> Hotels = new() { "MAIN TEST HOTEL" };
+    string? SelectedHotel;
+
+    List<string> RoomTypes = new();
+    string? SelectedRoomType;
+    List<string> Companies = new();
+    string? SelectedCompany;
+    List<string> Stations = new();
+    string? SelectedStation;
+    List<string> Carriers = new();
+    string? SelectedCarrier;
+    List<string> Transportations = new();
+    string? SelectedTransportation;
+
+    int ActiveDirectionTab = 0;
+
+    // ============================================================
+    // Grid Data
+    // ============================================================
+    List<TravelDetailModel> Data = new();
+    TravelDetailModel? SelectedItem;
+
+    IEnumerable<TravelDetailModel> FilteredData =>
+        Data.Where(d => d.Direction == (ActiveDirectionTab == 1 ? TravelDirection.DropOff : TravelDirection.PickUp));
+
+    // ============================================================
+    // Lifecycle
+    // ============================================================
+    protected override void OnInitialized()
+    {
+        SelectedHotel = Hotels.FirstOrDefault();
+    }
+
+    // ============================================================
+    // Actions
+    // ============================================================
+    void OnShow()
+    {
+        // TODO: call your real service using the filter criteria above
+        Data = new List<TravelDetailModel>();
+    }
+
+    void OnPrint()
+    {
+        // TODO: print logic
+    }
+
+    void OnPrintPickupCard()
+    {
+        // TODO: print pickup card logic
+    }
+
+    void OnClearCriteria()
+    {
+        SelectedRoomType = null;
+        SelectedCompany = null;
+        SelectedStation = null;
+        SelectedCarrier = null;
+        SelectedTransportation = null;
+        SelectedDate = DateTime.Today;
+    }
+
+    // ============================================================
+    // Models
+    // ============================================================
+    public enum TravelDirection
+    {
+        PickUp,
+        DropOff,
+    }
+
+    public class TravelDetailModel
+    {
+        public string Name { get; set; } = "";
+        public string RoomType { get; set; } = "";
+        public string Room { get; set; } = "";
+        public string Company { get; set; } = "";
+        public string TranNo { get; set; } = "";
+        public string FromStation { get; set; } = "";
+        public string ToStation { get; set; } = "";
+        public string Transportation { get; set; } = "";
+        public string Carrier { get; set; } = "";
+        public DateTime? TravelDate { get; set; }
+        public string FromCity { get; set; } = "";
+        public decimal Distance { get; set; }
+        public string Duration { get; set; } = "";
+        public TravelDirection Direction { get; set; }
+    }
+}

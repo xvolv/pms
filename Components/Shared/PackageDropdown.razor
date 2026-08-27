@@ -3,8 +3,7 @@
 <div class="package-dropdown-wrapper">
     <label>Packages</label>
     <div class="lookup-field">
-        <DxTextBox @bind-Text="SelectedPackage" ReadOnly="true"
-                   CssClass="erp-combobox lookup-input" NullText="" />
+        <DxTextBox @bind-Text="SelectedPackage" ReadOnly="true" CssClass="erp-combobox lookup-input" NullText="" />
         <button type="button" class="lookup-toggle-btn" @onclick="TogglePackagePopup">▾</button>
 
         @if (ShowPackagePopup)
@@ -12,8 +11,7 @@
             <div class="global-dropdown-popup">
                 <div class="global-dropdown-body">
                     <div class="global-dropdown-search-row">
-                        <input class="global-dropdown-search-input"
-                               @bind="PackagePopupFilter" @bind:event="oninput" />
+                        <input class="global-dropdown-search-input" @bind="PackagePopupFilter" @bind:event="oninput" />
                         <button type="button" class="global-dropdown-find-btn" @onclick="@(() => { })">Find</button>
                     </div>
                     <div class="global-dropdown-list">
@@ -37,8 +35,8 @@
                 </div>
             </div>
         }
-        </div>
     </div>
+</div>
 
 @code {
     [Parameter]
@@ -102,7 +100,7 @@
         z-index: 1000;
         background: #fff;
         border: 1px solid #888;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
         width: 420px;
         display: flex;
         flex-direction: column;

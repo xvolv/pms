@@ -3,8 +3,7 @@
 <div class="guest-dropdown-wrapper">
     <label>Guests</label>
     <div class="lookup-field">
-        <DxTextBox @bind-Text="SelectedGuestDisplay" ReadOnly="true"
-                   CssClass="erp-combobox lookup-input" NullText="" />
+        <DxTextBox @bind-Text="SelectedGuestDisplay" ReadOnly="true" CssClass="erp-combobox lookup-input" NullText="" />
         <button type="button" class="lookup-toggle-btn" @onclick="ToggleGuestPopup">▾</button>
 
         @if (ShowGuestPopup)
@@ -12,8 +11,7 @@
             <div class="global-dropdown-popup global-dropdown-popup-wide">
                 <div class="global-dropdown-body">
                     <div class="global-dropdown-search-row">
-                        <input class="global-dropdown-search-input"
-                               @bind="GuestPopupFilter" @bind:event="oninput" />
+                        <input class="global-dropdown-search-input" @bind="GuestPopupFilter" @bind:event="oninput" />
                         <button type="button" class="global-dropdown-find-btn" @onclick="FindGuest">Find</button>
                     </div>
                     <table class="global-dropdown-table">
@@ -28,7 +26,9 @@
                         <tbody>
                             @if (!FilteredGuestData.Any())
                             {
-                                <tr><td colspan="4" class="global-text-muted">No records</td></tr>
+                                <tr>
+                                    <td colspan="4" class="global-text-muted">No records</td>
+                                </tr>
                             }
                             else
                             {
@@ -54,8 +54,8 @@
                 </div>
             </div>
         }
-        </div>
     </div>
+</div>
 
 @code {
     [Parameter]
@@ -151,7 +151,7 @@
         z-index: 1000;
         background: #fff;
         border: 1px solid #888;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
         width: 420px;
         display: flex;
         flex-direction: column;
