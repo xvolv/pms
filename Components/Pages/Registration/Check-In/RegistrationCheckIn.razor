@@ -28,8 +28,10 @@
                         <li class="dropdown-item" @onclick="@(() => OnOption("AccompanyGuest"))">Accompany Guest</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Replicate"))">Replicate(Add on)</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Attachment"))">Attachment</li>
-                        <li class="dropdown-item" @onclick="@(() => OnOption("History"))">History</li>
-                        <li class="dropdown-item" @onclick="@(() => Navigation.NavigateTo("housekeeping"))">House Keeping</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Synchronization"))">Synchronization</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("ServiceRequest"))">Service Request</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("Package"))">Package</li>
+                        <li class="dropdown-item" @onclick="@(() => OnOption("LostAndFound"))">Lost & Found</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("WakeupCall"))">Wakeup Calls</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Messages"))">Messages</li>
                         <li class="dropdown-item" @onclick="@(() => OnOption("Routing"))">Routing</li>
@@ -64,6 +66,8 @@
                             @onclick="@(() => OnActivity("CheckIn"))">Check In</li>
                         <li class="dropdown-item @(IsActivityEnabled("CheckOut") ? "" : "disabled")"
                             @onclick="@(() => OnActivity("CheckOut"))">Check out</li>
+                        <li class="dropdown-item @(IsActivityEnabled("GroupCheckOut") ? "" : "disabled")"
+                            @onclick="@(() => OnActivity("GroupCheckOut"))">Group Check Out</li>
                         <li class="dropdown-item @(IsActivityEnabled("Reinstate") ? "" : "disabled")"
                             @onclick="@(() => OnActivity("Reinstate"))">Reinstate</li>
                         <li class="dropdown-item @(IsActivityEnabled("PostMaster") ? "" : "disabled")"
@@ -71,6 +75,11 @@
                     </ul>
                 }
             </div>
+
+            <button type="button" class="toolbar-btn" @onclick="OpenAdminStateChange" @onclick:stopPropagation="true">
+                <div class="toolbar-icon"><i class="bi bi-shield-lock"></i></div>
+                <div class="toolbar-text">Admin State Change</div>
+            </button>
 
             <div class="toolbar-dropdown">
                 <button type="button" class="toolbar-btn @(showBillingMenu ? "active" : "")"
@@ -338,6 +347,10 @@
     MsgDate="@businessDate"
     OnSave="@(() => { showSendMessage = false; ShowInfo("Message saved successfully."); })"
     OnOpenUserFind="@(() => showUserFind = true)" />
+
+<AdminStateChangePopup
+    @bind-Visible="showAdminStateChange"
+    OnValidated="OnAdminStateValidated" />
 
 <UserFindPopup
     @bind-Visible="showUserFind"
@@ -738,6 +751,7 @@
     bool showGuestFind = false;
     bool showNewAttachment = false;
     bool showShareCheckIn = false;
+    bool showAdminStateChange = false;
 
     AttachmentPopup? attachmentPopup;
 
@@ -891,6 +905,7 @@
             case "Cancel": return s != "Checked In" && s != "Inhouse" && s != "Cancelled" && s != "Checked Out";
             case "CheckIn": return s != "Checked In" && s != "Inhouse" && s != "Cancelled" && s != "Checked Out";
             case "CheckOut": return s == "Checked In" || s == "Inhouse";
+            case "GroupCheckOut": return s == "Checked In" || s == "Inhouse";
             case "Reinstate": return (s == "Cancelled" || s == "Checked Out" || s == "No show") && selectedReg.Departure.Date >= businessDate.Date;
             case "PostMaster": return s == "Checked In" || s == "Inhouse";
             default: return true;
@@ -1067,14 +1082,18 @@
                 break;
             case "Shares": showShareCheckIn = true; break;
             case "Attachment": showAttachment = true; break;
+            case "Synchronization":
+            case "ServiceRequest":
+            case "Package":
+            case "LostAndFound":
+                ShowInfo("This feature is not yet implemented.");
+                break;
             case "WakeupCall": showWakeupCall = true; break;
             case "Messages": showSendMessage = true; break;
             case "Privilege": showPrivilege = true; break;
             case "TravelDetail": showTravelDetail = true; break;
             case "RoomAssignment": showRoomAssignConfirm = true; break;
             case "Replicate":
-            case "History":
-            case "HouseKeeping":
             case "Routing":
             case "ScheduledActivity":
             case "IssueCard":
@@ -1098,6 +1117,18 @@
         }
         showNewAttachment = false;
         ShowInfo("Attachment saved.");
+    }
+
+    void OpenAdminStateChange()
+    {
+        if (selectedReg == null) { showNoSelection = true; return; }
+        showAdminStateChange = true;
+    }
+
+    void OnAdminStateValidated()
+    {
+        ShowInfo("OTP validated successfully.");
+        // Add state change logic here after OTP validation
     }
 
     void ConfirmRoomAssignment()
