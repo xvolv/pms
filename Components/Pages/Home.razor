@@ -1,7 +1,7 @@
 @page "/dashboard"
 @rendermode InteractiveServer
 @using DevExpress.Blazor
-@using DevExpress.Blazor.Internal
+
 
 <PageTitle>Dashboard - CNET ERP</PageTitle>
 
@@ -76,28 +76,6 @@
                 </div>
             </div>
 
-            <div class="calendar-box">
-                <div class="cal-left">
-                    <div class="cal-toggle">
-                        <DxComboBox Data="@calendarModes" @bind-Value="calendarMode" CssClass="erp-combobox" />
-                    </div>
-                    <div class="cal-nav-vert">
-                        <span class="cal-lbl">Month</span>
-                        <DxComboBox Data="@months" @bind-Value="selectedMonth" Width="90px" CssClass="erp-combobox" />
-                        <span class="cal-lbl">Year</span>
-                        <DxSpinEdit CssClass="dx-input-num" @bind-Value="selectedYear" MinValue="2000" MaxValue="2030"
-                                    Width="72px" />
-                    </div>
-                    <div class="cal-footer-vert">
-                        <span class="cal-date">@selectedDate.ToString("dd/MM/yyyy")</span>
-                    </div>
-                </div>
-                <div class="cal-right">
-                    <DxCalendar @bind-SelectedDate="selectedDate" CssClass="dash-calendar" VisibleDate="@visibleDate"
-                                VisibleDateChanged="OnVisibleDateChanged" SizeMode="SizeMode.Small" />
-                </div>
-            </div>
-
             <div class="logo-box">
                 <img src="cnet logo.png" alt="CNET Logo" class="cnet-logo-img" />
             </div>
@@ -111,12 +89,25 @@
                     <!-- Left: Task Statistics Grid -->
                     <div class="left-panel">
                         <div class="panel-toolbar">
-                            <DxButton Text="Refresh" IconCssClass="oi oi-reload" Click="RefreshTasks"
-                                      RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small" />
+                            <button type="button" class="icon-toolbar-btn" title="Refresh" @onclick="RefreshTasks">
+                                <i class="bi bi-arrow-clockwise" style="color:#4caf50;"></i>
+                            </button>
+                            <button type="button" class="icon-toolbar-btn" title="Print" @onclick="OnPrintTasks">
+                                <i class="bi bi-file-earmark-pdf" style="color:#d32f2f;"></i>
+                            </button>
+                            <button type="button" class="icon-toolbar-btn" title="Export to Excel" @onclick="OnExportTasks">
+                                <i class="bi bi-file-earmark-excel" style="color:#2e7d32;"></i>
+                            </button>
+
+                            <div class="panel-toolbar-hotel">
+                                <span class="tb-label">Hotel</span>
+                                <DxComboBox Data="@dashboardHotels" @bind-Value="selectedDashboardHotel"
+                                            CssClass="rt-detail-input" style="width:180px;" />
+                            </div>
                         </div>
                         <DxGrid Data="@taskItems" KeyFieldName="SN" CssClass="task-grid" RowClick="OnTaskRowClick"
                                 CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false"
-                                TextWrapEnabled="true">
+                                TextWrapEnabled="true" Height="180px">
                             <Columns>
                                 <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
                                 <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
@@ -124,6 +115,38 @@
                                 <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
                             </Columns>
                         </DxGrid>
+
+                        <!-- Today's Room Statistics -->
+                        <div class="chart-card">
+                            <div class="chart-title">Today's Room Statistics</div>
+                            <DxGrid Data="@roomStatsItems" KeyFieldName="SN" CssClass="room-stats-grid"
+                                    ShowPager="false" PageSize="20">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                                    <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="180" />
+                                    <DxGridDataColumn FieldName="Count" Caption="Count" Width="70px" />
+                                </Columns>
+                            </DxGrid>
+                        </div>
+
+                        <!-- Pie: Today's Room Status -->
+                        <div class="chart-card">
+                            <div class="chart-title">Today's Room Status</div>
+                            <DxPieChart Data="@roomStatusData" Height="200px" Width="100%">
+                                <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
+                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
+                                </DxPieChartSeries>
+                            </DxPieChart>
+                            <div class="legend-manual">
+                                <span class="leg-item"><span class="dot" style="background:#26a69a;"></span> Inspected (0): 0.00 %</span>
+                                <span class="leg-item"><span class="dot" style="background:#ffb300;"></span> Clean (14): 100.00 %</span>
+                                <span class="leg-item"><span class="dot" style="background:#e53935;"></span> Dirty (0): 0.00 %</span>
+                                <span class="leg-item"><span class="dot" style="background:#43a047;"></span> Pickup (0): 0.00 %</span>
+                                <span class="leg-item"><span class="dot" style="background:#6d4c31;"></span> Out of Service (0): 0.00 %</span>
+                                <span class="leg-item"><span class="dot" style="background:#1a237e;"></span> Out of Order (0): 0.00 %</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Right: Charts -->
@@ -164,37 +187,12 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Bottom: Today's Room Status -->
-                <div class="room-status-panel">
-                    <div class="room-status-title">Today's Room Status</div>
-                    <div class="room-status-placeholder">
-                        <!-- Placeholder – wire to real room status data when available -->
-                    </div>
-                </div>
-            </DxTabPage>
-
-            <DxTabPage Text="Task Notification">
-                <div class="tab-placeholder">Task Notification content</div>
-            </DxTabPage>
-            <DxTabPage Text="Activity">
-                <div class="tab-placeholder">Activity content</div>
-            </DxTabPage>
-            <DxTabPage Text="Message">
-                <div class="tab-placeholder">Message content</div>
-            </DxTabPage>
-            <DxTabPage Text="E-mail">
-                <div class="tab-placeholder">E-mail content</div>
             </DxTabPage>
             <DxTabPage Text="Security">
                 <div class="tab-placeholder">Security content</div>
             </DxTabPage>
-            <DxTabPage Text="Personal Record">
-                <div class="tab-placeholder">Personal Record content</div>
-            </DxTabPage>
-            <DxTabPage Text="My Note">
-                <div class="tab-placeholder">My Note content</div>
-            </DxTabPage>
+
+
         </DxTabs>
     </div>
 
@@ -207,28 +205,62 @@
 
         .dashboard-page {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            min-height: 100vh;
+            background: white;
+            height: 100vh;
             padding: 0;
 
+            display: flex;
+            flex-direction: column;
 
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
 
         .top-header {
             display: grid;
 
-            /* USER | CALENDAR | LOGO */
-            grid-template-columns: auto 560px 150px;
+            /* USER | LOGO — logo pushed to the far right */
+            grid-template-columns: 1fr 150px;
 
             gap: 12px;
             padding: 6px 12px;
 
-            background: #fff;
+            background: white ;
             @* border-bottom: 1px solid #1255c2; *@
 
             align-items: start;
+
+            flex: 0 0 auto;
+        }
+
+        /* The DxTabs nav strip and its content panel are siblings of
+           .top-header under .dashboard-page (DevExpress renders the tab
+           content panel as a plain .dx-tabs-content-panel with no way to
+           attach our own CssClass to it) — scope everything below to the
+           element right after OUR nav via the adjacent-sibling combinator,
+           so other DxTabs instances elsewhere in the app aren't affected. */
+        .main-tabs {
+            flex: 0 0 auto;
+        }
+
+        .main-tabs + .dx-tabs-content-panel {
+            flex: 1 1 auto;
+            min-height: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow: hidden;
+        }
+
+        .main-tabs + .dx-tabs-content-panel .dx-tabs-content {
+            flex: 1 1 auto;
+            min-height: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow: hidden;
         }
 
 
@@ -285,6 +317,7 @@
 
             white-space: normal;
             overflow-wrap: break-word;
+            font-family: monospace, monospace;
         }
 
         .info-grid {
@@ -320,100 +353,6 @@
 
 
 
-        .calendar-box {
-            display: flex;
-            flex-direction: row;
-
-            width: 100%;
-            micalendan-width: 0;
-
-            border: 1px solid #bdbdbd;
-            background: #fff;
-
-            @* padding: 5px 7px; *@
-            padding-bottom: 0px;
-            padding-right: 5px;
-            padding-left:5px;
-            padding-top:5px;
-
-            gap: 8px;
-
-            align-self: start;
-        }
-
-        .cal-left {
-            display: flex;
-            flex-direction: column;
-
-            justify-content: flex-start;
-
-            gap: 10px;
-
-            min-width: 95px;
-            flex-shrink: 0;
-
-            border-right: 1px solid #e0e0e0;
-
-            padding-right: 8px;
-        }
-
-        .cal-toggle {
-            font-size: 11px;
-        }
-
-        .cal-nav-vert {
-            display: flex;
-            flex-direction: column;
-
-            gap: 3px;
-
-            font-size: 11px;
-        }
-
-        .cal-lbl {
-            color: #777;
-            font-size: 10px;
-        }
-
-        .cal-footer-vert {
-            display: flex;
-            align-items: center;
-
-            font-size: 11px;
-
-            flex-shrink: 0;
-        }
-
-        .cal-date {
-            color: #555;
-
-            font-size: 14px;
-
-            text-align: center;
-
-            padding: 3px 5px ;
-
-            border: 1px solid lightgrey;
-            border-radius: 0px;
-
-            white-space: nowrap;
-
-            background: #fff;
-        }
-
-        .cal-right {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
-        .dash-calendar {
-            width: 100%;
-        }
-
-        .dash-calendar .dxbs-calendar-table-container .dxbs-calendar-table {
-            width: 100% !important;
-        }
-
         .logo-box {
             width: 150px;
 
@@ -431,43 +370,69 @@
             height: auto;
 
             object-fit: contain;
+            padding:2px;
+            border:1px solid #cfd8dc !important;
         }
 
 
    
 
         .main-tabs {
-            background: #fff;
+            
+            background: white;
             margin: 0 8px;
         }
 
 
         .main-tabs .nav-tabs {
-            border-bottom: 1px solid #d0d5dd;
 
-            padding-left: 8px;
-
-            overflow-x: auto;
 
             flex-wrap: nowrap !important;
         }
 
-        .main-tabs .nav-tabs .nav-link {
-            padding: 8px 16px !important;
+        .main-tabs .nav-tabs .nav-item {
+            flex: 1 1 0%;
 
-            font-size: 13px;
-
-            white-space: nowrap;
+            text-align: center;
         }
 
-        /* Matches room.css's .property-tabs/.rooms-tabs/.rt-modal-tabs
-           pattern: only the inactive state is touched (muted gray), and the
-           active tab is left alone to use Bootstrap's own default look
-           (white background, bordered) — same treatment as the rest of the
-           app, instead of the custom blue-underline active style this had
-           before. */
+        .main-tabs .nav-tabs .nav-link {
+            padding: 10px 0px !important;
+
+            font-size: 15px;
+
+            white-space: nowrap;
+
+            width: 100%;
+
+            border: 1px solid #d0d5dd !important;
+            border-bottom-color: transparent !important;
+            border-radius: 0px !important;
+
+            position: relative;
+        }
+
+        /* Inactive tabs get a visible border + recessed gray fill so they still
+           read as clickable, but sit a step behind the active tab (lower
+           z-index, no lift) instead of blending into the page. */
         .main-tabs .nav-tabs .nav-link:not(.active) {
             color: #6c757d !important;
+
+            background: #eef1f4;
+
+            border-bottom-color: #d0d5dd !important;
+            padding-bottom: 8px !important;
+            margin-top: 2px !important;
+            z-index: 1;
+        }
+
+        .main-tabs .nav-tabs .nav-link.active {
+            background: #fff;
+
+            border-color: #d0d5dd !important;
+            border-bottom-color: #fff !important;
+
+            z-index: 2;
         }
 
 
@@ -480,9 +445,12 @@
 
             padding: 10px;
 
-            background: #f5f6f8;
+            background: white;
 
-            min-height: 380px;
+            flex: 1 1 auto;
+            min-height: 0;
+
+            overflow: hidden;
         }
 
         .left-panel {
@@ -497,22 +465,84 @@
 
             min-width: 280px;
             max-width: 100%;
+            height: 100%;
+            min-height: 0;
 
+            overflow-y: auto;
             overflow-x: auto;
         }
+                .left-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-panel::-webkit-scrollbar-thumb {
+            background: hsla(0, 0%, 46%, 0.637);
+            border-radius: 0px;
+        }
+
+        .toolbar-group {
+            gap: 2px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }
+
 
         .panel-toolbar {
-            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 6px 8px;
 
             border-bottom: 1px solid #e0e0e0;
 
-            background: #f8f9fa;
+            background: white;
+
+            flex: 0 0 auto;
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .icon-toolbar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 36px;
+            height: 32px;
+
+            border: 1px solid #c8cdd4;
+            border-radius: 3px;
+            background: #fff;
+
+            cursor: pointer;
+        }
+
+        .icon-toolbar-btn i {
+            font-size: 18px;
+        }
+
+        .icon-toolbar-btn:hover {
+            background: #f0f4fa;
+        }
+
+        .panel-toolbar-hotel {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            margin-left: 8px;
         }
 
         .task-grid {
-            flex: 1;
+            flex: 0 0 auto;
 
             font-size: 12px;
+
+            height: 280px;
+            overflow: hidden;
         }
 
         .task-row-selected,
@@ -538,6 +568,10 @@
             gap: 10px;
 
             min-width: 260px;
+            height: 100%;
+            min-height: 0;
+
+            overflow-y: auto;
         }
 
         .chart-card {
@@ -547,7 +581,7 @@
 
             padding: 8px 12px;
 
-            flex: 1;
+
         }
 
         .chart-title {
@@ -602,34 +636,6 @@
 
 
 
-        .room-status-panel {
-            margin: 0 10px 10px;
-
-            background: #fff;
-
-            border: 1px solid #c8cdd4;
-
-            min-height: 120px;
-        }
-
-        .room-status-title {
-            text-align: center;
-
-            font-size: 16px;
-
-            font-weight: 600;
-
-            color: #1565c0;
-
-            padding: 10px;
-
-            border-bottom: 1px solid #eee;
-        }
-
-        .room-status-placeholder {
-            height: 80px;
-        }
-
         .tab-placeholder {
             padding: 40px;
 
@@ -642,43 +648,6 @@
 
 
        
-
-        .dash-calendar .card-body {
-            padding: 0.12rem 0.4rem !important;
-        }
-
-        .dash-calendar .dxbs-calendar-table-container {
-            padding: 0.05rem 0.25rem !important;
-        }
-
-        .dash-calendar .dxbs-calendar-header {
-            padding: 1px 4px !important;
-
-            min-height: 20px !important;
-        }
-
-        .dash-calendar .dxbs-calendar-day,
-        .dash-calendar td {
-            height: 16px !important;
-
-            padding: 0 !important;
-
-            font-size: 10px !important;
-
-            line-height: 16px !important;
-        }
-
-        .dash-calendar .dxbs-calendar-footer {
-            padding: 1px 4px !important;
-        }
-
-        .dash-calendar .dxbs-calendar-footer .btn {
-            padding: 0 8px !important;
-
-            font-size: 10px !important;
-
-            height: 19px !important;
-        }
 
 
  
@@ -710,21 +679,12 @@
             .top-header {
                 grid-template-columns: minmax(0, 1fr) 150px;
 
-                grid-template-areas:
-                    "user logo"
-                    "calendar calendar";
+                grid-template-areas: "user logo";
             }
 
             .user-card {
                 grid-area: user;
                 min-width: 0;
-            }
-
-            .calendar-box {
-                grid-area: calendar;
-
-                width: 560px;
-                max-width: 100%;
             }
 
             .logo-box {
@@ -750,9 +710,7 @@
             .top-header {
                 grid-template-columns: minmax(0, 1fr) 130px;
 
-                grid-template-areas:
-                    "user logo"
-                    "calendar calendar";
+                grid-template-areas: "user logo";
 
                 padding: 10px;
             }
@@ -822,13 +780,6 @@
                 height: auto;
             }
 
-            .calendar-box {
-                grid-area: calendar;
-
-                width: 560px;
-                max-width: 100%;
-            }
-
             .dashboard-body {
                 flex-direction: column;
             }
@@ -848,9 +799,7 @@
             .top-header {
                 grid-template-columns: minmax(0, 1fr) 90px;
 
-                grid-template-areas:
-                    "user logo"
-                    "calendar calendar";
+                grid-template-areas: "user logo";
             }
 
             .logo-box {
@@ -897,9 +846,7 @@
 
                 grid-template-columns: minmax(0, 1fr) 90px;
 
-                grid-template-areas:
-                    "user logo"
-                    "calendar calendar";
+                grid-template-areas: "user logo";
 
                 gap: 8px;
 
@@ -939,33 +886,21 @@
                 object-fit: contain;
             }
 
-            .calendar-box {
-                grid-area: calendar;
-
-                width: 100%;
-                max-width: 100%;
+            .dx-legend-inside .dx-chart-legend.dx-center{
+                background-color: red;
             }
+            
         }
+        .dx-legend-inside .dx-chart-legend.dx-center {
+    left: 87%;
+    transform: translate(-50%, 0);
+}
     </style>
 
 
 @code {
-    // ---------- Header / Calendar ----------
-    string calendarMode = "Gregorian";
-    string[] calendarModes = new[] { "Ethiopian", "Gregorian" };
-    int selectedMonth = 8;
+    // ---------- Header ----------
     int selectedYear = 2018;
-    DateTime selectedDate = new DateTime(2017, 8, 19);
-    DateTime visibleDate = new DateTime(2017, 8, 1);
-
-    List<int> months = Enumerable.Range(1, 12).ToList();
-
-    void OnVisibleDateChanged(DateTime date)
-    {
-        visibleDate = date;
-        selectedMonth = date.Month;
-        selectedYear = date.Year;
-    }
 
     // ---------- Tabs ----------
     int activeTab = 0;
@@ -1009,6 +944,53 @@
         StateHasChanged();
     }
 
+    void OnPrintTasks()
+    {
+        // TODO: print logic
+    }
+
+    void OnExportTasks()
+    {
+        // TODO: export to Excel logic
+    }
+
+    // ---------- Task panel toolbar ----------
+    List<string> dashboardHotels = new() { "MAIN TEST HOTEL" };
+    string? selectedDashboardHotel = "MAIN TEST HOTEL";
+
+    // ---------- Today's Room Statistics ----------
+    List<RoomStatItem> roomStatsItems = new()
+    {
+        new() { SN = 1, Description = "Total House Keeping Rooms", Count = 14 },
+        new() { SN = 2, Description = "Total Clean", Count = 14 },
+        new() { SN = 3, Description = "Total Dirty", Count = 0 },
+        new() { SN = 4, Description = "Total Inspected", Count = 0 },
+        new() { SN = 5, Description = "Total Pickup", Count = 0 },
+        new() { SN = 6, Description = "Total Out Of Order", Count = 0 },
+        new() { SN = 7, Description = "Total Out Of Service", Count = 0 },
+        new() { SN = 8, Description = "Not Reserved - Clean", Count = 14 },
+        new() { SN = 9, Description = "Not Reserved - Dirty", Count = 0 },
+        new() { SN = 10, Description = "Not Reserved - Inspected", Count = 0 },
+        new() { SN = 11, Description = "Not Reserved - Pickup", Count = 0 },
+        new() { SN = 12, Description = "Not Reserved - Out Of Service", Count = 0 },
+        new() { SN = 13, Description = "Reserved - Clean", Count = 0 },
+        new() { SN = 14, Description = "Reserved - Dirty", Count = 0 },
+        new() { SN = 15, Description = "Reserved - Inspected", Count = 0 },
+        new() { SN = 16, Description = "Reserved - Pickup", Count = 0 },
+        new() { SN = 17, Description = "Reserved - Out Of Service", Count = 0 },
+    };
+
+    // ---------- Today's Room Status pie ----------
+    List<RoomStatusSlice> roomStatusData = new()
+    {
+        new() { Name = "Inspected", Value = 0m },
+        new() { Name = "Clean", Value = 14m },
+        new() { Name = "Dirty", Value = 0m },
+        new() { Name = "Pickup", Value = 0m },
+        new() { Name = "Out of Service", Value = 0m },
+        new() { Name = "Out of Order", Value = 0m },
+    };
+
     // ---------- Occupancy pie ----------
     List<OccupancySlice> occupancyData = new()
     {
@@ -1046,6 +1028,19 @@
     }
 
     public class OccupancySlice
+    {
+        public string Name { get; set; } = "";
+        public decimal Value { get; set; }
+    }
+
+    public class RoomStatItem
+    {
+        public int SN { get; set; }
+        public string Description { get; set; } = "";
+        public int Count { get; set; }
+    }
+
+    public class RoomStatusSlice
     {
         public string Name { get; set; } = "";
         public decimal Value { get; set; }
