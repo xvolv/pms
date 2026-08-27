@@ -1,0 +1,230 @@
+@using DevExpress.Blazor
+
+<div class="db-pr-container" @onclick="CloseMenus">
+
+    <!-- ===================== FILTER BAR ===================== -->
+    <div class="db-pr-filter-bar">
+        <div class="db-pr-toolbar-row">
+            <button class="db-pr-toolbar-btn" type="button" @onclick="OnShow">
+                <i class="bi bi-eye"></i>
+                <span>Show</span>
+            </button>
+            <button class="db-pr-toolbar-btn" type="button" @onclick="OnExport">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <span>Export</span>
+            </button>
+            <button class="db-pr-toolbar-btn" type="button" @onclick="OnPrint">
+                <i class="bi bi-printer"></i>
+                <span>Print</span>
+            </button>
+
+            <!-- Preview dropdown -->
+            <div class="toolbar-dropdown" @onclick:stopPropagation="true">
+                <button type="button" class="db-pr-toolbar-btn @(showPreviewMenu ? "active" : "")"
+                        @onclick="TogglePreview">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Preview ▾</span>
+                </button>
+                @if (showPreviewMenu)
+                {
+                    <ul class="dropdown-menu show" style="min-width:180px;">
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("Folio"))">
+                            <i class="bi bi-receipt me-2"></i>Folio
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("ProformaFolio"))">
+                            <i class="bi bi-file-earmark-ruled me-2"></i>Proforma Folio
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("RateSummary"))">
+                            <i class="bi bi-bar-chart-line me-2"></i>Rate Summary
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("RegistrationCard"))">
+                            <i class="bi bi-card-heading me-2"></i>Registration Card
+                        </li>
+                        <li class="dropdown-item" @onclick="@(() => OnPreview("ConfirmationCard"))">
+                            <i class="bi bi-check2-square me-2"></i>Confirmation Card
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="db-pr-filter-fields">
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Room</label>
+                    <DxTextBox @bind-Text="filterRoom" SizeMode="SizeMode.Small" NullText="Room No." />
+                </div>
+                <div class="db-pr-filter-row">
+                    <label>Guest</label>
+                    <DxTextBox @bind-Text="filterGuest" SizeMode="SizeMode.Small" NullText="Guest Name" />
+                </div>
+            </div>
+            <div class="db-pr-filter-col">
+                <div class="db-pr-filter-row">
+                    <label>Date From</label>
+                    <DxDateEdit @bind-Date="filterFrom" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="db-pr-filter-row">
+                    <label>Date To</label>
+                    <DxDateEdit @bind-Date="filterTo" SizeMode="SizeMode.Small" />
+                </div>
+            </div>
+        </div>
+
+        <button class="db-pr-clear-btn" type="button" @onclick="ClearFilters">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Clear</span>
+        </button>
+    </div>
+
+    <!-- ===================== GRID ===================== -->
+    <div class="db-pr-main-content">
+        <div class="db-pr-grid-area">
+            <DxGrid Data="@rows"
+                    KeyFieldName="SN"
+                    PageSize="20"
+                    CssClass="db-pr-grid"
+                    Height="100%"
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItem="@selectedRow"
+                    SelectedDataItemChanged="@(e => selectedRow = (OthersRow?)e)">
+                <Columns>
+                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="50" />
+                    <DxGridDataColumn FieldName="Date" Caption="Date" Width="110" DisplayFormat="M/d/yyyy" />
+                    <DxGridDataColumn FieldName="Room" Caption="Room" Width="80" />
+                    <DxGridDataColumn FieldName="Guest" Caption="Guest" Width="180" />
+                    <DxGridDataColumn FieldName="Description" Caption="Description" />
+                    <DxGridDataColumn FieldName="Amount" Caption="Amount" Width="110" DisplayFormat="N2" />
+                    <DxGridDataColumn FieldName="Status" Caption="Status" Width="100" />
+                </Columns>
+            </DxGrid>
+            <div class="db-pr-record-info">
+                Record @(rows.Count == 0 ? 0 : (selectedRow == null ? 1 : rows.IndexOf(selectedRow) + 1)) of @rows.Count
+            </div>
+        </div>
+
+        <!-- Detail panel -->
+        <div class="db-pr-detail-panel @(isDetailCollapsed ? "db-pr-collapsed" : "")">
+            <div class="db-pr-detail-header">
+                @if (!isDetailCollapsed)
+                {
+                    <span class="db-pr-panel-title">@Title Detail</span>
+                    <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+                        <button type="button" title="Collapse" @onclick="@(() => isDetailCollapsed = true)">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <span class="db-pr-panel-title" @onclick="@(() => isDetailCollapsed = false)">@Title Detail</span>
+                }
+            </div>
+            <div class="db-pr-detail-body">
+                @if (selectedRow != null)
+                {
+                    <p><strong>SN:</strong> @selectedRow.SN</p>
+                    <p><strong>Date:</strong> @selectedRow.Date.ToString("M/d/yyyy")</p>
+                    <p><strong>Room:</strong> @selectedRow.Room</p>
+                    <p><strong>Guest:</strong> @selectedRow.Guest</p>
+                    <p><strong>Description:</strong> @selectedRow.Description</p>
+                    <p><strong>Amount:</strong> @selectedRow.Amount.ToString("N2")</p>
+                    <p><strong>Status:</strong> @selectedRow.Status</p>
+                }
+                else
+                {
+                    <span class="db-pr-text-muted">Select a record</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview info message -->
+    @if (!string.IsNullOrEmpty(previewMessage))
+    {
+        <div style="padding:8px 12px; font-size:12px; color:#1565c0; background:#e3f2fd; border-top:1px solid #bbdefb;">
+            <i class="bi bi-info-circle"></i> @previewMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Others";
+    [Parameter] public string ContentType { get; set; } = "POSCharges";
+
+    bool showPreviewMenu = false;
+    bool isDetailCollapsed = true;
+    string filterRoom = "";
+    string filterGuest = "";
+    DateTime? filterFrom;
+    DateTime? filterTo;
+    string previewMessage = "";
+
+    List<OthersRow> rows = new();
+    OthersRow? selectedRow;
+
+    protected override void OnParametersSet() => LoadData();
+
+    void LoadData()
+    {
+        // Stub data — replace with real service calls
+        rows = ContentType switch
+        {
+            "POSCharges" => new List<OthersRow>
+            {
+                new() { SN = 1, Date = new DateTime(2017, 8, 19), Room = "102", Guest = "Leo Rojas", Description = "Restaurant – Dinner", Amount = 450.00m, Status = "Posted" },
+                new() { SN = 2, Date = new DateTime(2017, 8, 19), Room = "102", Guest = "Leo Rojas", Description = "Minibar", Amount = 120.00m, Status = "Posted" },
+                new() { SN = 3, Date = new DateTime(2017, 8, 20), Room = "102", Guest = "Leo Rojas", Description = "Spa & Wellness", Amount = 600.00m, Status = "Posted" }
+            },
+            "TravelDetails" => new List<OthersRow>
+            {
+                new() { SN = 1, Date = new DateTime(2017, 8, 19), Room = "102", Guest = "Leo Rojas", Description = "Arriving From: Argentina", Amount = 0m, Status = "Active" },
+                new() { SN = 2, Date = new DateTime(2017, 8, 19), Room = "301", Guest = "teshome mola", Description = "Arriving From: Addis Ababa", Amount = 0m, Status = "Active" }
+            },
+            "WakeupCalls" => new List<OthersRow>
+            {
+                new() { SN = 1, Date = new DateTime(2017, 8, 20), Room = "102", Guest = "Leo Rojas", Description = "Wakeup at 06:00", Amount = 0m, Status = "Pending" }
+            },
+            "Messages" => new List<OthersRow>
+            {
+                new() { SN = 1, Date = new DateTime(2017, 8, 19), Room = "102", Guest = "Leo Rojas", Description = "MSG-00043-17: Package from reception", Amount = 0m, Status = "Delivered" }
+            },
+            _ => new List<OthersRow>()
+        };
+    }
+
+    void CloseMenus() => showPreviewMenu = false;
+    void TogglePreview() => showPreviewMenu = !showPreviewMenu;
+
+    void OnPreview(string type)
+    {
+        showPreviewMenu = false;
+        previewMessage = type switch
+        {
+            "Folio" => "Opening Folio preview for selected record...",
+            "ProformaFolio" => "Opening Proforma Folio for selected record...",
+            "RateSummary" => "Opening Rate Summary for selected record...",
+            "RegistrationCard" => "Opening Registration Card for selected record...",
+            "ConfirmationCard" => "Opening Confirmation Card for selected record...",
+            _ => ""
+        };
+        // In a real implementation, emit an event or call a service to open the relevant popup
+    }
+
+    void ClearFilters() { filterRoom = ""; filterGuest = ""; filterFrom = null; filterTo = null; previewMessage = ""; LoadData(); }
+    void OnShow() { }
+    void OnExport() { }
+    void OnPrint() { }
+
+    public class OthersRow
+    {
+        public int SN { get; set; }
+        public DateTime Date { get; set; }
+        public string Room { get; set; } = "";
+        public string Guest { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Amount { get; set; }
+        public string Status { get; set; } = "";
+    }
+}

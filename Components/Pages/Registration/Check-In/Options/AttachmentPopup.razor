@@ -1,16 +1,19 @@
 @using DevExpress.Blazor
-@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
 <DxPopup @bind-Visible="Visible"
          HeaderText="@($"Attachments ( {RegistrationNo} )")"
-         Width="560px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+         Width="720px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true"
+         CloseOnEscape="false">
     <BodyContentTemplate>
-        <div class="amend-toolbar">
+        <!-- Toolbar -->
+        <div class="att-toolbar">
             <button type="button" class="ci-btn" @onclick="HandleNew">
                 <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-file-earmark-plus"></i></div>
                 <div class="ci-text">New</div>
             </button>
-            <button type="button" class="ci-btn" @onclick="@(() => {})">
+            <button type="button" class="ci-btn" @onclick="HandleDelete" disabled="@(!CanDelete)">
                 <div class="ci-icon" style="color:#c62828;"><i class="bi bi-trash"></i></div>
                 <div class="ci-text">Delete</div>
             </button>
@@ -19,39 +22,396 @@
                 <div class="ci-text">Close</div>
             </button>
         </div>
-        <div style="display:flex; gap:8px; height:260px;">
-            <div style="flex:1; border:1px solid #ccc; background:#fafafa;"></div>
-            <div style="flex:1; border:1px solid #ccc; background:#fafafa;"></div>
+
+        <!-- Body: Tree (left) + Preview (right) -->
+        <div class="att-body">
+            <!-- Category / Attachment Tree -->
+            <div class="att-tree-panel">
+                <div class="att-tree-body">
+                    @foreach (var cat in Categories)
+                    {
+                        <div class="att-category-row @(cat.Name == selectedCategory && string.IsNullOrEmpty(selectedAttachmentId) ? "selected" : "")"
+                             @onclick="@(() => SelectCategory(cat.Name))">
+                            <i class="bi @GetCategoryIcon(cat.Name) att-cat-icon"></i>
+                            <span class="att-category-name">@cat.Name</span>
+                        </div>
+
+                        @if (cat.Name == expandedCategory)
+                        {
+                            @foreach (var att in cat.Attachments)
+                            {
+                                <div class="att-attachment-row @(att.Id == selectedAttachmentId ? "selected" : "")"
+                                     @onclick="@(() => SelectAttachment(cat.Name, att))">
+                                    <i class="bi bi-image att-file-icon"></i>
+                                    <span class="att-attachment-name">@att.Description</span>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="att-preview-panel">
+                @if (selectedAttachment != null && !string.IsNullOrEmpty(selectedAttachment.Url))
+                {
+                    @if (IsImageUrl(selectedAttachment.Url))
+                    {
+                        <img src="@selectedAttachment.Url"
+                             alt="@selectedAttachment.Description"
+                             class="att-preview-img" />
+                    }
+                    else
+                    {
+                        <div class="att-preview-placeholder">
+                            <i class="bi bi-file-earmark" style="font-size:48px; color:#888;"></i>
+                            <div style="margin-top:8px;">@selectedAttachment.Description</div>
+                            <div style="font-size:12px; color:#999; margin-top:4px;">@selectedAttachment.Url</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="att-preview-placeholder">
+                        <span style="color:#aaa;">Select an attachment to preview</span>
+                    </div>
+                }
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
-<!-- Embedded New Attachment Popup -->
-<NewAttachmentPopup
-    @bind-Visible="showNewAttachment"
-    OnSave="@(() => showNewAttachment = false)" />
+<!-- New Attachment Popup -->
+<NewAttachmentPopup @bind-Visible="showNewAttachment"
+                    Category="@selectedCategory"
+                    OnSaved="OnAttachmentSaved" />
+
+<!-- Delete Confirmation -->
+<DxPopup @bind-Visible="showDeleteConfirm"
+         HeaderText="Confirm Delete"
+         Width="360px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true">
+    <BodyContentTemplate>
+        <div style="padding:12px 8px; font-size:14px;">
+            Are you sure you want to delete
+            <strong>@(selectedAttachment?.Description ?? "this attachment")</strong>?
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <DxButton Text="Cancel"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      SizeMode="SizeMode.Small"
+                      Click="@(() => showDeleteConfirm = false)" />
+            <DxButton Text="Delete"
+                      RenderStyle="ButtonRenderStyle.Danger"
+                      SizeMode="SizeMode.Small"
+                      Click="ConfirmDelete" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .att-toolbar {
+        display: flex;
+        gap: 4px;
+        padding: 6px 4px 10px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 8px;
+    }
+
+    .ci-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        padding: 4px 8px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+    .ci-btn:hover:not(:disabled) {
+        background: #f0f0f0;
+    }
+    .ci-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+    .ci-icon {
+        font-size: 18px;
+        line-height: 1;
+    }
+    .ci-text {
+        font-size: 11px;
+        margin-top: 2px;
+        color: #333;
+    }
+
+    .att-body {
+        display: flex;
+        gap: 8px;
+        height: 340px;
+    }
+
+    .att-tree-panel {
+        width: 220px;
+        min-width: 200px;
+        border: 1px solid #c8cdd4;
+        background: #fff;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .att-tree-body {
+        font-size: 13px;
+    }
+
+    .att-category-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .att-category-row:hover {
+        background: #e8f0fe;
+    }
+    .att-category-row.selected {
+        background: #cce0ff;
+        outline: 1px dotted #1565c0;
+    }
+
+    .att-attachment-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px 4px 20px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .att-attachment-row:hover {
+        background: #e8f0fe;
+    }
+    .att-attachment-row.selected {
+        background: #cce0ff;
+        outline: 1px dotted #1565c0;
+    }
+
+    .att-cat-icon {
+        color: #1565c0;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    .att-file-icon {
+        color: #43a047;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .att-category-name,
+    .att-attachment-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .att-preview-panel {
+        flex: 1;
+        border: 1px solid #c8cdd4;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+        position: relative;
+    }
+
+    .att-preview-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    .att-preview-placeholder {
+        text-align: center;
+        color: #888;
+        padding: 16px;
+    }
+</style>
 
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
     [Parameter] public string? RegistrationNo { get; set; }
     [Parameter] public EventCallback OnNew { get; set; }
 
     bool showNewAttachment = false;
+    bool showDeleteConfirm = false;
 
-    protected override void OnParametersSet()
+    public string selectedCategory = "Trailer";
+    string expandedCategory = "Trailer";
+    string? selectedAttachmentId;
+    AttachmentItem? selectedAttachment;
+
+    bool CanDelete => selectedAttachment != null;
+
+    // Fixed category list matching the screenshot
+    List<AttachmentCategory> Categories = new()
     {
-        if (TargetRegistration != null && string.IsNullOrEmpty(RegistrationNo))
+        new("Banner"),
+        new("Certificate"),
+        new("Email"),
+        new("Finger Print"),
+        new("License"),
+        new("Passport"),
+        new("Personal Photo"),
+        new("Picture"),
+        new("Poster Landscape"),
+        new("Poster Portrait"),
+        new("Reference Documents"),
+        new("Trailer")
         {
-            RegistrationNo = TargetRegistration.Registration;
-        }
+            Attachments =
+            {
+                // Sample item matching screenshot (ssss under Trailer)
+                new AttachmentItem
+                {
+                    Id = "att-1",
+                    Description = "ssss",
+                    Url = "https://media.geeksforgeeks.org/wp-content/uploads/20230822131732/images.png",
+                    Category = "Trailer"
+                }
+            }
+        },
+        new("Video"),
+        new("National ID")
+    };
+
+    void SelectCategory(string name)
+    {
+        selectedCategory = name;
+        expandedCategory = name;
+        selectedAttachmentId = null;
+        selectedAttachment = null;
+        StateHasChanged();
+    }
+
+    void SelectAttachment(string category, AttachmentItem att)
+    {
+        selectedCategory = category;
+        expandedCategory = category;
+        selectedAttachmentId = att.Id;
+        selectedAttachment = att;
+        StateHasChanged();
     }
 
     async Task HandleNew()
     {
-        if (OnNew.HasDelegate) await OnNew.InvokeAsync();
-        else showNewAttachment = true;
+        if (string.IsNullOrEmpty(selectedCategory))
+            selectedCategory = Categories.FirstOrDefault()?.Name ?? "Banner";
+
+        if (OnNew.HasDelegate)
+            await OnNew.InvokeAsync();
+        else
+            showNewAttachment = true;
     }
+
+    void HandleDelete()
+    {
+        if (selectedAttachment == null) return;
+        showDeleteConfirm = true;
+    }
+
+    void ConfirmDelete()
+    {
+        if (selectedAttachment == null) return;
+
+        var cat = Categories.FirstOrDefault(c => c.Name == selectedAttachment.Category);
+        if (cat != null)
+        {
+            cat.Attachments.RemoveAll(a => a.Id == selectedAttachment.Id);
+        }
+
+        selectedAttachment = null;
+        selectedAttachmentId = null;
+        showDeleteConfirm = false;
+        StateHasChanged();
+    }
+
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+
+    public void OnAttachmentSaved(AttachmentItem item)
+    {
+        var cat = Categories.FirstOrDefault(c => c.Name == item.Category)
+                  ?? Categories.FirstOrDefault(c => c.Name == selectedCategory);
+
+        if (cat == null) return;
+
+        // Ensure Id
+        if (string.IsNullOrEmpty(item.Id))
+            item.Id = Guid.NewGuid().ToString("N");
+
+        item.Category = cat.Name;
+        cat.Attachments.Add(item);
+
+        expandedCategory = cat.Name;
+        selectedCategory = cat.Name;
+        selectedAttachmentId = item.Id;
+        selectedAttachment = item;
+
+        showNewAttachment = false;
+        StateHasChanged();
+    }
+
+    string GetCategoryIcon(string name) => name switch
+    {
+        "Banner" => "bi-flag",
+        "Certificate" => "bi-award",
+        "Email" => "bi-envelope",
+        "Finger Print" => "bi-fingerprint",
+        "License" => "bi-card-heading",
+        "Passport" => "bi-journal-bookmark",
+        "Personal Photo" => "bi-person-bounding-box",
+        "Picture" => "bi-image",
+        "Poster Landscape" => "bi-aspect-ratio",
+        "Poster Portrait" => "bi-phone",
+        "Reference Documents" => "bi-folder2",
+        "Trailer" => "bi-film",
+        "Video" => "bi-camera-video",
+        "National ID" => "bi-person-vcard",
+        _ => "bi-file-earmark"
+    };
+
+    bool IsImageUrl(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return false;
+        var lower = url.ToLowerInvariant();
+        return lower.EndsWith(".jpg") || lower.EndsWith(".jpeg") || lower.EndsWith(".png")
+            || lower.EndsWith(".gif") || lower.EndsWith(".bmp") || lower.EndsWith(".webp")
+            || lower.EndsWith(".svg") || lower.Contains("data:image") || lower.Contains("blob:")
+            || lower.Contains("http") && (lower.Contains(".jpg") || lower.Contains(".png") || lower.Contains(".jpeg") || lower.Contains("image"));
+    }
+
+    public class AttachmentCategory
+    {
+        public string Name { get; set; }
+        public List<AttachmentItem> Attachments { get; set; } = new();
+
+        public AttachmentCategory(string name) => Name = name;
+    }
+
+    public class AttachmentItem
+    {
+        public string Id { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Url { get; set; } = "";
+        public string Category { get; set; } = "";
+    }
 }

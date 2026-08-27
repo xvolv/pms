@@ -1,132 +1,422 @@
 @using DevExpress.Blazor
-@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup @bind-Visible="Visible" HeaderText="New Attachment" Width="520px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible"
+         HeaderText="New Attachment"
+         Width="560px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true"
+         CloseOnEscape="false">
     <BodyContentTemplate>
-        <div class="amend-toolbar">
-            <button type="button" class="ci-btn" @onclick="HandleSave">
-                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
-                <div class="ci-text">Save</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleBrowse">
-                <div class="ci-icon" style="color:#555;"><i class="bi bi-folder2-open"></i></div>
-                <div class="ci-text">Browse</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleScan">
-                <div class="ci-icon" style="color:#555;"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Scan</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleCamera">
-                <div class="ci-icon" style="color:#555;"><i class="bi bi-camera"></i></div>
-                <div class="ci-text">Camera</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleEdit">
-                <div class="ci-icon" style="color:#555;"><i class="bi bi-pencil"></i></div>
-                <div class="ci-text">Edit</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleClose">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
+        <!-- Toolbar + Url / Description row (matches screenshot) -->
+        <div class="na-top">
+            <div class="na-toolbar">
+                <button type="button" class="ci-btn" @onclick="HandleSave">
+                    <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                    <div class="ci-text">Save</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleBrowse">
+                    <div class="ci-icon" style="color:#555;"><i class="bi bi-folder2-open"></i></div>
+                    <div class="ci-text">Browse</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleScan">
+                    <div class="ci-icon" style="color:#555;"><i class="bi bi-printer"></i></div>
+                    <div class="ci-text">Scan</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleCamera">
+                    <div class="ci-icon" style="color:#555;"><i class="bi bi-camera"></i></div>
+                    <div class="ci-text">Camera</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleEdit">
+                    <div class="ci-icon" style="color:#555;"><i class="bi bi-pencil"></i></div>
+                    <div class="ci-text">Edit</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleClose">
+                    <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                    <div class="ci-text">Close</div>
+                </button>
+            </div>
+
+            <div class="na-fields">
+                <div class="na-field-row">
+                    <label>Url</label>
+                    <DxTextBox @bind-Text="Url"
+                               SizeMode="SizeMode.Small"
+                               CssClass="na-input"
+                               NullText="File path or URL..." />
+                </div>
+                <div class="na-field-row">
+                    <label>Description</label>
+                    <DxTextBox @bind-Text="Description"
+                               SizeMode="SizeMode.Small"
+                               CssClass="na-input"
+                               NullText="Required..." />
+                </div>
+            </div>
         </div>
-        <div class="amend-form">
-            <div class="amend-row">
-                <label>Url</label>
-                <DxTextBox @bind-Text="Url" SizeMode="SizeMode.Small" />
+
+        <!-- Hidden InputFile for file selection -->
+        <InputFile OnChange="OnFileSelected" class="d-none" @ref="fileInput" id="fileInput" />
+        <label for="fileInput" class="d-none" @ref="fileLabel"></label>
+
+        @if (!string.IsNullOrEmpty(validationError))
+        {
+            <div class="na-error">
+                <i class="bi bi-exclamation-circle"></i> @validationError
             </div>
-            <div class="amend-row">
-                <label></label>
-                <DxCheckBox @bind-Checked="IsUrlOnly">Url Only</DxCheckBox>
-            </div>
-            <div class="amend-row">
-                <label>Description</label>
-                <DxTextBox @bind-Text="Description" SizeMode="SizeMode.Small" />
-            </div>
-        </div>
-        
-        <!-- Preview Section - Shows image directly in popup -->
-        <div style="margin-top:10px; border:1px solid #ccc; height:180px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; overflow:hidden; position:relative;">
-            @if (!string.IsNullOrEmpty(Url) && IsValidUrl(Url))
+        }
+
+        <!-- Preview -->
+        <div class="na-preview-label">Preview</div>
+        <div class="na-preview">
+            @if (!string.IsNullOrEmpty(imageData))
+            {
+                <img src="@imageData" alt="Preview" class="na-preview-img" />
+            }
+            else if (!string.IsNullOrEmpty(Url) && IsValidUrlOrPath(Url))
             {
                 if (IsImageUrl(Url))
                 {
-                    <img src="@Url" alt="Preview" style="max-width:100%; max-height:100%; object-fit:contain;" />
+                    <img src="@Url" alt="Preview" class="na-preview-img" @onerror="OnImageError" />
                 }
                 else
                 {
-                    <div style="text-align:center; padding:10px;">
+                    <div class="na-preview-placeholder">
                         <i class="bi bi-file-earmark" style="font-size:48px; color:#888;"></i>
                         <div style="margin-top:8px; font-size:14px; color:#555;">File Preview</div>
-                        <div style="font-size:12px; color:#999; margin-top:4px;">@Url</div>
+                        <div style="font-size:12px; color:#999; margin-top:4px; word-break:break-all;">@Url</div>
                     </div>
                 }
             }
-            else if (!string.IsNullOrEmpty(Url) && !IsValidUrl(Url))
+            else if (!string.IsNullOrEmpty(Url))
             {
-                <div style="text-align:center; padding:10px;">
+                <div class="na-preview-placeholder">
                     <i class="bi bi-exclamation-triangle" style="font-size:36px; color:#f57c00;"></i>
-                    <div style="margin-top:8px; font-size:14px; color:#888;">Invalid URL</div>
+                    <div style="margin-top:8px; font-size:14px; color:#888;">Invalid path / URL</div>
                 </div>
             }
             else
             {
-                <span style="color:#888;">No preview available</span>
+                <span style="color:#aaa;">No preview available</span>
             }
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- Save Confirmation -->
+<DxPopup @bind-Visible="showSaveConfirm"
+         HeaderText="Confirm Save"
+         Width="360px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true">
+    <BodyContentTemplate>
+        <div style="padding:12px 8px; font-size:14px;">
+            Save this attachment?
+            <div style="margin-top:10px; font-size:13px; color:#555;">
+                <div><strong>Description:</strong> @Description</div>
+                <div style="margin-top:4px; word-break:break-all;"><strong>Url:</strong> @Url</div>
+                @if (!string.IsNullOrEmpty(Category))
+                {
+                    <div style="margin-top:4px;"><strong>Category:</strong> @Category</div>
+                }
+            </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <DxButton Text="Cancel"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      SizeMode="SizeMode.Small"
+                      Click="@(() => showSaveConfirm = false)" />
+            <DxButton Text="Save"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      SizeMode="SizeMode.Small"
+                      Click="ConfirmSave" />
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .na-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 8px;
+    }
+
+    .na-toolbar {
+        display: flex;
+        gap: 2px;
+        flex-shrink: 0;
+    }
+
+    .ci-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 52px;
+        padding: 4px 6px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+    .ci-btn:hover {
+        background: #f0f0f0;
+    }
+    .ci-icon {
+        font-size: 18px;
+        line-height: 1;
+    }
+    .ci-text {
+        font-size: 11px;
+        margin-top: 2px;
+        color: #333;
+    }
+
+    .na-fields {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+        padding-top: 2px;
+    }
+
+    .na-field-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .na-field-row label {
+        width: 78px;
+        text-align: right;
+        font-size: 12px;
+        color: #555;
+        flex-shrink: 0;
+    }
+    .na-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .na-error {
+        background: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffcc80;
+        border-radius: 3px;
+        padding: 6px 10px;
+        font-size: 13px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .na-preview-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 4px;
+        padding: 2px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .na-preview {
+        height: 240px;
+        border: 1px solid #c8cdd4;
+        background: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+        position: relative;
+    }
+
+    .na-preview-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    .na-preview-placeholder {
+        text-align: center;
+        padding: 12px;
+        color: #888;
+    }
+</style>
+
 @code {
+    [Inject] IJSRuntime JSRuntime { get; set; } = default!;
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public string? Category { get; set; }
+    [Parameter] public EventCallback<AttachmentPopup.AttachmentItem> OnSaved { get; set; }
 
-    private string Url { get; set; } = "C:\\Users\\user\\Pictures\\";
-    private string Description { get; set; } = string.Empty;
-    private bool IsUrlOnly { get; set; } = true;
+    string Url { get; set; } = "";
+    string Description { get; set; } = "";
+    string validationError = "";
+    bool showSaveConfirm = false;
+    bool imageLoadFailed = false;
+    string imageData = "";
+    InputFile? fileInput;
+    ElementReference fileLabel;
 
-    async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
-    
+    protected override void OnParametersSet()
+    {
+        if (Visible)
+        {
+            // Reset form when opened
+            validationError = "";
+            imageLoadFailed = false;
+            imageData = "";
+            // Keep previous Url/Description only if you want; otherwise clear:
+            // Url = "";
+            // Description = "";
+        }
+    }
+
+    async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            // Check if it's an image
+            if (!IsImageFile(file.Name))
+            {
+                validationError = "Please select an image file (jpg, png, gif, bmp, webp).";
+                return;
+            }
+
+            // Read file as data URL for preview
+            using (var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)) // 10MB limit
+            using (var memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+                imageData = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+                Url = file.Name;
+            }
+
+            // Auto-fill description if empty
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                Description = Path.GetFileNameWithoutExtension(file.Name);
+            }
+
+            validationError = "";
+        }
+    }
+
+    bool IsImageFile(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif"
+            || ext == ".bmp" || ext == ".webp" || ext == ".svg";
+    }
+
+    async Task HandleSave()
+    {
+        validationError = "";
+
+        // Description is required
+        if (string.IsNullOrWhiteSpace(Description))
+        {
+            validationError = "Description is required.";
+            return;
+        }
+
+        // Either imageData (from file) or Url must be provided
+        if (string.IsNullOrWhiteSpace(imageData) && string.IsNullOrWhiteSpace(Url))
+        {
+            validationError = "Please select a file or enter a URL.";
+            return;
+        }
+
+        // Show confirmation modal
+        showSaveConfirm = true;
+    }
+
+    async Task ConfirmSave()
+    {
+        showSaveConfirm = false;
+
+        // Use imageData if available (from file), otherwise use Url
+        var finalUrl = !string.IsNullOrEmpty(imageData) ? imageData : Url.Trim();
+
+        var item = new AttachmentPopup.AttachmentItem
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            Description = Description.Trim(),
+            Url = finalUrl,
+            Category = Category ?? ""
+        };
+
+        if (OnSaved.HasDelegate)
+            await OnSaved.InvokeAsync(item);
+
+        // Clear for next time
+        Url = "";
+        Description = "";
+        imageData = "";
+        validationError = "";
+
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleClose()
+    {
+        validationError = "";
+        await VisibleChanged.InvokeAsync(false);
+    }
+
     async Task HandleBrowse()
     {
-        // Implement browse logic
-    }
-    
-    async Task HandleScan()
-    {
-        // Implement scan logic
-    }
-    
-    async Task HandleCamera()
-    {
-        // Implement camera logic
-    }
-    
-    async Task HandleEdit()
-    {
-        // Implement edit logic
+        // Trigger the hidden InputFile by clicking the label
+        await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('fileInput').click()");
     }
 
-    private bool IsValidUrl(string url)
+    Task HandleScan()
     {
-        return Uri.TryCreate(url, UriKind.Absolute, out _);
+        // Placeholder for scanner integration
+        return Task.CompletedTask;
     }
 
-    private bool IsImageUrl(string url)
+    Task HandleCamera()
     {
-        if (string.IsNullOrEmpty(url)) return false;
-        var lowerUrl = url.ToLower();
-        return lowerUrl.EndsWith(".jpg") || 
-               lowerUrl.EndsWith(".jpeg") || 
-               lowerUrl.EndsWith(".png") || 
-               lowerUrl.EndsWith(".gif") || 
-               lowerUrl.EndsWith(".bmp") || 
-               lowerUrl.EndsWith(".webp") ||
-               lowerUrl.EndsWith(".svg") ||
-               lowerUrl.Contains("data:image") ||
-               lowerUrl.Contains("blob:") ||
-               lowerUrl.Contains("http") && (lowerUrl.Contains(".jpg") || lowerUrl.Contains(".png") || lowerUrl.Contains(".jpeg"));
+        // Placeholder for camera capture
+        return Task.CompletedTask;
+    }
+
+    Task HandleEdit()
+    {
+        // Placeholder for image editor
+        return Task.CompletedTask;
+    }
+
+    void OnImageError()
+    {
+        imageLoadFailed = true;
+    }
+
+    bool IsValidUrlOrPath(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        // Accept http(s), data:, blob:, or Windows/Unix path
+        if (Uri.TryCreate(value, UriKind.Absolute, out _)) return true;
+        if (value.Contains(":\\") || value.StartsWith("/") || value.StartsWith("\\\\")) return true;
+        return false;
+    }
+
+    bool IsImageUrl(string url)
+    {
+        if (string.IsNullOrEmpty(url) || imageLoadFailed) return false;
+        var lower = url.ToLowerInvariant();
+        return lower.EndsWith(".jpg") || lower.EndsWith(".jpeg") || lower.EndsWith(".png")
+            || lower.EndsWith(".gif") || lower.EndsWith(".bmp") || lower.EndsWith(".webp")
+            || lower.EndsWith(".svg") || lower.Contains("data:image") || lower.Contains("blob:")
+            || (lower.Contains("http") && (lower.Contains(".jpg") || lower.Contains(".png")
+                || lower.Contains(".jpeg") || lower.Contains("image") || lower.Contains("media")));
     }
 }

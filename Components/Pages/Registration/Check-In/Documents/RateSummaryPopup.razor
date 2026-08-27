@@ -1,0 +1,269 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup Visible="@Visible" VisibleChanged="OnPopupVisibleChanged"
+         HeaderText="Rate Summary" Width="900px"
+         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
+    <BodyContentTemplate>
+
+        <!-- Toolbar -->
+        <div class="pf-toolbar">
+            <button type="button" class="pf-btn" @onclick="HandleRefresh">
+                <div class="pf-btn-icon pf-icon-green"><i class="bi bi-arrow-clockwise"></i></div>
+                <div class="pf-btn-text">Refresh</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="@(() => {})">
+                <div class="pf-btn-icon"><i class="bi bi-file-earmark-excel"></i></div>
+                <div class="pf-btn-text">Excel</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="@(() => {})">
+                <div class="pf-btn-icon"><i class="bi bi-printer"></i></div>
+                <div class="pf-btn-text">Print</div>
+            </button>
+            <button type="button" class="pf-btn" @onclick="HandleClose">
+                <div class="pf-btn-icon pf-icon-red"><i class="bi bi-x-lg"></i></div>
+                <div class="pf-btn-text">Close</div>
+            </button>
+        </div>
+
+        <!-- Header info grid -->
+        <div class="pf-header-grid" style="grid-template-columns: 90px 1fr 110px 1fr 80px 1fr;">
+            <span class="pf-lbl">Guest Name</span>
+            <DxTextBox Text="@GuestName" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Reg. No</span>
+            <DxTextBox Text="@RegNo" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Company</span>
+            <DxTextBox Text="@Company" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+
+            <span class="pf-lbl">Arrival</span>
+            <DxTextBox Text="@(Arrival?.ToString("M/d/yyyy") ?? "")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Departure</span>
+            <DxTextBox Text="@(Departure?.ToString("M/d/yyyy") ?? "")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Nights</span>
+            <DxTextBox Text="@Nights.ToString()" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+
+            <span class="pf-lbl">Room</span>
+            <DxTextBox Text="@Room" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Room Type</span>
+            <DxTextBox Text="@RoomType" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+            <span class="pf-lbl">Rate Code</span>
+            <DxTextBox Text="@RateCode" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-input" />
+        </div>
+
+        <!-- Daily rate breakdown grid -->
+        <DxGrid Data="@RateRows"
+                CssClass="pf-grid"
+                ShowFilterRow="false"
+                ShowGroupPanel="false"
+                PageSize="50"
+                ShowPager="false"
+                SizeMode="SizeMode.Small">
+            <Columns>
+                <DxGridDataColumn FieldName="SN"            Caption="SN"               Width="50px" />
+                <DxGridDataColumn FieldName="Date"          Caption="Date"             Width="90px"  DisplayFormat="M/d/yyyy" />
+                <DxGridDataColumn FieldName="Day"           Caption="Day"              Width="60px" />
+                <DxGridDataColumn FieldName="RoomNo"        Caption="Room No."         Width="80px" />
+                <DxGridDataColumn FieldName="RoomType"      Caption="Room Type"        MinWidth="100" />
+                <DxGridDataColumn FieldName="RateCode"      Caption="Rate Code"        Width="120px" />
+                <DxGridDataColumn FieldName="Adults"        Caption="Adults"           Width="60px" />
+                <DxGridDataColumn FieldName="Children"      Caption="Children"         Width="70px" />
+                <DxGridDataColumn FieldName="BaseRate"      Caption="Base Rate"        Width="90px"  DisplayFormat="N2" />
+                <DxGridDataColumn FieldName="ServiceCharge" Caption="Ser. Charge(10%)" Width="110px" DisplayFormat="N2" />
+                <DxGridDataColumn FieldName="Vat"           Caption="VAT(15%)"         Width="90px"  DisplayFormat="N2" />
+                <DxGridDataColumn FieldName="Total"         Caption="Total"            Width="90px"  DisplayFormat="N2" />
+            </Columns>
+        </DxGrid>
+
+        <!-- Totals -->
+        <div class="pf-totals">
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">Base Total</span>
+                <DxTextBox Text="@BaseTotal.ToString("N2")"    ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">Service Charge</span>
+                <DxTextBox Text="@ServiceTotal.ToString("N2")" ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">VAT</span>
+                <DxTextBox Text="@VatTotal.ToString("N2")"     ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+            <div class="pf-total-row">
+                <span class="pf-total-lbl">Grand Total</span>
+                <DxTextBox Text="@GrandTotal.ToString("N2")"   ReadOnly="true" SizeMode="SizeMode.Small" CssClass="pf-total-input" />
+            </div>
+        </div>
+
+        <!-- Package inclusions (only shown when packages exist) -->
+        @if (PackageRows.Any())
+        {
+            <div style="font-size:12px; font-weight:600; padding:6px 12px 4px; border-top:1px solid #d0d4da;">
+                Package Inclusions
+            </div>
+            <DxGrid Data="@PackageRows"
+                    CssClass="pf-grid"
+                    ShowFilterRow="false"
+                    ShowGroupPanel="false"
+                    ShowPager="false"
+                    SizeMode="SizeMode.Small">
+                <Columns>
+                    <DxGridDataColumn FieldName="SN"          Caption="SN"          Width="50px" />
+                    <DxGridDataColumn FieldName="Package"     Caption="Package"      Width="120px" />
+                    <DxGridDataColumn FieldName="Description" Caption="Description"  MinWidth="150" />
+                    <DxGridDataColumn FieldName="PerNight"    Caption="Per Night"    Width="90px"  DisplayFormat="N2" />
+                    <DxGridDataColumn FieldName="Nights"      Caption="Nights"       Width="60px" />
+                    <DxGridDataColumn FieldName="Total"       Caption="Total"        Width="90px"  DisplayFormat="N2" />
+                </Columns>
+            </DxGrid>
+        }
+
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .pf-toolbar {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 6px 8px 8px;
+        border-bottom: 1px solid #d0d4da;
+        background: #f5f5f5;
+    }
+    .pf-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #c0c4ca;
+        border-radius: 3px;
+        padding: 4px 10px 3px;
+        cursor: pointer;
+        min-width: 56px;
+        gap: 2px;
+        transition: background .12s;
+    }
+    .pf-btn:hover { background: #e8eaf0; }
+    .pf-btn-icon  { font-size: 22px; line-height: 1; color: #444; }
+    .pf-icon-green { color: #2e7d32; }
+    .pf-icon-red   { color: #c62828; }
+    .pf-btn-text   { font-size: 11px; color: #222; white-space: nowrap; }
+
+    .pf-header-grid {
+        display: grid;
+        align-items: center;
+        gap: 5px 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #d0d4da;
+    }
+    .pf-lbl   { font-size: 12px; color: #333; white-space: nowrap; }
+    .pf-input { width: 100%; }
+
+    .pf-totals {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 3px;
+        padding: 6px 12px 8px;
+    }
+    .pf-total-row   { display: flex; align-items: center; gap: 6px; }
+    .pf-total-lbl   { font-size: 12px; color: #333; text-align: right; min-width: 110px; }
+    .pf-total-input { width: 110px; }
+</style>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public RegistrationRow? TargetRegistration { get; set; }
+    [Parameter] public string GuestName { get; set; } = "";
+    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string Company { get; set; } = "";
+    [Parameter] public DateTime? Arrival { get; set; }
+    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public string RoomType { get; set; } = "";
+    [Parameter] public string RateCode { get; set; } = "BUSINESS RATE";
+
+    int Nights => (Arrival.HasValue && Departure.HasValue)
+        ? Math.Max(1, (int)(Departure.Value - Arrival.Value).TotalDays) : 1;
+
+    List<RateSummaryRow>  RateRows    { get; set; } = new();
+    List<PackageSummaryRow> PackageRows { get; set; } = new();
+
+    decimal BaseTotal    => RateRows.Sum(r => r.BaseRate);
+    decimal ServiceTotal => RateRows.Sum(r => r.ServiceCharge);
+    decimal VatTotal     => RateRows.Sum(r => r.Vat);
+    decimal GrandTotal   => RateRows.Sum(r => r.Total);
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
+            if (string.IsNullOrEmpty(RegNo))     RegNo     = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Company))   Company   = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue)   Arrival   = TargetRegistration.Arrival;
+            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+            if (string.IsNullOrEmpty(Room))     Room     = TargetRegistration.Room?.Replace("#", "") ?? "";
+            if (string.IsNullOrEmpty(RoomType)) RoomType = TargetRegistration.RoomType ?? "";
+        }
+        if (Visible) BuildRows();
+    }
+
+    void BuildRows()
+    {
+        if (!Arrival.HasValue) return;
+        RateRows = new List<RateSummaryRow>();
+        var arr = Arrival.Value;
+        for (int i = 0; i < Nights; i++)
+        {
+            var date = arr.AddDays(i);
+            decimal baseRate = (date.DayOfWeek == DayOfWeek.Friday || date.DayOfWeek == DayOfWeek.Saturday)
+                ? 1650.00m : 1479.85m;
+            decimal svc = Math.Round(baseRate * 0.10m, 2);
+            decimal vat = Math.Round((baseRate + svc) * 0.15m, 2);
+            RateRows.Add(new RateSummaryRow
+            {
+                SN = i + 1, Date = date, Day = date.ToString("ddd"),
+                RoomNo = Room, RoomType = RoomType, RateCode = RateCode,
+                Adults = 1, Children = 0,
+                BaseRate = baseRate, ServiceCharge = svc, Vat = vat,
+                Total = baseRate + svc + vat
+            });
+        }
+        PackageRows = new List<PackageSummaryRow>
+        {
+            new() { SN = 1, Package = "Breakfast", Description = "Daily breakfast included",
+                    PerNight = 80.00m, Nights = Nights, Total = 80.00m * Nights }
+        };
+    }
+
+    void HandleRefresh() => BuildRows();
+    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+    private async Task OnPopupVisibleChanged(bool value) { if (!value) await HandleClose(); }
+
+    class RateSummaryRow
+    {
+        public int      SN            { get; set; }
+        public DateTime Date          { get; set; }
+        public string   Day           { get; set; } = "";
+        public string   RoomNo        { get; set; } = "";
+        public string   RoomType      { get; set; } = "";
+        public string   RateCode      { get; set; } = "";
+        public int      Adults        { get; set; }
+        public int      Children      { get; set; }
+        public decimal  BaseRate      { get; set; }
+        public decimal  ServiceCharge { get; set; }
+        public decimal  Vat           { get; set; }
+        public decimal  Total         { get; set; }
+    }
+
+    class PackageSummaryRow
+    {
+        public int     SN          { get; set; }
+        public string  Package     { get; set; } = "";
+        public string  Description { get; set; } = "";
+        public decimal PerNight    { get; set; }
+        public int     Nights      { get; set; }
+        public decimal Total       { get; set; }
+    }
+}

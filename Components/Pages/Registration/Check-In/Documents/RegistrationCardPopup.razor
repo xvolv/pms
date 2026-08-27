@@ -1,0 +1,1179 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<DxPopup Visible="@Visible"
+         VisibleChanged="OnPopupVisibleChanged"
+         HeaderText="Registration Card"
+         Width="820px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true"
+         CloseOnEscape="true">
+
+    <BodyContentTemplate>
+
+        <div class="rc-card">
+
+            <!-- =========================================================
+                 TITLE
+            ========================================================== -->
+            <div class="rc-title-bar">
+                GUEST REGISTRATION
+            </div>
+
+
+            <!-- =========================================================
+                 HOTEL HEADER
+            ========================================================== -->
+            <div class="rc-hotel-row">
+
+                <div class="rc-hotel-info">
+
+                    <div class="rc-hotel-name-plain">
+                        @HotelName
+                    </div>
+
+                    <div>
+                        <b>Branch:</b> @Branch
+                    </div>
+
+                    <div>
+                        <b>Tel:</b> @Tel
+                    </div>
+
+                    <div>
+                        <b>Web:</b> @Web
+                    </div>
+
+                    <div>
+                        <b>Email:</b> @HotelEmail
+                    </div>
+
+                    <div>
+                        <b>POBox:</b> @POBox
+                    </div>
+
+                    <div>
+                        @Address
+                    </div>
+
+                </div>
+
+
+                <div class="rc-hotel-right">
+
+                    <div class="rc-hotel-brand">
+                        @HotelName
+                    </div>
+
+                    <div class="rc-tin">
+                        TIN: @Tin
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================================
+                 RESERVATION NUMBER
+            ========================================================== -->
+            <div class="rc-section-bar">
+                Reservation #: @RegNo
+            </div>
+
+
+            <!-- =========================================================
+                 MAIN STAY TABLE
+            ========================================================== -->
+            <table class="rc-table rc-main-table">
+
+                <!-- =====================================================
+                     GUEST NAME / ARRIVAL / DEPARTURE / NIGHTS
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-guest-cell" rowspan="10">
+
+                        <div class="rc-guest-label">
+                            Guest Name
+                        </div>
+
+                        <div class="rc-guest-value">
+                            @GuestName
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Arrival
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Departure
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Nights
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     ARRIVAL VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @(Arrival?.ToString("dd-MMM-yy HH:mm") ?? "")
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @(Departure?.ToString("dd-MMM-yy HH:mm") ?? "")
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @Nights
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     ROOM / ROOM TYPE / ADULTS CHILDREN
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Room
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Room Type
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Adults/Children
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     ROOM VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @Room
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @RoomType
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @Adults/@Children
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     RATE / PAYMENT METHODS
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Rate
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell" colspan="2">
+
+                        <div class="rc-badge">
+                            Payment Methods
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     RATE VALUE / PAYMENT
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @Rate
+                    </td>
+
+                    <td class="rc-payment-cell"
+                        colspan="2"
+                        rowspan="2">
+
+                        <div class="rc-pay-line">
+                            [X] Cash
+                            &nbsp;&nbsp;
+                            [ ] Direct Bill
+                            &nbsp;&nbsp;
+                            [ ] Credit Card
+                        </div>
+
+                        <br />
+
+                        <div class="rc-pay-line">
+                            [ ] Check
+                            &nbsp;&nbsp;
+                            [ ] Other
+
+                            <span class="rc-underline"></span>
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     PACKAGE
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Package
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     PACKAGE VALUE
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @Package
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     ARRIVING FROM / NEXT DESTINATION
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Arriving From
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell" colspan="2">
+
+                        <div class="rc-badge">
+                            Next destination
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     ARRIVING FROM / NEXT DESTINATION VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val">
+                        @ArrivingFrom
+                    </td>
+
+                    <td class="rc-val"
+                        colspan="2">
+
+                        @NextDestination
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <!-- =========================================================
+                 PERSONAL DETAILS
+            ========================================================== -->
+
+            <table class="rc-table rc-personal-table">
+
+                <!-- =====================================================
+                     PERSONAL DETAILS LABEL
+                     (black bar sized to the left column only, matching
+                     the Guest Name column width - not the full card width)
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-personal-label-cell"
+                        style="width:22%;">
+                        Personal Details
+                    </td>
+
+                    <td class="rc-personal-blank-cell"
+                        colspan="3">
+                        &nbsp;
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     CITY / COUNTRY / NATIONALITY
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-guest-cell"
+                        rowspan="6"
+                        style="width:22%;">
+                        &nbsp;
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            City
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Country
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Nationality
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     CITY / COUNTRY / NATIONALITY VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @City
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @Country
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @Nationality
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     PASSPORT / BIRTH / WEDDING
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Passport/ID
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Birth date
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Wedding date
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     PASSPORT / BIRTH / WEDDING VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @PassportId
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @(BirthDate?.ToString("dd-MMM-yy HH:mm") ?? "")
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @(WeddingDate?.ToString("dd-MMM-yy") ?? "")
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     TELEPHONE / EMAIL / TITLE
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            TelePhone #
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Email
+                        </div>
+
+                    </td>
+
+                    <td class="rc-badge-cell">
+
+                        <div class="rc-badge">
+                            Title
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- =====================================================
+                     TELEPHONE / EMAIL / TITLE VALUES
+                ====================================================== -->
+                <tr>
+
+                    <td class="rc-val rc-center">
+                        @Telephone
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @GuestEmail
+                    </td>
+
+                    <td class="rc-val rc-center">
+                        @Title
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <!-- =========================================================
+                 INTERESTS
+            ========================================================== -->
+
+            <div class="rc-interests-row">
+
+                <b>Interests</b>
+                &nbsp;&nbsp;
+
+                [ ] City Tour
+                &nbsp;&nbsp;
+
+                [ ] Spa/ Wellness
+                &nbsp;&nbsp;
+
+                [ ] Shopping
+                &nbsp;&nbsp;
+
+                [ ] Museum
+
+            </div>
+
+
+            <!-- =========================================================
+                 MARKETING
+            ========================================================== -->
+
+            <div class="rc-note-row">
+
+                <div class="rc-note-text">
+
+                    We would like to send you information from time to time
+                    by email, regular mail or telephone, about our special
+                    offers and services. If you do not wish to receive this
+                    information, please tick the box on your right.
+
+                </div>
+
+                <div class="rc-note-checkbox">
+                    □
+                </div>
+
+            </div>
+
+
+            <!-- =========================================================
+                 SAFE DEPOSIT
+            ========================================================== -->
+
+            <div class="rc-note-text rc-note-block">
+
+                The hotel will not be responsible for any money, jewellery,
+                or valuables left in the guest rooms. Safe deposit boxes are
+                provided in the guest rooms.
+
+            </div>
+
+
+            <!-- =========================================================
+                 CHECK TIMES
+            ========================================================== -->
+
+            <div class="rc-checktime-row">
+
+                <div>
+                    <b>Check In Time:</b>
+                    &nbsp;
+                    @(CheckInTime?.ToString(@"hh\:mm") ?? "")
+                </div>
+
+                <div>
+                    <b>Check Out Time:</b>
+                    &nbsp;
+                    @(CheckOutTime?.ToString(@"hh\:mm") ?? "")
+                </div>
+
+            </div>
+
+
+            <!-- =========================================================
+                 LIABILITY
+            ========================================================== -->
+
+            <div class="rc-note-text rc-note-block">
+
+                I personally hold my self responsible for the payment of all
+                costs relating to my accommodation at the hotel, including
+                (though not restricted to), room charges, telephone charges,
+                the cost of goods supplied to me or services ordered by me
+                should they not be paid for when they fall due.
+
+                <br />
+
+                I the undersigned do by signing to confirm that I have read
+                and understand the conditions of residence and the welcome
+                card, and I personally (irrespective of the capacity in which
+                I so sign) agree to be bound by such conditions.
+
+            </div>
+
+
+            <!-- =========================================================
+                 SIGNATURES
+            ========================================================== -->
+
+            <div class="rc-signatures">
+
+                <div class="rc-sig">
+                    C.S.A Signature ________________
+                </div>
+
+                <div class="rc-sig"
+                     style="text-align:right;">
+                    Guest Signature ________________
+                </div>
+
+            </div>
+
+        </div>
+
+    </BodyContentTemplate>
+
+</DxPopup>
+
+
+<style>
+
+    /* ================================================================
+       CARD
+    ================================================================= */
+
+    .rc-card {
+        border: 2px solid #000;
+        padding: 0;
+        background: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        color: #000;
+        margin: 6px 0 2px;
+        overflow: hidden;
+    }
+
+
+    /* ================================================================
+       TITLE
+    ================================================================= */
+
+    .rc-title-bar {
+        background: #000;
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 6px 12px;
+        letter-spacing: 0.5px;
+    }
+
+
+    /* ================================================================
+       HOTEL HEADER
+    ================================================================= */
+
+    .rc-hotel-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 12px 8px;
+    }
+
+    .rc-hotel-info {
+        font-size: 11px;
+        line-height: 1.5;
+        color: #1a3a8a;
+    }
+
+    .rc-hotel-name-plain {
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 2px;
+    }
+
+    .rc-hotel-info b {
+        color: #1a3a8a;
+    }
+
+    .rc-hotel-right {
+        text-align: right;
+    }
+
+    .rc-hotel-brand {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 22px;
+        font-style: italic;
+        font-weight: 700;
+        color: #000;
+        line-height: 1.1;
+    }
+
+    .rc-tin {
+        font-size: 11px;
+        margin-top: 20px;
+        color: #000;
+    }
+
+
+    /* ================================================================
+       SECTION BAR (full-width black bar, e.g. Reservation #)
+    ================================================================= */
+
+    .rc-section-bar {
+        background: #000;
+        color: #fff;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+
+    /* ================================================================
+       PERSONAL DETAILS LABEL
+       A black bar the width of the left ("guest") column only -
+       NOT the full card width. The rest of that row (above the
+       City/Country/Nationality badges) stays plain white, exactly
+       like the reference image. It sits inside the table as an
+       ordinary row so the vertical divider lines up with the
+       blank column below it.
+    ================================================================= */
+
+    .rc-personal-label-cell {
+        background: #000 !important;
+        color: #fff;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 5px 10px !important;
+        vertical-align: middle;
+        border-right: 1px solid #888 !important;
+    }
+
+    .rc-personal-blank-cell {
+        background: #fff;
+    }
+
+
+    /* ================================================================
+       TABLE
+
+       IMPORTANT:
+       Only the OUTER edge of the table should show a border - no
+       gridlines between individual cells. The single exception is
+       the vertical divider that separates the "guest" column
+       (Guest Name / blank column) from the rest of the table,
+       which is drawn with rc-guest-cell's own right border.
+    ================================================================= */
+
+    .rc-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border: 1px solid #888;
+    }
+
+    .rc-table td {
+        border: none;
+        padding: 4px;
+        font-size: 11px;
+        vertical-align: middle;
+        background: #fff;
+    }
+
+
+    /* ================================================================
+       GUEST NAME
+    ================================================================= */
+
+    .rc-guest-cell {
+        width: 22%;
+        vertical-align: top !important;
+        padding: 10px 10px !important;
+        background: #fff;
+        border-right: 1px solid #888 !important;
+    }
+
+    .rc-guest-label {
+        font-weight: 700;
+        font-size: 11px;
+    }
+
+    .rc-guest-value {
+        font-weight: 700;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+
+    /* ================================================================
+       BLACK BADGES
+    ================================================================= */
+
+    .rc-badge-cell {
+        padding: 5px 10px !important;
+        background: #fff !important;
+    }
+
+    .rc-badge {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+
+        background: #000;
+        color: #fff;
+
+        font-weight: 700;
+        font-size: 10px;
+
+        text-align: center;
+
+        padding: 4px 8px;
+
+        white-space: nowrap;
+
+        border: none;
+        outline: none;
+    }
+
+
+    /* ================================================================
+       VALUE CELLS
+    ================================================================= */
+
+    .rc-val {
+        padding: 7px 10px !important;
+        background: #fff;
+        min-height: 28px;
+    }
+
+    .rc-center {
+        text-align: center;
+    }
+
+
+    /* ================================================================
+       PAYMENT METHODS
+       One merged cell - no internal borders needed.
+    ================================================================= */
+
+    .rc-payment-cell {
+        padding: 7px 10px !important;
+        background: #fff;
+    }
+
+    .rc-pay-line {
+        font-size: 11px;
+        line-height: 1.6;
+        white-space: nowrap;
+    }
+
+    .rc-underline {
+        display: inline-block;
+        border-bottom: 1px solid #000;
+        width: 90px;
+        margin-left: 4px;
+        vertical-align: baseline;
+    }
+
+
+    /* ================================================================
+       INTERESTS
+    ================================================================= */
+
+    .rc-interests-row {
+        border: 1px solid #888;
+        border-top: none;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+
+    /* ================================================================
+       NOTES
+    ================================================================= */
+
+    .rc-note-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+
+        padding: 9px 12px;
+
+        border-left: 1px solid #888;
+        border-right: 1px solid #888;
+    }
+
+    .rc-note-text {
+        font-size: 10.5px;
+        line-height: 1.5;
+        color: #1a3a8a;
+        flex: 1;
+    }
+
+    .rc-note-checkbox {
+        font-size: 16px;
+        line-height: 1;
+        flex-shrink: 0;
+        padding-top: 1px;
+    }
+
+    .rc-note-block {
+        padding: 8px 12px;
+        border-left: 1px solid #888;
+        border-right: 1px solid #888;
+    }
+
+
+    /* ================================================================
+       CHECK TIMES
+    ================================================================= */
+
+    .rc-checktime-row {
+        display: flex;
+        gap: 48px;
+
+        padding: 8px 12px;
+
+        font-size: 11px;
+        color: #1a3a8a;
+
+        border-left: 1px solid #888;
+        border-right: 1px solid #888;
+    }
+
+    .rc-checktime-row b {
+        color: #000;
+    }
+
+
+    /* ================================================================
+       SIGNATURES
+    ================================================================= */
+
+    .rc-signatures {
+        display: flex;
+        justify-content: space-between;
+
+        padding: 18px 12px 14px;
+
+        font-size: 11px;
+
+        border: 1px solid #888;
+        border-top: none;
+    }
+
+    .rc-sig {
+        width: 42%;
+        border-bottom: 1px solid #000;
+        padding-bottom: 2px;
+        min-height: 22px;
+    }
+
+</style>
+
+
+@code {
+
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public RegistrationRow? TargetRegistration { get; set; }
+
+
+    // ================================================================
+    // HOTEL
+    // ================================================================
+
+    [Parameter]
+    public string HotelName { get; set; } = "TEST HOTEL";
+
+    [Parameter]
+    public string Branch { get; set; } = "Head Office";
+
+    [Parameter]
+    public string Tel { get; set; } = "";
+
+    [Parameter]
+    public string Web { get; set; } = "";
+
+    [Parameter]
+    public string HotelEmail { get; set; } = "";
+
+    [Parameter]
+    public string POBox { get; set; } = "";
+
+    [Parameter]
+    public string Address { get; set; } = "Addis Ababa, Ethiopia";
+
+    [Parameter]
+    public string Tin { get; set; } = "0000000000-01";
+
+
+    // ================================================================
+    // STAY
+    // ================================================================
+
+    [Parameter]
+    public string GuestName { get; set; } = "";
+
+    [Parameter]
+    public string RegNo { get; set; } = "";
+
+    [Parameter]
+    public string Company { get; set; } = "";
+
+    [Parameter]
+    public DateTime? Arrival { get; set; }
+
+    [Parameter]
+    public DateTime? Departure { get; set; }
+
+    [Parameter]
+    public string Room { get; set; } = "";
+
+    [Parameter]
+    public string RoomType { get; set; } = "";
+
+    [Parameter]
+    public string Rate { get; set; } = "";
+
+    [Parameter]
+    public int Adults { get; set; } = 1;
+
+    [Parameter]
+    public int Children { get; set; } = 0;
+
+    [Parameter]
+    public string Package { get; set; } = "";
+
+    [Parameter]
+    public string ArrivingFrom { get; set; } = "";
+
+    [Parameter]
+    public string NextDestination { get; set; } = "";
+
+
+    // ================================================================
+    // PERSONAL DETAILS
+    // ================================================================
+
+    [Parameter]
+    public string Nationality { get; set; } = "";
+
+    [Parameter]
+    public string PassportId { get; set; } = "";
+
+    [Parameter]
+    public string Telephone { get; set; } = "";
+
+    [Parameter]
+    public string City { get; set; } = "";
+
+    [Parameter]
+    public string Country { get; set; } = "";
+
+    [Parameter]
+    public DateTime? BirthDate { get; set; }
+
+    [Parameter]
+    public DateTime? WeddingDate { get; set; }
+
+    [Parameter]
+    public string GuestEmail { get; set; } = "";
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+
+    // ================================================================
+    // CHECK TIMES
+    // ================================================================
+
+    [Parameter]
+    public TimeSpan? CheckInTime { get; set; }
+
+    [Parameter]
+    public TimeSpan? CheckOutTime { get; set; }
+
+
+    // ================================================================
+    // NIGHTS
+    // ================================================================
+
+    int Nights =>
+        (Arrival.HasValue && Departure.HasValue)
+            ? Math.Max(
+                1,
+                (int)(Departure.Value - Arrival.Value).TotalDays
+              )
+            : 1;
+
+
+    // ================================================================
+    // PARAMETERS
+    // ================================================================
+
+    protected override void OnParametersSet()
+    {
+        if (TargetRegistration != null)
+        {
+            if (string.IsNullOrEmpty(GuestName))
+                GuestName = TargetRegistration.Guest ?? "";
+
+            if (string.IsNullOrEmpty(RegNo))
+                RegNo = TargetRegistration.Registration ?? "";
+
+            if (string.IsNullOrEmpty(Company))
+                Company = TargetRegistration.Company ?? "";
+
+            if (!Arrival.HasValue)
+                Arrival = TargetRegistration.Arrival;
+
+            if (!Departure.HasValue)
+                Departure = TargetRegistration.Departure;
+
+            if (string.IsNullOrEmpty(Room))
+                Room = TargetRegistration.Room?.Replace("#", "") ?? "";
+
+            if (string.IsNullOrEmpty(RoomType))
+                RoomType = TargetRegistration.RoomType ?? "";
+
+            if (string.IsNullOrEmpty(Rate))
+                Rate = "100.00 USD";
+        }
+    }
+
+
+    // ================================================================
+    // CLOSE
+    // ================================================================
+
+    async Task HandleClose()
+        => await VisibleChanged.InvokeAsync(false);
+
+    private async Task OnPopupVisibleChanged(bool value)
+    {
+        if (!value)
+            await HandleClose();
+    }
+
+}

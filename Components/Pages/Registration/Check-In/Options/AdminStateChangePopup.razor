@@ -1,0 +1,268 @@
+@using DevExpress.Blazor
+
+<DxPopup @bind-Visible="Visible"
+         HeaderText="User OTP Authentication"
+         Width="760px"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="false"
+         CloseOnEscape="false">
+    <BodyContentTemplate>
+        <div class="otp-body">
+
+            <!-- Phone Number + Send OTP -->
+            <div class="otp-phone-row">
+                <label class="otp-phone-label">Phone Number</label>
+                <input type="text"
+                       class="otp-phone-input"
+                       @bind="PhoneNumber"
+                       @bind:event="oninput" />
+                <button type="button" class="otp-send-btn" @onclick="HandleSendOtp" disabled="@isSendingOtp">
+                    <i class="bi bi-envelope-check-fill" style="color:#2e7d32; font-size:18px;"></i>
+                    <span>@(isSendingOtp ? "Sending..." : "Send OTP")</span>
+                </button>
+            </div>
+
+            <!-- OTP Code (after send) -->
+            @if (otpSent)
+            {
+                <div class="otp-phone-row" style="margin-top:12px;">
+                    <label class="otp-phone-label">OTP Code</label>
+                    <input type="text"
+                           class="otp-phone-input"
+                           @bind="OtpCode"
+                           @bind:event="oninput"
+                           maxlength="6"
+                           placeholder="Enter OTP" />
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(validationError))
+            {
+                <div class="otp-error">@validationError</div>
+            }
+            @if (!string.IsNullOrEmpty(infoMessage))
+            {
+                <div class="otp-info">@infoMessage</div>
+            }
+
+            <!-- Validate / Cancel -->
+            <div class="otp-actions">
+                <button type="button" class="otp-action-btn" @onclick="HandleValidate">
+                    <i class="bi bi-check-circle-fill" style="color:#757575; font-size:28px;"></i>
+                    <span>Validate</span>
+                </button>
+                <button type="button" class="otp-action-btn" @onclick="HandleCancel">
+                    <i class="bi bi-x-circle-fill" style="color:#c62828; font-size:28px;"></i>
+                    <span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<style>
+    .otp-body {
+        padding: 28px 32px 24px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .otp-phone-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .otp-phone-label {
+        font-size: 25px;
+        color: #333;
+        white-space: nowrap;
+        min-width: 95px;
+        text-align: right;
+    }
+
+    .otp-phone-input {
+        width: 220px;
+        height: 28px;
+        border: 1px solid #999;
+        border-radius: 1px;
+        padding: 3px 9px;
+        font-size: 25px;
+        outline: none;
+        background: #fff;
+    }
+    .otp-phone-input:focus {
+        border-color: #555;
+    }
+
+    .otp-send-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border: 1px solid #bbb;
+        background: #fff;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 18px;
+        color: #333;
+        white-space: nowrap;
+        height: 28px;
+    }
+    .otp-send-btn:hover:not(:disabled) {
+        background: #f5f5f5;
+        border-color: #999;
+    }
+    .otp-send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .otp-error {
+        margin: 12px auto 0;
+        max-width: 360px;
+        padding: 6px 10px;
+        background: #ffebee;
+        border: 1px solid #ef9a9a;
+        color: #c62828;
+        font-size: 12px;
+        text-align: center;
+    }
+    .otp-info {
+        margin: 12px auto 0;
+        max-width: 360px;
+        padding: 6px 10px;
+        background: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        color: #2e7d32;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .otp-actions {
+        display: flex;
+        justify-content: center;
+        gap: 28px;
+        margin-top: 28px;
+    }
+
+    .otp-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 210px;
+        padding: ;
+        border: 1px solid #ccc;
+        background: #fff;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #333;
+    }
+    .otp-action-btn:hover {
+        background: #f9f9f9;
+        border-color: #999;
+    }
+</style>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public EventCallback OnValidated { get; set; }
+
+    string PhoneNumber = "";
+    string OtpCode = "";
+    string validationError = "";
+    string infoMessage = "";
+    bool otpSent = false;
+    bool isSendingOtp = false;
+    string generatedOtp = "";
+
+    async Task HandleSendOtp()
+    {
+        validationError = "";
+        infoMessage = "";
+
+        if (string.IsNullOrWhiteSpace(PhoneNumber))
+        {
+            validationError = "Please enter a phone number.";
+            return;
+        }
+
+        var digits = new string(PhoneNumber.Where(char.IsDigit).ToArray());
+        if (digits.Length < 9)
+        {
+            validationError = "Please enter a valid phone number.";
+            return;
+        }
+
+        isSendingOtp = true;
+        try
+        {
+            await Task.Delay(500);
+            generatedOtp = Random.Shared.Next(100000, 999999).ToString();
+            otpSent = true;
+            // Demo only – remove in production
+            infoMessage = $"OTP sent. (Demo code: {generatedOtp})";
+        }
+        finally
+        {
+            isSendingOtp = false;
+        }
+    }
+
+    async Task HandleValidate()
+    {
+        validationError = "";
+        infoMessage = "";
+
+        if (string.IsNullOrWhiteSpace(PhoneNumber))
+        {
+            validationError = "Please enter a phone number.";
+            return;
+        }
+
+        if (!otpSent)
+        {
+            validationError = "Please send OTP first.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(OtpCode))
+        {
+            validationError = "Please enter the OTP code.";
+            return;
+        }
+
+        if (OtpCode.Trim() != generatedOtp)
+        {
+            validationError = "Invalid OTP code.";
+            return;
+        }
+
+        if (OnValidated.HasDelegate)
+            await OnValidated.InvokeAsync();
+
+        ResetForm();
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleCancel()
+    {
+        ResetForm();
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    void ResetForm()
+    {
+        PhoneNumber = "";
+        OtpCode = "";
+        generatedOtp = "";
+        otpSent = false;
+        validationError = "";
+        infoMessage = "";
+        isSendingOtp = false;
+    }
+}
