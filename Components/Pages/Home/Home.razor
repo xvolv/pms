@@ -234,11 +234,11 @@
                                     <DxChartValueAxis>
                                         <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
                                     </DxChartValueAxis>
-                                    <DxChartAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                    <DxChartSplineAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
                                                        ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
                                                        Color="@reservationLineColor">
                                         <DxChartSeriesPoint Visible="true" />
-                                    </DxChartAreaSeries>
+                                    </DxChartSplineAreaSeries>
                                 </DxChart>
                             }
                         </div>
@@ -246,7 +246,89 @@
                 </div>
             </DxTabPage>
             <DxTabPage Text="Security">
-                <div class="tab-placeholder">Security content</div>
+                <div class="security-body">
+
+                    <!-- Left: Change Password -->
+                    <div class="security-left rt-modal-labeled">
+                        <fieldset class="rt-form-fieldset">
+                            <legend>Change Password</legend>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Employee Name</label>
+                                    <DxTextBox Text="@employeeName" ReadOnly="true" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>User Name</label>
+                                    <DxTextBox Text="@userName" ReadOnly="true" CssClass="rt-form-input" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Old Password</label>
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="oldPassword" @bind:event="oninput" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>New Password</label>
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="newPassword" @bind:event="oninput" />
+                                </div>
+                            </div>
+
+                            <div class="rt-form-row">
+                                <div class="rt-form-field rt-form-field-wide">
+                                    <label>Confirm Password</label>
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="confirmPassword" @bind:event="oninput" />
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(passwordFormError))
+                            {
+                                <div class="rt-validation-message security-form-error">@passwordFormError</div>
+                            }
+
+                            <div class="pwd-strength-wrap">
+                                <div class="pwd-strength-label">
+                                    Password Strength
+                                    @if (!string.IsNullOrEmpty(newPassword))
+                                    {
+                                        <span class="pwd-strength-level" style="color:@PasswordStrengthColor;">@PasswordStrengthLabel</span>
+                                    }
+                                </div>
+                                <div class="pwd-strength-track">
+                                    <div class="pwd-strength-fill" style="width:@(PasswordStrengthPercent)%; background-color:@PasswordStrengthColor;"></div>
+                                </div>
+                            </div>
+
+                            <div class="security-form-actions">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="ClearPasswordForm">Clear</button>
+                                <button type="button" class="btn btn-primary" @onclick="ApplyPasswordChange">Apply</button>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Right: Password Change Log -->
+                    <div class="security-right chart-card">
+                        <div class="chart-title">Password Change Log</div>
+                        <DxGrid Data="@passwordChangeLog" KeyFieldName="SN" PageSize="10" ShowPager="true"
+                                SizeMode="SizeMode.Small" Height="100%">
+                            <Columns>
+                                <DxGridDataColumn FieldName="SN" Caption="SN" Width="60px" />
+                                <DxGridDataColumn FieldName="User" Caption="User" MinWidth="140" />
+                                <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="200" />
+                                <DxGridDataColumn FieldName="StartDate" Caption="Start Date" Width="150px" DisplayFormat="dd-MMM-yyyy HH:mm" />
+                                <DxGridDataColumn FieldName="MachineName" Caption="Machine Name" MinWidth="150" />
+                                <DxGridDataColumn FieldName="OrganizationUnit" Caption="Organization Unit" MinWidth="160" />
+                            </Columns>
+                        </DxGrid>
+                    </div>
+                </div>
             </DxTabPage>
 
 
@@ -439,5 +521,79 @@
                 .Min(x => x.Month)
                 .Year;
         }
+    }
+
+
+
+    // ---------- Security tab: Change Password ----------
+    string employeeName = "SYSTEM CNET ADMINISTRATOR";
+    string userName = "CNET ADMIN";
+
+    string oldPassword = "";
+    string newPassword = "";
+    string confirmPassword = "";
+    string? passwordFormError;
+
+    List<PasswordChangeLogItem> passwordChangeLog = new();
+
+    int PasswordStrengthScore
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(newPassword))
+                return 0;
+
+            int score = 0;
+            if (newPassword.Length >= 8) score++;
+            if (newPassword.Any(char.IsUpper)) score++;
+            if (newPassword.Any(char.IsLower)) score++;
+            if (newPassword.Any(char.IsDigit)) score++;
+            if (newPassword.Any(c => !char.IsLetterOrDigit(c))) score++;
+
+            return score;
+        }
+    }
+
+    int PasswordStrengthPercent => PasswordStrengthScore * 20;
+
+    string PasswordStrengthLabel => PasswordStrengthScore switch
+    {
+        <= 1 => "Weak",
+        2 or 3 => "Medium",
+        _ => "Strong"
+    };
+
+    string PasswordStrengthColor => PasswordStrengthScore switch
+    {
+        <= 1 => "#e53935",
+        2 or 3 => "#ffb300",
+        _ => "#43a047"
+    };
+
+    void ClearPasswordForm()
+    {
+        oldPassword = "";
+        newPassword = "";
+        confirmPassword = "";
+        passwordFormError = null;
+    }
+
+    void ApplyPasswordChange()
+    {
+        if (string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            passwordFormError = "Please fill in all password fields.";
+            return;
+        }
+
+        if (newPassword != confirmPassword)
+        {
+            passwordFormError = "New password and confirm password do not match.";
+            return;
+        }
+
+        passwordFormError = null;
+
+        // TODO: call the change-password API once the endpoint is available.
     }
 }
