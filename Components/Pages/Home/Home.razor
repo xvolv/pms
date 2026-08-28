@@ -79,6 +79,12 @@
                     </div>
                 </div>
             </div>
+            <div class="header-meta">
+                <div class="date-version">
+                    <div class="version-row">Version: 1.0.0</div>
+                    <div class="date-row">CURRENT DATE: @DateTime.Now.ToString("dddd, MMMM dd, yyyy")</div>
+                </div>
+            </div>
 
             <div class="logo-box">
                 <img src="cnet logo.png" alt="CNET Logo" class="cnet-logo-img" />
@@ -109,51 +115,72 @@
                                             CssClass="rt-detail-input" style="width:180px;" />
                             </div>
                         </div>
-                        <DxGrid Data="@taskItems" KeyFieldName="sn" CssClass="task-grid" RowClick="OnTaskRowClick"
-                                CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false" TextWrapEnabled="true"
-                                Height="180px">
-                            <Columns>
-                                <DxGridDataColumn FieldName="sn" Caption="SN" Width="40px" />
-                                <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
-                                <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
-                                <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
-                            </Columns>
-                        </DxGrid>
+                        @if (isLoading)
+                        {
+                            <LoadingSpinner Height="180px" />
+                        }
+                        else
+                        {
+                            <DxGrid Data="@taskItems" KeyFieldName="sn" CssClass="task-grid" RowClick="OnTaskRowClick"
+                                    CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false" TextWrapEnabled="true"
+                                    Height="180px">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="sn" Caption="SN" Width="40px" />
+                                    <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
+                                    <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
+                                    <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
+                                </Columns>
+                            </DxGrid>
+                        }
 
                         <!-- Today's Room Statistics -->
                         <div class="chart-card">
                             <div class="chart-title">Today's Room Statistics</div>
-                            <DxGrid Data="@roomStatsItems" KeyFieldName="SN" CssClass="room-stats-grid" ShowPager="false"
-                                    PageSize="20">
-                                <Columns>
-                                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
-                                    <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="180" />
-                                    <DxGridDataColumn FieldName="Count" Caption="Count" Width="70px" />
-                                </Columns>
-                            </DxGrid>
+                            @if (isLoading)
+                            {
+                                <LoadingSpinner Height="160px" />
+                            }
+                            else
+                            {
+                                <DxGrid Data="@roomStatsItems" KeyFieldName="SN" CssClass="room-stats-grid" ShowPager="false"
+                                        PageSize="20">
+                                    <Columns>
+                                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                                        <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="180" />
+                                        <DxGridDataColumn FieldName="Count" Caption="Count" Width="70px" />
+                                    </Columns>
+                                </DxGrid>
+                            }
                         </div>
 
                         <!-- Pie: Today's Room Status -->
                         <div class="chart-card">
                             <div class="chart-title">Today's Room Status</div>
-                            <DxPieChart Data="@roomStatusData" Height="300px" Width="100%">
-                                <DxChartLegend Visible="false" />
-                                <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
-                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
-                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
-                                        <DxChartSeriesLabelConnector Visible="true" />
-                                    </DxChartSeriesLabel>
-                                </DxPieChartSeries>
-                            </DxPieChart>
-                            <div class="legend-manual">
-                                @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
-                                {
-                                    <span class="leg-item">
-                                        <span class="dot" style="background:@GetPaletteColor(idx);"></span>
-                                        @slice.Name: @slice.Value.ToString("n2") %
-                                    </span>
-                                }
-                            </div>
+                            @if (isLoading)
+                            {
+                                <LoadingSpinner Height="300px" />
+                            }
+                            else
+                            {
+                                <DxPieChart Data="@roomStatusData" Height="300px" Width="100%">
+                                    <DxChartLegend Visible="false" />
+                                    <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
+                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                            <DxChartSeriesLabelConnector Visible="true" />
+                                        </DxChartSeriesLabel>
+                                    </DxPieChartSeries>
+                                </DxPieChart>
+                                <div class="legend-manual">
+                                    @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
+                                    {
+                                        <span class="leg-item">
+                                            <span class="dot" style="background:@GetPaletteColor(idx);"></span>
+                                            @slice.Name: @slice.Value.ToString("n2") %
+                                        </span>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
 
@@ -162,44 +189,58 @@
                         <!-- Pie: Room Occupancy -->
                         <div class="chart-card">
                             <div class="chart-title">Room Occupancy (Today)</div>
-                            <DxPieChart Data="@occupancyData" Height="250px" Width="100%">
-                                <DxChartLegend Visible="false" />
-                                <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
-                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
-                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
-                                        <DxChartSeriesLabelConnector Visible="true" />
-                                    </DxChartSeriesLabel>
-                                </DxPieChartSeries>
-                            </DxPieChart>
-                            <div class="legend-manual">
-                                @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
-                                {
-                                    <span class="leg-item">
-                                        <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
-                                        @slice.Name: @slice.Value.ToString("n2") %
-                                    </span>
-                                }
-                            </div>
+                            @if (isLoading)
+                            {
+                                <LoadingSpinner Height="250px" />
+                            }
+                            else
+                            {
+                                <DxPieChart Data="@occupancyData" Height="250px" Width="100%">
+                                    <DxChartLegend Visible="false" />
+                                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                            <DxChartSeriesLabelConnector Visible="true" />
+                                        </DxChartSeriesLabel>
+                                    </DxPieChartSeries>
+                                </DxPieChart>
+                                <div class="legend-manual">
+                                    @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
+                                    {
+                                        <span class="leg-item">
+                                            <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
+                                            @slice.Name: @slice.Value.ToString("n2") %
+                                        </span>
+                                    }
+                                </div>
+                            }
                         </div>
 
                         <!-- Line: Reservations -->
                         <div class="chart-card">
                             <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
-                            <DxChart Data="@reservationData" Height="360px" Width="100%">
-                                <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
-                                <DxChartTooltip Enabled="true" />
-                                <DxChartArgumentAxis>
-                                    <DxChartAxisLabel />
-                                </DxChartArgumentAxis>
-                                <DxChartValueAxis>
-                                    <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
-                                </DxChartValueAxis>
-                                <DxChartAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
-                                                   ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
-                                                   Color="@reservationLineColor">
-                                    <DxChartSeriesPoint Visible="true" />
-                                </DxChartAreaSeries>
-                            </DxChart>
+                            @if (isLoading)
+                            {
+                                <LoadingSpinner Height="360px" />
+                            }
+                            else
+                            {
+                                <DxChart Data="@reservationData" Height="360px" Width="100%">
+                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                                    <DxChartTooltip Enabled="true" />
+                                    <DxChartArgumentAxis>
+                                        <DxChartAxisLabel />
+                                    </DxChartArgumentAxis>
+                                    <DxChartValueAxis>
+                                        <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
+                                    </DxChartValueAxis>
+                                    <DxChartAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                                       ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                                       Color="@reservationLineColor">
+                                        <DxChartSeriesPoint Visible="true" />
+                                    </DxChartAreaSeries>
+                                </DxChart>
+                            }
                         </div>
                     </div>
                 </div>
@@ -215,6 +256,7 @@
 
     int selectedYear = DateTime.Today.Year;
     int activeTab = 0;
+    bool isLoading = true;
 
     DashboardDTO? selectedTask;
     List<DashboardDTO> taskItems = new List<DashboardDTO>();
@@ -310,6 +352,18 @@
 
 
     protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadDashboardAsync();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadDashboardAsync()
     {
         CNET_V7_Domain.Misc.ResponseModel<PMSDashBoardReport>? response = await DashboardService.GetPmsDashboardReportAsync();
 

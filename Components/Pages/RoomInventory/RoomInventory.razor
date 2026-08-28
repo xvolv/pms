@@ -107,11 +107,12 @@
                     <DxChartArgumentAxis>
                         <DxChartAxisLabel />
                     </DxChartArgumentAxis>
-                    <DxChartAreaSeries T="RoomInventoryChartPoint" TArgument="int" TValue="int"
-                                       ArgumentField="@(x => x.Day)" ValueField="@(x => x.Total)" Name="Total Room Inventory"
-                                       Color="@chartColor">
+
+                    <DxChartSplineAreaSeries T="RoomInventoryChartPoint" TArgument="int" TValue="int"
+                                             ArgumentField="@(x => x.Day)" ValueField="@(x => x.Total)" Name="Total Room Inventory"
+                                             Color="@chartColor">
                         <DxChartSeriesPoint Visible="true" />
-                    </DxChartAreaSeries>
+                    </DxChartSplineAreaSeries>
                 </DxChart>
             </div>
         }
@@ -164,13 +165,24 @@
     private void GenerateInventory()
     {
         var newRows = new List<RoomInventoryRow>();
+
         foreach (var (type, count) in new (string, int)[] { ("Standard", 10), ("Delux", 10) })
         {
             var row = new RoomInventoryRow { RoomType = type };
+
             for (int d = 1; d <= DaysInMonth; d++)
-                row.DailyCounts[d] = count;
+            {
+                if (d == 15)
+                    row.DailyCounts[d] = 9;
+                else if (d >= 20)
+                    row.DailyCounts[d] = 3;
+                else
+                    row.DailyCounts[d] = 0;
+            }
+
             newRows.Add(row);
         }
+
         inventoryRows = newRows;
         remarks.Clear();
     }

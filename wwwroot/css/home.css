@@ -19,8 +19,8 @@
 .top-header {
     display: grid;
 
-    /* USER | LOGO — logo pushed to the far right */
-    grid-template-columns: 1fr 150px;
+    /* USER (sized to content) | DATE/VERSION (fills the rest, box centered in it) | LOGO */
+    grid-template-columns: auto 1fr 150px;
 
     gap: 12px;
     padding: 0px 12px;
@@ -152,6 +152,43 @@
 }
 
 
+
+.header-meta {
+    display: flex;
+    justify-content: flex-start;
+
+    padding-top: 0px;
+    padding-left: 28px;
+}
+
+.date-version {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    width: 150%;
+
+    background: #f7f8fa;
+    border: 1px solid #e2e5e9;
+    border-radius: 0px;
+
+    padding: 6px 14px;
+    margin-bottom: 4px;
+}
+
+.version-row {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #444;
+}
+
+.date-row {
+    font-size: 12px;
+
+    color: #777;
+    white-space: nowrap;
+}
 
 .logo-box {
     width: 150px;

@@ -32,7 +32,7 @@
 .ri-table td {
     border-right: 1px solid #eef0f2;
     border-bottom: 1px solid #eef0f2;
-    padding: 0px 0px;
+    padding: 1px 1px;
     text-align: start;
 }
 
@@ -102,7 +102,7 @@
 .ri-chart-card {
     background-color: #ffffff;
     border: 1px solid #d3d3d3;
-    border-radius: 4px;
+    border-radius: 0px;
     padding: 12px;
     margin-top: 10px;
 }

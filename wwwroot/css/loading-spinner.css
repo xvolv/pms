@@ -1,0 +1,31 @@
+.cnet-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 120px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.cnet-loading-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(30, 136, 229, 0.2);
+    border-top-color: #1e88e5;
+    border-radius: 50%;
+    animation: cnet-spin 0.8s linear infinite;
+}
+
+.cnet-loading-text {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+@keyframes cnet-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
