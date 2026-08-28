@@ -446,10 +446,10 @@
 
 
 @media (max-width: 1500px) {
-
+/* 
     .top-header {
-        grid-template-columns: minmax(380px, 1fr) minmax(440px, 1.5fr) 140px;
-    }
+        grid-template-columns: minmax(380px, 1fr) minmax(440px, 1.5fr;
+    } */
 
     .user-card {
         min-width: 0;
