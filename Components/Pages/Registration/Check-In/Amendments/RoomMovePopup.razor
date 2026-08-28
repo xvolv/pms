@@ -109,8 +109,7 @@
                     </div>
                     <div class="rm-field-row-right">
                         <label class="rm-label">New Rate Amount</label>
-                        <DxSpinEdit Value="@NewRateAmount" ValueChanged="@((decimal v) => { NewRateAmount = v; _ = NewRateAmountChanged.InvokeAsync(v); })"
-                                    SizeMode="SizeMode.Small" DisplayFormat="0.00" />
+                        <DxTextBox Text="@(NewRateAmount.ToString("0.00"))" SizeMode="SizeMode.Small" ReadOnly="true" />
                     </div>
                 </div>
             </div>
