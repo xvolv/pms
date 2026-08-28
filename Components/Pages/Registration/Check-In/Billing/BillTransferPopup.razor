@@ -1,145 +1,431 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Shared
 
-<DxPopup @bind-Visible="Visible" HeaderText="Bill Transfer" Width="980px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible"
+         HeaderVisible="false"
+         ShowCloseButton="false"
+         Width="1050px"
+         CloseOnOutsideClick="false"
+         CloseOnEscape="true"
+         CssClass="bill-transfer-popup">
     <BodyContentTemplate>
-        <div class="amend-toolbar" style="flex-wrap:wrap;">
-            <button type="button" class="toolbar-btn" @onclick="HandleRefresh">
-                <div class="toolbar-icon"><i class="bi bi-arrow-clockwise"></i></div>
-                <div class="toolbar-text">Refresh</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
-                <div class="toolbar-icon"><i class="bi bi-file-earmark-excel"></i></div>
-                <div class="toolbar-text">Excel</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
-                <div class="toolbar-icon"><i class="bi bi-filetype-pdf"></i></div>
-                <div class="toolbar-text">PDF</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="@(() => {})">
-                <div class="toolbar-icon"><i class="bi bi-printer"></i></div>
-                <div class="toolbar-text">Print</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="HandleClose">
-                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="toolbar-text">Close</div>
-            </button>
-            <span style="margin-left:8px; font-size:12px;">To</span>
-            <DxTextBox @bind-Text="ToGuest" Width="160px" SizeMode="SizeMode.Small" />
-            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleOpenGuestFind" />
-            <DxCheckBox Checked="SelectAll" CheckedChanged="@((bool v) => HandleSelectAll(v))">Select All</DxCheckBox>
-            <button type="button" class="toolbar-btn" @onclick="HandleTransfer">
-                <div class="toolbar-icon"><i class="bi bi-arrow-left-right"></i></div>
-                <div class="toolbar-text">Transfer<br/>Bill</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="HandleReturn">
-                <div class="toolbar-icon"><i class="bi bi-arrow-return-left"></i></div>
-                <div class="toolbar-text">Return<br/>Bill</div>
-            </button>
-            <span style="font-size:12px;">Window</span>
-            <DxComboBox CssClass="erp-combobox" Data="@WindowOptions" @bind-Value="Window" Width="110px" SizeMode="SizeMode.Small" />
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; margin-bottom:8px; font-size:12px; border:1px solid #c8cdd4; padding:8px;">
-            <div><label style="color:#555;">Guest Name</label> <DxTextBox @bind-Text="GuestName" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            <div><label style="color:#555;">Arrival Date</label> <DxTextBox Text="@(Arrival?.ToString("dddd, MMMM dd, yyyy") ?? "")" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            <div><label style="color:#555;">Reg. No</label> <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            <div><label style="color:#555;">Departure Date</label> <DxTextBox Text="@(Departure?.ToString("dddd, MMMM dd, yyyy") ?? "")" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            <div><label style="color:#555;">Company</label> <DxTextBox @bind-Text="Company" SizeMode="SizeMode.Small" ReadOnly="true" /></div>
-            <div><label style="color:#555;">TIN</label> <DxTextBox @bind-Text="Tin" SizeMode="SizeMode.Small" /></div>
-            <div><label style="color:#555;">FS Num.</label> <DxTextBox @bind-Text="FsNum" SizeMode="SizeMode.Small" /></div>
-        </div>
-        <div style="font-size:12px; font-weight:600; color:#1565c0; margin:4px 0;">Guest Ledger</div>
-        <div style="font-size:12px; font-weight:600; margin-bottom:2px;">Room Charges</div>
-        <table class="multi-table" style="width:100%;">
-            <thead><tr><th></th><th>SN</th><th>Date</th><th>Room No.</th><th>Room Type</th><th>Room Rate</th><th>Adults</th><th>Child</th><th>Remark</th><th>Amount</th></tr></thead>
-            <tbody>
-                @foreach (var r in RoomCharges)
-                {
-                    <tr><td><DxCheckBox @bind-Checked="r.Selected" /></td><td>@r.SN</td>
-                        <td>@r.Date.ToString("M/d/yyyy")</td><td>@r.RoomNo</td><td>@r.RoomType</td><td>@r.RoomRate</td>
-                        <td>@r.Adults</td><td>@r.Child</td><td>@r.Remark</td><td>@r.Amount.ToString("N2")</td></tr>
-                }
-            </tbody>
-        </table>
-        <div style="text-align:right; font-size:12px; margin:4px 0 8px;">
-            <div>Subtotal <b>@RoomSubtotal.ToString("N2")</b></div>
-            <div>Service Charge <b>@RoomService.ToString("N2")</b></div>
-            <div>VAT <b>@RoomVat.ToString("N2")</b></div>
-            <div>Grand Total <b>@RoomGrand.ToString("N2")</b></div>
-        </div>
-        <div style="font-size:12px; font-weight:600; margin-bottom:2px;">Extra Bills</div>
-        <table class="multi-table" style="width:100%;">
-            <thead><tr><th></th><th>SN</th><th>Room No.</th><th>Date</th><th>Invoice ID</th><th>Ser. Charge</th><th>Discount</th><th>VAT</th><th>Sub Total</th><th>Remark</th><th>Grand Total</th></tr></thead>
-            <tbody>
-                @foreach (var e in ExtraBills)
-                {
-                    <tr><td><DxCheckBox @bind-Checked="e.Selected" /></td><td>@e.SN</td><td>@e.RoomNo</td>
-                        <td>@e.Date.ToString("M/d/yyyy")</td><td>@e.InvoiceId</td><td>@e.SerCharge.ToString("N2")</td>
-                        <td>@e.Discount.ToString("N2")</td><td>@e.Vat.ToString("N2")</td><td>@e.SubTotal.ToString("N2")</td>
-                        <td>@e.Remark</td><td>@e.GrandTotal.ToString("N2")</td></tr>
-                }
-            </tbody>
-        </table>
-        <div style="text-align:right; font-size:12px; margin:4px 0;">Total Extra Bill <b>@TotalExtra.ToString("N2")</b></div>
-        <div style="font-size:12px; font-weight:600; margin:6px 0 2px;">Payment History</div>
-        <table class="multi-table" style="width:100%;">
-            <thead><tr><th></th><th>SN</th><th>Date</th><th>Receipt No.</th><th>Voucher Type</th><th>Received By</th><th>Remark</th><th>Amount</th></tr></thead>
-            <tbody>
-                @foreach (var p in PaymentHistory)
-                {
-                    <tr><td><DxCheckBox @bind-Checked="p.Selected" /></td><td>@p.SN</td>
-                        <td>@p.Date.ToString("M/d/yyyy")</td><td>@p.ReceiptNo</td><td>@p.VoucherType</td>
-                        <td>@p.ReceivedBy</td><td>@p.Remark</td><td>@p.Amount.ToString("N2")</td></tr>
-                }
-            </tbody>
-        </table>
-        <div style="text-align:right; font-size:12px; margin-top:4px;">
-            <div>Total Paid <b>@TotalPaid.ToString("N2")</b></div>
-        </div>
-        <div style="font-size:11px; color:#555; margin-top:6px; border-top:1px solid #eee; padding-top:4px;">
-            Total Room Charge = @RoomSubtotal.ToString("N2") &nbsp; Total Extra Bills = @TotalExtra.ToString("N2") &nbsp;
-            TOTAL SELECTED = @TotalSelected.ToString("N2")
+        <div class="bt-container">
+            <!-- Window Title Bar -->
+            <div class="bt-titlebar">
+                <span class="bt-title-text">Bill Transfer</span>
+                <i class="bi bi-x bt-title-close" @onclick="HandleClose" title="Close"></i>
+            </div>
+
+            <!-- Blue Header Accent Bar -->
+            <div class="bt-header-accent"></div>
+
+            <!-- Toolbar (matching Reference Image 1 & 5) -->
+            <div class="bt-toolbar">
+                <button type="button" class="bt-tb-btn" @onclick="HandleRefresh">
+                    <i class="bi bi-arrow-clockwise bt-icon-refresh"></i>
+                    <span>Refresh</span>
+                </button>
+
+                <!-- Print Dropdown Button -->
+                <div class="bt-dropdown-wrapper">
+                    <button type="button" class="bt-tb-btn" @onclick="TogglePrintMenu">
+                        <div class="bt-print-box">
+                            <i class="bi bi-printer bt-icon-print"></i>
+                            <i class="bi bi-caret-down-fill bt-icon-caret"></i>
+                        </div>
+                        <span>Print</span>
+                    </button>
+
+                    @if (showPrintMenu)
+                    {
+                        <div class="bt-dropdown-menu" @onclick:stopPropagation="true">
+                            <div class="bt-dropdown-item" @onclick="@(() => OpenPrint("All"))">
+                                All
+                            </div>
+                            <div class="bt-dropdown-item" @onclick="@(() => OpenPrint("RoomCharge"))">
+                                Room Charge
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <button type="button" class="bt-tb-btn" @onclick="HandleClose">
+                    <div class="bt-close-icon-box">
+                        <i class="bi bi-x"></i>
+                    </div>
+                    <span>Close</span>
+                </button>
+
+                <div class="bt-divider"></div>
+
+                <!-- To / From Dropdown Selection Area -->
+                <div class="bt-target-group">
+                    <span class="bt-label">@(FromOthers ? "From" : "To")</span>
+                    <div class="bt-custom-dropdown" @onclick="HandleOpenTargetSearch">
+                        <input type="text" class="bt-dropdown-input" value="@(FromOthers ? (SelectedFromRegistrations.Any() ? $"{SelectedFromRegistrations.Count} selected" : "Select Registrations") : ToGuest)" readonly placeholder="" />
+                        <span class="bt-dropdown-arrow"><i class="bi bi-caret-down-fill"></i></span>
+                    </div>
+                </div>
+
+                <!-- From Others Switch & Select All (stacked vertically) -->
+                <div class="bt-toggle-stack">
+                    <div class="bt-switch-row">
+                        <span class="bt-switch-label">From Others</span>
+                        <label class="bt-toggle-switch">
+                            <input type="checkbox" checked="@FromOthers" @onchange="OnToggleFromOthers" />
+                            <span class="bt-toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="bt-select-all-row">
+                        <span class="bt-switch-label">Select All</span>
+                        <input type="checkbox" class="bt-chk" checked="@SelectAll" @onchange="@((ChangeEventArgs e) => HandleSelectAll((bool)(e.Value ?? false)))" />
+                    </div>
+                </div>
+
+                <div class="bt-divider"></div>
+
+                <button type="button" class="bt-tb-btn" @onclick="HandleTransfer">
+                    <div class="bt-transfer-icon-box">
+                        <span class="bt-ab-red">A</span>
+                        <span class="bt-ab-green">B</span>
+                        <div class="bt-ab-arrow">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                    <span>Transfer Bill</span>
+                </button>
+
+                <button type="button" class="bt-tb-btn" @onclick="HandleReturn">
+                    <i class="bi bi-arrow-90deg-left bt-icon-return"></i>
+                    <span>Return Bill</span>
+                </button>
+
+                <div class="bt-divider"></div>
+
+                <!-- Window & Currency Stacked Column-wise -->
+                <div class="bt-combos-column">
+                    <div class="bt-combo-row">
+                        <span class="bt-combo-lbl">Window</span>
+                        <DxComboBox CssClass="erp-combobox" Data="@WindowOptions" @bind-Value="Window" Width="115px" SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="bt-combo-row">
+                        <span class="bt-combo-lbl">Currency</span>
+                        <DxComboBox CssClass="erp-combobox" Data="@CurrencyOptions" @bind-Value="Currency" Width="115px" SizeMode="SizeMode.Small" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata Info Grid -->
+            <div class="bt-info-section">
+                <div class="bt-info-left">
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">Guest Name</label>
+                        <input type="text" class="bt-field-val" value="@GuestName" readonly />
+                    </div>
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">Reg. No</label>
+                        <input type="text" class="bt-field-val" value="@RegNo" readonly />
+                    </div>
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">Company</label>
+                        <input type="text" class="bt-field-val" value="@Company" readonly />
+                    </div>
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">FS Num.</label>
+                        <input type="text" class="bt-field-val" value="@FsNum" @onchange="@(e => FsNum = e.Value?.ToString() ?? "")" />
+                    </div>
+                </div>
+
+                <div class="bt-info-right">
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">Arrival Date</label>
+                        <input type="text" class="bt-field-val" value="@(Arrival?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")" readonly />
+                    </div>
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">Departure Date</label>
+                        <input type="text" class="bt-field-val" value="@(Departure?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")" readonly />
+                    </div>
+                    <div class="bt-field-row">
+                        <label class="bt-field-lbl">TIN</label>
+                        <input type="text" class="bt-field-val" value="@Tin" @onchange="@(e => Tin = e.Value?.ToString() ?? "")" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Header -->
+            <div class="bt-tab-strip">
+                <div class="bt-tab active">Guest Ledger</div>
+            </div>
+
+            <!-- Content Area with Tables and Right-Aligned Total Forms -->
+            <div class="bt-content-body">
+                <!-- SECTION 1: Room Charges -->
+                <div class="bt-sec-title">Room Charges</div>
+                <div class="bt-grid-scroll">
+                    <table class="bt-table">
+                        <thead>
+                            <tr>
+                                <th style="width:28px; text-align:center;">
+                                    <input type="checkbox" checked="@RoomCharges.All(x => x.Selected)" @onchange="@((ChangeEventArgs e) => ToggleAllRoomCharges((bool)(e.Value ?? false)))" />
+                                </th>
+                                <th style="width:35px; text-align:center;">SN</th>
+                                <th style="width:85px;">Date</th>
+                                <th style="width:110px;">Room No.</th>
+                                <th style="width:100px;">Room Type</th>
+                                <th style="width:100px;">Room Rate</th>
+                                <th style="width:80px; text-align:center;">No. Of Adult</th>
+                                <th style="width:80px; text-align:center;">No. Of Child</th>
+                                <th>Remark</th>
+                                <th style="width:90px; text-align:right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (RoomCharges != null && RoomCharges.Any())
+                            {
+                                @foreach (var r in RoomCharges)
+                                {
+                                    <tr class="@(r.Selected ? "bt-row-selected" : "")" @onclick="() => r.Selected = !r.Selected">
+                                        <td style="text-align:center;" @onclick:stopPropagation="true">
+                                            <input type="checkbox" @bind="r.Selected" />
+                                        </td>
+                                        <td style="text-align:center;">@r.SN</td>
+                                        <td>@r.Date.ToString("M/d/yyyy")</td>
+                                        <td>@(r.RoomNo + (string.IsNullOrEmpty(r.Guest) ? "" : $" [{r.Guest}]"))</td>
+                                        <td>@r.RoomType</td>
+                                        <td>@r.RoomRate</td>
+                                        <td style="text-align:center;">@r.Adults</td>
+                                        <td style="text-align:center;">@r.Child</td>
+                                        <td>@r.Remark</td>
+                                        <td style="text-align:right;">@r.Amount.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Room Charge Summary Form (matching Image 5) -->
+                <div class="bt-summary-container">
+                    <table class="bt-summary-form">
+                        <tr>
+                            <td class="sum-lbl">Subtotal</td>
+                            <td class="sum-val"><input type="text" value="@RoomSubtotal.ToString("N2")" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl">Discount</td>
+                            <td class="sum-val"><input type="text" value="@Discount.ToString("N2")" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl">Service Charge</td>
+                            <td class="sum-val"><input type="text" value="@RoomService.ToString("N2")" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl">VAT</td>
+                            <td class="sum-val"><input type="text" value="@RoomVat.ToString("N2")" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl font-bold">Grand Total</td>
+                            <td class="sum-val"><input type="text" value="@RoomGrand.ToString("N2")" readonly class="font-bold" /></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- SECTION 2: Extra Bills -->
+                <div class="bt-sec-title-row">
+                    <span class="bt-sec-title">Extra Bills</span>
+                    <label class="bt-expand-lbl">
+                        <input type="checkbox" @bind="ExpandAllExtra" /> Expand All
+                    </label>
+                </div>
+                <div class="bt-grid-scroll">
+                    <table class="bt-table">
+                        <thead>
+                            <tr>
+                                <th style="width:28px; text-align:center;">
+                                    <input type="checkbox" checked="@ExtraBills.All(x => x.Selected)" @onchange="@((ChangeEventArgs e) => ToggleAllExtraBills((bool)(e.Value ?? false)))" />
+                                </th>
+                                <th style="width:35px; text-align:center;">SN</th>
+                                <th style="width:75px;">Room No.</th>
+                                <th style="width:85px;">Date</th>
+                                <th style="width:100px;">Invoice ID</th>
+                                <th style="width:80px; text-align:right;">Ser. Charge</th>
+                                <th style="width:75px; text-align:right;">Discount</th>
+                                <th style="width:75px; text-align:right;">VAT</th>
+                                <th style="width:85px; text-align:right;">Sub Total</th>
+                                <th>Remark</th>
+                                <th style="width:90px; text-align:right;">Grand Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ExtraBills != null && ExtraBills.Any())
+                            {
+                                @foreach (var e in ExtraBills)
+                                {
+                                    <tr class="@(e.Selected ? "bt-row-selected" : "")" @onclick="() => e.Selected = !e.Selected">
+                                        <td style="text-align:center;" @onclick:stopPropagation="true">
+                                            <input type="checkbox" @bind="e.Selected" />
+                                        </td>
+                                        <td style="text-align:center;">@e.SN</td>
+                                        <td>@e.RoomNo</td>
+                                        <td>@e.Date.ToString("M/d/yyyy")</td>
+                                        <td>@e.InvoiceId</td>
+                                        <td style="text-align:right;">@e.SerCharge.ToString("N2")</td>
+                                        <td style="text-align:right;">@e.Discount.ToString("N2")</td>
+                                        <td style="text-align:right;">@e.Vat.ToString("N2")</td>
+                                        <td style="text-align:right;">@e.SubTotal.ToString("N2")</td>
+                                        <td>@e.Remark</td>
+                                        <td style="text-align:right;">@e.GrandTotal.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bt-summary-container">
+                    <table class="bt-summary-form">
+                        <tr>
+                            <td class="sum-lbl">Total Extra Bill</td>
+                            <td class="sum-val"><input type="text" value="@TotalExtra.ToString("N2")" readonly /></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- SECTION 3: Payment History -->
+                <div class="bt-sec-title">Payment History</div>
+                <div class="bt-grid-scroll">
+                    <table class="bt-table">
+                        <thead>
+                            <tr>
+                                <th style="width:28px; text-align:center;">
+                                    <input type="checkbox" checked="@PaymentHistory.All(x => x.Selected)" @onchange="@((ChangeEventArgs e) => ToggleAllPayments((bool)(e.Value ?? false)))" />
+                                </th>
+                                <th style="width:35px; text-align:center;">SN</th>
+                                <th style="width:85px;">Date</th>
+                                <th style="width:110px;">Receipt No.</th>
+                                <th style="width:100px;">Voucher Type</th>
+                                <th style="width:110px;">Received By</th>
+                                <th>Remark</th>
+                                <th style="width:90px; text-align:right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (PaymentHistory != null && PaymentHistory.Any())
+                            {
+                                @foreach (var p in PaymentHistory)
+                                {
+                                    <tr class="@(p.Selected ? "bt-row-selected" : "")" @onclick="() => p.Selected = !p.Selected">
+                                        <td style="text-align:center;" @onclick:stopPropagation="true">
+                                            <input type="checkbox" @bind="p.Selected" />
+                                        </td>
+                                        <td style="text-align:center;">@p.SN</td>
+                                        <td>@p.Date.ToString("M/d/yyyy")</td>
+                                        <td>@p.ReceiptNo</td>
+                                        <td>@p.VoucherType</td>
+                                        <td>@p.ReceivedBy</td>
+                                        <td>@p.Remark</td>
+                                        <td style="text-align:right;">@p.Amount.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bt-summary-container">
+                    <table class="bt-summary-form">
+                        <tr>
+                            <td class="sum-lbl">Total Credit</td>
+                            <td class="sum-val"><input type="text" value="300.00" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl">Total Paid</td>
+                            <td class="sum-val"><input type="text" value="@TotalPaid.ToString("N2")" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="sum-lbl">Total Refund</td>
+                            <td class="sum-val"><input type="text" value="0.00" readonly /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bottom Status Footer -->
+            <div class="bt-footer-bar">
+                <span>Total Room Charge = @RoomGrand.ToString("N2")</span>
+                <span>Total Extra Bills = @TotalExtra.ToString("N0")</span>
+                <span>Total Payments = @TotalPaid.ToString("N0")</span>
+                <span><b>TOTAL SELECTED = @TotalSelected.ToString("N2")</b></span>
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
-<!-- Nested Bt Guest Find Popup -->
-<BtGuestFindPopup
-    @bind-Visible="showBtGuestFind"
-    GuestList="@GuestFindList"
-    SelectedGuest="@selectedBtGuest"
-    SelectedGuestChanged="@(g => selectedBtGuest = g)"
-    OnOk="HandleSelectBtGuest" />
+<!-- Printable Guest Ledger Dialog (All / Room Charge) -->
+<GuestLedgerPrintPopup
+    @bind-Visible="showLedgerPrint"
+    PrintMode="@currentPrintMode"
+    GuestName="@GuestName"
+    RegNo="@RegNo"
+    Company="@Company"
+    TinNo="@Tin"
+    FsNo="@FsNum"
+    ArrivalDate="@Arrival"
+    DepartureDate="@Departure"
+    RoomCharges="@RoomCharges"
+    ExtraBills="@ExtraBills"
+    PaymentHistory="@PaymentHistory" />
+
+<!-- Registration Search / Find Popup (Global component from Shared directory) -->
+<RegistrationSearchPopup
+    @bind-Visible="showRegistrationSearch"
+    IsMultiSelect="@FromOthers"
+    Items="@RegistrationSearchList"
+    SelectedItem="@selectedLookupItem"
+    SelectedItemChanged="@(item => selectedLookupItem = item)"
+    OnSelect="HandleSelectLookupItem"
+    OnMultiSelectCompleted="HandleMultiSelectLookupCompleted" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
     [Parameter] public RegistrationRow? TargetRegistration { get; set; }
-    [Parameter] public string GuestName { get; set; } = "";
-    [Parameter] public string RegNo { get; set; } = "";
+    [Parameter] public string GuestName { get; set; } = "BEREKET BEKELE WOLDEAMANUEL";
+    [Parameter] public string RegNo { get; set; } = "REG-00008-26";
     [Parameter] public string Company { get; set; } = "";
     [Parameter] public string FsNum { get; set; } = "";
     [Parameter] public string Tin { get; set; } = "";
-    [Parameter] public DateTime? Arrival { get; set; }
-    [Parameter] public DateTime? Departure { get; set; }
+    [Parameter] public DateTime? Arrival { get; set; } = new DateTime(2026, 8, 27, 14, 15, 0);
+    [Parameter] public DateTime? Departure { get; set; } = new DateTime(2026, 9, 16, 12, 0, 0);
     [Parameter] public string? ToGuest { get; set; }
     [Parameter] public EventCallback<string?> ToGuestChanged { get; set; }
     [Parameter] public string? Window { get; set; } = "All";
+    [Parameter] public string? Currency { get; set; } = "Birr";
+    [Parameter] public bool FromOthers { get; set; }
     [Parameter] public bool SelectAll { get; set; }
+    [Parameter] public decimal Discount { get; set; } = 0.00m;
+
     [Parameter] public List<TransferChargeRow> RoomCharges { get; set; } = new();
     [Parameter] public List<ExtraBillRow> ExtraBills { get; set; } = new();
     [Parameter] public List<PaymentHistoryRow> PaymentHistory { get; set; } = new();
     [Parameter] public List<string> WindowOptions { get; set; } = new() { "All", "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
-    [Parameter] public List<TransferGuestItem> GuestFindList { get; set; } = new();
+    [Parameter] public List<string> CurrencyOptions { get; set; } = new() { "Birr", "USD", "EUR" };
+    [Parameter] public List<RegistrationLookupItem> RegistrationSearchList { get; set; } = new();
     [Parameter] public EventCallback OnRefresh { get; set; }
     [Parameter] public EventCallback OnOpenGuestFind { get; set; }
     [Parameter] public EventCallback<bool> OnSelectAll { get; set; }
     [Parameter] public EventCallback OnTransfer { get; set; }
     [Parameter] public EventCallback OnReturn { get; set; }
 
-    bool showBtGuestFind = false;
-    TransferGuestItem? selectedBtGuest;
+    bool showPrintMenu = false;
+    bool showLedgerPrint = false;
+    string currentPrintMode = "All";
+    bool ExpandAllExtra = false;
+
+    bool showRegistrationSearch = false;
+    RegistrationLookupItem? selectedLookupItem;
+    List<RegistrationLookupItem> SelectedFromRegistrations = new();
 
     decimal RoomSubtotal => RoomCharges.Sum(x => x.Amount);
     decimal RoomService => Math.Round(RoomSubtotal * 0.10m, 2);
@@ -155,11 +441,16 @@
     {
         if (TargetRegistration != null)
         {
-            if (string.IsNullOrEmpty(GuestName)) GuestName = TargetRegistration.Guest ?? "";
-            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
-            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company ?? "";
-            if (!Arrival.HasValue) Arrival = TargetRegistration.Arrival;
-            if (!Departure.HasValue) Departure = TargetRegistration.Departure;
+            if (string.IsNullOrEmpty(GuestName) || GuestName == "BEREKET BEKELE WOLDEAMANUEL") 
+                GuestName = TargetRegistration.Guest ?? "BEREKET BEKELE WOLDEAMANUEL";
+            if (string.IsNullOrEmpty(RegNo) || RegNo == "REG-00008-26") 
+                RegNo = TargetRegistration.Registration ?? "REG-00008-26";
+            if (string.IsNullOrEmpty(Company)) 
+                Company = TargetRegistration.Company ?? "";
+            if (!Arrival.HasValue) 
+                Arrival = TargetRegistration.Arrival;
+            if (!Departure.HasValue) 
+                Departure = TargetRegistration.Departure;
         }
 
         if (Visible)
@@ -169,56 +460,570 @@
                 var arr = Arrival ?? DateTime.Today;
                 RoomCharges = new List<TransferChargeRow>
                 {
-                    new() { SN = 1, Date = arr, RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false },
-                    new() { SN = 2, Date = arr.AddDays(1), RoomNo = "102", RoomType = "Standard Room", RoomRate = "BUSINESS RATE", Adults = 1, Child = 0, Amount = 1479.85m, Selected = false }
+                    new() { SN = 1, Date = new DateTime(2026, 8, 19), RoomNo = "101", RoomType = "Standard", RoomRate = "Rate 1", Adults = 1, Child = 0, Amount = 86.96m, Selected = true, Guest = "JANE DOE" },
+                    new() { SN = 2, Date = new DateTime(2026, 8, 19), RoomNo = "205", RoomType = "Delux", RoomRate = "Rate 1", Adults = 1, Child = 0, Amount = 86.96m, Selected = true, Guest = "JANE DOE" },
+                    new() { SN = 3, Date = new DateTime(2026, 8, 20), RoomNo = "205", RoomType = "Delux", RoomRate = "Rate 1", Adults = 1, Child = 0, Amount = 86.96m, Selected = true, Guest = "JANE DOE" }
                 };
             }
-            if (!PaymentHistory.Any())
+            if (!RegistrationSearchList.Any())
             {
-                var arr = Arrival ?? DateTime.Today;
-                PaymentHistory = new List<PaymentHistoryRow>
+                RegistrationSearchList = new List<RegistrationLookupItem>
                 {
-                    new() { SN = 1, Date = arr.AddDays(-7), ReceiptNo = "WCNO-00029-17", VoucherType = "Rebate", ReceivedBy = "CNET ADMIN", Amount = -1000m, Selected = false },
-                    new() { SN = 2, Date = arr.AddDays(-7), ReceiptNo = "CRV-56534", VoucherType = "Cash Receipt", ReceivedBy = "CNET ADMIN", Amount = 605.02m, Selected = false }
-                };
-            }
-            if (!GuestFindList.Any())
-            {
-                GuestFindList = new List<TransferGuestItem>
-                {
-                    new() { Registration = "REG-00157-17", RoomType = "Standard Room", Room = "102", Guest = "Leo Rojas" },
-                    new() { Registration = "REG-00155-17", RoomType = "Pseudo Rooms", Room = "301", Guest = "teshome mola" },
-                    new() { Registration = "REG-00156-17", RoomType = "Executive", Room = "202", Guest = "Solomon Tuffa Bereket" },
-                    new() { Registration = "REG-00113-17", RoomType = "Standard Room", Room = "103", Guest = "miskir engida engida" }
+                    new() { Code = "REG-00000-26", RoomNumber = "101", Guest = "JANE DOE", RoomType = "Standard", Company = "", Selected = true },
+                    new() { Code = "REG-00001-26", RoomNumber = "205", Guest = "JANE DOE", RoomType = "Delux", Company = "RED CLOUD ICT S...", Selected = false },
+                    new() { Code = "REG-00002-26", RoomNumber = "207", Guest = "JANE DOE", RoomType = "Delux", Company = "RED CLOUD ICT S...", Selected = false },
+                    new() { Code = "REG-00003-26", RoomNumber = "208", Guest = "JANE DOE", RoomType = "Delux", Company = "", Selected = false },
+                    new() { Code = "REG-00004-26", RoomNumber = "209", Guest = "JANE DOE", RoomType = "Delux", Company = "", Selected = false },
+                    new() { Code = "REG-00005-26", RoomNumber = "210", Guest = "JANE DOE", RoomType = "Delux", Company = "", Selected = false },
+                    new() { Code = "REG-00006-26", RoomNumber = "102", Guest = "JANE DOE", RoomType = "Standard", Company = "", Selected = false },
+                    new() { Code = "REG-00007-26", RoomNumber = "103", Guest = "JANE DOE", RoomType = "Standard", Company = "", Selected = false }
                 };
             }
         }
     }
 
-    async Task HandleRefresh() => await OnRefresh.InvokeAsync();
-    async Task HandleOpenGuestFind()
+    void OnToggleFromOthers(ChangeEventArgs e)
     {
-        if (OnOpenGuestFind.HasDelegate) await OnOpenGuestFind.InvokeAsync();
-        else showBtGuestFind = true;
-    }
-    void HandleSelectBtGuest()
-    {
-        var sel = selectedBtGuest ?? GuestFindList.FirstOrDefault();
-        if (sel != null)
+        FromOthers = (bool)(e.Value ?? false);
+        if (!FromOthers)
         {
-            ToGuest = $"{sel.Registration} - {sel.Guest}";
+            SelectedFromRegistrations.Clear();
+        }
+    }
+
+    void HandleOpenTargetSearch()
+    {
+        showRegistrationSearch = true;
+    }
+
+    void HandleSelectLookupItem(RegistrationLookupItem item)
+    {
+        if (item != null)
+        {
+            ToGuest = $"{item.Code}";
             ToGuestChanged.InvokeAsync(ToGuest);
         }
-        showBtGuestFind = false;
+        showRegistrationSearch = false;
     }
-    async Task HandleSelectAll(bool v)
+
+    void HandleMultiSelectLookupCompleted(List<RegistrationLookupItem> list)
+    {
+        SelectedFromRegistrations = list;
+        showRegistrationSearch = false;
+    }
+
+    void TogglePrintMenu() => showPrintMenu = !showPrintMenu;
+
+    void OpenPrint(string mode)
+    {
+        currentPrintMode = mode;
+        showPrintMenu = false;
+        showLedgerPrint = true;
+    }
+
+    void ToggleAllRoomCharges(bool v)
     {
         foreach (var r in RoomCharges) r.Selected = v;
+    }
+
+    void ToggleAllExtraBills(bool v)
+    {
         foreach (var e in ExtraBills) e.Selected = v;
+    }
+
+    void ToggleAllPayments(bool v)
+    {
         foreach (var p in PaymentHistory) p.Selected = v;
+    }
+
+    async Task HandleSelectAll(bool v)
+    {
+        SelectAll = v;
+        ToggleAllRoomCharges(v);
+        ToggleAllExtraBills(v);
+        ToggleAllPayments(v);
         await OnSelectAll.InvokeAsync(v);
     }
+
+    async Task HandleRefresh() => await OnRefresh.InvokeAsync();
     async Task HandleTransfer() => await OnTransfer.InvokeAsync();
     async Task HandleReturn() => await OnReturn.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
+
+<style>
+    .bill-transfer-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+    }
+
+    .bill-transfer-popup .dxbl-popup {
+        border-radius: 0;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .bt-container {
+        display: flex;
+        flex-direction: column;
+        background: #f7f9fa;
+        font-family: Arial, "Segoe UI", sans-serif;
+        color: #222;
+    }
+
+    /* Window Title */
+    .bt-titlebar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 28px;
+        padding: 0 10px;
+        background: #ffffff;
+        border-bottom: 1px solid #e1e4e8;
+    }
+
+    .bt-title-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: #222;
+    }
+
+    .bt-title-close {
+        cursor: pointer;
+        font-size: 18px;
+        color: #666;
+    }
+
+    .bt-title-close:hover {
+        color: #d9534f;
+    }
+
+    .bt-header-accent {
+        height: 22px;
+        background: #0078d4;
+        width: 100%;
+    }
+
+    /* Toolbar */
+    .bt-toolbar {
+        display: flex;
+        align-items: center;
+        background: #f0f2f5;
+        border-bottom: 1px solid #d0d7de;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+
+    .bt-tb-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        padding: 2px 6px;
+        font-size: 11px;
+        color: #333;
+        cursor: pointer;
+        user-select: none;
+        min-width: 48px;
+    }
+
+
+    .bt-tb-btn span {
+        margin-top: 2px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .bt-icon-refresh {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .bt-print-box {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .bt-icon-print {
+        font-size: 24px;
+        color: #555;
+        line-height: 1;
+    }
+
+    .bt-icon-caret {
+        font-size: 9px;
+        color: #666;
+    }
+
+    .bt-close-icon-box {
+        width: 22px;
+        height: 20px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        font-size: 28px;
+        line-height: 1;
+    }
+
+    .bt-icon-return {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .bt-transfer-icon-box {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        line-height: 1;
+        gap: 2px;
+    }
+
+    .bt-ab-red { color: #d9534f; font-weight: bold; }
+    .bt-ab-green { color: #5cb85c; font-weight: bold; }
+    .bt-ab-arrow { font-size: 14px; color: #4a90e2; }
+
+    .bt-dropdown-wrapper {
+        position: relative;
+    }
+
+    .bt-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1050;
+        background: #ffffff;
+        border: 1px solid #c9c9c9;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 130px;
+        padding: 4px 0;
+    }
+
+    .bt-dropdown-item {
+        padding: 5px 14px;
+        font-size: 12px;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .bt-dropdown-item:hover {
+        background: #0d6efd;
+        color: #ffffff;
+    }
+
+    .bt-divider {
+        width: 1px;
+        height: 34px;
+        background: #d0d7de;
+        margin: 0 4px;
+    }
+
+    /* Target Dropdown Box */
+    .bt-target-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .bt-label {
+        font-size: 12px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .bt-custom-dropdown {
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid #a6b0bc;
+        border-radius: 1px;
+        width: 165px;
+        height: 22px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+    .bt-dropdown-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 11px;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .bt-dropdown-arrow {
+        color: #777;
+        font-size: 10px;
+    }
+
+    /* Stacked Toggle Switch & Select All */
+    .bt-toggle-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 11px;
+    }
+
+    .bt-switch-row, .bt-select-all-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .bt-switch-label {
+        color: #1a4f85;
+        font-size: 11px;
+        min-width: 65px;
+    }
+
+    .bt-chk {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Rounded Toggle Switch */
+    .bt-toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 16px;
+        margin: 0;
+    }
+
+    .bt-toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .bt-toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #ffffff;
+        border: 1px solid #777;
+        border-radius: 16px;
+        transition: .2s;
+    }
+
+    .bt-toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 10px;
+        width: 10px;
+        left: 3px;
+        bottom: 2px;
+        background-color: #0078d4;
+        border-radius: 50%;
+        transition: .2s;
+    }
+
+    input:checked + .bt-toggle-slider {
+        background-color: #0078d4;
+        border-color: #0078d4;
+    }
+
+    input:checked + .bt-toggle-slider:before {
+        background-color: #ffffff;
+        transform: translateX(26px);
+    }
+
+    /* Stacked Window & Currency Combos */
+    .bt-combos-column {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-left: auto;
+    }
+
+    .bt-combo-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .bt-combo-lbl {
+        font-size: 11px;
+        color: #333;
+        width: 55px;
+        text-align: right;
+    }
+
+    /* Info Section */
+    .bt-info-section {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 4px 20px;
+        background: #ffffff;
+        border-bottom: 1px solid #d0d7de;
+        padding: 6px 14px;
+    }
+
+    .bt-info-left, .bt-info-right {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .bt-field-row {
+        display: flex;
+        align-items: center;
+    }
+
+    .bt-field-lbl {
+        width: 100px;
+        font-size: 11px;
+        color: #444;
+        margin: 0;
+    }
+
+    .bt-field-val {
+        flex: 1;
+        height: 22px;
+        border: 1px solid #ced4da;
+        border-radius: 1px;
+        padding: 1px 6px;
+        font-size: 11px;
+        background: #ffffff;
+        color: #222;
+    }
+
+    /* Tab Strip */
+    .bt-tab-strip {
+        display: flex;
+        padding-left: 10px;
+        margin-top: 6px;
+        border-bottom: 1px solid #d0d7de;
+    }
+
+    .bt-tab {
+        background: #ffffff;
+        border: 1px solid #d0d7de;
+        border-bottom: 1px solid #ffffff;
+        padding: 4px 12px;
+        font-size: 11.5px;
+        font-weight: 500;
+        margin-bottom: -1px;
+        color: #333;
+    }
+
+    /* Body with Tables */
+    .bt-content-body {
+        padding: 6px 12px;
+        max-height: 480px;
+        overflow-y: auto;
+        background: #ffffff;
+    }
+
+    .bt-sec-title {
+        font-size: 11.5px;
+        font-weight: bold;
+        color: #333;
+        margin: 4px 0 2px 0;
+    }
+
+    .bt-sec-title-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 6px 0 2px 0;
+    }
+
+    .bt-expand-lbl {
+        font-size: 11px;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin: 0;
+    }
+
+    .bt-grid-scroll {
+        border: 1px solid #c5cbcf;
+        max-height: 120px;
+        overflow-y: auto;
+        background: #ffffff;
+    }
+
+    .bt-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    .bt-table th {
+        background: #f6f7f9;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 1px solid #c5cbcf;
+        border-right: 1px solid #ebeef0;
+        padding: 3px 5px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .bt-table td {
+        padding: 2px 5px;
+        border-bottom: 1px solid #ebeef0;
+        border-right: 1px solid #ebeef0;
+        color: #333;
+    }
+
+    .bt-table tr.bt-row-selected td {
+        background-color: #a0d5f8 !important;
+        color: #000000 !important;
+    }
+
+    /* Summary Form Layout (matching Image 5) */
+    .bt-summary-container {
+        display: flex;
+        justify-content: flex-end;
+        padding: 4px 0 6px 0;
+    }
+
+    .bt-summary-form {
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    .bt-summary-form td {
+        padding: 1px 4px;
+    }
+
+    .sum-lbl {
+        text-align: right;
+        color: #333;
+        width: 100px;
+    }
+
+    .sum-val input {
+        width: 115px;
+        height: 20px;
+        text-align: right;
+        border: 1px solid #ced4da;
+        background: #ffffff;
+        padding: 1px 4px;
+        font-size: 11px;
+    }
+
+    .font-bold {
+        font-weight: bold;
+    }
+
+    /* Bottom Footer Bar */
+    .bt-footer-bar {
+        display: flex;
+        gap: 16px;
+        padding: 5px 12px;
+        background: #f0f2f5;
+        border-top: 1px solid #d0d7de;
+        font-size: 11px;
+        color: #333;
+    }
+</style>

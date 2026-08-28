@@ -1,0 +1,309 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@inject IJSRuntime JSRuntime
+
+<DxPopup @bind-Visible="Visible"
+         HeaderVisible="false"
+         ShowCloseButton="false"
+         Width="980px"
+         CloseOnOutsideClick="true"
+         CloseOnEscape="true"
+         CssClass="resdetail-print-popup">
+    <BodyContentTemplate>
+        <div class="print-dialog-container">
+            <!-- Printable Clean Sheet (matching Image 2) -->
+            <div class="print-sheet" id="reservation-detail-print-area">
+                <!-- Page Top Actions (Close button on print page, hidden during actual print) -->
+                <div class="print-page-topbar no-print">
+                    <button type="button" class="print-page-close-btn" @onclick="CloseDialog" title="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Title Header -->
+                <div class="print-hotel-name">@HotelName</div>
+                <div class="print-doc-title">Reservation Detail - @RegistrationNo</div>
+                <div class="print-date-line">Date : @(PrintDate.ToString("M/d/yyyy"))</div>
+
+                <!-- Print Table with Master and Sub-rows -->
+                <table class="print-table">
+                    <thead>
+                        <tr>
+                            <th style="width:75px;">Date</th>
+                            <th style="width:65px;">Week Day</th>
+                            <th style="width:40px;">Adult</th>
+                            <th style="width:40px;">Child</th>
+                            <th style="width:65px;">Room Count</th>
+                            <th style="width:80px;">Room Type</th>
+                            <th style="width:80px;">Actual RTC</th>
+                            <th style="width:45px;">Room</th>
+                            <th style="width:60px;">Rate</th>
+                            <th style="width:75px;">Rate Amount</th>
+                            <th style="width:95px;">Market</th>
+                            <th style="width:95px;">Source</th>
+                            <th style="width:50px;">Is Fixed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Rows != null && Rows.Any())
+                        {
+                            @foreach (var r in Rows)
+                            {
+                                <tr>
+                                    <td>@r.Date.ToString("M/d/yyyy")</td>
+                                    <td>@r.WeekDay</td>
+                                    <td style="text-align:center;">@r.Adult</td>
+                                    <td style="text-align:center;">@r.Child</td>
+                                    <td style="text-align:center;">@r.RoomCount</td>
+                                    <td>@r.RoomType</td>
+                                    <td>@r.ActualRTC</td>
+                                    <td style="text-align:center;">@r.Room</td>
+                                    <td>@r.Rate</td>
+                                    <td style="text-align:right;">@r.RateAmount.ToString("N2")</td>
+                                    <td>@r.Market</td>
+                                    <td>@r.Source</td>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" checked="@r.IsFixed" disabled />
+                                    </td>
+                                </tr>
+
+                                @if (r.Packages != null && r.Packages.Any())
+                                {
+                                    <tr class="print-sub-header">
+                                        <th colspan="4" style="background:#d9d9d9; font-weight:bold; text-align:left; padding-left:12px;">Package Header Description</th>
+                                        <th colspan="2" style="background:#d9d9d9; font-weight:bold; text-align:center;">Id</th>
+                                        <th colspan="2" style="background:#d9d9d9; font-weight:bold; text-align:left; padding-left:8px;">Registration Detail</th>
+                                        <th style="background:#d9d9d9; font-weight:bold; text-align:left;">Package</th>
+                                        <th style="background:#d9d9d9; font-weight:bold; text-align:right;">Amount</th>
+                                        <th colspan="3" style="background:#d9d9d9; font-weight:bold; text-align:left; padding-left:8px;">Remark</th>
+                                    </tr>
+
+                                    @foreach (var pkg in r.Packages)
+                                    {
+                                        <tr class="print-sub-data">
+                                            <td colspan="4" style="padding-left:12px;">@(string.IsNullOrEmpty(pkg.PackageHeaderDescription) ? pkg.Package : pkg.PackageHeaderDescription)</td>
+                                            <td colspan="2" style="text-align:center;">@(string.IsNullOrEmpty(pkg.Id) ? "1" : pkg.Id)</td>
+                                            <td colspan="2" style="padding-left:8px;">@(string.IsNullOrEmpty(pkg.RegistrationDetail) ? "Standard" : pkg.RegistrationDetail)</td>
+                                            <td>@pkg.Package</td>
+                                            <td style="text-align:right;">@pkg.Amount.ToString("N2")</td>
+                                            <td colspan="3" style="padding-left:8px;">@pkg.Remark</td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="13" style="text-align:center; padding:10px;">No reservation detail records found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <!-- Signatures Row (4 columns) -->
+                <div class="print-signatures-container">
+                    <div class="print-sig-col">
+                        <div class="print-sig-line"></div>
+                        <div class="print-sig-label">Prepared By</div>
+                    </div>
+                    <div class="print-sig-col">
+                        <div class="print-sig-line"></div>
+                        <div class="print-sig-label">Checked By</div>
+                    </div>
+                    <div class="print-sig-col">
+                        <div class="print-sig-line"></div>
+                        <div class="print-sig-label">Approved By</div>
+                    </div>
+                    <div class="print-sig-col">
+                        <div class="print-sig-line"></div>
+                        <div class="print-sig-label">Authorized By</div>
+                    </div>
+                </div>
+
+                <!-- Footer Left -->
+                <div class="print-system-footer">
+                    ERP System
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public string HotelName { get; set; } = "TEST HOTEL";
+    [Parameter] public string RegistrationNo { get; set; } = "REG-00004-26";
+    [Parameter] public DateTime PrintDate { get; set; } = DateTime.Today;
+    [Parameter] public List<DailyDetailRow> Rows { get; set; } = new();
+
+    async Task CloseDialog()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(Visible);
+    }
+}
+
+<style>
+    .resdetail-print-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+        background: #ffffff;
+    }
+
+    .resdetail-print-popup .dxbl-popup {
+        border-radius: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .print-dialog-container {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        font-family: Arial, "Segoe UI", sans-serif;
+        padding: 10px 0 20px 0;
+        max-height: 88vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .print-sheet {
+        background: #ffffff;
+        margin: 0 auto;
+        padding: 10px 30px 24px 30px;
+        width: 100%;
+        max-width: 920px;
+        box-sizing: border-box;
+        color: #000000;
+        position: relative;
+    }
+
+    .print-page-topbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 4px;
+    }
+
+    .print-page-close-btn {
+        background: transparent;
+        border: none;
+        color: #555;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: color 0.15s, background-color 0.15s;
+    }
+
+    .print-page-close-btn:hover {
+        color: #d9271e;
+        background-color: #f1f3f5;
+    }
+
+    .print-hotel-name {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+    }
+
+    .print-doc-title {
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    .print-date-line {
+        text-align: right;
+        font-size: 11.5px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        margin-bottom: 40px;
+    }
+
+    .print-table th, .print-table td {
+        border: 1px solid #bfbfbf;
+        padding: 4px 6px;
+    }
+
+    .print-table th {
+        background-color: #d9d9d9;
+        font-weight: 600;
+        text-align: center;
+        color: #000;
+    }
+
+    .print-sub-header th {
+        background-color: #d9d9d9 !important;
+        font-weight: 700 !important;
+        font-size: 10.5px;
+    }
+
+    .print-sub-data td {
+        background-color: #ffffff;
+        font-size: 10.5px;
+    }
+
+    .print-signatures-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+        margin-bottom: 30px;
+        padding: 0 10px;
+    }
+
+    .print-sig-col {
+        width: 20%;
+        text-align: center;
+    }
+
+    .print-sig-line {
+        border-top: 1px solid #000000;
+        margin-bottom: 6px;
+        width: 100%;
+    }
+
+    .print-sig-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #000000;
+    }
+
+    .print-system-footer {
+        font-size: 11px;
+        color: #333333;
+        margin-top: 15px;
+        border-top: 1px dotted #ccc;
+        padding-top: 4px;
+    }
+
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        #reservation-detail-print-area, #reservation-detail-print-area * {
+            visibility: visible;
+        }
+        #reservation-detail-print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 20px;
+            box-shadow: none;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>

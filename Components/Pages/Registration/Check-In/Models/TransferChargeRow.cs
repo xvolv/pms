@@ -12,4 +12,5 @@ public class TransferChargeRow
     public string Remark { get; set; } = "";
     public decimal Amount { get; set; }
     public bool Selected { get; set; }
+    public string Guest { get; set; } = "";
 }

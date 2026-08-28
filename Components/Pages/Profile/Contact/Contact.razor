@@ -4,12 +4,15 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Profile - Contact</PageTitle>
-<div class="top-tab-header">
-    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
-        Contact
-        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+@if (!IsModal)
+{
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Contact
+            <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
     </div>
-</div>
+}
 
 
 <div class="profile-page-wrapper">
@@ -355,6 +358,10 @@
 </DxPopup>
 
 @code {
+    [Parameter] public bool IsModal { get; set; }
+    [Parameter] public EventCallback<PersonProfileRow> OnSaved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private PersonProfileRow contact = new();
     private List<PersonProfileRow> searchResults = new();
     private int? editingId;
@@ -449,7 +456,7 @@
         RequestConfirm("Save Contact", $"Are you sure you want to {verb} this contact?", false, SaveContactConfirmed);
     }
 
-    private Task SaveContactConfirmed()
+    private async Task SaveContactConfirmed()
     {
         if (editingId is int id)
         {
@@ -465,7 +472,11 @@
         }
 
         statusMessage = "Contact saved.";
-        return Task.CompletedTask;
+
+        if (OnSaved.HasDelegate)
+        {
+            await OnSaved.InvokeAsync(contact);
+        }
     }
 
     private void RequestConfirm(string title, string message, bool danger, Func<Task> action)
@@ -624,9 +635,16 @@
         target.Note = source.Note;
     }
 
-    private void Close()
+    private async Task Close()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        if (IsModal && OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }
 

@@ -1,0 +1,631 @@
+@namespace ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+
+<div class="right-side-panel-wrapper">
+    <!-- Sliding/Expanding Drawer -->
+    @if (!string.IsNullOrEmpty(activeTab))
+    {
+        <div class="panel-drawer">
+            <!-- Drawer Header -->
+            <div class="panel-drawer-header">
+                <span class="panel-title-text">@GetTabTitle(activeTab)</span>
+                <div class="panel-actions">
+                    <button type="button" class="panel-action-btn" title="Pin Panel" @onclick="TogglePin">
+                        <i class="bi @(isPinned ? "bi-pin-fill" : "bi-pin-angle")"></i>
+                    </button>
+                    <button type="button" class="panel-action-btn" title="Close" @onclick="ClosePanel">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Drawer Body -->
+            <div class="panel-drawer-body">
+                @if (activeTab == "Activities")
+                {
+                    <div class="activities-box-header">
+                        Activities on @(SelectedReg?.Registration ?? "REG-00003-26") (Room - @(SelectedReg?.Room?.Replace("#", "") ?? "208"))
+                    </div>
+                    <div class="activities-list-wrap">
+                        <table class="panel-data-table">
+                            <tbody>
+                                @foreach (var act in GetActivities())
+                                {
+                                    <tr class="act-row @(selectedActivity == act ? "act-selected" : "")" @onclick="() => selectedActivity = act">
+                                        <td class="act-name">@act.Name</td>
+                                        <td class="act-meta">[@act.Timestamp.ToString("M/d/yyyy h:mm:ss tt")] [@act.Machine]</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else if (activeTab == "LogBook")
+                {
+                    <div class="panel-table-wrap">
+                        <table class="panel-grid-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Category</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (logBookEntries.Any())
+                                {
+                                    @foreach (var entry in logBookEntries)
+                                    {
+                                        <tr>
+                                            <td>@entry.Date.ToString("M/d/yyyy HH:mm")</td>
+                                            <td>@entry.User</td>
+                                            <td>@entry.Category</td>
+                                            <td>@entry.Note</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="empty-panel-cell">No log entries to display</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else if (activeTab == "TravelDetail")
+                {
+                    <div class="travel-detail-toolbar">
+                        <button type="button" class="pickup-card-btn" @onclick="PrintPickupCard">
+                            <i class="bi bi-grid-3x3-gap-fill"></i>
+                            <span>Print Pickup Card</span>
+                        </button>
+                    </div>
+                    <div class="panel-table-wrap">
+                        <table class="panel-grid-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Station</th>
+                                    <th>Transportation</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (travelDetails.Any())
+                                {
+                                    @foreach (var td in travelDetails)
+                                    {
+                                        <tr>
+                                            <td>@td.Type</td>
+                                            <td>@td.Station</td>
+                                            <td>@td.Transportation</td>
+                                            <td>@td.Time</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="empty-panel-cell">No travel details found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else if (activeTab == "ServiceRequest")
+                {
+                    <div class="panel-table-wrap">
+                        <table class="panel-grid-table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>Id</th>
+                                    <th>Date</th>
+                                    <th>Assigned Person</th>
+                                    <th>User</th>
+                                    <th>Service Req</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (serviceRequests.Any())
+                                {
+                                    @foreach (var sr in serviceRequests)
+                                    {
+                                        <tr>
+                                            <td>@sr.SN</td>
+                                            <td>@sr.Id</td>
+                                            <td>@sr.Date.ToString("M/d/yyyy")</td>
+                                            <td>@sr.AssignedPerson</td>
+                                            <td>@sr.User</td>
+                                            <td>@sr.ServiceReq</td>
+                                            <td>@sr.Note</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="empty-panel-cell">No service requests</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else if (activeTab == "CustomerProfile")
+                {
+                    <div class="cp-card">
+                        <div class="cp-banner">
+                            Detail: Main Consignee: - Guest
+                        </div>
+                        <table class="cp-table">
+                            <tbody>
+                                <tr>
+                                    <td class="cp-col-label">Name</td>
+                                    <td class="cp-col-val">@(SelectedReg?.Guest ?? "JANE")</td>
+                                </tr>
+                                <tr>
+                                    <td class="cp-col-label">TIN</td>
+                                    <td class="cp-col-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="cp-col-label">Passport Id</td>
+                                    <td class="cp-col-val">54564564564654</td>
+                                </tr>
+                                <tr>
+                                    <td class="cp-col-label">Branch</td>
+                                    <td class="cp-col-val">Main Consignee</td>
+                                </tr>
+                                <tr>
+                                    <td class="cp-col-label">Address</td>
+                                    <td class="cp-col-val"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Vertical Tab Rail -->
+    <div class="vertical-tab-rail">
+        <div class="tab-rail-item @(activeTab == "Activities" ? "active" : "")" @onclick='() => ToggleTab("Activities")'>
+            <i class="bi bi-journal-text rail-icon text-warning"></i>
+            <span class="rail-text">Activities</span>
+        </div>
+        <div class="tab-rail-item @(activeTab == "LogBook" ? "active" : "")" @onclick='() => ToggleTab("LogBook")'>
+            <span class="rail-text">Log Book</span>
+        </div>
+        <div class="tab-rail-item @(activeTab == "TravelDetail" ? "active" : "")" @onclick='() => ToggleTab("TravelDetail")'>
+            <span class="rail-text">Travel Detail</span>
+        </div>
+        <div class="tab-rail-item @(activeTab == "ServiceRequest" ? "active" : "")" @onclick='() => ToggleTab("ServiceRequest")'>
+            <i class="bi bi-person-fill-gear rail-icon text-success"></i>
+            <span class="rail-text">Service Request</span>
+        </div>
+        <div class="tab-rail-item @(activeTab == "CustomerProfile" ? "active" : "")" @onclick='() => ToggleTab("CustomerProfile")'>
+            <span class="rail-text">Customer Profile</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .right-side-panel-wrapper {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        position: relative;
+        user-select: none;
+        align-self: stretch;
+        flex-shrink: 0;
+    }
+
+    .vertical-tab-rail {
+        width: 34px;
+        background: #f0f2f5;
+        border-left: 1px solid #d0d5dd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 6px;
+        height: 100%;
+        box-sizing: border-box;
+        z-index: 100;
+    }
+
+    .tab-rail-item {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 2px;
+        cursor: pointer;
+        color: #333;
+        font-size: 11px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.15s ease;
+    }
+
+    .tab-rail-item:hover {
+        background: #e2e8f0;
+    }
+
+    .tab-rail-item.active {
+        background: #ffffff;
+        color: #1565c0;
+        border-left: 2px solid #1565c0;
+        font-weight: 600;
+    }
+
+    .rail-icon {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .rail-text {
+        writing-mode: vertical-rl;
+        transform: rotate(0deg);
+        white-space: nowrap;
+        letter-spacing: 0.3px;
+        line-height: 1;
+    }
+
+    .panel-drawer {
+        position: absolute;
+        top: 0;
+        right: 34px;
+        bottom: 0;
+        width: 350px;
+        height: 100%;
+        background: #ffffff;
+        border-left: 1px solid #d0d5dd;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -4px 0 14px rgba(0, 0, 0, 0.15);
+        z-index: 99;
+        overflow: hidden;
+    }
+
+    .panel-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 12px;
+        background: #ffffff;
+        border-bottom: 1px solid #d0d5dd;
+    }
+
+    .panel-title-text {
+        font-size: 15px;
+        font-weight: 500;
+        color: #1565c0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .panel-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .panel-action-btn {
+        background: none;
+        border: none;
+        color: #555;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 2px;
+    }
+
+    .panel-action-btn:hover {
+        color: #1565c0;
+        background: #f0f4f8;
+    }
+
+    .panel-drawer-body {
+        flex: 1;
+        padding: 8px;
+        overflow-y: auto;
+        font-size: 12px;
+        background: #ffffff;
+    }
+
+    /* Activities Specific */
+    .activities-box-header {
+        background: #f5f5f5;
+        border: 1px solid #d0d5dd;
+        border-bottom: none;
+        padding: 6px 10px;
+        font-weight: 600;
+        color: #333;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .activities-list-wrap {
+        border: 1px solid #d0d5dd;
+        min-height: 120px;
+        background: #fff;
+    }
+
+    .panel-data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .act-row {
+        cursor: pointer;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .act-row.act-selected {
+        background-color: #0078d7 !important;
+        color: #ffffff !important;
+    }
+
+    .act-name {
+        padding: 6px 10px;
+        font-weight: 500;
+        width: 45%;
+    }
+
+    .act-meta {
+        padding: 6px 10px;
+        font-size: 11px;
+        text-align: right;
+    }
+
+    /* Panel Tables */
+    .panel-table-wrap {
+        border: 1px solid #d0d5dd;
+        overflow-x: auto;
+    }
+
+    .panel-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .panel-grid-table th {
+        background: #fafafa;
+        border-bottom: 1px solid #d0d5dd;
+        border-right: 1px solid #eeeeee;
+        padding: 5px 8px;
+        font-weight: 600;
+        color: #555;
+        text-align: left;
+    }
+
+    .panel-grid-table td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #eeeeee;
+        border-right: 1px solid #f0f0f0;
+        color: #333;
+    }
+
+    .empty-panel-cell {
+        text-align: center;
+        color: #888;
+        padding: 20px !important;
+    }
+
+    /* Travel Detail */
+    .travel-detail-toolbar {
+        margin-bottom: 8px;
+    }
+
+    .pickup-card-btn {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+        border: 1px solid #cccccc;
+        border-radius: 2px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 11px;
+        color: #333;
+    }
+
+    .pickup-card-btn:hover {
+        background: #e8e8e8;
+    }
+
+    .pickup-card-btn i {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 2px;
+    }
+
+    /* Customer Profile (matching screenshot) */
+    .cp-card {
+        border: 1px solid #90a4ae;
+        background: #ffffff;
+        margin: 0;
+    }
+
+    .cp-banner {
+        background: #80c6ed;
+        color: #000000;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 5px 8px;
+        border-bottom: 1px solid #90a4ae;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .cp-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .cp-table td {
+        border-bottom: 1px solid #d0d5dd;
+        border-right: 1px solid #d0d5dd;
+        padding: 4px 8px;
+        height: 25px;
+        vertical-align: middle;
+    }
+
+    .cp-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .cp-col-label {
+        width: 110px;
+        color: #333333;
+        background: #ffffff;
+    }
+
+    .cp-col-val {
+        color: #000000;
+        font-weight: 500;
+        background: #ffffff;
+    }
+</style>
+
+@code {
+    [Parameter] public RegistrationRow? SelectedReg { get; set; }
+
+    string activeTab = "";
+    bool isPinned = true;
+    ActivityItem? selectedActivity;
+
+    List<LogBookEntry> logBookEntries = new();
+    List<TravelDetailItem> travelDetails = new();
+    List<ServiceRequestItem> serviceRequests = new();
+
+    protected override void OnParametersSet()
+    {
+        RefreshData();
+    }
+
+    void RefreshData()
+    {
+        var regNo = SelectedReg?.Registration ?? "REG-00003-26";
+        var roomNo = SelectedReg?.Room?.Replace("#", "") ?? "208";
+        var guest = SelectedReg?.Guest ?? "BEREKET BEKELE WOLDEAMANUEL";
+
+        // Sample LogBook
+        logBookEntries = new List<LogBookEntry>
+        {
+            new LogBookEntry { Date = DateTime.Now.AddHours(-3), User = "CNET ADMIN", Category = "Check In", Note = $"Checked in {guest} to room {roomNo}." },
+            new LogBookEntry { Date = DateTime.Now.AddDays(-1), User = "SYSTEM", Category = "Reservation", Note = $"Reservation {regNo} created." }
+        };
+
+        // Sample Travel Details
+        travelDetails = new List<TravelDetailItem>
+        {
+            new TravelDetailItem { Type = "Pick Up", Station = "Bole International Airport", Transportation = "Hotel Shuttle", Time = "14:30" },
+            new TravelDetailItem { Type = "Drop Off", Station = "Bole International Airport", Transportation = "Airport Taxi", Time = "11:00" }
+        };
+
+        // Sample Service Requests
+        serviceRequests = new List<ServiceRequestItem>
+        {
+            new ServiceRequestItem { SN = 1, Id = "SR-1002", Date = DateTime.Today, AssignedPerson = "Housekeeping Staff", User = "CNET ADMIN", ServiceReq = "Extra Towels", Note = $"Room {roomNo} requested extra towels" },
+            new ServiceRequestItem { SN = 2, Id = "SR-1005", Date = DateTime.Today, AssignedPerson = "Room Service", User = "CNET ADMIN", ServiceReq = "Breakfast in Room", Note = "7:30 AM delivery" }
+        };
+    }
+
+    void ToggleTab(string tabName)
+    {
+        if (activeTab == tabName)
+            activeTab = "";
+        else
+        {
+            activeTab = tabName;
+            RefreshData();
+        }
+    }
+
+    void ClosePanel()
+    {
+        activeTab = "";
+    }
+
+    void TogglePin()
+    {
+        isPinned = !isPinned;
+    }
+
+    string GetTabTitle(string tab) => tab switch
+    {
+        "Activities" => "Activities",
+        "LogBook" => "Log Book",
+        "TravelDetail" => "Travel Detail",
+        "ServiceRequest" => "Service Request",
+        "CustomerProfile" => "Customer Profile",
+        _ => ""
+    };
+
+    List<ActivityItem> GetActivities()
+    {
+        var regNo = SelectedReg?.Registration ?? "REG-00003-26";
+        var roomNo = SelectedReg?.Room?.Replace("#", "") ?? "208";
+
+        var list = new List<ActivityItem>
+        {
+            new ActivityItem { Name = $"Check in by CNET ADMIN", Timestamp = DateTime.Parse("8/19/2026 5:19:55 PM"), Machine = "DESKTOP-DNDI5E2", IsSelected = true },
+            new ActivityItem { Name = $"Room Assigned ({roomNo}) by ADMIN", Timestamp = DateTime.Parse("8/19/2026 5:15:10 PM"), Machine = "DESKTOP-DNDI5E2" },
+            new ActivityItem { Name = $"Reservation {regNo} Created", Timestamp = DateTime.Parse("8/19/2026 10:02:00 AM"), Machine = "DESKTOP-DNDI5E2" }
+        };
+
+        if (selectedActivity == null) selectedActivity = list.FirstOrDefault();
+        return list;
+    }
+
+    void PrintPickupCard()
+    {
+        // Print pickup card action
+    }
+
+    public class ActivityItem
+    {
+        public string Name { get; set; } = "";
+        public DateTime Timestamp { get; set; }
+        public string Machine { get; set; } = "";
+        public bool IsSelected { get; set; }
+    }
+
+    public class LogBookEntry
+    {
+        public DateTime Date { get; set; }
+        public string User { get; set; } = "";
+        public string Category { get; set; } = "";
+        public string Note { get; set; } = "";
+    }
+
+    public class TravelDetailItem
+    {
+        public string Type { get; set; } = "";
+        public string Station { get; set; } = "";
+        public string Transportation { get; set; } = "";
+        public string Time { get; set; } = "";
+    }
+
+    public class ServiceRequestItem
+    {
+        public int SN { get; set; }
+        public string Id { get; set; } = "";
+        public DateTime Date { get; set; }
+        public string AssignedPerson { get; set; } = "";
+        public string User { get; set; } = "";
+        public string ServiceReq { get; set; } = "";
+        public string Note { get; set; } = "";
+    }
+}

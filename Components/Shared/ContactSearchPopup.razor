@@ -1,0 +1,152 @@
+@using DevExpress.Blazor
+
+<DxPopup Visible="@Visible"
+         VisibleChanged="@HandleVisibleChanged"
+         HeaderText="Contact Search"
+         Width="520px"
+         CloseOnOutsideClick="true"
+         ShowCloseButton="true"
+         CloseOnEscape="true"
+         CssClass="global-lookup-popup">
+    <BodyContentTemplate>
+        <div class="lookup-modal-container">
+            <div class="lookup-modal-searchrow">
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search contact name..." />
+                <button type="button" class="lookup-modal-find-btn">Find</button>
+            </div>
+            <div class="lookup-modal-gridwrap">
+                <DxGrid @ref="gridRef"
+                        Data="@FilteredContacts"
+                        CssClass="lookup-modal-grid"
+                        ShowFilterRow="false"
+                        ShowGroupPanel="false"
+                        CustomizeElement="OnCustomizeElement"
+                        RowClick="OnRowClick"
+                        RowDoubleClick="OnRowDoubleClick">
+                    <Columns>
+                        <DxGridDataColumn FieldName="@nameof(ContactItem.Code)" Caption="Code" Width="100px" />
+                        <DxGridDataColumn FieldName="@nameof(ContactItem.FirstName)" Caption="First Name" Width="140px" />
+                        <DxGridDataColumn FieldName="@nameof(ContactItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                        <DxGridDataColumn FieldName="@nameof(ContactItem.Phone)" Caption="Phone / ID" Width="120px" />
+                    </Columns>
+                </DxGrid>
+            </div>
+            <div class="lookup-modal-footer">
+                <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleAddNew">Add New</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public List<ContactItem>? Contacts { get; set; }
+    [Parameter] public ContactItem? SelectedContact { get; set; }
+    [Parameter] public EventCallback<ContactItem?> SelectedContactChanged { get; set; }
+    [Parameter] public EventCallback<ContactItem> OnSelect { get; set; }
+    [Parameter] public EventCallback OnAddNew { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    string SearchText { get; set; } = "";
+    ContactItem? selectedRow;
+    IGrid? gridRef;
+
+    List<ContactItem> DefaultContacts { get; } = new()
+    {
+        new() { Code = "PCU-00002", FirstName = "KEBEDE", MiddleName = "ZELEKE ABEBE", Phone = "5565556456" },
+        new() { Code = "PCU-00003", FirstName = "BROWN", MiddleName = "CHRIS", Phone = "3423343" },
+        new() { Code = "PCU-00009", FirstName = "NAGUIB", MiddleName = "ALI TAHER", Phone = "D02018" },
+        new() { Code = "PCU-00010", FirstName = "GIRMA", MiddleName = "BIRHANU ASSEFA", Phone = "423432" },
+        new() { Code = "PCU-00011", FirstName = "GIRMA", MiddleName = "SOFOIANA BELIHU", Phone = "43241" },
+        new() { Code = "PCU-00012", FirstName = "GIRMA", MiddleName = "DEFAR BEGENA", Phone = "342342" }
+    };
+
+    List<ContactItem> DataList => (Contacts != null && Contacts.Count > 0) ? Contacts : DefaultContacts;
+
+    IEnumerable<ContactItem> FilteredContacts =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? DataList
+            : DataList.Where(c => (c.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.FirstName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (c.Phone?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedContact != null)
+        {
+            selectedRow = SelectedContact;
+        }
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as ContactItem;
+        if (item != null)
+        {
+            selectedRow = item;
+        }
+    }
+
+    async Task OnRowDoubleClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as ContactItem;
+        if (item != null)
+        {
+            selectedRow = item;
+            await HandleSelect();
+        }
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as ContactItem;
+            if (item != null && item.Code == selectedRow.Code)
+            {
+                e.CssClass = "lookup-modal-row-selected";
+            }
+        }
+    }
+
+    async Task HandleSelect()
+    {
+        if (selectedRow != null)
+        {
+            await SelectedContactChanged.InvokeAsync(selectedRow);
+            await OnSelect.InvokeAsync(selectedRow);
+        }
+        await HandleClose();
+    }
+
+    async Task HandleAddNew()
+    {
+        await OnAddNew.InvokeAsync();
+    }
+
+    async Task HandleClear()
+    {
+        selectedRow = null;
+        await SelectedContactChanged.InvokeAsync(null);
+        await OnClear.InvokeAsync();
+        await HandleClose();
+    }
+
+    async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleVisibleChanged(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
+}

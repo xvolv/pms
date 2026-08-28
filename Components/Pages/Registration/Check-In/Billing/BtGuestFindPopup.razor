@@ -1,35 +1,98 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup @bind-Visible="Visible" HeaderText="Registration" Width="560px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible"
+         HeaderVisible="false"
+         ShowCloseButton="false"
+         Width="580px"
+         CloseOnOutsideClick="true"
+         CloseOnEscape="true"
+         CssClass="bt-guest-popup">
     <BodyContentTemplate>
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <DxTextBox Width="100%" SizeMode="SizeMode.Small" />
-            <DxButton Text="Find" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" />
-        </div>
-        <table class="multi-table" style="width:100%;">
-            <thead>
-                <tr><th>Registration</th><th>Room Type</th><th>Room</th><th>Guest</th></tr>
-            </thead>
-            <tbody>
-                @foreach (var g in GuestList)
-                {
-                    <tr style="cursor:pointer;"
-                        class="@(SelectedGuest == g ? "row-selected" : "")"
-                        @onclick="() => SelectedGuestChanged.InvokeAsync(g)"
-                        @ondblclick="HandleOk">
-                        <td>@g.Registration</td>
-                        <td>@g.RoomType</td>
-                        <td>@g.Room</td>
-                        <td>@g.Guest</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <div style="margin-top:10px; text-align:right;">
-            <DxButton Text="Clear" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleClear" />
-            <DxButton Text="OK" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Primary" Click="HandleOk" />
+        <div class="guest-find-dialog">
+            <!-- Top search bar -->
+            <div class="find-top-row">
+                <input type="text" class="find-search-input" @bind="SearchText" @bind:event="oninput" placeholder="" />
+                <button type="button" class="find-btn" @onclick="HandleFind">Find</button>
+            </div>
+
+            <!-- Table content -->
+            <div class="find-table-wrap">
+                <table class="find-grid-table">
+                    <thead>
+                        <tr>
+                            @if (IsMultiSelect)
+                            {
+                                <th style="width:70px; text-align:left; padding-left:8px;">Selection</th>
+                            }
+                            <th style="width:110px;">Registration</th>
+                            <th style="width:55px;">Room</th>
+                            <th style="width:120px;">Guest</th>
+                            @if (IsMultiSelect)
+                            {
+                                <th>Company</th>
+                            }
+                            else
+                            {
+                                <th>Room Type</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (FilteredList != null && FilteredList.Any())
+                        {
+                            @foreach (var g in FilteredList)
+                            {
+                                bool isSelected = IsMultiSelect ? g.Selected : SelectedGuest?.Registration == g.Registration;
+                                <tr class="@(isSelected ? "find-row-selected" : "")"
+                                    @onclick="() => ToggleSelection(g)"
+                                    @ondblclick="HandleRowDblClick">
+                                    @if (IsMultiSelect)
+                                    {
+                                        <td style="text-align:center; padding:2px;">
+                                            <input type="checkbox" @bind="g.Selected" @onclick:stopPropagation="true" />
+                                        </td>
+                                    }
+                                    <td>@g.Registration</td>
+                                    <td>@g.Room</td>
+                                    <td>@g.Guest</td>
+                                    @if (IsMultiSelect)
+                                    {
+                                        <td>@g.Company</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@g.RoomType</td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="@(IsMultiSelect ? 5 : 4)" style="text-align:center; padding:12px; color:#777;">
+                                    No registrations found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom action row (matching Image 2 & 4) -->
+            <div class="find-bottom-row">
+                <button type="button" class="find-corner-close" @onclick="HandleClose" title="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+
+                <div class="find-btn-group">
+                    @if (IsMultiSelect)
+                    {
+                        <button type="button" class="find-action-btn" @onclick="HandleGo">GO</button>
+                    }
+                    <button type="button" class="find-action-btn" @onclick="HandleClear">Clear</button>
+                </div>
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
@@ -37,15 +100,203 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public bool IsMultiSelect { get; set; }
     [Parameter] public List<TransferGuestItem> GuestList { get; set; } = new();
     [Parameter] public TransferGuestItem? SelectedGuest { get; set; }
     [Parameter] public EventCallback<TransferGuestItem?> SelectedGuestChanged { get; set; }
     [Parameter] public EventCallback OnOk { get; set; }
+    [Parameter] public EventCallback<List<TransferGuestItem>> OnMultiSelectCompleted { get; set; }
 
-    async Task HandleOk() { await OnOk.InvokeAsync(); await VisibleChanged.InvokeAsync(false); }
+    string SearchText { get; set; } = "";
+
+    IEnumerable<TransferGuestItem> FilteredList =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? GuestList
+            : GuestList.Where(g =>
+                (g.Registration?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.Guest?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (g.Room?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    void HandleFind() { }
+
+    void ToggleSelection(TransferGuestItem g)
+    {
+        if (IsMultiSelect)
+        {
+            g.Selected = !g.Selected;
+        }
+        else
+        {
+            SelectedGuest = g;
+            SelectedGuestChanged.InvokeAsync(g);
+        }
+    }
+
+    async Task HandleRowDblClick()
+    {
+        if (!IsMultiSelect && SelectedGuest != null)
+        {
+            await OnOk.InvokeAsync();
+            await VisibleChanged.InvokeAsync(false);
+        }
+    }
+
+    async Task HandleGo()
+    {
+        var selectedList = GuestList.Where(g => g.Selected).ToList();
+        await OnMultiSelectCompleted.InvokeAsync(selectedList);
+        await VisibleChanged.InvokeAsync(false);
+    }
+
     async Task HandleClear()
     {
-        await SelectedGuestChanged.InvokeAsync(null);
+        if (IsMultiSelect)
+        {
+            foreach (var g in GuestList) g.Selected = false;
+        }
+        else
+        {
+            SelectedGuest = null;
+            await SelectedGuestChanged.InvokeAsync(null);
+        }
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleClose()
+    {
         await VisibleChanged.InvokeAsync(false);
     }
 }
+
+<style>
+    .bt-guest-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+    }
+
+    .bt-guest-popup .dxbl-popup {
+        border-radius: 0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .guest-find-dialog {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        padding: 10px 12px 6px 12px;
+        font-family: Arial, "Segoe UI", sans-serif;
+        font-size: 11.5px;
+    }
+
+    .find-top-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .find-search-input {
+        flex: 1;
+        height: 24px;
+        border: 1px solid #a6b0bc;
+        padding: 2px 6px;
+        font-size: 11.5px;
+        outline: none;
+    }
+
+    .find-btn {
+        width: 75px;
+        height: 24px;
+        background: #ffffff;
+        border: 1px solid #7c8895;
+        font-size: 11.5px;
+        cursor: pointer;
+    }
+
+    .find-btn:hover {
+        background: #f0f3f6;
+    }
+
+    .find-table-wrap {
+        height: 220px;
+        overflow-y: auto;
+        border: 1px solid #c5cbcf;
+        border-bottom: none;
+    }
+
+    .find-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11.5px;
+    }
+
+    .find-grid-table th {
+        background: #f6f7f9;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 1px solid #c5cbcf;
+        border-right: 1px solid #e1e4e8;
+        padding: 4px 6px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .find-grid-table td {
+        padding: 3px 6px;
+        border-bottom: 1px solid #ebeef0;
+        border-right: 1px solid #ebeef0;
+        color: #333;
+    }
+
+    .find-grid-table tr {
+        cursor: pointer;
+    }
+
+    .find-grid-table tr:hover {
+        background-color: #f0f6ff;
+    }
+
+    .find-grid-table tr.find-row-selected {
+        background-color: #cfe7fd !important;
+    }
+
+    .find-bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #c5cbcf;
+        padding-top: 6px;
+        margin-top: 6px;
+    }
+
+    .find-corner-close {
+        background: transparent;
+        border: none;
+        color: #666;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0 4px;
+    }
+
+    .find-corner-close:hover {
+        color: #d9534f;
+    }
+
+    .find-btn-group {
+        display: flex;
+        gap: 6px;
+    }
+
+    .find-action-btn {
+        width: 75px;
+        height: 24px;
+        background: #ffffff;
+        border: 1px solid #7c8895;
+        font-size: 11.5px;
+        cursor: pointer;
+    }
+
+    .find-action-btn:hover {
+        background: #f0f3f6;
+    }
+</style>
