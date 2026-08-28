@@ -1,0 +1,389 @@
+@page "/dashboard"
+@using ERP.V7.WebPMS.Components.Pages.Home.Models
+@rendermode InteractiveServer
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.Dashboard
+@using CNET_V7_Domain.Misc.PmsDTO
+@inject IDashboardService DashboardService
+
+
+<PageTitle>Dashboard - CNET ERP</PageTitle>
+
+<div class="dashboard-page">
+
+    <!-- ===================== TOP HEADER ===================== -->
+    <div class="top-header">
+        <div class="user-card">
+            <!-- Left: female avatar icon -->
+            <div class="avatar">
+                <svg viewBox="0 0 100 100" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+
+                    <!-- Background -->
+                    <rect width="100" height="100" fill="#b5b9d3" />
+
+                    <!-- Female profile placeholder silhouette -->
+                    <path d="
+                    M 50,7
+
+                    C 35,7 25,16 23,31
+                    C 21,41 21,51 19,59
+
+                    C 17,64 14,67 11,70
+                    C 15,70 18,68 21,65
+
+                    C 19,69 17,72 14,75
+                    C 19,76 23,74 26,71
+
+                    C 25,76 23,79 21,82
+                    C 28,85 35,86 40,87
+
+                    L 40,91
+
+                    C 34,93 28,96 21,98
+                    L 79,98
+
+                    C 72,96 66,93 60,91
+                    L 60,87
+
+                    C 65,86 72,85 79,82
+
+                    C 77,79 75,76 74,71
+
+                    C 77,74 81,76 86,75
+                    C 83,72 81,69 79,65
+
+                    C 82,68 85,70 89,70
+                    C 86,67 83,64 81,59
+
+                    C 79,51 79,41 77,31
+                    C 75,16 65,7 50,7
+
+                    Z
+                    " fill="#ffffff" />
+                </svg>
+            </div>
+
+            <!-- Right: flex column -->
+            <div class="user-details">
+                <!-- Row 1: hotel name full width -->
+                <div class="welcome-row">
+                    Welcome to <span class="hotel-name">Eden Hotel</span>
+                </div>
+                <!-- Row 2: one aligned list — Access Level is just another row, not a separate column -->
+                <div class="info-grid">
+                    <div class="info-row"><span class="lbl">Name</span><span class="val">SYSTEM CNET
+                        ADMINISTRATOR</span></div>
+                        <div class="info-row"><span class="lbl">Role</span><span class="val">CNET ADMIN</span></div>
+                        <div class="info-row"><span class="lbl">Department</span><span class="val"></span></div>
+                        <div class="info-row"><span class="lbl">Access Level</span><span class="val">81.07%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logo-box">
+                <img src="cnet logo.png" alt="CNET Logo" class="cnet-logo-img" />
+            </div>
+        </div>
+
+        <!-- ===================== MAIN TABS ===================== -->
+        <DxTabs @bind-ActiveTabIndex="activeTab" CssClass="main-tabs">
+            <DxTabPage Text="Dashboard">
+                <div class="dashboard-body">
+
+                    <!-- Left: Task Statistics Grid -->
+                    <div class="left-panel">
+                        <div class="panel-toolbar">
+                            <button type="button" class="icon-toolbar-btn" title="Refresh" @onclick="RefreshTasks">
+                                <i class="bi bi-arrow-clockwise" style="color:#4caf50;"></i>
+                            </button>
+                            <button type="button" class="icon-toolbar-btn" title="Print" @onclick="OnPrintTasks">
+                                <i class="bi bi-file-earmark-pdf" style="color:#d32f2f;"></i>
+                            </button>
+                            <button type="button" class="icon-toolbar-btn" title="Export to Excel" @onclick="OnExportTasks">
+                                <i class="bi bi-file-earmark-excel" style="color:#2e7d32;"></i>
+                            </button>
+
+                            <div class="panel-toolbar-hotel">
+                                <span class="tb-label">Hotel</span>
+                                <DxComboBox Data="@dashboardHotels" @bind-Value="selectedDashboardHotel"
+                                            CssClass="rt-detail-input" style="width:180px;" />
+                            </div>
+                        </div>
+                        <DxGrid Data="@taskItems" KeyFieldName="sn" CssClass="task-grid" RowClick="OnTaskRowClick"
+                                CustomizeElement="OnTaskCustomizeElement" PageSize="15" ShowPager="false" TextWrapEnabled="true"
+                                Height="180px">
+                            <Columns>
+                                <DxGridDataColumn FieldName="sn" Caption="SN" Width="40px" />
+                                <DxGridDataColumn FieldName="Task" Caption="Task" MinWidth="140" />
+                                <DxGridDataColumn FieldName="Statistics" Caption="Statistics" Width="80px" />
+                                <DxGridDataColumn FieldName="Remark" Caption="Remark" MinWidth="220" />
+                            </Columns>
+                        </DxGrid>
+
+                        <!-- Today's Room Statistics -->
+                        <div class="chart-card">
+                            <div class="chart-title">Today's Room Statistics</div>
+                            <DxGrid Data="@roomStatsItems" KeyFieldName="SN" CssClass="room-stats-grid" ShowPager="false"
+                                    PageSize="20">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                                    <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="180" />
+                                    <DxGridDataColumn FieldName="Count" Caption="Count" Width="70px" />
+                                </Columns>
+                            </DxGrid>
+                        </div>
+
+                        <!-- Pie: Today's Room Status -->
+                        <div class="chart-card">
+                            <div class="chart-title">Today's Room Status</div>
+                            <DxPieChart Data="@roomStatusData" Height="300px" Width="100%">
+                                <DxChartLegend Visible="false" />
+                                <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
+                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                        <DxChartSeriesLabelConnector Visible="true" />
+                                    </DxChartSeriesLabel>
+                                </DxPieChartSeries>
+                            </DxPieChart>
+                            <div class="legend-manual">
+                                @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
+                                {
+                                    <span class="leg-item">
+                                        <span class="dot" style="background:@GetPaletteColor(idx);"></span>
+                                        @slice.Name: @slice.Value.ToString("n2") %
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Charts -->
+                    <div class="right-panel">
+                        <!-- Pie: Room Occupancy -->
+                        <div class="chart-card">
+                            <div class="chart-title">Room Occupancy (Today)</div>
+                            <DxPieChart Data="@occupancyData" Height="250px" Width="100%">
+                                <DxChartLegend Visible="false" />
+                                <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                        <DxChartSeriesLabelConnector Visible="true" />
+                                    </DxChartSeriesLabel>
+                                </DxPieChartSeries>
+                            </DxPieChart>
+                            <div class="legend-manual">
+                                @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
+                                {
+                                    <span class="leg-item">
+                                        <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
+                                        @slice.Name: @slice.Value.ToString("n2") %
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Line: Reservations -->
+                        <div class="chart-card">
+                            <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
+                            <DxChart Data="@reservationData" Height="360px" Width="100%">
+                                <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                                <DxChartTooltip Enabled="true" />
+                                <DxChartArgumentAxis>
+                                    <DxChartAxisLabel />
+                                </DxChartArgumentAxis>
+                                <DxChartValueAxis>
+                                    <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
+                                </DxChartValueAxis>
+                                <DxChartAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                                   ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                                   Color="@reservationLineColor">
+                                    <DxChartSeriesPoint Visible="true" />
+                                </DxChartAreaSeries>
+                            </DxChart>
+                        </div>
+                    </div>
+                </div>
+            </DxTabPage>
+            <DxTabPage Text="Security">
+                <div class="tab-placeholder">Security content</div>
+            </DxTabPage>
+
+
+        </DxTabs>
+    </div>
+@code {
+
+    int selectedYear = DateTime.Today.Year;
+    int activeTab = 0;
+
+    DashboardDTO? selectedTask;
+    List<DashboardDTO> taskItems = new List<DashboardDTO>();
+
+    void OnTaskRowClick(GridRowClickEventArgs e)
+    {
+        selectedTask = e.Grid?.GetDataItem(e.VisibleIndex) as DashboardDTO;
+    }
+
+    void OnTaskCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as DashboardDTO;
+
+            if (item != null &&
+                selectedTask != null &&
+                item.sn == selectedTask.sn)
+            {
+                e.CssClass = "task-row-selected";
+            }
+        }
+    }
+
+    void RefreshTasks()
+    {
+        selectedTask = null;
+        StateHasChanged();
+    }
+
+    void OnPrintTasks()
+    {
+        // TODO: print logic
+    }
+
+    void OnExportTasks()
+    {
+        // TODO: export to Excel logic
+    }
+
+
+    // ---------- Task panel toolbar ----------
+    List<string> dashboardHotels = new()
+    {
+        "MAIN TEST HOTEL"
+    };
+
+    string? selectedDashboardHotel = "MAIN TEST HOTEL";
+
+
+
+    List<RoomStatItem> roomStatsItems = new List<RoomStatItem>();
+
+
+
+
+    List<RoomStatusSlice> roomStatusData = new List<RoomStatusSlice>();
+
+    static readonly string[] StatusPalette =
+    {
+        "#26a69a", "#ffb300", "#e53935", "#43a047", "#6d4c31", "#1a237e",
+    };
+
+    string GetPaletteColor(int index) => StatusPalette[index % StatusPalette.Length];
+
+
+
+    List<OccupancySlice> occupancyData = new();
+
+
+
+    int totalReservations = 0;
+
+    System.Drawing.Color reservationLineColor =
+        System.Drawing.Color.FromArgb(0x1e, 0x88, 0xe5);
+
+    List<ReservationPoint> reservationData = new List<ReservationPoint>();
+
+    int ReservationAxisMax
+    {
+        get
+        {
+            var max = reservationData.Count == 0 ? 0 : reservationData.Max(x => x.Count);
+            return Math.Max(10, (int)(Math.Ceiling(max / 5.0) * 5));
+        }
+    }
+
+
+
+    private PMSDashBoardReport? dashboardReport;
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        CNET_V7_Domain.Misc.ResponseModel<PMSDashBoardReport>? response = await DashboardService.GetPmsDashboardReportAsync();
+
+        if (response?.Data == null)
+            return;
+
+        dashboardReport = response.Data;
+
+
+
+        taskItems = dashboardReport.DashboardInfo
+            ?? new List<DashboardDTO>();
+
+
+        roomStatsItems = dashboardReport.RommStatusList?
+            .Select(x => new RoomStatItem
+            {
+                SN = x.SN,
+                Description = x.description,
+                Count = x.count
+            })
+            .ToList()
+            ?? new List<RoomStatItem>();
+
+
+        roomStatusData = dashboardReport.HouseKeepingInfo?
+            .Select(x => new RoomStatusSlice
+            {
+                Name = x.Argument,
+                Value = (decimal)(x.value?.FirstOrDefault() ?? 0)
+            })
+            .ToList()
+            ?? new List<RoomStatusSlice>();
+
+
+        occupancyData = new List<OccupancySlice>();
+        if (dashboardReport.VacantInfo != null)
+        {
+            occupancyData.Add(new OccupancySlice
+            {
+                Name = dashboardReport.VacantInfo.Argument,
+                Value = (decimal)(dashboardReport.VacantInfo.value?.FirstOrDefault() ?? 0)
+            });
+        }
+        if (dashboardReport.OccupiedInfo != null)
+        {
+            occupancyData.Add(new OccupancySlice
+            {
+                Name = dashboardReport.OccupiedInfo.Argument,
+                Value = (decimal)(dashboardReport.OccupiedInfo.value?.FirstOrDefault() ?? 0)
+            });
+        }
+
+
+
+
+        reservationData = dashboardReport.MonthlyReservationCountList?
+            .Select((x, i) => new ReservationPoint
+            {
+                Month = new DateTime(DateTime.Today.Year, i + 1, 1),
+                Count = x.Item3
+            })
+            .ToList()
+            ?? new List<ReservationPoint>();
+
+        totalReservations = reservationData.Sum(x => x.Count);
+
+        if (reservationData.Count > 0)
+        {
+
+
+            selectedYear = reservationData
+                .Min(x => x.Month)
+                .Year;
+        }
+    }
+}
