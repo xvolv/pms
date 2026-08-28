@@ -47,13 +47,13 @@ namespace ERP.V7.WebPMS.Services
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "API call failed to {RequestUrl}. Falling back to mock data for demonstration purposes.", requestUrl);
-                
+
                 // Return a mock response so the UI can be tested offline
                 var mockResponse = new ResponseModel<SystemInitDTO>
                 {
                     Success = false,
-                    Message = "Connection failed."+ ex.Message,
-                    
+                    Message = "Connection failed." + ex.Message,
+
                 };
                 return mockResponse;
             }
