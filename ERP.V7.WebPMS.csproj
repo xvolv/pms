@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Reference Include="CNET_V7_Domain">
+
       <HintPath>dll\CNET_V7_Domain.dll</HintPath>
     </Reference>
   </ItemGroup>

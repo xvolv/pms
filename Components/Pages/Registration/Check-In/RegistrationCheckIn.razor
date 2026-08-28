@@ -346,15 +346,23 @@
     RegNo="@(selectedReg?.Registration ?? "")"
     Guest="@(selectedReg?.Guest ?? "")"
     CurrentRoomType="@(selectedReg?.RoomType ?? "")"
+    CurrentRTC="@(selectedReg?.RoomType ?? "")"
     CurrentRoom="@(selectedReg?.Room ?? "")"
+    CurrentRate="@(selectedDetailRow?.Rate ?? "Rate 1")"
+    OldRateAmount="@(selectedDetailRow?.RateAmount ?? 100.00m)"
     NewRoomType="@roomMoveNewRoomType"
     NewRoomTypeChanged="@((string? v) => roomMoveNewRoomType = v)"
+    RTC="@roomMoveNewRTC"
+    RTCChanged="@((string? v) => roomMoveNewRTC = v)"
     NewRoom="@roomMoveNewRoom"
     NewRoomChanged="@((string v) => roomMoveNewRoom = v)"
+    NewRate="@roomMoveNewRate"
+    NewRateChanged="@((string v) => roomMoveNewRate = v)"
+    NewRateAmount="@roomMoveNewRateAmount"
+    NewRateAmountChanged="@((decimal v) => roomMoveNewRateAmount = v)"
     Start="@businessDate"
     End="@selectedReg?.Departure"
-    OnSave="@(() => { showRoomMove = false; ApplyFilters(); })"
-    OnRoomSearch="OpenRoomSearchForRoomMove" />
+    OnSave="HandleRoomMoveSave" />
 
 <PaymentOptionsPopup
     @bind-Visible="showPaymentOptions"
@@ -862,6 +870,9 @@
 
     string roomMoveNewRoom = "";
     string? roomMoveNewRoomType;
+    string? roomMoveNewRTC;
+    string roomMoveNewRate = "Rate 1";
+    decimal roomMoveNewRateAmount = 100.00m;
 
 
     string ciRegNo = "";
@@ -1040,7 +1051,10 @@
             case "Rate": showRateAdjustment = true; break;
             case "RoomMove":
                 roomMoveNewRoomType = selectedReg.RoomType;
-                roomMoveNewRoom = "";
+                roomMoveNewRTC = selectedReg.RoomType;
+                roomMoveNewRoom = (selectedReg.Room ?? "").Replace("#", "");
+                roomMoveNewRate = selectedDetailRow?.Rate ?? "Rate 1";
+                roomMoveNewRateAmount = selectedDetailRow?.RateAmount ?? 100.00m;
                 showRoomMove = true;
                 break;
             case "Payment": showPaymentOptions = true; break;
@@ -1303,6 +1317,24 @@
 
     void OpenRoomSearchForAmendment() { roomSearchContext = "DateAmendment"; currentMultiRowForRoom = null; selectedRoomItem = null; showRoomSearch = true; }
     void OpenRoomSearchForRoomMove() { roomSearchContext = "RoomMove"; currentMultiRowForRoom = null; selectedRoomItem = null; showRoomSearch = true; }
+
+    void HandleRoomMoveSave()
+    {
+        if (selectedReg != null)
+        {
+            if (!string.IsNullOrWhiteSpace(roomMoveNewRoom))
+            {
+                selectedReg.Room = roomMoveNewRoom;
+            }
+            if (!string.IsNullOrWhiteSpace(roomMoveNewRoomType))
+            {
+                selectedReg.RoomType = roomMoveNewRoomType;
+            }
+        }
+        showRoomMove = false;
+        ApplyFilters();
+        ShowInfo("Room moved successfully.");
+    }
 
     void CloseStateConfirm() => showStateConfirm = false;
     void CloseArrivalError() => showArrivalError = false;

@@ -57,4 +57,12 @@ namespace ERP.V7.WebPMS.Components.Shared
         public string Name { get; set; } = "";
         public string SourceType { get; set; } = "";
     }
+
+    public class RateRow
+    {
+        public string Name { get; set; } = "";
+        public string StandardRoom { get; set; } = "";
+        public string Executive { get; set; } = "";
+        public string PseudoRooms { get; set; } = "";
+    }
 }

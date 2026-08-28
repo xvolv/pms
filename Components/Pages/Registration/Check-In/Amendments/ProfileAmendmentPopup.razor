@@ -141,42 +141,42 @@
 
 <!-- ===================== ADD NEW PROFILE MODALS ===================== -->
 <DxPopup @bind-Visible="showGuestModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Guest" CloseOnEscape="true">
+         HeaderText="Add New Guest" CloseOnEscape="false">
     <BodyContentTemplate>
         <Guest IsModal="true" OnSaved="HandleGuestSavedFromModal" OnClose="() => showGuestModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
 <DxPopup @bind-Visible="showContactModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Contact" CloseOnEscape="true">
+         HeaderText="Add New Contact" CloseOnEscape="false">
     <BodyContentTemplate>
         <Contact IsModal="true" OnSaved="HandleContactSavedFromModal" OnClose="() => showContactModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
 <DxPopup @bind-Visible="showCompanyModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Company" CloseOnEscape="true">
+         HeaderText="Add New Company" CloseOnEscape="false">
     <BodyContentTemplate>
         <Company IsModal="true" OnSaved="HandleCompanySavedFromModal" OnClose="() => showCompanyModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
 <DxPopup @bind-Visible="showAgentModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Travel Agent" CloseOnEscape="true">
+         HeaderText="Add New Travel Agent" CloseOnEscape="false">
     <BodyContentTemplate>
         <TravelAgent IsModal="true" OnSaved="HandleAgentSavedFromModal" OnClose="() => showAgentModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
 <DxPopup @bind-Visible="showGroupModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Group" CloseOnEscape="true">
+         HeaderText="Add New Group" CloseOnEscape="false">
     <BodyContentTemplate>
         <Group IsModal="true" OnSaved="HandleGroupSavedFromModal" OnClose="() => showGroupModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
 <DxPopup @bind-Visible="showSourceModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
-         HeaderText="Add New Source" CloseOnEscape="true">
+         HeaderText="Add New Source" CloseOnEscape="false">
     <BodyContentTemplate>
         <Source IsModal="true" OnSaved="HandleSourceSavedFromModal" OnClose="() => showSourceModal = false" />
     </BodyContentTemplate>
