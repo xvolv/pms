@@ -224,31 +224,85 @@
         </div>
     </div>
 
-    <!-- Grid -->
-    <DxGrid Data="@filteredRegistrations" KeyFieldName="SN" PageSize="20" ShowPager="false" SizeMode="SizeMode.Small"
-            Width="100%" Height="480px" FocusedRowEnabled="true" FocusedRowKey="@(selectedReg?.SN)"
-            FocusedRowKeyChanged="OnFocusedRowKeyChanged" RowClick="OnGridRowClick" CustomizeElement="OnRegCustomize"
-            CssClass="reg-grid">
-        <Columns>
-            <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
-            <DxGridDataColumn FieldName="Registration" Caption="Registration" Width="110px" />
-            <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
-            <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
-            <DxGridDataColumn FieldName="Guest" Caption="Guest" Width="160px" />
-            <DxGridDataColumn FieldName="Company" Caption="Company" Width="120px" />
-            <DxGridDataColumn FieldName="Arrival" Caption="Arrival" Width="100px" DisplayFormat="M/d/yyyy" />
-            <DxGridDataColumn FieldName="Departure" Caption="Departure" Width="100px" DisplayFormat="M/d/yyyy" />
-            <DxGridDataColumn FieldName="Nights" Caption="# of Night" Width="80px" />
-            <DxGridDataColumn FieldName="Payment" Caption="Payment" />
-        </Columns>
-    </DxGrid>
+    <!-- Main Content Grid + Right Side Panels -->
+    <div class="reg-main-content-layout">
+        <div class="reg-grid-area">
+            <!-- Grid wrapped in zoom controller -->
+            <div class="grid-zoom-wrapper" style="--grid-font-size: @(GetGridFontSize());">
+                <DxGrid Data="@filteredRegistrations" KeyFieldName="SN" PageSize="20" ShowPager="false" SizeMode="SizeMode.Small"
+                        Width="100%" Height="100%" FocusedRowEnabled="true" FocusedRowKey="@(selectedReg?.SN)"
+                        FocusedRowKeyChanged="OnFocusedRowKeyChanged" RowClick="OnGridRowClick" CustomizeElement="OnRegCustomize"
+                        CssClass="reg-grid">
+                    <Columns>
+                        <DxGridDataColumn FieldName="SN" Caption="SN" Width="40px" />
+                        <DxGridDataColumn FieldName="Registration" Caption="Registration" Width="110px" />
+                        <DxGridDataColumn FieldName="Room" Caption="Room" Width="70px" />
+                        <DxGridDataColumn FieldName="RoomType" Caption="Room Type" Width="120px" />
+                        <DxGridDataColumn FieldName="Guest" Caption="Guest" Width="160px" />
+                        <DxGridDataColumn FieldName="Company" Caption="Company" Width="120px" />
+                        <DxGridDataColumn FieldName="Arrival" Caption="Arrival" Width="100px" DisplayFormat="M/d/yyyy" />
+                        <DxGridDataColumn FieldName="Departure" Caption="Departure" Width="100px" DisplayFormat="M/d/yyyy" />
+                        <DxGridDataColumn FieldName="Nights" Caption="# of Night" Width="80px" />
+                        <DxGridDataColumn FieldName="Payment" Caption="Payment" />
+                    </Columns>
+                </DxGrid>
+            </div>
 
-    <div class="record-bar">
-        <button type="button" class="nav-btn" @onclick="GoFirst" title="First"><i class="bi bi-chevron-bar-left"></i></button>
-        <button type="button" class="nav-btn" @onclick="GoPrev" title="Previous"><i class="bi bi-chevron-left"></i></button>
-        <span class="record-text">Record @(GetRecordIndex()) of @filteredRegistrations.Count</span>
-        <button type="button" class="nav-btn" @onclick="GoNext" title="Next"><i class="bi bi-chevron-right"></i></button>
-        <button type="button" class="nav-btn" @onclick="GoLast" title="Last"><i class="bi bi-chevron-bar-right"></i></button>
+            <div class="record-bar">
+                <div class="record-bar-left">
+                    <button type="button" class="nav-btn" @onclick="GoFirst" title="First Record"><i class="bi bi-chevron-bar-left"></i></button>
+                    <button type="button" class="nav-btn" @onclick="GoFastPrev" title="Previous 5 Records"><i class="bi bi-chevron-double-left"></i></button>
+                    <button type="button" class="nav-btn" @onclick="GoPrev" title="Previous Record"><i class="bi bi-chevron-left"></i></button>
+                    <span class="record-text">Record @(GetRecordIndex()) of @filteredRegistrations.Count</span>
+                    <button type="button" class="nav-btn" @onclick="GoNext" title="Next Record"><i class="bi bi-chevron-right"></i></button>
+                    <button type="button" class="nav-btn" @onclick="GoFastNext" title="Next 5 Records"><i class="bi bi-chevron-double-right"></i></button>
+                    <button type="button" class="nav-btn" @onclick="GoLast" title="Last Record"><i class="bi bi-chevron-bar-right"></i></button>
+
+                    <span class="record-divider"></span>
+
+                    <button type="button" class="action-btn" title="Add Record"><i class="bi bi-plus-lg"></i></button>
+                    <button type="button" class="action-btn" title="Delete Record"><i class="bi bi-dash-lg"></i></button>
+                    <button type="button" class="action-btn" title="Edit Record"><i class="bi bi-pencil"></i></button>
+                    <button type="button" class="action-btn" title="Save Changes"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="action-btn" title="Cancel Changes"><i class="bi bi-x-lg"></i></button>
+
+                    <button type="button" class="square-toggle-btn ms-1" title="Collapse Panel"><i class="bi bi-caret-left-fill"></i></button>
+                </div>
+
+                <div class="record-bar-right">
+                    <button type="button" class="square-toggle-btn" title="Expand Panel"><i class="bi bi-caret-right-fill"></i></button>
+                </div>
+            </div>
+
+            <!-- Bottom Status / Footer Panel -->
+            <div class="bottom-footer-panel">
+                <div class="footer-indicators">
+                    <span class="footer-item" title="No Post"><i class="bi bi-dash-circle-fill text-danger me-1"></i>No Post [ 0 ]</span>
+                    <span class="footer-item" title="Travel Detail"><i class="bi bi-bus-front text-primary me-1"></i>Travel Detail [ 0 ]</span>
+                    <span class="footer-item" title="Accompany Guest"><i class="bi bi-people-fill text-dark me-1"></i>Accompany Guest [ 0 ]</span>
+                    <span class="footer-item" title="Room Share"><i class="bi bi-people-fill text-danger me-1"></i>Room Share [ 0 ]</span>
+                    <span class="footer-item" title="Log Message"><i class="bi bi-book-half text-primary me-1"></i>Log Message [ 0 ]</span>
+                    <span class="footer-item" title="Wake-Up Call"><i class="bi bi-alarm text-dark me-1"></i>Wake-Up Call [ 0 ]</span>
+                    <span class="footer-item" title="Master Guest"><i class="bi bi-star-fill text-warning me-1"></i>Master Guest [ 2 ]</span>
+                    <span class="footer-item" title="Dueouts"><i class="bi bi-calendar-check text-dark me-1"></i>Dueouts [ 0 ]</span>
+                    <span class="footer-item" title="Daily Charged"><i class="bi bi-currency-dollar text-success me-1"></i>Daily Charged [ 0 ]</span>
+                    <span class="footer-item" title="6PM Checkin"><i class="bi bi-clock-history text-dark me-1"></i>6PM Checkin [ 0 ]</span>
+                    <span class="footer-item" title="Online Reservation"><i class="bi bi-phone text-primary me-1"></i>Online Reservation [ 0 ]</span>
+                </div>
+
+                <div class="footer-zoom-controls">
+                    <button type="button" class="zoom-btn" @onclick="ZoomOut" title="Zoom Out">-</button>
+                    <input type="range" class="zoom-slider" min="70" max="200" step="1"
+                           value="@gridZoomPercent"
+                           @oninput="OnZoomInput" />
+                    <button type="button" class="zoom-btn" @onclick="ZoomIn" title="Zoom In">+</button>
+                    <span class="zoom-text">@($"{gridZoomPercent:F2}%")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Panels -->
+        <RegistrationRightSidePanels SelectedReg="@selectedReg" />
     </div>
 </div>
 <!-- ========== AMENDMENT POPUPS ========== -->
@@ -292,15 +346,23 @@
     RegNo="@(selectedReg?.Registration ?? "")"
     Guest="@(selectedReg?.Guest ?? "")"
     CurrentRoomType="@(selectedReg?.RoomType ?? "")"
+    CurrentRTC="@(selectedReg?.RoomType ?? "")"
     CurrentRoom="@(selectedReg?.Room ?? "")"
+    CurrentRate="@(selectedDetailRow?.Rate ?? "Rate 1")"
+    OldRateAmount="@(selectedDetailRow?.RateAmount ?? 100.00m)"
     NewRoomType="@roomMoveNewRoomType"
     NewRoomTypeChanged="@((string? v) => roomMoveNewRoomType = v)"
+    RTC="@roomMoveNewRTC"
+    RTCChanged="@((string? v) => roomMoveNewRTC = v)"
     NewRoom="@roomMoveNewRoom"
     NewRoomChanged="@((string v) => roomMoveNewRoom = v)"
+    NewRate="@roomMoveNewRate"
+    NewRateChanged="@((string v) => roomMoveNewRate = v)"
+    NewRateAmount="@roomMoveNewRateAmount"
+    NewRateAmountChanged="@((decimal v) => roomMoveNewRateAmount = v)"
     Start="@businessDate"
     End="@selectedReg?.Departure"
-    OnSave="@(() => { showRoomMove = false; ApplyFilters(); })"
-    OnRoomSearch="OpenRoomSearchForRoomMove" />
+    OnSave="HandleRoomMoveSave" />
 
 <PaymentOptionsPopup
     @bind-Visible="showPaymentOptions"
@@ -808,6 +870,9 @@
 
     string roomMoveNewRoom = "";
     string? roomMoveNewRoomType;
+    string? roomMoveNewRTC;
+    string roomMoveNewRate = "Rate 1";
+    decimal roomMoveNewRateAmount = 100.00m;
 
 
     string ciRegNo = "";
@@ -986,7 +1051,10 @@
             case "Rate": showRateAdjustment = true; break;
             case "RoomMove":
                 roomMoveNewRoomType = selectedReg.RoomType;
-                roomMoveNewRoom = "";
+                roomMoveNewRTC = selectedReg.RoomType;
+                roomMoveNewRoom = (selectedReg.Room ?? "").Replace("#", "");
+                roomMoveNewRate = selectedDetailRow?.Rate ?? "Rate 1";
+                roomMoveNewRateAmount = selectedDetailRow?.RateAmount ?? 100.00m;
                 showRoomMove = true;
                 break;
             case "Payment": showPaymentOptions = true; break;
@@ -1166,7 +1234,8 @@
         dailyDetailRows = new List<DailyDetailRow>();
         if (selectedReg == null) return;
         int sn = 1;
-        for (var d = selectedReg.Arrival; d < selectedReg.Departure; d = d.AddDays(1))
+        var end = selectedReg.Departure > selectedReg.Arrival ? selectedReg.Departure : selectedReg.Arrival.AddDays(1);
+        for (var d = selectedReg.Arrival; d < end; d = d.AddDays(1))
         {
             bool isPast = d.Date < businessDate.Date;
             dailyDetailRows.Add(new DailyDetailRow
@@ -1175,16 +1244,27 @@
                 Date = d,
                 Adult = 1,
                 Child = 0,
-                RoomCount = selectedReg.RoomCount,
-                RoomType = selectedReg.RoomType,
-                ActualRTC = selectedReg.RoomType,
-                Room = selectedReg.Room ?? "",
-                Rate = "Standard Rate",
-                RateAmount = isPast ? 50 : (d.DayOfWeek == DayOfWeek.Friday || d.DayOfWeek == DayOfWeek.Saturday ? 500 : 50),
-                Market = "Corporate Business",
-                Source = "Company Direct",
-                IsFixed = true,
-                Packages = new List<PackageRow> { new() { Package = "Lunch", Amount = 60, Remark = "" } }
+                RoomCount = selectedReg.RoomCount > 0 ? selectedReg.RoomCount : 1,
+                RoomType = !string.IsNullOrEmpty(selectedReg.RoomType) ? selectedReg.RoomType : "Standard",
+                ActualRTC = !string.IsNullOrEmpty(selectedReg.RoomType) ? selectedReg.RoomType : "Standard",
+                Room = (selectedReg.Room ?? "107").Replace("#", ""),
+                Rate = "Rate 1",
+                RateAmount = isPast ? 50 : (d.DayOfWeek == DayOfWeek.Friday || d.DayOfWeek == DayOfWeek.Saturday ? 500 : 100),
+                Market = "Reserved Tran...",
+                Source = "Membership M...",
+                IsFixed = false,
+                Packages = new List<PackageRow>
+                {
+                    new()
+                    {
+                        PackageHeaderDescription = "Breakfast Buffet",
+                        Id = "PKG-101",
+                        RegistrationDetail = "Standard Inclusions",
+                        Package = "Breakfast",
+                        Amount = 25.0000m,
+                        Remark = "Complimentary"
+                    }
+                }
             });
         }
     }
@@ -1237,6 +1317,24 @@
 
     void OpenRoomSearchForAmendment() { roomSearchContext = "DateAmendment"; currentMultiRowForRoom = null; selectedRoomItem = null; showRoomSearch = true; }
     void OpenRoomSearchForRoomMove() { roomSearchContext = "RoomMove"; currentMultiRowForRoom = null; selectedRoomItem = null; showRoomSearch = true; }
+
+    void HandleRoomMoveSave()
+    {
+        if (selectedReg != null)
+        {
+            if (!string.IsNullOrWhiteSpace(roomMoveNewRoom))
+            {
+                selectedReg.Room = roomMoveNewRoom;
+            }
+            if (!string.IsNullOrWhiteSpace(roomMoveNewRoomType))
+            {
+                selectedReg.RoomType = roomMoveNewRoomType;
+            }
+        }
+        showRoomMove = false;
+        ApplyFilters();
+        ShowInfo("Room moved successfully.");
+    }
 
     void CloseStateConfirm() => showStateConfirm = false;
     void CloseArrivalError() => showArrivalError = false;
@@ -1494,8 +1592,10 @@
     int GetRecordIndex() => selectedReg == null ? 0 : filteredRegistrations.IndexOf(selectedReg) + 1;
 
     void GoFirst() { selectedReg = filteredRegistrations.FirstOrDefault(); StateHasChanged(); }
+    void GoFastPrev() { if (selectedReg == null || !filteredRegistrations.Any()) return; var idx = filteredRegistrations.IndexOf(selectedReg); selectedReg = filteredRegistrations[Math.Max(0, idx - 5)]; StateHasChanged(); }
     void GoPrev() { if (selectedReg == null) return; var idx = filteredRegistrations.IndexOf(selectedReg); if (idx > 0) selectedReg = filteredRegistrations[idx - 1]; StateHasChanged(); }
     void GoNext() { if (selectedReg == null) return; var idx = filteredRegistrations.IndexOf(selectedReg); if (idx >= 0 && idx < filteredRegistrations.Count - 1) selectedReg = filteredRegistrations[idx + 1]; StateHasChanged(); }
+    void GoFastNext() { if (selectedReg == null || !filteredRegistrations.Any()) return; var idx = filteredRegistrations.IndexOf(selectedReg); if (idx >= 0) selectedReg = filteredRegistrations[Math.Min(filteredRegistrations.Count - 1, idx + 5)]; StateHasChanged(); }
     void GoLast() { selectedReg = filteredRegistrations.LastOrDefault(); StateHasChanged(); }
 
     void ApplyFilters()
@@ -1516,6 +1616,31 @@
     {
         filterRoom = ""; filterGuest = null; filterState = "Inhouse"; filterArrival = null; filterDeparture = null; filterCompany = null;
         ApplyFilters();
+    }
+
+    double gridZoomPercent = 100.0;
+
+    string GetGridFontSize() => $"{(12.5 * gridZoomPercent / 100.0).ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}px";
+
+    void OnZoomInput(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out var val))
+        {
+            gridZoomPercent = val;
+            StateHasChanged();
+        }
+    }
+
+    void ZoomIn()
+    {
+        gridZoomPercent = Math.Min(200.0, gridZoomPercent + 10.0);
+        StateHasChanged();
+    }
+
+    void ZoomOut()
+    {
+        gridZoomPercent = Math.Max(70.0, gridZoomPercent - 10.0);
+        StateHasChanged();
     }
 
     void UpdateRegistrationState(int? sn, string newState)

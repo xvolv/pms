@@ -1,8 +1,14 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Shared
 
-<DxPopup @bind-Visible="Visible" HeaderText="Room Move" Width="440px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible"
+         HeaderText="Room Move"
+         Width="min(680px, 96vw)"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="true"
+         CloseOnEscape="false"
+         CssClass="rm-popup">
     <BodyContentTemplate>
         <div class="amend-toolbar">
             <button type="button" class="ci-btn" @onclick="HandleSave">
@@ -14,44 +20,127 @@
                 <div class="ci-text">Close</div>
             </button>
         </div>
-        <div class="amend-form">
-            <div class="amend-row"><label>Reg. No</label>
-                <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
-            </div>
-            <div class="amend-row"><label>Guest</label>
-                <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
-            </div>
-            <div class="amend-row"><label>Current Room Type</label>
-                <DxTextBox @bind-Text="CurrentRoomType" SizeMode="SizeMode.Small" ReadOnly="true" />
-            </div>
-            <div class="amend-row"><label>Current Room</label>
-                <DxTextBox @bind-Text="CurrentRoom" SizeMode="SizeMode.Small" ReadOnly="true" />
-            </div>
-            <div class="amend-row"><label>New Room Type</label>
-                <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" Value="@NewRoomType"
-                            ValueChanged="@((string? v) => NewRoomTypeChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
-            </div>
-            <div class="amend-row"><label>Move To Room</label>
-                <div class="input-with-btn">
-                    <DxTextBox Text="@NewRoom" TextChanged="@((string v) => NewRoomChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
-                    <DxButton IconCssClass="bi bi-plus-lg" CssClass="circle-btn"
-                              RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Small"
-                              Click="@(() => OnRoomSearch.InvokeAsync())" />
+
+        <div class="rm-container">
+            <!-- Top Reg. No & Guest Row -->
+            <div class="rm-top-row">
+                <div class="rm-field-group rm-reg-group">
+                    <label class="rm-label">Reg. No</label>
+                    <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
+                </div>
+                <div class="rm-field-group rm-guest-group">
+                    <label class="rm-label">Guest</label>
+                    <DxTextBox @bind-Text="Guest" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
             </div>
-            <div class="amend-row"><label>Start</label>
-                <DxDateEdit @bind-Date="Start" SizeMode="SizeMode.Small" />
+
+            <!-- Date Range Section -->
+            <div class="rm-date-box">
+                <div class="rm-date-header">Date Range</div>
+                <div class="rm-date-body">
+                    <div class="rm-date-item">
+                        <label class="rm-label">Start</label>
+                        <DxDateEdit @bind-Date="Start" SizeMode="SizeMode.Small" DisplayFormat="M/d/yyyy" />
+                    </div>
+                    <div class="rm-date-item">
+                        <label class="rm-label">End</label>
+                        <DxDateEdit @bind-Date="End" SizeMode="SizeMode.Small" DisplayFormat="M/d/yyyy" />
+                    </div>
+                </div>
             </div>
-            <div class="amend-row"><label>End</label>
-                <DxDateEdit @bind-Date="End" SizeMode="SizeMode.Small" />
+
+            <!-- 2-Column Comparison Layout (Current vs New) -->
+            <div class="rm-columns">
+                <!-- Left Column: Current Details -->
+                <div class="rm-col">
+                    <div class="rm-field-row">
+                        <label class="rm-label">Current Room Type</label>
+                        <DxTextBox @bind-Text="CurrentRoomType" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="rm-field-row">
+                        <label class="rm-label">Current RTC</label>
+                        <DxTextBox @bind-Text="CurrentRTC" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="rm-field-row">
+                        <label class="rm-label">Current Room</label>
+                        <DxTextBox @bind-Text="CurrentRoom" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="rm-field-row">
+                        <label class="rm-label">Current Rate</label>
+                        <DxTextBox @bind-Text="CurrentRate" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                    <div class="rm-field-row">
+                        <label class="rm-label">Old Rate Amount</label>
+                        <DxTextBox Text="@(OldRateAmount.ToString("0.00"))" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    </div>
+                </div>
+
+                <!-- Right Column: New Details -->
+                <div class="rm-col">
+                    <div class="rm-field-row-right">
+                        <label class="rm-label">New Room Type</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@RoomTypes" Value="@NewRoomType"
+                                    ValueChanged="@((string? v) => { NewRoomType = v; _ = NewRoomTypeChanged.InvokeAsync(v); })"
+                                    SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="rm-field-row-right">
+                        <label class="rm-label">RTC</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@RTCList" Value="@RTC"
+                                    ValueChanged="@((string? v) => { RTC = v; _ = RTCChanged.InvokeAsync(v); })"
+                                    SizeMode="SizeMode.Small" />
+                    </div>
+                    <div class="rm-field-row-right">
+                        <label class="rm-label">Move To Room</label>
+                        <div class="rm-input-with-btn">
+                            <DxTextBox Text="@NewRoom" TextChanged="@((string v) => { NewRoom = v; _ = NewRoomChanged.InvokeAsync(v); })" SizeMode="SizeMode.Small" />
+                            <button type="button" class="rm-circle-btn" @onclick="OpenRoomSearch" title="Search Room">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="rm-field-row-right">
+                        <label class="rm-label">New Rate</label>
+                        <div class="rm-input-with-btn">
+                            <DxTextBox Text="@NewRate" TextChanged="@((string v) => { NewRate = v; _ = NewRateChanged.InvokeAsync(v); })" SizeMode="SizeMode.Small" />
+                            <button type="button" class="rm-circle-btn" @onclick="OpenRateSearch" title="Search Rate">
+                                <i class="bi bi-plus-circle-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="rm-field-row-right">
+                        <label class="rm-label">New Rate Amount</label>
+                        <DxSpinEdit Value="@NewRateAmount" ValueChanged="@((decimal v) => { NewRateAmount = v; _ = NewRateAmountChanged.InvokeAsync(v); })"
+                                    SizeMode="SizeMode.Small" DisplayFormat="0.00" />
+                    </div>
+                </div>
             </div>
-            <div class="amend-row"><label>Reason</label>
-                <DxComboBox CssClass="erp-combobox" Data="@Reasons" @bind-Value="Reason" SizeMode="SizeMode.Small" />
+
+            <!-- Bottom Full-Width Reason Row -->
+            <div class="rm-reason-row">
+                <label class="rm-label">Reason</label>
+                <DxComboBox CssClass="erp-combobox" Data="@Reasons" Value="@Reason"
+                            ValueChanged="@((string? v) => { Reason = v; _ = ReasonChanged.InvokeAsync(v); })"
+                            SizeMode="SizeMode.Small" />
             </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
+
+<!-- ===================== SHARED / GLOBAL POPUPS ===================== -->
+<RoomSearchPopup @bind-Visible="showRoomSearch"
+                 GuestName="@Guest"
+                 @bind-SelectedRoom="selectedRoomItem"
+                 OnSelect="HandleRoomSelected" />
+
+<RateSearchPopup @bind-Visible="showRateSearch"
+                 StartDate="@Start"
+                 EndDate="@End"
+                 RateSearchRows="@rateSearchRows"
+                 OnSelect="HandleRateSelected"
+                 OnSearch="HandleRateSearch"
+                 OnRateInfo="HandleRateInfo"
+                 OnRowClick="OnRateRowClick"
+                 OnCustomizeElement="OnRateCustomizeElement" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
@@ -60,24 +149,343 @@
     [Parameter] public string RegNo { get; set; } = "";
     [Parameter] public string Guest { get; set; } = "";
     [Parameter] public string CurrentRoomType { get; set; } = "";
+    [Parameter] public string CurrentRTC { get; set; } = "";
     [Parameter] public string CurrentRoom { get; set; } = "";
+    [Parameter] public string CurrentRate { get; set; } = "";
+    [Parameter] public decimal OldRateAmount { get; set; } = 100.00m;
 
     [Parameter] public string? NewRoomType { get; set; }
     [Parameter] public EventCallback<string?> NewRoomTypeChanged { get; set; }
 
+    [Parameter] public string? RTC { get; set; }
+    [Parameter] public EventCallback<string?> RTCChanged { get; set; }
+
     [Parameter] public string NewRoom { get; set; } = "";
     [Parameter] public EventCallback<string> NewRoomChanged { get; set; }
 
-    [Parameter] public DateTime? Start { get; set; }
-    [Parameter] public DateTime? End { get; set; }
-    [Parameter] public string? Reason { get; set; }
+    [Parameter] public string NewRate { get; set; } = "";
+    [Parameter] public EventCallback<string> NewRateChanged { get; set; }
 
-    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard Room", "Executive", "Deluxe", "Suite", "Pseudo Rooms" };
+    [Parameter] public decimal NewRateAmount { get; set; } = 100.00m;
+    [Parameter] public EventCallback<decimal> NewRateAmountChanged { get; set; }
+
+    [Parameter] public DateTime? Start { get; set; }
+    [Parameter] public EventCallback<DateTime?> StartChanged { get; set; }
+
+    [Parameter] public DateTime? End { get; set; }
+    [Parameter] public EventCallback<DateTime?> EndChanged { get; set; }
+
+    [Parameter] public string? Reason { get; set; }
+    [Parameter] public EventCallback<string?> ReasonChanged { get; set; }
+
+    [Parameter] public List<string> RoomTypes { get; set; } = new() { "Standard", "Standard Room", "Executive", "Delux", "Deluxe", "Suite", "Pseudo Rooms" };
+    [Parameter] public List<string> RTCList { get; set; } = new() { "Standard", "Standard Room", "Executive", "Delux", "Deluxe", "Suite", "Pseudo Rooms" };
     [Parameter] public List<string> Reasons { get; set; } = new() { "Room Upgrade", "Ceiling Does not work", "No Hot Water", "Transfer to PM Account", "Electric Problem", "Problem on the Door", "Toilet does not Work" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnRoomSearch { get; set; }
+    [Parameter] public EventCallback OnRateSearch { get; set; }
 
-    async Task HandleSave() => await OnSave.InvokeAsync();
-    async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+    // Room Search state
+    private bool showRoomSearch;
+    private RoomItem? selectedRoomItem;
+
+    // Rate Search state
+    private bool showRateSearch;
+    private RateRow? selectedRateRow;
+    private List<RateRow> rateSearchRows = new()
+    {
+        new() { Name = "Physical Inventory", StandardRoom = "16", Executive = "13", PseudoRooms = "5" },
+        new() { Name = "Standard Rate", StandardRoom = "275.00", Executive = "350.00", PseudoRooms = "" },
+        new() { Name = "Rate 1", StandardRoom = "100.00", Executive = "150.00", PseudoRooms = "" },
+        new() { Name = "Special Rate", StandardRoom = "300.00", Executive = "400.00", PseudoRooms = "" },
+        new() { Name = "posting Date Rate", StandardRoom = "200.00", Executive = "280.00", PseudoRooms = "" },
+        new() { Name = "Arriva Date Rate", StandardRoom = "300.00", Executive = "420.00", PseudoRooms = "" },
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(CurrentRTC) && !string.IsNullOrWhiteSpace(CurrentRoomType))
+        {
+            CurrentRTC = CurrentRoomType;
+        }
+
+        if (string.IsNullOrWhiteSpace(NewRoomType))
+        {
+            NewRoomType = !string.IsNullOrWhiteSpace(CurrentRoomType) ? CurrentRoomType : "Standard";
+        }
+
+        if (string.IsNullOrWhiteSpace(RTC))
+        {
+            RTC = !string.IsNullOrWhiteSpace(NewRoomType) ? NewRoomType : "Standard";
+        }
+
+        if (string.IsNullOrWhiteSpace(CurrentRate))
+        {
+            CurrentRate = "Rate 1";
+        }
+
+        if (OldRateAmount <= 0)
+        {
+            OldRateAmount = 100.00m;
+        }
+
+        if (string.IsNullOrWhiteSpace(NewRate))
+        {
+            NewRate = CurrentRate;
+        }
+
+        if (NewRateAmount <= 0)
+        {
+            NewRateAmount = OldRateAmount > 0 ? OldRateAmount : 100.00m;
+        }
+
+        if (string.IsNullOrWhiteSpace(NewRoom) && !string.IsNullOrWhiteSpace(CurrentRoom))
+        {
+            NewRoom = CurrentRoom;
+        }
+
+        if (Start == null)
+        {
+            Start = DateTime.Today;
+        }
+
+        if (End == null)
+        {
+            End = DateTime.Today.AddDays(1);
+        }
+
+        if (string.IsNullOrWhiteSpace(Reason) && Reasons.Any())
+        {
+            Reason = Reasons.FirstOrDefault();
+        }
+    }
+
+    private void OpenRoomSearch()
+    {
+        if (OnRoomSearch.HasDelegate)
+        {
+            _ = OnRoomSearch.InvokeAsync();
+        }
+        else
+        {
+            selectedRoomItem = null;
+            showRoomSearch = true;
+        }
+    }
+
+    private void OpenRateSearch()
+    {
+        if (OnRateSearch.HasDelegate)
+        {
+            _ = OnRateSearch.InvokeAsync();
+        }
+        else
+        {
+            selectedRateRow = null;
+            showRateSearch = true;
+        }
+    }
+
+    private async Task HandleRoomSelected()
+    {
+        if (selectedRoomItem != null)
+        {
+            if (selectedRoomItem.HKStatus.Equals("Dirty", StringComparison.OrdinalIgnoreCase)) return;
+
+            NewRoom = selectedRoomItem.Room;
+            await NewRoomChanged.InvokeAsync(NewRoom);
+
+            if (!string.IsNullOrEmpty(selectedRoomItem.RoomType))
+            {
+                NewRoomType = selectedRoomItem.RoomType;
+                await NewRoomTypeChanged.InvokeAsync(NewRoomType);
+                RTC = selectedRoomItem.RoomType;
+                await RTCChanged.InvokeAsync(RTC);
+            }
+        }
+        showRoomSearch = false;
+    }
+
+    private void OnRateRowClick(GridRowClickEventArgs e)
+    {
+        selectedRateRow = e.Grid?.GetDataItem(e.VisibleIndex) as RateRow;
+    }
+
+    private void OnRateCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRateRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RateRow;
+            if (item?.Name == selectedRateRow.Name)
+            {
+                e.CssClass = "rate-row-selected";
+            }
+        }
+    }
+
+    private async Task HandleRateSelected()
+    {
+        if (selectedRateRow != null && selectedRateRow.Name != "Physical Inventory")
+        {
+            NewRate = selectedRateRow.Name;
+            await NewRateChanged.InvokeAsync(NewRate);
+
+            string amtStr = (NewRoomType?.Contains("Executive", StringComparison.OrdinalIgnoreCase) == true || NewRoomType?.Contains("Delux", StringComparison.OrdinalIgnoreCase) == true)
+                ? selectedRateRow.Executive
+                : selectedRateRow.StandardRoom;
+
+            if (decimal.TryParse(amtStr, out var amt))
+            {
+                NewRateAmount = amt;
+                await NewRateAmountChanged.InvokeAsync(NewRateAmount);
+            }
+        }
+        showRateSearch = false;
+    }
+
+    private void HandleRateSearch() { }
+    private void HandleRateInfo() { }
+
+    private async Task HandleSave() => await OnSave.InvokeAsync();
+    private async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
+
+<style>
+    .rm-popup .dxbl-popup-body-content {
+        padding: 6px 12px 12px !important;
+        background-color: #f6f7f9;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .rm-container {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .rm-top-row {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .rm-reg-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 240px;
+    }
+
+    .rm-guest-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .rm-label {
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #333;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .rm-date-box {
+        border: 1px solid #d0d7dd;
+        background: #ffffff;
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 2px 0 6px;
+    }
+
+    .rm-date-header {
+        background: #eceff1;
+        padding: 3px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #455a64;
+        border-bottom: 1px solid #d0d7dd;
+    }
+
+    .rm-date-body {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 16px;
+        gap: 20px;
+    }
+
+    .rm-date-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        max-width: 250px;
+    }
+
+    .rm-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 18px;
+    }
+
+    .rm-col {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .rm-field-row {
+        display: grid;
+        grid-template-columns: 115px 1fr;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .rm-field-row-right {
+        display: grid;
+        grid-template-columns: 95px 1fr;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .rm-reason-row {
+        display: grid;
+        grid-template-columns: 115px 1fr;
+        gap: 8px;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .rm-input-with-btn {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .rm-input-with-btn > :first-child {
+        flex: 1;
+    }
+
+    .rm-circle-btn {
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2b3e50;
+        font-size: 19px;
+        line-height: 1;
+        transition: color 0.15s ease, transform 0.1s ease;
+    }
+
+    .rm-circle-btn:hover {
+        color: #0d6efd;
+        transform: scale(1.08);
+    }
+</style>

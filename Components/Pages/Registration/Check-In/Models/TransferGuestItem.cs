@@ -6,4 +6,6 @@ public class TransferGuestItem
     public string RoomType { get; set; } = "";
     public string Room { get; set; } = "";
     public string Guest { get; set; } = "";
+    public string Company { get; set; } = "";
+    public bool Selected { get; set; }
 }

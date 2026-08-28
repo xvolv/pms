@@ -1,7 +1,19 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Shared
+@using ERP.V7.WebPMS.Components.Pages.Profile.Guest
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Contact
+@using ERP.V7.WebPMS.Components.Pages.Profile.TravelAgent
+@using ERP.V7.WebPMS.Components.Pages.Profile.TravelAgent.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Source
+@using ERP.V7.WebPMS.Components.Pages.Profile.Source.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 
-<DxPopup @bind-Visible="Visible" HeaderText="Profile Amendment" Width="420px"
+<DxPopup @bind-Visible="Visible" HeaderText="Profile Amendment" Width="440px"
          CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
         <div class="amend-toolbar">
@@ -15,37 +27,158 @@
             </button>
         </div>
         <div class="amend-form">
-            <div class="amend-row"><label>Guest</label>
-                <DxComboBox CssClass="erp-combobox" Data="@GuestNames" Value="@Guest"
-                            ValueChanged="@((string? v) => GuestChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+            <!-- Guest -->
+            <div class="amend-row">
+                <label>Guest</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Guest" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showGuestSearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showGuestSearch = true)">▾</button>
+                </div>
             </div>
-            <div class="amend-row"><label>Contact</label>
-                <DxComboBox CssClass="erp-combobox" Data="@ContactList" Value="@Contact"
-                            ValueChanged="@((string? v) => ContactChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+
+            <!-- Contact -->
+            <div class="amend-row">
+                <label>Contact</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Contact" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showContactSearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showContactSearch = true)">▾</button>
+                </div>
             </div>
-            <div class="amend-row"><label>Company</label>
-                <DxComboBox CssClass="erp-combobox" Data="@CompanyList" Value="@Company"
-                            ValueChanged="@((string? v) => CompanyChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+
+            <!-- Company -->
+            <div class="amend-row">
+                <label>Company</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Company" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showCompanySearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showCompanySearch = true)">▾</button>
+                </div>
             </div>
-            <div class="amend-row"><label>Agent</label>
-                <DxComboBox CssClass="erp-combobox" Data="@AgentList" Value="@Agent"
-                            ValueChanged="@((string? v) => AgentChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+
+            <!-- Agent -->
+            <div class="amend-row">
+                <label>Agent</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Agent" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showAgentSearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showAgentSearch = true)">▾</button>
+                </div>
             </div>
-            <div class="amend-row"><label>Group</label>
-                <DxComboBox CssClass="erp-combobox" Data="@GroupList" Value="@Group"
-                            ValueChanged="@((string? v) => GroupChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+
+            <!-- Group -->
+            <div class="amend-row">
+                <label>Group</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Group" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showGroupSearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showGroupSearch = true)">▾</button>
+                </div>
             </div>
-            <div class="amend-row"><label>Source</label>
-                <DxComboBox CssClass="erp-combobox" Data="@SourceList" Value="@Source"
-                            ValueChanged="@((string? v) => SourceChanged.InvokeAsync(v))"
-                            SizeMode="SizeMode.Small" />
+
+            <!-- Source -->
+            <div class="amend-row">
+                <label>Source</label>
+                <div class="lookup-field">
+                    <DxTextBox @bind-Text="Source" ReadOnly="true" Width="100%"
+                               CssClass="erp-combobox lookup-input" Click="@(() => showSourceSearch = true)" />
+                    <button type="button" class="lookup-toggle-btn"
+                            @onclick="@(() => showSourceSearch = true)">▾</button>
+                </div>
             </div>
         </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ===================== GLOBAL SEARCH POPUPS (FROM SHARED) ===================== -->
+<GuestSearchPopup
+    @bind-Visible="showGuestSearch"
+    Guests="@Guests"
+    OnSelect="OnGuestSelected"
+    OnAddNew="AddNewGuest"
+    OnClear="ClearGuest" />
+
+<ContactSearchPopup
+    @bind-Visible="showContactSearch"
+    Contacts="@Contacts"
+    OnSelect="OnContactSelected"
+    OnAddNew="AddNewContact"
+    OnClear="ClearContact" />
+
+<CompanySearchPopup
+    @bind-Visible="showCompanySearch"
+    Customers="@Customers"
+    OnSelect="OnCompanySelected"
+    OnAddNew="AddNewCompany"
+    OnClear="ClearCompany" />
+
+<AgentSearchPopup
+    @bind-Visible="showAgentSearch"
+    Agents="@Agents"
+    OnSelect="OnAgentSelected"
+    OnAddNew="AddNewAgent"
+    OnClear="ClearAgent" />
+
+<GroupSearchPopup
+    @bind-Visible="showGroupSearch"
+    Groups="@Groups"
+    OnSelect="OnGroupSelected"
+    OnAddNew="AddNewGroup"
+    OnClear="ClearGroup" />
+
+<SourceSearchPopup
+    @bind-Visible="showSourceSearch"
+    Sources="@Sources"
+    OnSelect="OnSourceSelected"
+    OnAddNew="AddNewSource"
+    OnClear="ClearSource" />
+
+<!-- ===================== ADD NEW PROFILE MODALS ===================== -->
+<DxPopup @bind-Visible="showGuestModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Guest" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <Guest IsModal="true" OnSaved="HandleGuestSavedFromModal" OnClose="() => showGuestModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showContactModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Contact" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <Contact IsModal="true" OnSaved="HandleContactSavedFromModal" OnClose="() => showContactModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showCompanyModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Company" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <Company IsModal="true" OnSaved="HandleCompanySavedFromModal" OnClose="() => showCompanyModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showAgentModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Travel Agent" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <TravelAgent IsModal="true" OnSaved="HandleAgentSavedFromModal" OnClose="() => showAgentModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showGroupModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Group" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <Group IsModal="true" OnSaved="HandleGroupSavedFromModal" OnClose="() => showGroupModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showSourceModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Source" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <Source IsModal="true" OnSaved="HandleSourceSavedFromModal" OnClose="() => showSourceModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
@@ -72,15 +205,31 @@
     [Parameter] public EventCallback<string?> SourceChanged { get; set; }
 
     [Parameter] public RegistrationRow? TargetRegistration { get; set; }
-
-    [Parameter] public List<string> GuestNames { get; set; } = new() { "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun", "abel kaleab", "Dog Snoop", "bayu abenezer", "Selase bonjour Bete" };
-    [Parameter] public List<string> ContactList { get; set; } = new() { "", "KEBEDE ZELEKE ABEBE", "BROWN CHRIS" };
-    [Parameter] public List<string> CompanyList { get; set; } = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
-    [Parameter] public List<string> AgentList { get; set; } = new() { "", "MY AGENT", "RIHANN\'S AGENT" };
-    [Parameter] public List<string> GroupList { get; set; } = new() { "", "Musical Group", "Girls Group" };
-    [Parameter] public List<string> SourceList { get; set; } = new() { "", "Company Directory", "Website", "Walk-in" };
-
     [Parameter] public EventCallback OnSave { get; set; }
+
+    // Search Popup Visibility Flags
+    bool showGuestSearch = false;
+    bool showContactSearch = false;
+    bool showCompanySearch = false;
+    bool showAgentSearch = false;
+    bool showGroupSearch = false;
+    bool showSourceSearch = false;
+
+    // Add New Modal Visibility Flags
+    bool showGuestModal = false;
+    bool showContactModal = false;
+    bool showCompanyModal = false;
+    bool showAgentModal = false;
+    bool showGroupModal = false;
+    bool showSourceModal = false;
+
+    // Data lists for search popups
+    List<GuestItem> Guests { get; set; } = new();
+    List<ContactItem> Contacts { get; set; } = new();
+    List<CustomerItem> Customers { get; set; } = new();
+    List<AgentItem> Agents { get; set; } = new();
+    List<GroupItem> Groups { get; set; } = new();
+    List<SourceItem> Sources { get; set; } = new();
 
     protected override void OnParametersSet()
     {
@@ -90,6 +239,237 @@
             Company ??= TargetRegistration.Company;
             Agent ??= TargetRegistration.Company == "MISIKIR LTD" ? "MY AGENT" : "";
         }
+    }
+
+    // --- Guest Handlers ---
+    void OnGuestSelected(GuestItem item)
+    {
+        Guest = item.FullName;
+        GuestChanged.InvokeAsync(Guest);
+        showGuestSearch = false;
+    }
+
+    void ClearGuest()
+    {
+        Guest = "";
+        GuestChanged.InvokeAsync(Guest);
+        showGuestSearch = false;
+    }
+
+    void AddNewGuest()
+    {
+        showGuestSearch = false;
+        showGuestModal = true;
+    }
+
+    void HandleGuestSavedFromModal(PersonProfileRow savedGuest)
+    {
+        if (savedGuest != null)
+        {
+            var fullName = $"{savedGuest.FirstName} {savedGuest.MiddleName} {savedGuest.LastName}".Replace("  ", " ").Trim();
+            Guest = fullName;
+            GuestChanged.InvokeAsync(Guest);
+            Guests.Add(new GuestItem
+            {
+                FirstName = savedGuest.FirstName ?? "",
+                MiddleName = $"{savedGuest.MiddleName} {savedGuest.LastName}".Trim(),
+                Tin = savedGuest.PassportNum ?? ""
+            });
+        }
+        showGuestModal = false;
+    }
+
+    // --- Contact Handlers ---
+    void OnContactSelected(ContactItem item)
+    {
+        Contact = item.FullName;
+        ContactChanged.InvokeAsync(Contact);
+        showContactSearch = false;
+    }
+
+    void ClearContact()
+    {
+        Contact = "";
+        ContactChanged.InvokeAsync(Contact);
+        showContactSearch = false;
+    }
+
+    void AddNewContact()
+    {
+        showContactSearch = false;
+        showContactModal = true;
+    }
+
+    void HandleContactSavedFromModal(PersonProfileRow p)
+    {
+        if (p != null)
+        {
+            var newContact = new ContactItem
+            {
+                Code = p.Code ?? $"PCU-{new Random().Next(10000, 99999)}",
+                FirstName = p.FirstName ?? "",
+                MiddleName = $"{p.MiddleName} {p.LastName}".Trim(),
+                Phone = p.Phone1 ?? p.PassportNum ?? ""
+            };
+            Contacts.Add(newContact);
+            Contact = newContact.FullName;
+            ContactChanged.InvokeAsync(Contact);
+        }
+        showContactModal = false;
+    }
+
+    // --- Company Handlers ---
+    void OnCompanySelected(CustomerItem item)
+    {
+        Company = item.FirstName;
+        CompanyChanged.InvokeAsync(Company);
+        showCompanySearch = false;
+    }
+
+    void ClearCompany()
+    {
+        Company = "";
+        CompanyChanged.InvokeAsync(Company);
+        showCompanySearch = false;
+    }
+
+    void AddNewCompany()
+    {
+        showCompanySearch = false;
+        showCompanyModal = true;
+    }
+
+    void HandleCompanySavedFromModal(CompanyRow c)
+    {
+        if (c != null)
+        {
+            var newCustomer = new CustomerItem
+            {
+                Code = !string.IsNullOrEmpty(c.CorpId) ? c.CorpId : $"COM-{new Random().Next(10000, 99999)}",
+                FirstName = c.Name ?? "New Company",
+                MiddleName = "",
+                Tin = c.TinNo ?? ""
+            };
+            Customers.Add(newCustomer);
+            Company = newCustomer.FirstName;
+            CompanyChanged.InvokeAsync(Company);
+        }
+        showCompanyModal = false;
+    }
+
+    // --- Agent Handlers ---
+    void OnAgentSelected(AgentItem item)
+    {
+        Agent = item.Name;
+        AgentChanged.InvokeAsync(Agent);
+        showAgentSearch = false;
+    }
+
+    void ClearAgent()
+    {
+        Agent = "";
+        AgentChanged.InvokeAsync(Agent);
+        showAgentSearch = false;
+    }
+
+    void AddNewAgent()
+    {
+        showAgentSearch = false;
+        showAgentModal = true;
+    }
+
+    void HandleAgentSavedFromModal(TravelAgentRow a)
+    {
+        if (a != null)
+        {
+            var newAgent = new AgentItem
+            {
+                Code = !string.IsNullOrEmpty(a.AgentId) ? a.AgentId : $"AGT-{new Random().Next(10000, 99999)}",
+                Name = a.Name ?? "",
+                IataNo = a.IataNo ?? "",
+                AgentType = a.AgentType ?? "Corporate"
+            };
+            Agents.Add(newAgent);
+            Agent = newAgent.Name;
+            AgentChanged.InvokeAsync(Agent);
+        }
+        showAgentModal = false;
+    }
+
+    // --- Group Handlers ---
+    void OnGroupSelected(GroupItem item)
+    {
+        Group = item.Name;
+        GroupChanged.InvokeAsync(Group);
+        showGroupSearch = false;
+    }
+
+    void ClearGroup()
+    {
+        Group = "";
+        GroupChanged.InvokeAsync(Group);
+        showGroupSearch = false;
+    }
+
+    void AddNewGroup()
+    {
+        showGroupSearch = false;
+        showGroupModal = true;
+    }
+
+    void HandleGroupSavedFromModal(GroupRow g)
+    {
+        if (g != null)
+        {
+            var newGroup = new GroupItem
+            {
+                Code = !string.IsNullOrEmpty(g.GroupCode) ? g.GroupCode : $"GRP-{new Random().Next(100, 999)}",
+                Name = g.Name ?? "",
+                Description = g.GroupType ?? ""
+            };
+            Groups.Add(newGroup);
+            Group = newGroup.Name;
+            GroupChanged.InvokeAsync(Group);
+        }
+        showGroupModal = false;
+    }
+
+    // --- Source Handlers ---
+    void OnSourceSelected(SourceItem item)
+    {
+        Source = item.Name;
+        SourceChanged.InvokeAsync(Source);
+        showSourceSearch = false;
+    }
+
+    void ClearSource()
+    {
+        Source = "";
+        SourceChanged.InvokeAsync(Source);
+        showSourceSearch = false;
+    }
+
+    void AddNewSource()
+    {
+        showSourceSearch = false;
+        showSourceModal = true;
+    }
+
+    void HandleSourceSavedFromModal(SourceRow s)
+    {
+        if (s != null)
+        {
+            var newSource = new SourceItem
+            {
+                Code = !string.IsNullOrEmpty(s.Code) ? s.Code : $"SRC-{new Random().Next(100, 999)}",
+                Name = s.Name ?? "New Source",
+                SourceType = s.SourceType ?? "Manual"
+            };
+            Sources.Add(newSource);
+            Source = newSource.Name;
+            SourceChanged.InvokeAsync(Source);
+        }
+        showSourceModal = false;
     }
 
     async Task HandleSave() => await OnSave.InvokeAsync();

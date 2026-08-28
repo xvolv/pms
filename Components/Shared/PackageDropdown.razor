@@ -1,9 +1,9 @@
 @using DevExpress.Blazor
 
-<div class="package-dropdown-wrapper">
+<div class="package-dropdown-wrapper @CssClass">
     <label>Packages</label>
-    <div class="lookup-field">
-        <DxTextBox @bind-Text="SelectedPackage" ReadOnly="true" CssClass="erp-combobox lookup-input" NullText="" />
+    <div class="lookup-field global-dropdown-anchor">
+        <DxTextBox @bind-Text="SelectedPackage" ReadOnly="true" CssClass="erp-combobox lookup-input" NullText="" Click="TogglePackagePopup" />
         <button type="button" class="lookup-toggle-btn" @onclick="TogglePackagePopup">▾</button>
 
         @if (ShowPackagePopup)
@@ -11,7 +11,7 @@
             <div class="global-dropdown-popup">
                 <div class="global-dropdown-body">
                     <div class="global-dropdown-search-row">
-                        <input class="global-dropdown-search-input" @bind="PackagePopupFilter" @bind:event="oninput" />
+                        <input class="global-dropdown-search-input" @bind="PackagePopupFilter" @bind:event="oninput" placeholder="Search package..." />
                         <button type="button" class="global-dropdown-find-btn" @onclick="@(() => { })">Find</button>
                     </div>
                     <div class="global-dropdown-list">
@@ -27,7 +27,7 @@
                 </div>
                 <div class="global-dropdown-clear-row">
                     <button type="button" class="global-dropdown-clear-btn"
-                            @onclick="@(() => PackagePopupFilter = string.Empty)">Clear</button>
+                            @onclick="ClearSelection">Clear</button>
                 </div>
                 <div class="global-dropdown-footer-bar">
                     <i class="bi bi-x-lg" @onclick="() => ShowPackagePopup = false"></i>
@@ -65,6 +65,14 @@
     {
         SelectedPackage = item;
         await SelectedPackageChanged.InvokeAsync(SelectedPackage);
+        ShowPackagePopup = false;
+    }
+
+    async Task ClearSelection()
+    {
+        SelectedPackage = null;
+        await SelectedPackageChanged.InvokeAsync(null);
+        PackagePopupFilter = string.Empty;
         ShowPackagePopup = false;
     }
 

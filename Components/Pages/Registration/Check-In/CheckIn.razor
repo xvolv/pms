@@ -3,6 +3,15 @@
 @using Microsoft.AspNetCore.Components
 @using ERP.V7.WebPMS.Components.Shared
 @using ERP.V7.WebPMS.Components.Pages.Profile.Guest
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company
+@using ERP.V7.WebPMS.Components.Pages.Profile.Company.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group
+@using ERP.V7.WebPMS.Components.Pages.Profile.Group.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Contact
+@using ERP.V7.WebPMS.Components.Pages.Profile.TravelAgent
+@using ERP.V7.WebPMS.Components.Pages.Profile.TravelAgent.Models
+@using ERP.V7.WebPMS.Components.Pages.Profile.Source
+@using ERP.V7.WebPMS.Components.Pages.Profile.Source.Models
 @using ERP.V7.WebPMS.Components.Pages.Profile.Shared
 @inject NavigationManager Navigation
 
@@ -247,8 +256,7 @@
                                       SizeMode="SizeMode.Small"
                                       Click="OpenRateSearch" />
                         </div>
-                        <label>Packages</label>
-                        <DxComboBox CssClass="erp-combobox" Data="@packages" @bind-Value="package" SizeMode="SizeMode.Small" />
+                        <PackageDropdown @bind-SelectedPackage="package" PackageItems="@packages" CssClass="stay-package-span" />
 
                         <label>Rate</label>
                         <DxTextBox @bind-Text="rate" SizeMode="SizeMode.Small" />
@@ -464,13 +472,88 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- ===================== COMPANY / CUSTOMER SEARCH POPUP ===================== -->
+<CompanySearchPopup @bind-Visible="showCompanySearch"
+                    Customers="@Customers"
+                    OnSelect="SelectCustomer"
+                    OnAddNew="AddNewCompany"
+                    OnClear="ClearCustomer" />
+
+<!-- ===================== GROUP SEARCH POPUP ===================== -->
+<GroupSearchPopup @bind-Visible="showGroupSearch"
+                  Groups="@Groups"
+                  OnSelect="SelectGroup"
+                  OnAddNew="AddNewGroup"
+                  OnClear="ClearGroup" />
+
 <!-- ===================== GUEST SEARCH POPUP ===================== -->
-<DxPopup @bind-Visible="showGuestSearch"
-         HeaderText="Guest Profile"
-         Width="min(1100px, 95vw)"
-         CloseOnOutsideClick="false" ShowCloseButton="true">
+<GuestSearchPopup @bind-Visible="showGuestSearch"
+                  Guests="@Guests"
+                  OnSelect="SelectGuest"
+                  OnAddNew="AddNewGuest"
+                  OnClear="ClearGuest" />
+
+<!-- ===================== CONTACT SEARCH POPUP ===================== -->
+<ContactSearchPopup @bind-Visible="showContactSearch"
+                    Contacts="@Contacts"
+                    OnSelect="SelectContact"
+                    OnAddNew="AddNewContact"
+                    OnClear="ClearContact" />
+
+<!-- ===================== AGENT SEARCH POPUP ===================== -->
+<AgentSearchPopup @bind-Visible="showAgentSearch"
+                  Agents="@Agents"
+                  OnSelect="SelectAgent"
+                  OnAddNew="AddNewAgent"
+                  OnClear="ClearAgent" />
+
+<!-- ===================== SOURCE SEARCH POPUP ===================== -->
+<SourceSearchPopup @bind-Visible="showSourceSearch"
+                   Sources="@Sources"
+                   OnSelect="SelectSource"
+                   OnAddNew="AddNewSource"
+                   OnClear="ClearSource" />
+
+<!-- ===================== FORM MODALS ===================== -->
+<DxPopup @bind-Visible="showCompanyModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Company" CloseOnEscape="true">
     <BodyContentTemplate>
-        <Guest IsModal="true" OnSaved="OnGuestSavedFromModal" OnClose="() => showGuestSearch = false" />
+        <Company IsModal="true" OnSaved="HandleCompanySaved" OnClose="() => showCompanyModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showGroupModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Group" CloseOnEscape="true">
+    <BodyContentTemplate>
+        <Group IsModal="true" OnSaved="HandleGroupSaved" OnClose="() => showGroupModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showGuestModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Guest" CloseOnEscape="true">
+    <BodyContentTemplate>
+        <Guest IsModal="true" OnSaved="OnGuestSavedFromModal" OnClose="() => showGuestModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showContactModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Contact" CloseOnEscape="true">
+    <BodyContentTemplate>
+        <Contact IsModal="true" OnSaved="HandleContactSaved" OnClose="() => showContactModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showAgentModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Travel Agent" CloseOnEscape="true">
+    <BodyContentTemplate>
+        <TravelAgent IsModal="true" OnSaved="HandleAgentSaved" OnClose="() => showAgentModal = false" />
+    </BodyContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="showSourceModal" Width="900px" Height="600px" ShowCloseButton="true" CloseOnOutsideClick="false"
+         HeaderText="Add New Source" CloseOnEscape="true">
+    <BodyContentTemplate>
+        <Source IsModal="true" OnSaved="HandleSourceSaved" OnClose="() => showSourceModal = false" />
     </BodyContentTemplate>
 </DxPopup>
 
@@ -728,6 +811,10 @@
         text-align: right;
         color: #555;
         white-space: nowrap;
+    }
+
+    .stay-package-span {
+        grid-column: span 2;
     }
 
     .class-grid {
@@ -1191,8 +1278,77 @@
                      && !string.IsNullOrWhiteSpace(room)
                      && !string.IsNullOrWhiteSpace(rateCode);
 
-    // Guest Search
+    // Search Popups visibility
+    bool showCompanySearch = false;
+    bool showGroupSearch = false;
     bool showGuestSearch = false;
+    bool showContactSearch = false;
+    bool showAgentSearch = false;
+    bool showSourceSearch = false;
+
+    // Form Modals visibility
+    bool showCompanyModal = false;
+    bool showGroupModal = false;
+    bool showGuestModal = false;
+    bool showContactModal = false;
+    bool showAgentModal = false;
+    bool showSourceModal = false;
+
+    List<CustomerItem> Customers { get; set; } = new()
+    {
+        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" },
+        new() { Code = "PCU00001", FirstName = "ETHIO TELECOM", MiddleName = "HEAD OFFICE", Tin = "0000012345" },
+        new() { Code = "PCU00002", FirstName = "COMMERCIAL BANK OF ETHIOPIA", MiddleName = "CBE MAIN", Tin = "0000054321" },
+        new() { Code = "PCU00003", FirstName = "ETHIOPIAN AIRLINES", MiddleName = "EAL HEADQUARTERS", Tin = "0000098765" }
+    };
+
+    List<GroupItem> Groups { get; set; } = new()
+    {
+        new() { Code = "GRP-001", Name = "JANE", Description = "Jane Tour Group" },
+        new() { Code = "GRP-002", Name = "ABEBE", Description = "Abebe Corporate Group" },
+        new() { Code = "GRP-003", Name = "KEBEDE", Description = "Kebede Delegation" },
+        new() { Code = "GRP-004", Name = "OTHER GROUP", Description = "General Event Group" }
+    };
+
+    List<GuestItem> Guests { get; set; } = new()
+    {
+        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
+        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
+        new() { FirstName = "JOHN", MiddleName = "SMITH", Tin = "" },
+        new() { FirstName = "TEST", MiddleName = "", Tin = "" },
+        new() { FirstName = "Solomon", MiddleName = "Bereket Tuffa", Tin = "EP155353" },
+        new() { FirstName = "Leo", MiddleName = "Rojas", Tin = "3342343434" },
+        new() { FirstName = "miskir", MiddleName = "engida engida", Tin = "" }
+    };
+
+    List<ContactItem> Contacts { get; set; } = new()
+    {
+        new() { Code = "PCU-00002", FirstName = "KEBEDE", MiddleName = "ZELEKE ABEBE", Phone = "5565556456" },
+        new() { Code = "PCU-00003", FirstName = "BROWN", MiddleName = "CHRIS", Phone = "3423343" },
+        new() { Code = "PCU-00009", FirstName = "NAGUIB", MiddleName = "ALI TAHER", Phone = "D02018" },
+        new() { Code = "PCU-00010", FirstName = "GIRMA", MiddleName = "BIRHANU ASSEFA", Phone = "423432" },
+        new() { Code = "PCU-00011", FirstName = "GIRMA", MiddleName = "SOFOIANA BELIHU", Phone = "43241" },
+        new() { Code = "PCU-00012", FirstName = "GIRMA", MiddleName = "DEFAR BEGENA", Phone = "342342" }
+    };
+
+    List<AgentItem> Agents { get; set; } = new()
+    {
+        new() { Code = "OA-00001", Name = "RIHANN'S AGENT", IataNo = "343422234-34", AgentType = "Corporate" },
+        new() { Code = "OA-00002", Name = "MY AGENT", IataNo = "566632222-22", AgentType = "Retail" },
+        new() { Code = "OA-00003", Name = "GLOBAL TOURS & TRAVEL", IataNo = "789123456-01", AgentType = "Online" },
+        new() { Code = "OA-00004", Name = "ETHIO TRAVEL AGENCY", IataNo = "112233445-55", AgentType = "Wholesale" }
+    };
+
+    List<SourceItem> Sources { get; set; } = new()
+    {
+        new() { Code = "SRC-001", Name = "Company Directory", SourceType = "Corporate" },
+        new() { Code = "SRC-002", Name = "Website", SourceType = "Direct" },
+        new() { Code = "SRC-003", Name = "Travel Agent", SourceType = "Travel Agent" },
+        new() { Code = "SRC-004", Name = "Walk-in", SourceType = "Walk-In" },
+        new() { Code = "SRC-005", Name = "Online OTA", SourceType = "OTA" }
+    };
+
+    // Guest Search
     string guestSearchText = "";
     List<Guest> guestList = new();
     List<Guest> filteredGuests = new();
@@ -1205,15 +1361,6 @@
     List<LookupItem> currentLookupData = new();
     List<LookupItem> filteredLookupItems = new();
 
-    List<LookupItem> companyData = new()
-    {
-        new("111334666", "MAMO", "111111111-11"),
-        new("11133uuu", "Mamo", "123888888"),
-        new("27116", "ZERHUN GIRMA W/GIORGIS", ""),
-        new("OCU-00031-17", "MELAKE LTD", "888888888-87"),
-        new("OCU-00032-17", "ABENEZER LTD", "777777777-77"),
-    };
-
     List<LookupItem> contactData = new()
     {
         new("PCU-00002", "KEBEDE ZELEKE ABEBE", "5565556456"),
@@ -1225,12 +1372,6 @@
     {
         new("OA-00001", "RIHANN'S AGENT", "343422234-34"),
         new("OA-00002", "MY AGENT", "566632222-22"),
-    };
-
-    List<LookupItem> groupData = new()
-    {
-        new("OG-00001", "Musical Group", "3434223434-34"),
-        new("OG-00002", "Girls Group", "3342333434"),
     };
 
     List<LookupItem> sourceData = new()
@@ -1345,9 +1486,118 @@
 
     void OpenGuestSearch()
     {
-        guestSearchText = "";
-        filteredGuests = guestList.ToList();
         showGuestSearch = true;
+    }
+
+    void SelectGuest(GuestItem g)
+    {
+        var existing = guestList.FirstOrDefault(x => x.FirstName.Equals(g.FirstName, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+        {
+            selectedGuestId = existing.Id;
+            title = existing.Title;
+            passport = existing.Identification;
+            if (existing.Id == 15)
+            {
+                nationality = "Argentinean";
+                title = "Capitain";
+            }
+        }
+        else
+        {
+            var newId = guestList.Any() ? guestList.Max(x => x.Id) + 1 : 1;
+            var newG = new Guest
+            {
+                Id = newId,
+                FirstName = g.FirstName,
+                MiddleName = g.MiddleName ?? "",
+                LastName = "",
+                Identification = g.Tin
+            };
+            guestList.Add(newG);
+            selectedGuestId = newId;
+            passport = g.Tin;
+        }
+        showGuestSearch = false;
+    }
+
+    void ClearGuest()
+    {
+        selectedGuestId = null;
+        nationality = "";
+        passport = "";
+        title = "";
+        address = "";
+        showGuestSearch = false;
+    }
+
+    void AddNewGuest()
+    {
+        showGuestSearch = false;
+        showGuestModal = true;
+    }
+
+    void SelectCustomer(CustomerItem c)
+    {
+        company = c.FirstName;
+        showCompanySearch = false;
+    }
+
+    void ClearCustomer()
+    {
+        company = "";
+        showCompanySearch = false;
+    }
+
+    void AddNewCompany()
+    {
+        showCompanySearch = false;
+        showCompanyModal = true;
+    }
+
+    void HandleCompanySaved(CompanyRow c)
+    {
+        var newCustomer = new CustomerItem
+        {
+            Code = c.CorpId,
+            FirstName = c.Name,
+            MiddleName = c.Name.Length > 30 ? c.Name.Substring(0, 30) + "..." : c.Name,
+            Tin = c.TinNo
+        };
+        Customers.Add(newCustomer);
+        company = c.Name;
+        showCompanyModal = false;
+    }
+
+    void SelectGroup(GroupItem g)
+    {
+        group = g.Name;
+        showGroupSearch = false;
+    }
+
+    void ClearGroup()
+    {
+        group = "";
+        showGroupSearch = false;
+    }
+
+    void AddNewGroup()
+    {
+        showGroupSearch = false;
+        showGroupModal = true;
+    }
+
+    void HandleGroupSaved(GroupRow g)
+    {
+        var newGroup = new GroupItem
+        {
+            Code = g.GroupId,
+            Name = g.Name,
+            Description = g.GroupType
+        };
+        Groups.Add(newGroup);
+        group = g.Name;
+        showGroupModal = false;
     }
 
     void OpenRoomSearch() => showRoomSearch = true;
@@ -1433,6 +1683,16 @@
             selectedGuestId = newId;
         }
 
+        if (!Guests.Any(g => g.FirstName.Equals(savedGuest.FirstName, StringComparison.OrdinalIgnoreCase)))
+        {
+            Guests.Add(new GuestItem
+            {
+                FirstName = savedGuest.FirstName ?? "",
+                MiddleName = $"{savedGuest.MiddleName} {savedGuest.LastName}".Trim(),
+                Tin = savedGuest.PassportNum ?? ""
+            });
+        }
+
         title = savedGuest.Title ?? "";
         nationality = savedGuest.Nationality ?? "";
         passport = savedGuest.PassportNum ?? "";
@@ -1442,24 +1702,147 @@
         address = string.Join(", ", addrParts);
 
         showGuestSearch = false;
+        showGuestModal = false;
+    }
+
+    void SelectContact(ContactItem c)
+    {
+        contact = c.FullName;
+        showContactSearch = false;
+    }
+
+    void ClearContact()
+    {
+        contact = "";
+        showContactSearch = false;
+    }
+
+    void AddNewContact()
+    {
+        showContactSearch = false;
+        showContactModal = true;
+    }
+
+    void HandleContactSaved(PersonProfileRow p)
+    {
+        var newContact = new ContactItem
+        {
+            Code = p.Code ?? $"PCU-{new Random().Next(10000, 99999)}",
+            FirstName = p.FirstName ?? "",
+            MiddleName = $"{p.MiddleName} {p.LastName}".Trim(),
+            Phone = p.Phone1 ?? p.PassportNum ?? ""
+        };
+        Contacts.Add(newContact);
+        contact = newContact.FullName;
+        showContactModal = false;
+    }
+
+    void SelectAgent(AgentItem a)
+    {
+        agent = a.Name;
+        showAgentSearch = false;
+    }
+
+    void ClearAgent()
+    {
+        agent = "";
+        showAgentSearch = false;
+    }
+
+    void AddNewAgent()
+    {
+        showAgentSearch = false;
+        showAgentModal = true;
+    }
+
+    void HandleAgentSaved(TravelAgentRow a)
+    {
+        var newAgent = new AgentItem
+        {
+            Code = a.AgentId ?? $"OA-{new Random().Next(10000, 99999)}",
+            Name = a.Name ?? "",
+            IataNo = a.IataNo ?? "",
+            AgentType = a.AgentType ?? "Other"
+        };
+        Agents.Add(newAgent);
+        agent = a.Name ?? "";
+        showAgentModal = false;
+    }
+
+    void SelectSource(SourceItem s)
+    {
+        consigneeSource = s.Name;
+        source = s.Name;
+        showSourceSearch = false;
+    }
+
+    void ClearSource()
+    {
+        consigneeSource = "";
+        source = "";
+        showSourceSearch = false;
+    }
+
+    void AddNewSource()
+    {
+        showSourceSearch = false;
+        showSourceModal = true;
+    }
+
+    void HandleSourceSaved(SourceRow s)
+    {
+        var code = !string.IsNullOrWhiteSpace(s.Code) ? s.Code : (!string.IsNullOrWhiteSpace(s.SourceId) ? s.SourceId : $"SRC-{new Random().Next(100, 999)}");
+        var name = s.Name ?? "";
+        var newSource = new SourceItem
+        {
+            Code = code,
+            Name = name,
+            SourceType = s.SourceType ?? "Other"
+        };
+        Sources.Add(newSource);
+        if (!sources.Contains(name) && !string.IsNullOrEmpty(name))
+        {
+            sources.Add(name);
+        }
+        consigneeSource = name;
+        source = name;
+        showSourceModal = false;
     }
 
     // Lookup
     void OpenLookup(string type)
     {
+        if (type == "Company")
+        {
+            showCompanySearch = true;
+            return;
+        }
+        if (type == "Group")
+        {
+            showGroupSearch = true;
+            return;
+        }
+        if (type == "Contact")
+        {
+            showContactSearch = true;
+            return;
+        }
+        if (type == "Agent")
+        {
+            showAgentSearch = true;
+            return;
+        }
+        if (type == "Source")
+        {
+            showSourceSearch = true;
+            return;
+        }
+
         lookupType = type;
         lookupTitle = type;
         lookupSearchText = "";
 
-        currentLookupData = type switch
-        {
-            "Company" => companyData,
-            "Contact" => contactData,
-            "Agent"   => agentData,
-            "Group"   => groupData,
-            "Source"  => sourceData,
-            _         => new List<LookupItem>()
-        };
+        currentLookupData = new List<LookupItem>();
         filteredLookupItems = currentLookupData.ToList();
         showLookup = true;
     }

@@ -5,12 +5,15 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Profile - Source</PageTitle>
-<div class="top-tab-header">
-    <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
-        Source
-        <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+@if (!IsModal)
+{
+    <div class="top-tab-header">
+        <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
+            Source
+            <i class="bi bi-x fs-4" style="position: absolute; top: -6px; right: 3px; cursor: pointer;"></i>
+        </div>
     </div>
-</div>
+}
 
 <div class="profile-page-wrapper">
     <EditForm Model="@source" OnValidSubmit="HandleValidSubmit">
@@ -255,11 +258,14 @@
 </div>
 
 @code {
+    [Parameter] public bool IsModal { get; set; }
+    [Parameter] public EventCallback<SourceRow> OnSaved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private SourceRow source = new();
     private string? statusMessage;
 
-    private List<string> sourceTypes = new() { "OTA", "Direct", "Walk-In", "Corporate", "Travel Agent", "GDS",
-"Wholesaler", "Other" };
+    private List<string> sourceTypes = new() { "OTA", "Direct", "Walk-In", "Corporate", "Travel Agent", "GDS", "Wholesaler", "Other" };
     private List<string> categories = new() { "Business", "Leisure", "Group", "Government", "Corporate", "VIP" };
     private List<string> accountNos = new() { "AR-001", "AR-002", "AR-003", "AR-004" };
     private List<string> taxTypes = new() { "VAT", "TOT", "Exempt" };
@@ -299,17 +305,29 @@
         statusMessage = null;
     }
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
         statusMessage = "Source saved.";
+
+        if (OnSaved.HasDelegate)
+        {
+            await OnSaved.InvokeAsync(source);
+        }
     }
 
     private void OpenNote()
     {
     }
 
-    private void Close()
+    private async Task Close()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        if (IsModal && OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }

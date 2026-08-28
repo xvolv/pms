@@ -1,110 +1,166 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Pages.Registration.Reservation
 
 <DxPopup @bind-Visible="Visible" HeaderText="@($"Reservation Detail - {RegistrationNo}")"
-         Width="960px"  CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+         Width="1050px" CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="true">
     <BodyContentTemplate>
-        <div class="amend-toolbar">
-            <button type="button" class="ci-btn" @onclick="HandleRefresh">
-                <div class="ci-icon" style="color:#43a047;"><i class="bi bi-arrow-clockwise"></i></div>
-                <div class="ci-text">Refresh</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="HandleEdit">
-                <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-pencil-square"></i></div>
-                <div class="ci-text">Edit</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="@(() => {})">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-filetype-pdf"></i></div>
-                <div class="ci-text">To PDF</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="@(() => {})">
-                <div class="ci-icon" style="color:#2e7d32;"><i class="bi bi-file-earmark-excel"></i></div>
-                <div class="ci-text">To Excel</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="@(() => {})">
-                <div class="ci-icon" style="color:#555;"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Print</div>
-            </button>
-            <div style="display:flex; align-items:center; gap:4px; margin-left:8px;">
-                <DxCheckBox @bind-Checked="expandAllPackages">Expand All</DxCheckBox>
+        <div class="resdetail-container">
+
+            <!-- Toolbar with Secondary Icons (matching Image 1) -->
+            <div class="resdetail-toolbar">
+                <div class="resdetail-tbtn" @onclick="HandleRefresh" title="Refresh">
+                    <i class="bi bi-arrow-repeat resdetail-icon"></i>
+                    <span>Refresh</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="HandleEdit" title="Edit">
+                    <i class="bi bi-pencil-square resdetail-icon"></i>
+                    <span>Edit</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="@(() => {})" title="To PDF">
+                    <i class="bi bi-filetype-pdf resdetail-icon"></i>
+                    <span>To PDF</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="@(() => {})" title="To Excel">
+                    <i class="bi bi-filetype-xls resdetail-icon"></i>
+                    <span>To Excel</span>
+                </div>
+
+                <div class="resdetail-tbtn" @onclick="HandlePrint" title="Print">
+                    <i class="bi bi-printer resdetail-icon"></i>
+                    <span>Print</span>
+                </div>
+
+                <div class="resdetail-tbsep"></div>
+
+                <div class="resdetail-expandall">
+                    <i class="bi bi-arrows-angle-expand resdetail-icon"></i>
+                    <span>Expand All</span>
+                    <DxCheckBox @bind-Checked="expandAllPackages" CssClass="resdetail-expand-checkbox" />
+                </div>
+
+                <div class="resdetail-tbsep"></div>
+
+                <div class="resdetail-tbtn" style="margin-left:auto;" @onclick="HandleClose" title="Close">
+                    <i class="bi bi-x-square-fill resdetail-icon-red-lg"></i>
+                    <span>Close</span>
+                </div>
             </div>
-            <button type="button" class="ci-btn" style="margin-left:auto;" @onclick="HandleClose">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
-        </div>
-        <div class="detail-grid-wrap">
-            <table class="detail-table">
-                <thead>
-                    <tr>
-                        <th style="width:28px;"></th>
-                        <th style="width:90px;">Date</th>
-                        <th style="width:80px;">Week Day</th>
-                        <th style="width:50px;">Adult</th>
-                        <th style="width:50px;">Child</th>
-                        <th style="width:70px;">Room Co...</th>
-                        <th style="width:110px;">Room Type</th>
-                        <th style="width:110px;">Actual RTC</th>
-                        <th style="width:60px;">Room</th>
-                        <th style="width:100px;">Rate</th>
-                        <th style="width:80px;">Rate Amount</th>
-                        <th style="width:110px;">Market</th>
-                        <th style="width:110px;">Source</th>
-                        <th style="width:60px;">Is Fixed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in Rows)
-                    {
-                        <tr class="@(SelectedRow?.SN == row.SN ? "detail-selected" : "")"
-                            @onclick="() => SelectRow(row)">
-                            <td>
-                                @if (row.Packages.Any())
-                                {
-                                    <button class="expand-btn" @onclick:stopPropagation="true"
-                                            @onclick="() => row.Expanded = !row.Expanded">
-                                        <i class="bi bi-chevron-@(row.Expanded || expandAllPackages ? "down" : "right")"></i>
-                                    </button>
-                                }
-                            </td>
-                            <td>@row.Date.ToString("M/d/yyyy")</td>
-                            <td>@row.WeekDay</td>
-                            <td>@row.Adult</td>
-                            <td>@row.Child</td>
-                            <td>@row.RoomCount</td>
-                            <td>@row.RoomType</td>
-                            <td>@row.ActualRTC</td>
-                            <td>@row.Room</td>
-                            <td>@row.Rate</td>
-                            <td>@row.RateAmount.ToString("N2")</td>
-                            <td>@row.Market</td>
-                            <td>@row.Source</td>
-                            <td style="text-align:center;"><DxCheckBox @bind-Checked="row.IsFixed" Enabled="false" /></td>
+
+            <!-- Detail Grid Wrap (matching Image 1) -->
+            <div class="detail-grid-wrap">
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th style="width:28px; text-align:center;"></th>
+                            <th style="width:95px;">Date</th>
+                            <th style="width:85px;">Week Day</th>
+                            <th style="width:50px; text-align:center;">Adult</th>
+                            <th style="width:50px; text-align:center;">Child</th>
+                            <th style="width:80px; text-align:center;">Room Co...</th>
+                            <th style="width:110px;">Room Type</th>
+                            <th style="width:110px;">Actual RTC</th>
+                            <th style="width:60px; text-align:center;">Ro...</th>
+                            <th style="width:90px;">Rate</th>
+                            <th style="width:95px; text-align:right;">Rate Amount</th>
+                            <th style="width:120px;">Market</th>
+                            <th style="width:120px;">Source</th>
+                            <th style="width:65px; text-align:center;">Is Fixed</th>
                         </tr>
-                        @if ((row.Expanded || expandAllPackages) && row.Packages.Any())
+                    </thead>
+                    <tbody>
+                        @if (Rows != null && Rows.Any())
                         {
-                            <tr class="package-row">
-                                <td colspan="14" style="padding:0;">
-                                    <table class="package-table">
-                                        <thead>
-                                            <tr><th style="width:200px;">Package</th><th style="width:120px;">Amount</th><th>Remark</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var pkg in row.Packages)
-                                            {
-                                                <tr><td>@pkg.Package</td><td>@pkg.Amount.ToString("N4")</td><td>@pkg.Remark</td></tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                            @foreach (var row in Rows)
+                            {
+                                bool isExpanded = row.Expanded || expandAllPackages;
+                                bool isSelected = SelectedRow?.SN == row.SN;
+
+                                <tr class="@(isSelected ? "detail-selected" : "")"
+                                    @onclick="() => SelectRow(row)">
+                                    <td style="text-align:center; padding: 2px 4px;">
+                                        @if (row.Packages != null && row.Packages.Any())
+                                        {
+                                            <button type="button" class="expand-btn" @onclick:stopPropagation="true"
+                                                    @onclick="() => row.Expanded = !row.Expanded"
+                                                    title="@(isExpanded ? "Collapse" : "Expand")">
+                                                <i class="bi bi-@(isExpanded ? "dash-square" : "plus-square")"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                    <td>@row.Date.ToString("M/d/yyyy")</td>
+                                    <td>@row.WeekDay</td>
+                                    <td style="text-align:center;">@row.Adult</td>
+                                    <td style="text-align:center;">@row.Child</td>
+                                    <td style="text-align:center;">@row.RoomCount</td>
+                                    <td>@row.RoomType</td>
+                                    <td>@row.ActualRTC</td>
+                                    <td style="text-align:center;">@row.Room</td>
+                                    <td>@row.Rate</td>
+                                    <td style="text-align:right;">@row.RateAmount.ToString("N2")</td>
+                                    <td>@row.Market</td>
+                                    <td>@row.Source</td>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" checked="@row.IsFixed" disabled />
+                                    </td>
+                                </tr>
+
+                                @if (isExpanded && row.Packages != null && row.Packages.Any())
+                                {
+                                    <tr class="package-row">
+                                        <td colspan="14" style="padding:0; background:#f9fafb;">
+                                            <table class="package-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:200px; font-weight:700;">Package Header Description</th>
+                                                        <th style="width:60px; font-weight:700;">Id</th>
+                                                        <th style="width:160px; font-weight:700;">Registration Detail</th>
+                                                        <th style="width:120px; font-weight:700;">Package</th>
+                                                        <th style="width:100px; text-align:right; font-weight:700;">Amount</th>
+                                                        <th style="font-weight:700;">Remark</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var pkg in row.Packages)
+                                                    {
+                                                        <tr>
+                                                            <td>@(string.IsNullOrEmpty(pkg.PackageHeaderDescription) ? pkg.Package : pkg.PackageHeaderDescription)</td>
+                                                            <td>@(string.IsNullOrEmpty(pkg.Id) ? "1" : pkg.Id)</td>
+                                                            <td>@(string.IsNullOrEmpty(pkg.RegistrationDetail) ? "Standard" : pkg.RegistrationDetail)</td>
+                                                            <td>@pkg.Package</td>
+                                                            <td style="text-align:right;">@pkg.Amount.ToString("N2")</td>
+                                                            <td>@pkg.Remark</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="14" style="text-align:center; padding:12px; color:#777;">
+                                    No reservation detail rows available.
                                 </td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
+
+<!-- Printable sheet dialog for Reservation Detail matching Image 2 -->
+<ReservationDetailPrintPopup @bind-Visible="showPrintPopup"
+                             RegistrationNo="@(RegistrationNo ?? "REG-00157-17")"
+                             Rows="@Rows" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
@@ -119,9 +175,209 @@
     [Parameter] public EventCallback OnEdit { get; set; }
 
     bool expandAllPackages = false;
+    bool showPrintPopup = false;
 
     void SelectRow(DailyDetailRow row) => SelectedRowChanged.InvokeAsync(row);
     async Task HandleRefresh() => await OnRefresh.InvokeAsync();
     async Task HandleEdit() => await OnEdit.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+    void HandlePrint() => showPrintPopup = true;
 }
+
+<style>
+    .resdetail-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+    }
+
+    .resdetail-popup .dxbl-popup {
+        border-radius: 2px;
+    }
+
+    .resdetail-container {
+        display: flex;
+        flex-direction: column;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        font-size: 12px;
+        color: #222;
+        background: #ffffff;
+    }
+
+    .resdetail-titlebar {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 10px;
+        background: #ffffff;
+        border-bottom: 1px solid #d6d6d6;
+    }
+
+    .resdetail-title-icon {
+        color: #e83e8c;
+        font-size: 13px;
+        margin-right: 8px;
+    }
+
+    .resdetail-title-text {
+        flex: 1;
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+    }
+
+    .resdetail-title-close {
+        cursor: pointer;
+        color: #555;
+        font-size: 14px;
+        padding: 4px;
+    }
+
+    .resdetail-title-close:hover {
+        color: #d9271e;
+    }
+
+    .resdetail-toolbar {
+        display: flex;
+        align-items: center;
+        background: #f2f2f2;
+        border-bottom: 1px solid #d6d6d6;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .resdetail-tbtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 58px;
+        padding: 3px 4px;
+        border-radius: 3px;
+        cursor: pointer;
+        color: #333;
+        text-align: center;
+        user-select: none;
+    }
+
+    .resdetail-tbtn span {
+        font-size: 11px;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+
+    .resdetail-icon {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .resdetail-icon-red-lg {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .resdetail-tbsep {
+        width: 1px;
+        height: 32px;
+        background: #cfcfcf;
+        margin: 0 6px;
+    }
+
+    .resdetail-expandall {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 6px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .resdetail-expandall .resdetail-icon {
+        font-size: 16px;
+        color: #6c757d;
+    }
+
+    .resdetail-expand-checkbox {
+        margin-left: 2px;
+    }
+
+    /* Grid / Table */
+    .detail-grid-wrap {
+        padding: 0;
+        max-height: 480px;
+        overflow: auto;
+    }
+
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11.5px;
+    }
+
+    .detail-table th {
+        background: #eef0f2;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 1px solid #c9c9c9;
+        border-right: 1px solid #dcdcdc;
+        padding: 5px 6px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .detail-table td {
+        padding: 4px 6px;
+        border-right: 1px solid #eaeaea;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+    }
+
+    .detail-table tr:hover {
+        background-color: #f5f9ff;
+    }
+
+    .detail-table tr.detail-selected td {
+        background-color: #2f7ed8 !important;
+        color: #ffffff !important;
+        border-right: 1px solid #1f66bc !important;
+    }
+
+    .expand-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        color: #666;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    .expand-btn:hover {
+        color: #1565c0;
+    }
+
+    /* Sub-table for Packages */
+    .package-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        margin: 0;
+        background: #ffffff;
+    }
+
+    .package-table th {
+        background: #f0f4f8 !important;
+        color: #333 !important;
+        font-weight: 700 !important;
+        padding: 4px 8px !important;
+        border-bottom: 1px solid #d0d7de !important;
+        border-right: 1px solid #e1e4e8 !important;
+    }
+
+    .package-table td {
+        padding: 4px 8px !important;
+        border-bottom: 1px solid #eaeaea !important;
+        border-right: 1px solid #eaeaea !important;
+        color: #333 !important;
+    }
+</style>

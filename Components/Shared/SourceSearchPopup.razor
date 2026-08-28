@@ -1,0 +1,149 @@
+@using DevExpress.Blazor
+
+<DxPopup Visible="@Visible"
+         VisibleChanged="@HandleVisibleChanged"
+         HeaderText="Source Search"
+         Width="500px"
+         CloseOnOutsideClick="true"
+         ShowCloseButton="true"
+         CloseOnEscape="true"
+         CssClass="global-lookup-popup">
+    <BodyContentTemplate>
+        <div class="lookup-modal-container">
+            <div class="lookup-modal-searchrow">
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search source..." />
+                <button type="button" class="lookup-modal-find-btn">Find</button>
+            </div>
+            <div class="lookup-modal-gridwrap">
+                <DxGrid @ref="gridRef"
+                        Data="@FilteredSources"
+                        CssClass="lookup-modal-grid"
+                        ShowFilterRow="false"
+                        ShowGroupPanel="false"
+                        CustomizeElement="OnCustomizeElement"
+                        RowClick="OnRowClick"
+                        RowDoubleClick="OnRowDoubleClick">
+                    <Columns>
+                        <DxGridDataColumn FieldName="@nameof(SourceItem.Code)" Caption="Code" Width="110px" />
+                        <DxGridDataColumn FieldName="@nameof(SourceItem.Name)" Caption="Source Name" Width="200px" />
+                        <DxGridDataColumn FieldName="@nameof(SourceItem.SourceType)" Caption="Source Type" Width="120px" />
+                    </Columns>
+                </DxGrid>
+            </div>
+            <div class="lookup-modal-footer">
+                <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleAddNew">Add New</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
+                <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter] public List<SourceItem>? Sources { get; set; }
+    [Parameter] public SourceItem? SelectedSource { get; set; }
+    [Parameter] public EventCallback<SourceItem?> SelectedSourceChanged { get; set; }
+    [Parameter] public EventCallback<SourceItem> OnSelect { get; set; }
+    [Parameter] public EventCallback OnAddNew { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    string SearchText { get; set; } = "";
+    SourceItem? selectedRow;
+    IGrid? gridRef;
+
+    List<SourceItem> DefaultSources { get; } = new()
+    {
+        new() { Code = "SRC-001", Name = "Company Directory", SourceType = "Corporate" },
+        new() { Code = "SRC-002", Name = "Website", SourceType = "Direct" },
+        new() { Code = "SRC-003", Name = "Travel Agent", SourceType = "Travel Agent" },
+        new() { Code = "SRC-004", Name = "Walk-in", SourceType = "Walk-In" },
+        new() { Code = "SRC-005", Name = "Online OTA", SourceType = "OTA" }
+    };
+
+    List<SourceItem> DataList => (Sources != null && Sources.Count > 0) ? Sources : DefaultSources;
+
+    IEnumerable<SourceItem> FilteredSources =>
+        string.IsNullOrWhiteSpace(SearchText)
+            ? DataList
+            : DataList.Where(s => (s.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (s.Name?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (s.SourceType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedSource != null)
+        {
+            selectedRow = SelectedSource;
+        }
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as SourceItem;
+        if (item != null)
+        {
+            selectedRow = item;
+        }
+    }
+
+    async Task OnRowDoubleClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as SourceItem;
+        if (item != null)
+        {
+            selectedRow = item;
+            await HandleSelect();
+        }
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && selectedRow != null)
+        {
+            var item = e.Grid?.GetDataItem(e.VisibleIndex) as SourceItem;
+            if (item != null && item.Code == selectedRow.Code)
+            {
+                e.CssClass = "lookup-modal-row-selected";
+            }
+        }
+    }
+
+    async Task HandleSelect()
+    {
+        if (selectedRow != null)
+        {
+            await SelectedSourceChanged.InvokeAsync(selectedRow);
+            await OnSelect.InvokeAsync(selectedRow);
+        }
+        await HandleClose();
+    }
+
+    async Task HandleAddNew()
+    {
+        await OnAddNew.InvokeAsync();
+    }
+
+    async Task HandleClear()
+    {
+        selectedRow = null;
+        await SelectedSourceChanged.InvokeAsync(null);
+        await OnClear.InvokeAsync();
+        await HandleClose();
+    }
+
+    async Task HandleClose()
+    {
+        Visible = false;
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    async Task HandleVisibleChanged(bool visible)
+    {
+        Visible = visible;
+        await VisibleChanged.InvokeAsync(visible);
+    }
+}

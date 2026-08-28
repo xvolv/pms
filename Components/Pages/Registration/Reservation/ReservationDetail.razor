@@ -1,8 +1,13 @@
+@using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Pages.Registration.Reservation
+
 <DxPopup @bind-Visible="@Visible"
          HeaderVisible="false"
          ShowCloseButton="false"
-         Width="1100px"
-         Height="80vh"
+         Width="1050px"
+         CloseOnOutsideClick="false"
+         CloseOnEscape="true"
          AllowResize="true"
          AllowDrag="true"
          CssClass="resdetail-popup">
@@ -13,84 +18,166 @@
             <div class="resdetail-titlebar">
                 <i class="bi bi-arrow-90deg-left resdetail-title-icon"></i>
                 <span class="resdetail-title-text">Reservation Detail - @ReservationId</span>
-                <i class="bi bi-x-lg resdetail-title-close" @onclick="CloseDialog"></i>
+                <i class="bi bi-x-lg resdetail-title-close" @onclick="CloseDialog" title="Close"></i>
             </div>
 
             @* ---------------- Toolbar ---------------- *@
             <div class="resdetail-toolbar">
 
-                <div class="resdetail-tbtn" @onclick="OnRefresh">
-                    <i class="bi bi-arrow-repeat resdetail-icon resdetail-icon-green"></i>
+                <div class="resdetail-tbtn" @onclick="OnRefresh" title="Refresh">
+                    <i class="bi bi-arrow-repeat resdetail-icon"></i>
                     <span>Refresh</span>
                 </div>
 
-                <div class="resdetail-tbtn" @onclick="OnEdit">
-                    <i class="bi bi-pencil-square resdetail-icon resdetail-icon-orange"></i>
+                <div class="resdetail-tbtn" @onclick="OnEdit" title="Edit">
+                    <i class="bi bi-pencil-square resdetail-icon"></i>
                     <span>Edit</span>
                 </div>
 
-                <div class="resdetail-tbtn" @onclick="OnToPdf">
-                    <i class="bi bi-filetype-pdf resdetail-icon resdetail-icon-red"></i>
+                <div class="resdetail-tbtn" @onclick="OnToPdf" title="To PDF">
+                    <i class="bi bi-filetype-pdf resdetail-icon"></i>
                     <span>To PDF</span>
                 </div>
 
-                <div class="resdetail-tbtn" @onclick="OnToExcel">
-                    <i class="bi bi-filetype-xls resdetail-icon resdetail-icon-green"></i>
+                <div class="resdetail-tbtn" @onclick="OnToExcel" title="To Excel">
+                    <i class="bi bi-filetype-xls resdetail-icon"></i>
                     <span>To Excel</span>
                 </div>
 
-                <div class="resdetail-tbtn" @onclick="OnPrint">
-                    <i class="bi bi-printer resdetail-icon resdetail-icon-dark"></i>
+                <div class="resdetail-tbtn" @onclick="OnPrint" title="Print">
+                    <i class="bi bi-printer resdetail-icon"></i>
                     <span>Print</span>
                 </div>
 
                 <div class="resdetail-tbsep"></div>
 
                 <div class="resdetail-expandall">
-                    <i class="bi bi-arrows-angle-expand resdetail-icon resdetail-icon-green"></i>
+                    <i class="bi bi-arrows-angle-expand resdetail-icon"></i>
                     <span>Expand All</span>
                     <DxCheckBox @bind-Checked="@ExpandAll" CssClass="resdetail-expand-checkbox" />
                 </div>
 
                 <div class="resdetail-tbsep"></div>
 
-                <div class="resdetail-tbtn" @onclick="CloseDialog">
-                    <i class="bi bi-x-circle-fill resdetail-icon resdetail-icon-red-lg"></i>
+                <div class="resdetail-tbtn" style="margin-left:auto;" @onclick="CloseDialog" title="Close">
+                    <i class="bi bi-x-square-fill resdetail-icon-red-lg"></i>
                     <span>Close</span>
                 </div>
 
             </div>
 
-            @* ---------------- Grid ---------------- *@
-            <div class="resdetail-gridwrap">
-                <DxGrid Data="@Rows"
-                        CssClass="resdetail-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        ShowAllRows="true"
-                        SelectionMode="GridSelectionMode.Single"
-                        @bind-SelectedDataItem="@SelectedRow">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Date)" Caption="Date" DisplayFormat="M/d/yyyy" Width="100px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.WeekDay)" Caption="Week Day" Width="100px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Adult)" Caption="Adult" Width="70px" TextAlignment="GridTextAlignment.Center" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Child)" Caption="Child" Width="70px" TextAlignment="GridTextAlignment.Center" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomConfig)" Caption="Room Co..." Width="100px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomType)" Caption="Room Type" Width="120px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.ActualRTC)" Caption="Actual RTC" Width="110px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RoomNo)" Caption="Ro..." Width="60px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Rate)" Caption="Rate" Width="90px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.RateAmount)" Caption="Rate Amount" Width="110px" DisplayFormat="N2" TextAlignment="GridTextAlignment.Right" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Market)" Caption="Market" Width="130px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.Source)" Caption="Source" Width="130px" />
-                        <DxGridDataColumn FieldName="@nameof(ReservationDetailRow.IsFixed)" Caption="Is Fixed" Width="80px" TextAlignment="GridTextAlignment.Center" />
-                    </Columns>
-                </DxGrid>
+            @* ---------------- Master-Detail Grid ---------------- *@
+            <div class="detail-grid-wrap">
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th style="width:28px; text-align:center;"></th>
+                            <th style="width:95px;">Date</th>
+                            <th style="width:85px;">Week Day</th>
+                            <th style="width:50px; text-align:center;">Adult</th>
+                            <th style="width:50px; text-align:center;">Child</th>
+                            <th style="width:80px; text-align:center;">Room Co...</th>
+                            <th style="width:110px;">Room Type</th>
+                            <th style="width:110px;">Actual RTC</th>
+                            <th style="width:60px; text-align:center;">Ro...</th>
+                            <th style="width:90px;">Rate</th>
+                            <th style="width:95px; text-align:right;">Rate Amount</th>
+                            <th style="width:120px;">Market</th>
+                            <th style="width:120px;">Source</th>
+                            <th style="width:65px; text-align:center;">Is Fixed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Rows != null && Rows.Any())
+                        {
+                            @foreach (var row in Rows)
+                            {
+                                bool isExpanded = row.Expanded || ExpandAll;
+                                bool isSelected = SelectedRow == row;
+
+                                <tr class="@(isSelected ? "detail-selected" : "")"
+                                    @onclick="() => SelectedRow = row">
+                                    <td style="text-align:center; padding: 2px 4px;">
+                                        @if (row.Packages != null && row.Packages.Any())
+                                        {
+                                            <button type="button" class="expand-btn" @onclick:stopPropagation="true"
+                                                    @onclick="() => row.Expanded = !row.Expanded"
+                                                    title="@(isExpanded ? "Collapse" : "Expand")">
+                                                <i class="bi bi-@(isExpanded ? "dash-square" : "plus-square")"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                    <td>@row.Date.ToString("M/d/yyyy")</td>
+                                    <td>@row.WeekDay</td>
+                                    <td style="text-align:center;">@row.Adult</td>
+                                    <td style="text-align:center;">@row.Child</td>
+                                    <td style="text-align:center;">@row.RoomConfig</td>
+                                    <td>@row.RoomType</td>
+                                    <td>@row.ActualRTC</td>
+                                    <td style="text-align:center;">@row.RoomNo</td>
+                                    <td>@row.Rate</td>
+                                    <td style="text-align:right;">@row.RateAmount.ToString("N2")</td>
+                                    <td>@row.Market</td>
+                                    <td>@row.Source</td>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" checked="@row.IsFixed" disabled />
+                                    </td>
+                                </tr>
+
+                                @if (isExpanded && row.Packages != null && row.Packages.Any())
+                                {
+                                    <tr class="package-row">
+                                        <td colspan="14" style="padding:0; background:#f9fafb;">
+                                            <table class="package-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:200px; font-weight:700;">Package Header Description</th>
+                                                        <th style="width:60px; font-weight:700;">Id</th>
+                                                        <th style="width:160px; font-weight:700;">Registration Detail</th>
+                                                        <th style="width:120px; font-weight:700;">Package</th>
+                                                        <th style="width:100px; text-align:right; font-weight:700;">Amount</th>
+                                                        <th style="font-weight:700;">Remark</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var pkg in row.Packages)
+                                                    {
+                                                        <tr>
+                                                            <td>@(string.IsNullOrEmpty(pkg.PackageHeaderDescription) ? pkg.Package : pkg.PackageHeaderDescription)</td>
+                                                            <td>@(string.IsNullOrEmpty(pkg.Id) ? "1" : pkg.Id)</td>
+                                                            <td>@(string.IsNullOrEmpty(pkg.RegistrationDetail) ? "Standard" : pkg.RegistrationDetail)</td>
+                                                            <td>@pkg.Package</td>
+                                                            <td style="text-align:right;">@pkg.Amount.ToString("N2")</td>
+                                                            <td>@pkg.Remark</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="14" style="text-align:center; padding:12px; color:#777;">
+                                    No reservation detail rows available.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
 
         </div>
     </BodyContentTemplate>
 </DxPopup>
+
+<!-- Printable sheet dialog for Reservation Detail matching Image 2 -->
+<ReservationDetailPrintPopup @bind-Visible="showPrintPopup"
+                             RegistrationNo="@(ReservationId ?? "REG-00008-26")"
+                             Rows="@GetPrintRows()" />
 
 @code {
     [Parameter] public bool Visible { get; set; } = false;
@@ -98,10 +185,10 @@
     [Parameter] public string ReservationId { get; set; } = "REG-00008-26";
     [Parameter] public string RoomType { get; set; } = "Standard Room";
     [Parameter] public string ActualRTC { get; set; } = "Standard Room";
-    [Parameter] public string RoomNo { get; set; } = "103";
+    [Parameter] public string RoomNo { get; set; } = "107";
     [Parameter] public int Adult { get; set; } = 1;
     [Parameter] public int Child { get; set; } = 0;
-    [Parameter] public string Rate { get; set; } = "Standard Rate";
+    [Parameter] public string Rate { get; set; } = "Rate 1";
     [Parameter] public decimal RateAmount { get; set; } = 100.00m;
     [Parameter] public DateTime? ArrivalDate { get; set; }
     [Parameter] public DateTime? DepartureDate { get; set; }
@@ -109,6 +196,7 @@
     [Parameter] public string Source { get; set; } = "Membership M...";
 
     bool ExpandAll { get; set; }
+    bool showPrintPopup { get; set; }
     object? SelectedRow { get; set; }
 
     List<ReservationDetailRow> Rows { get; set; } = new();
@@ -139,14 +227,47 @@
                 RoomConfig = 1,
                 RoomType = !string.IsNullOrWhiteSpace(RoomType) ? RoomType : "Standard Room",
                 ActualRTC = !string.IsNullOrWhiteSpace(ActualRTC) ? ActualRTC : (!string.IsNullOrWhiteSpace(RoomType) ? RoomType : "Standard Room"),
-                RoomNo = !string.IsNullOrWhiteSpace(RoomNo) ? RoomNo : "103",
-                Rate = !string.IsNullOrWhiteSpace(Rate) ? Rate : "Standard Rate",
+                RoomNo = !string.IsNullOrWhiteSpace(RoomNo) ? RoomNo : "107",
+                Rate = !string.IsNullOrWhiteSpace(Rate) ? Rate : "Rate 1",
                 RateAmount = parsedRate,
                 Market = !string.IsNullOrWhiteSpace(Market) ? Market : "Reserved Tran...",
                 Source = !string.IsNullOrWhiteSpace(Source) ? Source : "Membership M...",
-                IsFixed = false
+                IsFixed = false,
+                Packages = new List<PackageRow>
+                {
+                    new()
+                    {
+                        PackageHeaderDescription = "Complimentary Breakfast",
+                        Id = "101",
+                        RegistrationDetail = "Breakfast Package",
+                        Package = "Breakfast",
+                        Amount = 25.0000m,
+                        Remark = "Standard Inclusions"
+                    }
+                }
             });
         }
+    }
+
+    List<DailyDetailRow> GetPrintRows()
+    {
+        return Rows.Select((r, idx) => new DailyDetailRow
+        {
+            SN = idx + 1,
+            Date = r.Date,
+            Adult = r.Adult,
+            Child = r.Child,
+            RoomCount = r.RoomConfig,
+            RoomType = r.RoomType,
+            ActualRTC = r.ActualRTC,
+            Room = r.RoomNo,
+            Rate = r.Rate,
+            RateAmount = r.RateAmount,
+            Market = r.Market,
+            Source = r.Source,
+            IsFixed = r.IsFixed,
+            Packages = r.Packages
+        }).ToList();
     }
 
     async Task CloseDialog()
@@ -157,27 +278,25 @@
 
     void OnRefresh()
     {
-        // TODO: reload reservation detail rows from the server
+        GenerateRows();
+        StateHasChanged();
     }
 
     void OnEdit()
     {
-        // TODO: switch grid/row into edit mode
     }
 
     void OnToPdf()
     {
-        // TODO: export grid to PDF
     }
 
     void OnToExcel()
     {
-        // TODO: export grid to Excel
     }
 
     void OnPrint()
     {
-        // TODO: print current view
+        showPrintPopup = true;
     }
 
     public class ReservationDetailRow
@@ -195,6 +314,8 @@
         public string Market { get; set; } = string.Empty;
         public string Source { get; set; } = string.Empty;
         public bool IsFixed { get; set; }
+        public bool Expanded { get; set; }
+        public List<PackageRow> Packages { get; set; } = new();
     }
 }
 
@@ -205,14 +326,14 @@
     }
 
     .resdetail-popup .dxbl-popup {
-        border-radius: 0;
+        border-radius: 2px;
     }
 
     .resdetail-container {
         display: flex;
         flex-direction: column;
         font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-        font-size: 12.5px;
+        font-size: 12px;
         color: #222;
         background: #ffffff;
     }
@@ -229,7 +350,7 @@
     }
 
     .resdetail-title-icon {
-        color: #c0392b;
+        color: #e83e8c;
         font-size: 13px;
         margin-right: 8px;
     }
@@ -258,7 +379,7 @@
         align-items: center;
         background: #f2f2f2;
         border-bottom: 1px solid #d6d6d6;
-        padding: 6px 10px;
+        padding: 4px 8px;
         gap: 4px;
     }
 
@@ -267,12 +388,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: 62px;
-        padding: 4px 2px;
+        min-width: 58px;
+        padding: 3px 4px;
         border-radius: 3px;
         cursor: pointer;
         color: #333;
         text-align: center;
+        user-select: none;
     }
 
     .resdetail-tbtn:hover {
@@ -287,21 +409,22 @@
     }
 
     .resdetail-icon {
+        font-size: 20px;
+        line-height: 1;
+        color: #6c757d;
+    }
+
+    .resdetail-icon-red-lg {
+        color: #d9271e;
         font-size: 22px;
         line-height: 1;
     }
 
-    .resdetail-icon-green   { color: #4caf50; }
-    .resdetail-icon-orange  { color: #ef8b1e; }
-    .resdetail-icon-red     { color: #d9271e; }
-    .resdetail-icon-red-lg  { color: #d9271e; font-size: 24px; }
-    .resdetail-icon-dark    { color: #2c3e50; }
-
     .resdetail-tbsep {
         width: 1px;
-        height: 38px;
+        height: 32px;
         background: #cfcfcf;
-        margin: 0 8px;
+        margin: 0 6px;
     }
 
     .resdetail-expandall {
@@ -314,7 +437,8 @@
     }
 
     .resdetail-expandall .resdetail-icon {
-        font-size: 18px;
+        font-size: 16px;
+        color: #6c757d;
     }
 
     .resdetail-expand-checkbox {
@@ -322,34 +446,84 @@
     }
 
     /* ================= Grid ================= */
-    .resdetail-gridwrap {
+    .detail-grid-wrap {
         padding: 0;
+        max-height: 480px;
+        overflow: auto;
     }
 
-    .resdetail-grid.dxbl-grid {
-        border: none;
-        border-radius: 0;
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11.5px;
     }
 
-    .resdetail-grid .dxbl-grid-header-cell {
-        background: #eef0f2 !important;
+    .detail-table th {
+        background: #eef0f2;
         font-weight: 600;
         color: #333;
-        border-bottom: 1px solid #c9c9c9 !important;
-        border-right: 1px solid #dcdcdc !important;
-        padding: 6px 8px !important;
+        border-bottom: 1px solid #c9c9c9;
+        border-right: 1px solid #dcdcdc;
+        padding: 5px 6px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-    .resdetail-grid .dxbl-grid-data-cell {
-        padding: 5px 8px !important;
-        border-right: 1px solid #eaeaea !important;
-        border-bottom: 1px solid #f0f0f0 !important;
+    .detail-table td {
+        padding: 4px 6px;
+        border-right: 1px solid #eaeaea;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
     }
 
-    /* Selected row styling to match the highlighted blue row in the reference */
-    .resdetail-grid .dxbl-grid-data-row.dxbl-grid-selected-row .dxbl-grid-data-cell {
-        background: #2f7ed8 !important;
+    .detail-table tr:hover {
+        background-color: #f5f9ff;
+    }
+
+    .detail-table tr.detail-selected td {
+        background-color: #2f7ed8 !important;
         color: #ffffff !important;
         border-right: 1px solid #1f66bc !important;
+    }
+
+    .expand-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        color: #666;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    .expand-btn:hover {
+        color: #1565c0;
+    }
+
+    /* Sub-table for Packages */
+    .package-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        margin: 0;
+        background: #ffffff;
+    }
+
+    .package-table th {
+        background: #f0f4f8 !important;
+        color: #333 !important;
+        font-weight: 700 !important;
+        padding: 4px 8px !important;
+        border-bottom: 1px solid #d0d7de !important;
+        border-right: 1px solid #e1e4e8 !important;
+    }
+
+    .package-table td {
+        padding: 4px 8px !important;
+        border-bottom: 1px solid #eaeaea !important;
+        border-right: 1px solid #eaeaea !important;
+        color: #333 !important;
     }
 </style>

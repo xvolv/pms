@@ -1,9 +1,10 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Shared
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
          HeaderText="Registrations Search"
-         Width="550px"
+         Width="580px"
          CloseOnOutsideClick="true"
          ShowCloseButton="true"
          CloseOnEscape="true"
@@ -11,28 +12,81 @@
     <BodyContentTemplate>
         <div class="lookup-modal-container">
             <div class="lookup-modal-searchrow">
-                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search registration code, guest or room..." />
-                <button type="button" class="lookup-modal-find-btn">Find</button>
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="" />
+                <button type="button" class="lookup-modal-find-btn" @onclick="@(() => {})">Find</button>
             </div>
+            
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredItems"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Code)" Caption="Code" Width="120px" />
-                        <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.Guest)" Caption="Guest" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomNumber)" Caption="Room Number" Width="110px" />
-                        <DxGridDataColumn FieldName="@nameof(RegistrationLookupItem.RoomType)" Caption="Room Type" Width="110px" />
-                    </Columns>
-                </DxGrid>
+                <table class="reg-search-table">
+                    <thead>
+                        <tr>
+                            @if (IsMultiSelect)
+                            {
+                                <th style="width:70px; text-align:left; padding-left:8px;">Selection</th>
+                            }
+                            <th style="width:115px;">Registration</th>
+                            <th style="width:55px;">Room</th>
+                            <th style="width:125px;">Guest</th>
+                            @if (IsMultiSelect)
+                            {
+                                <th>Company</th>
+                            }
+                            else
+                            {
+                                <th>Room Type</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (FilteredItems != null && FilteredItems.Any())
+                        {
+                            @foreach (var item in FilteredItems)
+                            {
+                                bool isSelected = IsMultiSelect ? item.Selected : (selectedRow?.Code == item.Code || SelectedItem?.Code == item.Code);
+                                <tr class="@(isSelected ? "reg-row-selected" : "")"
+                                    @onclick="() => ToggleItemSelection(item)"
+                                    @ondblclick="() => HandleRowDblClick(item)">
+                                    @if (IsMultiSelect)
+                                    {
+                                        <td style="text-align:center; padding:2px;">
+                                            <input type="checkbox" @bind="item.Selected" @onclick:stopPropagation="true" />
+                                        </td>
+                                    }
+                                    <td>@item.Code</td>
+                                    <td>@item.RoomNumber</td>
+                                    <td>@item.Guest</td>
+                                    @if (IsMultiSelect)
+                                    {
+                                        <td>@item.Company</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@item.RoomType</td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="@(IsMultiSelect ? 5 : 4)" style="text-align:center; padding:12px; color:#777;">
+                                    No registrations found.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
+
             <div class="lookup-modal-footer">
-                <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                @if (IsMultiSelect)
+                {
+                    <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleGo">GO</button>
+                }
+                else
+                {
+                    <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
+                }
                 <button type="button" class="lookup-modal-btn" @onclick="HandleClear">Clear</button>
                 <button type="button" class="lookup-modal-btn" @onclick="HandleClose">Close</button>
             </div>
@@ -43,27 +97,28 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public bool IsMultiSelect { get; set; }
 
     [Parameter] public List<RegistrationLookupItem>? Items { get; set; }
     [Parameter] public RegistrationLookupItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<RegistrationLookupItem?> SelectedItemChanged { get; set; }
     [Parameter] public EventCallback<RegistrationLookupItem> OnSelect { get; set; }
+    [Parameter] public EventCallback<List<RegistrationLookupItem>> OnMultiSelectCompleted { get; set; }
     [Parameter] public EventCallback OnClear { get; set; }
 
     string SearchText { get; set; } = "";
     RegistrationLookupItem? selectedRow;
-    IGrid? gridRef;
 
     List<RegistrationLookupItem> DefaultItems { get; } = new()
     {
-        new() { Code = "REG-00000-26", Guest = "JANE DOE", RoomNumber = "101", RoomType = "Standard" },
-        new() { Code = "REG-00001-26", Guest = "JANE DOE", RoomNumber = "205", RoomType = "Delux" },
-        new() { Code = "REG-00002-26", Guest = "JANE DOE", RoomNumber = "207", RoomType = "Delux" },
-        new() { Code = "REG-00003-26", Guest = "JANE DOE", RoomNumber = "208", RoomType = "Delux" },
-        new() { Code = "REG-00004-26", Guest = "JANE DOE", RoomNumber = "209", RoomType = "Delux" },
-        new() { Code = "REG-00005-26", Guest = "JANE DOE", RoomNumber = "210", RoomType = "Delux" },
-        new() { Code = "REG-00006-26", Guest = "JANE DOE", RoomNumber = "102", RoomType = "Standard" },
-        new() { Code = "REG-00007-26", Guest = "JANE DOE", RoomNumber = "103", RoomType = "Standard" }
+        new() { Code = "REG-00000-26", Guest = "JANE DOE", RoomNumber = "101", RoomType = "Standard", Company = "", Selected = true },
+        new() { Code = "REG-00001-26", Guest = "JANE DOE", RoomNumber = "205", RoomType = "Delux", Company = "RED CLOUD ICT S...", Selected = false },
+        new() { Code = "REG-00002-26", Guest = "JANE DOE", RoomNumber = "207", RoomType = "Delux", Company = "RED CLOUD ICT S...", Selected = false },
+        new() { Code = "REG-00003-26", Guest = "JANE DOE", RoomNumber = "208", RoomType = "Delux", Company = "", Selected = false },
+        new() { Code = "REG-00004-26", Guest = "JANE DOE", RoomNumber = "209", RoomType = "Delux", Company = "", Selected = false },
+        new() { Code = "REG-00005-26", Guest = "JANE DOE", RoomNumber = "210", RoomType = "Delux", Company = "", Selected = false },
+        new() { Code = "REG-00006-26", Guest = "JANE DOE", RoomNumber = "102", RoomType = "Standard", Company = "", Selected = false },
+        new() { Code = "REG-00007-26", Guest = "JANE DOE", RoomNumber = "103", RoomType = "Standard", Company = "", Selected = false }
     };
 
     List<RegistrationLookupItem> DataList => (Items != null && Items.Count > 0) ? Items : DefaultItems;
@@ -74,7 +129,8 @@
             : DataList.Where(i => (i.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (i.Guest?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (i.RoomNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                                  (i.RoomType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+                                  (i.RoomType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (i.Company?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
     protected override void OnParametersSet()
     {
@@ -84,34 +140,25 @@
         }
     }
 
-    void OnRowClick(GridRowClickEventArgs e)
+    void ToggleItemSelection(RegistrationLookupItem item)
     {
-        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RegistrationLookupItem;
-        if (item != null)
+        if (IsMultiSelect)
+        {
+            item.Selected = !item.Selected;
+        }
+        else
         {
             selectedRow = item;
+            SelectedItemChanged.InvokeAsync(item);
         }
     }
 
-    async Task OnRowDoubleClick(GridRowClickEventArgs e)
+    async Task HandleRowDblClick(RegistrationLookupItem item)
     {
-        var item = e.Grid?.GetDataItem(e.VisibleIndex) as RegistrationLookupItem;
-        if (item != null)
+        if (!IsMultiSelect)
         {
             selectedRow = item;
             await HandleSelect();
-        }
-    }
-
-    void OnCustomizeElement(GridCustomizeElementEventArgs e)
-    {
-        if (e.ElementType == GridElementType.DataRow && selectedRow != null)
-        {
-            var item = e.Grid?.GetDataItem(e.VisibleIndex) as RegistrationLookupItem;
-            if (item != null && item.Code == selectedRow.Code)
-            {
-                e.CssClass = "lookup-modal-row-selected";
-            }
         }
     }
 
@@ -125,11 +172,25 @@
         await HandleClose();
     }
 
+    async Task HandleGo()
+    {
+        var selectedList = DataList.Where(x => x.Selected).ToList();
+        await OnMultiSelectCompleted.InvokeAsync(selectedList);
+        await HandleClose();
+    }
+
     async Task HandleClear()
     {
-        selectedRow = null;
-        await SelectedItemChanged.InvokeAsync(null);
-        await OnClear.InvokeAsync();
+        if (IsMultiSelect)
+        {
+            foreach (var item in DataList) item.Selected = false;
+        }
+        else
+        {
+            selectedRow = null;
+            await SelectedItemChanged.InvokeAsync(null);
+            await OnClear.InvokeAsync();
+        }
         await HandleClose();
     }
 
@@ -145,3 +206,123 @@
         await VisibleChanged.InvokeAsync(visible);
     }
 }
+
+<style>
+    .global-lookup-popup .dxbl-popup-body-content {
+        padding: 0 !important;
+    }
+
+    .lookup-modal-container {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        padding: 10px 12px 6px 12px;
+        font-family: Arial, "Segoe UI", sans-serif;
+        font-size: 11.5px;
+    }
+
+    .lookup-modal-searchrow {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .lookup-modal-search-input {
+        flex: 1;
+        height: 24px;
+        border: 1px solid #a6b0bc;
+        padding: 2px 6px;
+        font-size: 11.5px;
+        outline: none;
+    }
+
+    .lookup-modal-find-btn {
+        width: 75px;
+        height: 24px;
+        background: #ffffff;
+        border: 1px solid #7c8895;
+        font-size: 11.5px;
+        cursor: pointer;
+    }
+
+    .lookup-modal-find-btn:hover {
+        background: #f0f3f6;
+    }
+
+    .lookup-modal-gridwrap {
+        height: 220px;
+        overflow-y: auto;
+        border: 1px solid #c5cbcf;
+        border-bottom: none;
+    }
+
+    .reg-search-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11.5px;
+    }
+
+    .reg-search-table th {
+        background: #f6f7f9;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 1px solid #c5cbcf;
+        border-right: 1px solid #e1e4e8;
+        padding: 4px 6px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .reg-search-table td {
+        padding: 3px 6px;
+        border-bottom: 1px solid #ebeef0;
+        border-right: 1px solid #ebeef0;
+        color: #333;
+    }
+
+    .reg-search-table tr {
+        cursor: pointer;
+    }
+
+    .reg-search-table tr:hover {
+        background-color: #f0f6ff;
+    }
+
+    .reg-search-table tr.reg-row-selected td {
+        background-color: #cfe7fd !important;
+    }
+
+    .lookup-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        border-top: 1px solid #c5cbcf;
+        padding-top: 6px;
+        margin-top: 6px;
+    }
+
+    .lookup-modal-btn {
+        min-width: 70px;
+        height: 24px;
+        background: #ffffff;
+        border: 1px solid #7c8895;
+        font-size: 11.5px;
+        cursor: pointer;
+    }
+
+    .lookup-modal-btn:hover {
+        background: #f0f3f6;
+    }
+
+    .lookup-modal-btn-select {
+        background: #0078d4;
+        color: #ffffff;
+        border-color: #0078d4;
+    }
+
+    .lookup-modal-btn-select:hover {
+        background: #106ebe;
+    }
+</style>
