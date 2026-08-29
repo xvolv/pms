@@ -76,8 +76,8 @@
 }
 
 .avatar {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
 
     flex-shrink: 0;
 
@@ -90,6 +90,7 @@
     justify-content: center;
 
     overflow: hidden;
+    border-radius:0px;
 }
 
 .avatar svg {
@@ -798,6 +799,7 @@
     .user-card {
         grid-area: user;
         min-width: 0;
+        border:1px solid red;
     }
 
     .logo-box {
@@ -817,7 +819,7 @@
     .cnet-logo-img {
         display: block;
 
-        width: 90px;
+        width: 98px;
         height: auto;
 
         object-fit: contain;

@@ -156,31 +156,26 @@
                         <!-- Pie: Today's Room Status -->
                         <div class="chart-card">
                             <div class="chart-title">Today's Room Status</div>
-                            @if (isLoading)
-                            {
-                                <LoadingSpinner Height="300px" />
-                            }
-                            else
-                            {
-                                <DxPieChart Data="@roomStatusData" Height="300px" Width="100%">
-                                    <DxChartLegend Visible="false" />
-                                    <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
-                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
-                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
-                                            <DxChartSeriesLabelConnector Visible="true" />
-                                        </DxChartSeriesLabel>
-                                    </DxPieChartSeries>
-                                </DxPieChart>
-                                <div class="legend-manual">
-                                    @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
-                                    {
-                                        <span class="leg-item">
-                                            <span class="dot" style="background:@GetPaletteColor(idx);"></span>
-                                            @slice.Name: @slice.Value.ToString("n2") %
-                                        </span>
-                                    }
-                                </div>
-                            }
+
+                            <DxPieChart Data="@roomStatusData" Height="300px" Width="100%">
+                                <DxChartLegend Visible="false" />
+                                <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
+                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                        <DxChartSeriesLabelConnector Visible="true" />
+                                    </DxChartSeriesLabel>
+                                </DxPieChartSeries>
+                            </DxPieChart>
+                            <div class="legend-manual">
+                                @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
+                                {
+                                    <span class="leg-item">
+                                        <span class="dot" style="background:@GetPaletteColor(idx);"></span>
+                                        @slice.Name: @slice.Value.ToString("n2") %
+                                    </span>
+                                }
+                            </div>
+
                         </div>
                     </div>
 
@@ -189,58 +184,49 @@
                         <!-- Pie: Room Occupancy -->
                         <div class="chart-card">
                             <div class="chart-title">Room Occupancy (Today)</div>
-                            @if (isLoading)
-                            {
-                                <LoadingSpinner Height="250px" />
-                            }
-                            else
-                            {
-                                <DxPieChart Data="@occupancyData" Height="250px" Width="100%">
-                                    <DxChartLegend Visible="false" />
-                                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
-                                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
-                                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
-                                            <DxChartSeriesLabelConnector Visible="true" />
-                                        </DxChartSeriesLabel>
-                                    </DxPieChartSeries>
-                                </DxPieChart>
-                                <div class="legend-manual">
-                                    @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
-                                    {
-                                        <span class="leg-item">
-                                            <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
-                                            @slice.Name: @slice.Value.ToString("n2") %
-                                        </span>
-                                    }
-                                </div>
-                            }
+
+                              
+                            <DxPieChart Data="@occupancyData" Height="250px" Width="100%">
+                                <DxChartLegend Visible="false" />
+                                <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                                  ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                        <DxChartSeriesLabelConnector Visible="true" />
+                                    </DxChartSeriesLabel>
+                                </DxPieChartSeries>
+                            </DxPieChart>
+                            <div class="legend-manual">
+                                @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
+                                {
+                                    <span class="leg-item">
+                                        <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
+                                        @slice.Name: @slice.Value.ToString("n2") %
+                                    </span>
+                                }
+                            </div>
+
                         </div>
 
                         <!-- Line: Reservations -->
                         <div class="chart-card">
                             <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
-                            @if (isLoading)
-                            {
-                                <LoadingSpinner Height="360px" />
-                            }
-                            else
-                            {
-                                <DxChart Data="@reservationData" Height="360px" Width="100%">
-                                    <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
-                                    <DxChartTooltip Enabled="true" />
-                                    <DxChartArgumentAxis>
-                                        <DxChartAxisLabel />
-                                    </DxChartArgumentAxis>
-                                    <DxChartValueAxis>
-                                        <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
-                                    </DxChartValueAxis>
-                                    <DxChartSplineAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
-                                                       ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
-                                                       Color="@reservationLineColor">
-                                        <DxChartSeriesPoint Visible="true" />
-                                    </DxChartSplineAreaSeries>
-                                </DxChart>
-                            }
+
+                            <DxChart Data="@reservationData" Height="360px" Width="100%">
+                                <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                                <DxChartTooltip Enabled="true" />
+                                <DxChartArgumentAxis>
+                                    <DxChartAxisLabel />
+                                </DxChartArgumentAxis>
+                                <DxChartValueAxis>
+                                    <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
+                                </DxChartValueAxis>
+                                <DxChartSplineAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                                         ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                                         Color="@reservationLineColor">
+                                    <DxChartSeriesPoint Visible="true" />
+                                </DxChartSplineAreaSeries>
+                            </DxChart>
+
                         </div>
                     </div>
                 </div>
@@ -270,21 +256,24 @@
                             <div class="rt-form-row">
                                 <div class="rt-form-field rt-form-field-wide">
                                     <label>Old Password</label>
-                                    <input type="password" class="rt-form-input rt-native-input" @bind="oldPassword" @bind:event="oninput" />
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="oldPassword"
+                                           @bind:event="oninput" />
                                 </div>
                             </div>
 
                             <div class="rt-form-row">
                                 <div class="rt-form-field rt-form-field-wide">
                                     <label>New Password</label>
-                                    <input type="password" class="rt-form-input rt-native-input" @bind="newPassword" @bind:event="oninput" />
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="newPassword"
+                                           @bind:event="oninput" />
                                 </div>
                             </div>
 
                             <div class="rt-form-row">
                                 <div class="rt-form-field rt-form-field-wide">
                                     <label>Confirm Password</label>
-                                    <input type="password" class="rt-form-input rt-native-input" @bind="confirmPassword" @bind:event="oninput" />
+                                    <input type="password" class="rt-form-input rt-native-input" @bind="confirmPassword"
+                                           @bind:event="oninput" />
                                 </div>
                             </div>
 
@@ -298,16 +287,20 @@
                                     Password Strength
                                     @if (!string.IsNullOrEmpty(newPassword))
                                     {
-                                        <span class="pwd-strength-level" style="color:@PasswordStrengthColor;">@PasswordStrengthLabel</span>
+                                        <span class="pwd-strength-level"
+                                              style="color:@PasswordStrengthColor;">@PasswordStrengthLabel</span>
                                     }
                                 </div>
                                 <div class="pwd-strength-track">
-                                    <div class="pwd-strength-fill" style="width:@(PasswordStrengthPercent)%; background-color:@PasswordStrengthColor;"></div>
+                                    <div class="pwd-strength-fill"
+                                         style="width:@(PasswordStrengthPercent)%; background-color:@PasswordStrengthColor;">
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="security-form-actions">
-                                <button type="button" class="btn btn-outline-secondary" @onclick="ClearPasswordForm">Clear</button>
+                                <button type="button" class="btn btn-outline-secondary"
+                                        @onclick="ClearPasswordForm">Clear</button>
                                 <button type="button" class="btn btn-primary" @onclick="ApplyPasswordChange">Apply</button>
                             </div>
                         </fieldset>
@@ -322,7 +315,8 @@
                                 <DxGridDataColumn FieldName="SN" Caption="SN" Width="60px" />
                                 <DxGridDataColumn FieldName="User" Caption="User" MinWidth="140" />
                                 <DxGridDataColumn FieldName="Description" Caption="Description" MinWidth="200" />
-                                <DxGridDataColumn FieldName="StartDate" Caption="Start Date" Width="150px" DisplayFormat="dd-MMM-yyyy HH:mm" />
+                                <DxGridDataColumn FieldName="StartDate" Caption="Start Date" Width="150px"
+                                                  DisplayFormat="dd-MMM-yyyy HH:mm" />
                                 <DxGridDataColumn FieldName="MachineName" Caption="Machine Name" MinWidth="150" />
                                 <DxGridDataColumn FieldName="OrganizationUnit" Caption="Organization Unit" MinWidth="160" />
                             </Columns>
@@ -580,7 +574,8 @@
 
     void ApplyPasswordChange()
     {
-        if (string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+        if (string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(newPassword) ||
+string.IsNullOrWhiteSpace(confirmPassword))
         {
             passwordFormError = "Please fill in all password fields.";
             return;
