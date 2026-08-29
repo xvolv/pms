@@ -1,0 +1,13 @@
+<div class="cnet-loading @CssClass" style="@(string.IsNullOrWhiteSpace(Height) ? null : $"height:{Height};")">
+    <div class="cnet-loading-spinner"></div>
+    @if (!string.IsNullOrWhiteSpace(Text))
+    {
+        <div class="cnet-loading-text">@Text</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Text { get; set; } = "Loading...";
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+}

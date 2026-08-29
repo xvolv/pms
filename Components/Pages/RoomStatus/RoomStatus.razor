@@ -22,17 +22,19 @@
             </button>
 
             <div class="rst-filters">
-                <div class="rst-filter-row">
-                    <span class="tb-label" style="width: 65px;">Hotel</span>
-                    <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" />
-                    @* <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox> *@
-                </div>
-                <div class="rst-filter-row">
-                    <span class="tb-label">Group by</span>
-                    <DxComboBox Data="@groupByOptions" @bind-Value="groupBy" CssClass="rt-detail-input" />
-                    <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox>
-                    <span class="tb-label">Date</span>
-                    <DxDateEdit @bind-Date="selectedDate" CssClass="rt-detail-input" style="width:130px;" />
+                <div class="hk-filter-group hk-filter-group-stack">
+                    <div class="rst-filter-row">
+                        <span class="tb-label" style="width: 65px;">Hotel</span>
+                        <DxComboBox Data="@hotels" @bind-Value="selectedHotel" CssClass="rt-detail-input" />
+                        @* <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox> *@
+                    </div>
+                    <div class="rst-filter-row">
+                        <span class="tb-label">Group by</span>
+                        <DxComboBox Data="@groupByOptions" @bind-Value="groupBy" CssClass="rt-detail-input" />
+                        <DxCheckBox @bind-Checked="showRoomStatus">Show Room Status</DxCheckBox>
+                        <span class="tb-label">Date</span>
+                        <DxDateEdit @bind-Date="selectedDate" CssClass="rt-detail-input" style="width:130px;" />
+                    </div>
                 </div>
             </div>
         </div>
