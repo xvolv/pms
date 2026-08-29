@@ -78,7 +78,7 @@
 
             <button type="button" class="toolbar-btn" @onclick="OpenAdminStateChange" @onclick:stopPropagation="true">
                 <div class="toolbar-icon"><i class="bi bi-shield-lock"></i></div>
-                <div class="toolbar-text">Admin State Change</div>
+                <div class="toolbar-text">Admin State<br />Change</div>
             </button>
 
             <div class="toolbar-dropdown">
@@ -130,7 +130,7 @@
                 </button>
                 @if (showPreviewMenu)
                 {
-                    <ul class="dropdown-menu show" style="min-width:190px;">
+                    <ul class="dropdown-menu show" style="min-width:170px;">
                         <li class="dropdown-item" @onclick="@(() => OnPreview("Folio"))">
                             <i class="bi bi-receipt me-2"></i>Folio
                         </li>
@@ -152,11 +152,16 @@
         </div>
 
         <div class="filter-columns">
+            <!-- Group 1: Room, Guest, State -->
             <div class="filter-col">
                 <div class="filter-row">
-                    <span class="filter-icon text-secondary" ><i class="bi bi-house-door-fill"></i></span>
+                    <span class="filter-icon text-secondary"><i class="bi bi-house-door-fill"></i></span>
                     <span class="filter-label">Room</span>
-                    <DxTextBox @bind-Text="filterRoom" Width="100%" SizeMode="SizeMode.Small" />
+                    <DxTextBox Text="@filterRoom" 
+                               TextChanged="@((string v) => { filterRoom = new string((v ?? "").Where(char.IsDigit).ToArray()); ApplyFilters(); })"
+                               Width="100%" 
+                               SizeMode="SizeMode.Small" 
+                               BindValueMode="BindValueMode.OnInput" />
                 </div>
                 <div class="filter-row">
                     <span class="filter-icon text-secondary"><i class="bi bi-person-fill"></i></span>
@@ -185,42 +190,144 @@
                 </div>
             </div>
 
+            <!-- Group 2: Arrival, Departure, 3rd Dynamic Row -->
             <div class="filter-col">
                 <div class="filter-row">
                     <span class="filter-label filter-label-plain">Arrival</span>
-                    <DxDateEdit @bind-Date="filterArrival" Width="100%" SizeMode="SizeMode.Small" />
+                    <DxDateEdit Date="@filterArrival" DateChanged="@((DateTime? d) => { filterArrival = d; ApplyFilters(); })"
+                                Width="100%" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="filter-row">
                     <span class="filter-label filter-label-plain">Departure</span>
-                    <DxDateEdit @bind-Date="filterDeparture" Width="100%" SizeMode="SizeMode.Small" />
+                    <DxDateEdit Date="@filterDeparture" DateChanged="@((DateTime? d) => { filterDeparture = d; ApplyFilters(); })"
+                                Width="100%" SizeMode="SizeMode.Small" />
                 </div>
                 <div class="filter-row">
-                    <span class="filter-label filter-label-plain">Company</span>
-                    <DxComboBox CssClass="erp-combobox" Data="@companyFilterList" @bind-Value="filterCompany" Width="100%"
-                                SizeMode="SizeMode.Small" />
+                    @switch (advancedFilterMode)
+                    {
+                        case "Agent":
+                            <span class="filter-label filter-label-plain">Travel Agent</span>
+                            <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showAgentSearch = true)">
+                                <DxTextBox Text="@filterAgent" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" />
+                                <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                            </div>
+                            break;
+                        case "Source":
+                            <span class="filter-label filter-label-plain">Source</span>
+                            <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showSourceSearch = true)">
+                                <DxTextBox Text="@filterSource" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" />
+                                <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                            </div>
+                            break;
+                        case "Group":
+                            <span class="filter-label filter-label-plain">Group</span>
+                            <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showGroupSearch = true)">
+                                <DxTextBox Text="@filterGroup" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" />
+                                <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                            </div>
+                            break;
+                        case "Contact":
+                            <span class="filter-label filter-label-plain">Contact</span>
+                            <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showContactSearch = true)">
+                                <DxTextBox Text="@filterContact" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" />
+                                <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                            </div>
+                            break;
+                        case "Market":
+                            <span class="filter-label filter-label-plain">Market</span>
+                            <DxTextBox Text="@filterMarket" TextChanged="@((string v) => { filterMarket = v; ApplyFilters(); })"
+                                       Width="100%" SizeMode="SizeMode.Small" BindValueMode="BindValueMode.OnInput" />
+                            break;
+                        case "RegistrationNo":
+                            <span class="filter-label filter-label-plain">Reg. No</span>
+                            <DxTextBox Text="@filterRegNo" TextChanged="@((string v) => { filterRegNo = v; ApplyFilters(); })"
+                                       Width="100%" SizeMode="SizeMode.Small" BindValueMode="BindValueMode.OnInput" />
+                            break;
+                        default:
+                            <span class="filter-label filter-label-plain">Company</span>
+                            <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showCompanySearch = true)">
+                                <DxTextBox Text="@filterCompany" ReadOnly="true" Width="100%"
+                                           CssClass="erp-combobox lookup-input" />
+                                <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                            </div>
+                            break;
+                    }
                 </div>
+            </div>
+
+            <!-- Middle Toolbar Buttons: Advanced Search and Print -->
+            <div class="toolbar-group toolbar-group-middle">
+                <div class="toolbar-dropdown">
+                    <button type="button" class="toolbar-btn @(showAdvancedSearchMenu ? "active" : "")" @onclick="ToggleAdvancedSearch">
+                        <div class="toolbar-icon"><i class="bi bi-search"></i></div>
+                        <div class="toolbar-text">Advanced<br />Search ▾</div>
+                    </button>
+                    @if (showAdvancedSearchMenu)
+                    {
+                        <ul class="dropdown-menu show" style="min-width: 140px;">
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("DateRange"))">Date Range</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Arrivals"))">Arrivals</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Arrived"))">Arrived</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Inhouse"))">Inhouse</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("StayOver"))">Stay Over</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("DueOut"))">Due Out</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Departed"))">Departed</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Company"))">Company</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("TravelAgent"))">Travel Agent</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Source"))">Source</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Group"))">Group</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Contact"))">Contact</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("Market"))">Market</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("RegistrationNo"))">Registration No</li>
+                            <li class="dropdown-item" @onclick="@(() => OnAdvancedSearch("PostMasters"))">Post Masters</li>
+                        </ul>
+                    }
+                </div>
+
+                <button type="button" class="toolbar-btn" @onclick="NoOp">
+                    <div class="toolbar-icon"><i class="bi bi-printer-fill"></i></div>
+                    <div class="toolbar-text">Print ▾</div>
+                </button>
+            </div>
+
+            <!-- Group 3: Range By, Start Date, End Date -->
+            <div class="filter-col">
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">Range By</span>
+                    <DxComboBox CssClass="erp-combobox" Data="@rangeByList" Value="@filterRangeBy"
+                                ValueChanged="@((string v) => { filterRangeBy = v; ApplyFilters(); })"
+                                Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">Start Date</span>
+                    <DxDateEdit Date="@filterStartDate" DateChanged="@((DateTime? d) => { filterStartDate = d; ApplyFilters(); })"
+                                Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label filter-label-plain">End Date</span>
+                    <DxDateEdit Date="@filterEndDate" DateChanged="@((DateTime? d) => { filterEndDate = d; ApplyFilters(); })"
+                                Width="100%" SizeMode="SizeMode.Small" />
+                </div>
+            </div>
+
+            <!-- Action Button: Clear Filter -->
+            <div class="toolbar-group toolbar-group-clear">
+                <button type="button" class="toolbar-btn" @onclick="ClearFilters" title="Clear Filter">
+                    <div class="toolbar-icon"><i class="bi bi-funnel"></i></div>
+                    <div class="toolbar-text">Clear<br />Filter</div>
+                </button>
             </div>
         </div>
 
-        <div class="toolbar-group" style="margin-left:auto;">
+        <!-- Search Criteria -->
+        <div class="search-criteria-group">
             <span class="search-criteria-label">Search Criteria:</span>
             <textarea class="search-criteria-textbox"
-          readonly
-          style="width: 200px; height: 100px; resize: none;">
-    @GetSearchCriteria()
-</textarea>
-            <button type="button" class="toolbar-btn" @onclick="ApplyFilters">
-                <div class="toolbar-icon"><i class="bi bi-search"></i></div>
-                <div class="toolbar-text">Advanced<br />Search ▾</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="NoOp">
-                <div class="toolbar-icon"><i class="bi bi-printer-fill"></i></div>
-                <div class="toolbar-text">Print ▾</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="ClearFilters" title="Clear Filter">
-                <div class="toolbar-icon"><i class="bi bi-x-lg"></i></div>
-                <div class="toolbar-text">Clear<br />Filter</div>
-            </button>
+                      readonly>@GetSearchCriteria()</textarea>
         </div>
     </div>
 
@@ -707,6 +814,32 @@
     FilterText="@roomFilterText"
     OnSelect="SelectRoom" />
 
+<!-- ========== GLOBAL LOOKUP SEARCH POPUPS ========== -->
+<CompanySearchPopup
+    @bind-Visible="showCompanySearch"
+    OnSelect="SelectCompanyFilter"
+    OnClear="ClearCompanyFilter" />
+
+<AgentSearchPopup
+    @bind-Visible="showAgentSearch"
+    OnSelect="SelectAgentFilter"
+    OnClear="ClearAgentFilter" />
+
+<SourceSearchPopup
+    @bind-Visible="showSourceSearch"
+    OnSelect="SelectSourceFilter"
+    OnClear="ClearSourceFilter" />
+
+<GroupSearchPopup
+    @bind-Visible="showGroupSearch"
+    OnSelect="SelectGroupFilter"
+    OnClear="ClearGroupFilter" />
+
+<ContactSearchPopup
+    @bind-Visible="showContactSearch"
+    OnSelect="SelectContactFilter"
+    OnClear="ClearContactFilter" />
+
 <!-- ========== PREVIEW POPUPS ========== -->
 
 <FolioPopup
@@ -769,8 +902,27 @@
     DateTime? filterArrival;
     DateTime? filterDeparture;
     string? filterCompany;
+    string? filterAgent;
+    string? filterSource;
+    string? filterGroup;
+    string? filterContact;
+    string filterMarket = "";
+    string filterRegNo = "";
+    string filterRangeBy = "";
+    DateTime? filterStartDate = new DateTime(2026, 8, 28);
+    DateTime? filterEndDate = new DateTime(2026, 8, 28);
+    string advancedFilterMode = "Company";
+    string activeAdvancedSearch = "";
+    bool showAdvancedSearchMenu = false;
 
-    List<string> stateFilterList = new() { "All", "Waiting List", "6PM", "Guaranteed", "Cancelled", "Checked In", "Checked Out", "Inhouse", "No show" };
+    bool showCompanySearch = false;
+    bool showAgentSearch = false;
+    bool showSourceSearch = false;
+    bool showGroupSearch = false;
+    bool showContactSearch = false;
+
+    List<string> rangeByList = new() { "", "Issued Date", "Arrival", "Departure" };
+    List<string> stateFilterList = new() { "All", "Waiting List", "6PM", "Guaranteed", "Cancelled", "Checked In", "Checked Out", "Inhouse", "No show", "PM" };
     List<string> guestFilterList = new() { "", "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun" };
     List<string> companyFilterList = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
 
@@ -932,12 +1084,180 @@
     }
 
     void NoOp() { }
-    void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
-    void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
-    void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
-    void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; showPreviewMenu = false; }
-    void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showPreviewMenu = false; }
-    void TogglePreview() { showPreviewMenu = !showPreviewMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; }
+    void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
+    void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
+    void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
+    void ToggleOptions() { showOptionsMenu = !showOptionsMenu; showActivitiesMenu = false; showAmendmentMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
+    void ToggleBilling() { showBillingMenu = !showBillingMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
+    void TogglePreview() { showPreviewMenu = !showPreviewMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showAdvancedSearchMenu = false; }
+    void ToggleAdvancedSearch() { showAdvancedSearchMenu = !showAdvancedSearchMenu; showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; }
+
+    void OnAdvancedSearch(string option)
+    {
+        showAdvancedSearchMenu = false;
+
+        switch (option)
+        {
+            case "DateRange":
+                activeAdvancedSearch = "Date Range";
+                filterRangeBy = "Arrival";
+                filterStartDate = businessDate;
+                filterEndDate = businessDate;
+                ApplyFilters();
+                break;
+
+            case "Arrivals":
+                activeAdvancedSearch = "Arrivals";
+                filterState = "All";
+                filterArrival = businessDate;
+                filterDeparture = null;
+                ApplyFilters();
+                break;
+
+            case "Arrived":
+                activeAdvancedSearch = "Arrived";
+                filterState = "Inhouse";
+                filterArrival = businessDate;
+                filterDeparture = null;
+                ApplyFilters();
+                break;
+
+            case "Inhouse":
+                activeAdvancedSearch = "Inhouse";
+                filterState = "Inhouse";
+                filterArrival = null;
+                filterDeparture = null;
+                ApplyFilters();
+                break;
+
+            case "StayOver":
+                activeAdvancedSearch = "Stay Overs";
+                filterState = "Inhouse";
+                filterArrival = null;
+                filterDeparture = null;
+                ApplyFilters();
+                break;
+
+            case "DueOut":
+                activeAdvancedSearch = "Due Out";
+                filterDeparture = businessDate;
+                filterArrival = null;
+                ApplyFilters();
+                break;
+
+            case "Departed":
+                activeAdvancedSearch = "Departed";
+                filterState = "Checked Out";
+                filterDeparture = businessDate;
+                filterArrival = null;
+                ApplyFilters();
+                break;
+
+            case "Company":
+                advancedFilterMode = "Company";
+                showCompanySearch = true;
+                break;
+
+            case "TravelAgent":
+                advancedFilterMode = "Agent";
+                showAgentSearch = true;
+                break;
+
+            case "Source":
+                advancedFilterMode = "Source";
+                showSourceSearch = true;
+                break;
+
+            case "Group":
+                advancedFilterMode = "Group";
+                showGroupSearch = true;
+                break;
+
+            case "Contact":
+                advancedFilterMode = "Contact";
+                showContactSearch = true;
+                break;
+
+            case "Market":
+                advancedFilterMode = "Market";
+                break;
+
+            case "RegistrationNo":
+                advancedFilterMode = "RegistrationNo";
+                break;
+
+            case "PostMasters":
+                activeAdvancedSearch = "Post Masters";
+                filterState = "PM";
+                ApplyFilters();
+                break;
+        }
+    }
+
+    void SelectCompanyFilter(CustomerItem c)
+    {
+        filterCompany = c.FirstName;
+        showCompanySearch = false;
+        ApplyFilters();
+    }
+    void ClearCompanyFilter()
+    {
+        filterCompany = null;
+        showCompanySearch = false;
+        ApplyFilters();
+    }
+
+    void SelectAgentFilter(AgentItem a)
+    {
+        filterAgent = a.Name;
+        showAgentSearch = false;
+        ApplyFilters();
+    }
+    void ClearAgentFilter()
+    {
+        filterAgent = null;
+        showAgentSearch = false;
+        ApplyFilters();
+    }
+
+    void SelectSourceFilter(SourceItem s)
+    {
+        filterSource = s.Name;
+        showSourceSearch = false;
+        ApplyFilters();
+    }
+    void ClearSourceFilter()
+    {
+        filterSource = null;
+        showSourceSearch = false;
+        ApplyFilters();
+    }
+
+    void SelectGroupFilter(GroupItem g)
+    {
+        filterGroup = g.Name;
+        showGroupSearch = false;
+        ApplyFilters();
+    }
+    void ClearGroupFilter()
+    {
+        filterGroup = null;
+        showGroupSearch = false;
+        ApplyFilters();
+    }
+
+    void SelectContactFilter(ContactItem c)
+    {
+        filterContact = c.FullName;
+        showContactSearch = false;
+        ApplyFilters();
+    }
+    void ClearContactFilter()
+    {
+        filterContact = null;
+        showContactSearch = false;
+        ApplyFilters();
+    }
 
     void OnPreview(string preview)
     {
@@ -956,10 +1276,60 @@
     string GetSearchCriteria()
     {
         var parts = new List<string>();
-        if (!string.IsNullOrWhiteSpace(filterState) && filterState != "All") parts.Add($"State = {filterState}");
-        if (filterArrival.HasValue) parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
-        if (parts.Count == 0) return "";
-        return string.Join(", ", parts);
+
+        if (!string.IsNullOrWhiteSpace(filterState))
+        {
+            parts.Add($"State = {filterState}");
+        }
+
+        if (filterArrival.HasValue)
+            parts.Add($"Arrival = {filterArrival.Value:M/d/yyyy}");
+
+        if (filterDeparture.HasValue)
+            parts.Add($"Departure = {filterDeparture.Value:M/d/yyyy}");
+
+        if (!string.IsNullOrWhiteSpace(activeAdvancedSearch))
+        {
+            parts.Add($"Advanced Search = {activeAdvancedSearch}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterRangeBy))
+        {
+            parts.Add($"Range By = {filterRangeBy}");
+            if (filterStartDate.HasValue)
+                parts.Add($"Start Date = {filterStartDate.Value:M/d/yyyy}");
+            if (filterEndDate.HasValue)
+                parts.Add($"End Date = {filterEndDate.Value:M/d/yyyy}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterRoom))
+            parts.Add($"Room = {filterRoom}");
+
+        if (!string.IsNullOrWhiteSpace(filterGuest))
+            parts.Add($"Guest = {filterGuest}");
+
+        if (!string.IsNullOrWhiteSpace(filterCompany))
+            parts.Add($"Company = {filterCompany}");
+
+        if (!string.IsNullOrWhiteSpace(filterAgent))
+            parts.Add($"Travel Agent = {filterAgent}");
+
+        if (!string.IsNullOrWhiteSpace(filterSource))
+            parts.Add($"Source = {filterSource}");
+
+        if (!string.IsNullOrWhiteSpace(filterGroup))
+            parts.Add($"Group = {filterGroup}");
+
+        if (!string.IsNullOrWhiteSpace(filterContact))
+            parts.Add($"Contact = {filterContact}");
+
+        if (!string.IsNullOrWhiteSpace(filterMarket))
+            parts.Add($"Market = {filterMarket}");
+
+        if (!string.IsNullOrWhiteSpace(filterRegNo))
+            parts.Add($"Reg. No = {filterRegNo}");
+
+        return string.Join("   ", parts);
     }
 
     bool IsActivityEnabled(string activity)
@@ -1601,20 +1971,121 @@
     void ApplyFilters()
     {
         filteredRegistrations = allRegistrations.Where(r =>
-            (string.IsNullOrWhiteSpace(filterRoom) || (!string.IsNullOrEmpty(r.Room) && r.Room.Contains(filterRoom, StringComparison.OrdinalIgnoreCase))) &&
-            (string.IsNullOrWhiteSpace(filterGuest) || r.Guest == filterGuest) &&
-            (filterState == "All" || r.State == filterState) &&
-            (filterArrival == null || r.Arrival.Date == filterArrival.Value.Date) &&
-            (filterDeparture == null || r.Departure.Date == filterDeparture.Value.Date) &&
-            (string.IsNullOrWhiteSpace(filterCompany) || r.Company == filterCompany)
-        ).ToList();
+        {
+            // Room filter
+            if (!string.IsNullOrWhiteSpace(filterRoom) && (string.IsNullOrEmpty(r.Room) || !r.Room.Contains(filterRoom, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            // Guest filter
+            if (!string.IsNullOrWhiteSpace(filterGuest) && r.Guest != filterGuest)
+                return false;
+
+            // State filter
+            if (filterState != "All" && r.State != filterState)
+                return false;
+
+            // Advanced: Stay Over filter (in-house staying past today)
+            if (activeAdvancedSearch == "StayOver")
+            {
+                if (r.State != "Inhouse" && r.State != "Checked In")
+                    return false;
+                if (r.Departure.Date <= businessDate.Date)
+                    return false;
+            }
+
+            // Advanced: Post Masters filter
+            if (activeAdvancedSearch == "PostMasters" || filterState == "PM")
+            {
+                if (r.State != "PM" && r.RoomType != "Pseudo Rooms" && r.RoomType != "PM")
+                    return false;
+            }
+
+            // Date Range filter
+            if (advancedFilterMode == "DateRange")
+            {
+                if (filterStartDate.HasValue && filterEndDate.HasValue)
+                {
+                    var start = filterStartDate.Value.Date;
+                    var end = filterEndDate.Value.Date;
+
+                    if (filterRangeBy == "Arrival Date" && (r.Arrival.Date < start || r.Arrival.Date > end))
+                        return false;
+                    else if (filterRangeBy == "Departure Date" && (r.Departure.Date < start || r.Departure.Date > end))
+                        return false;
+                    else if (filterRangeBy == "Stay Date" && (r.Departure.Date < start || r.Arrival.Date > end))
+                        return false;
+                }
+            }
+            else
+            {
+                // Standard Arrival & Departure filter
+                if (filterArrival != null && r.Arrival.Date != filterArrival.Value.Date)
+                    return false;
+
+                if (filterDeparture != null && r.Departure.Date != filterDeparture.Value.Date)
+                    return false;
+            }
+
+            // Company filter
+            if (!string.IsNullOrWhiteSpace(filterCompany) && r.Company != filterCompany)
+                return false;
+
+            // Travel Agent filter
+            if (!string.IsNullOrWhiteSpace(filterAgent) && r.Company != filterAgent && r.Guest != filterAgent)
+                return false;
+
+            // Source filter
+            if (!string.IsNullOrWhiteSpace(filterSource) && r.Company != filterSource)
+                return false;
+
+            // Group filter
+            if (!string.IsNullOrWhiteSpace(filterGroup) && r.Company != filterGroup)
+                return false;
+
+            // Contact filter
+            if (!string.IsNullOrWhiteSpace(filterContact) && r.Guest != filterContact)
+                return false;
+
+            // Market filter
+            if (!string.IsNullOrWhiteSpace(filterMarket))
+            {
+                if (!r.Company.Contains(filterMarket, StringComparison.OrdinalIgnoreCase) && !r.Guest.Contains(filterMarket, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            // Registration No filter
+            if (!string.IsNullOrWhiteSpace(filterRegNo))
+            {
+                if (!r.Registration.Contains(filterRegNo, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return true;
+        }).ToList();
+
         selectedReg = filteredRegistrations.FirstOrDefault();
         StateHasChanged();
     }
 
     void ClearFilters()
     {
-        filterRoom = ""; filterGuest = null; filterState = "Inhouse"; filterArrival = null; filterDeparture = null; filterCompany = null;
+        filterRoom = "";
+        filterGuest = null;
+        filterState = "Inhouse";
+        filterArrival = null;
+        filterDeparture = null;
+        filterCompany = null;
+        filterAgent = null;
+        filterSource = null;
+        filterGroup = null;
+        filterContact = null;
+        filterMarket = "";
+        filterRegNo = "";
+        filterRangeBy = "";
+        filterStartDate = new DateTime(2026, 8, 28);
+        filterEndDate = new DateTime(2026, 8, 28);
+        advancedFilterMode = "Company";
+        activeAdvancedSearch = "";
         ApplyFilters();
     }
 
