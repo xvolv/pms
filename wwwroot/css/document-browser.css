@@ -136,13 +136,13 @@
 
 .db-pr-filter-bar {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     gap: 26px;
-    background: #eef0ef;
-    border-bottom: 1px solid #c9c9c9;
+    background: white;
+    border: 1px solid #c9c9c9;
     padding: 6px 14px;
     flex-wrap: wrap;
-    margin-top: 4px;
+    margin: 4px  0px;
 }
 
 /* Show / Export — plain buttons, icon on top / label below,
