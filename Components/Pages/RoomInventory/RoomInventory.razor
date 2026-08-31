@@ -226,8 +226,183 @@
     </div>
 </div>
 
-<InfoDialog Visible="@showPrintInfo" Title="Information" Message="Print preview isn't set up yet."
-            OnOk="() => showPrintInfo = false" />
+<DevExpressPrintPreview
+    @bind-Visible="showPrintPreview"
+    Title="Print Dialog"
+    DocumentTitle="Room Inventory"
+    PrintElementId="room-inventory-print-area"
+    IsLandscape="@(activeTabIndex == 0)"
+    IsMaximized="true">
+
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">@(selectedHotel ?? "MAIN TEST HOTEL")</div>
+        <div class="dx-report-doc-title">
+            @(activeTabIndex == 0 ? "Monthly Room Inventory" : "Daily Room Inventory")
+        </div>
+    </div>
+
+    <div class="dx-report-meta-row" style="justify-content: space-between;">
+        <span>Month : @selectedMonth @selectedYear</span>
+        <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    @if (activeTabIndex == 0)
+    {
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th>Room Type</th>
+                    @for (int d = 1; d <= DaysInMonth; d++)
+                    {
+                        <th style="text-align:center;">@d</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in inventoryRows)
+                {
+                    <tr>
+                        <td>@row.RoomType</td>
+                        @for (int d = 1; d <= DaysInMonth; d++)
+                        {
+                            <td style="text-align:center;">@row.DailyCounts[d]</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    @for (int d = 1; d <= DaysInMonth; d++)
+                    {
+                        <td style="text-align:center;"><strong>@GetTotal(d)</strong></td>
+                    }
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="ri-chart-card">
+            <DxChart Data="@ChartData" Height="320px" Width="100%">
+                <DxChartArgumentAxis>
+                    <DxChartAxisLabel />
+                </DxChartArgumentAxis>
+
+                <DxChartSplineAreaSeries T="RoomInventoryChartPoint" TArgument="int" TValue="int"
+                                         ArgumentField="@(x => x.Day)" ValueField="@(x => x.Total)" Name="Total Room Inventory"
+                                         Color="@chartColor">
+                    <DxChartSeriesPoint Visible="true" />
+                </DxChartSplineAreaSeries>
+            </DxChart>
+        </div>
+    }
+    else
+    {
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th>Room Type</th>
+                    <th>Total Room</th>
+                    <th>Total Registration</th>
+                    <th>InHouse Room</th>
+                    <th>Stay Over Room</th>
+                    <th>Due Out Room</th>
+                    <th>Check Out Room</th>
+                    <th>6PM Room</th>
+                    <th>Real Time Available</th>
+                    <th>Forcasted Available</th>
+                    <th>Real Time Occ.</th>
+                    <th>Forcasted Occ.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in dailyInventoryRows)
+                {
+                    <tr>
+                        <td>@row.RoomType</td>
+                        <td style="text-align:right;">@row.TotalRoom</td>
+                        <td style="text-align:right;">@row.TotalRegistration</td>
+                        <td style="text-align:right;">@row.InHouseRoom</td>
+                        <td style="text-align:right;">@row.StayOverRoom</td>
+                        <td style="text-align:right;">@row.DueOutRoom</td>
+                        <td style="text-align:right;">@row.CheckOutRoom</td>
+                        <td style="text-align:right;">@row.SixPMRoom</td>
+                        <td style="text-align:right;">@row.RealTimeAvailable</td>
+                        <td style="text-align:right;">@row.ForecastedAvailable</td>
+                        <td style="text-align:right;">@row.RealTimeOccPercent.ToString("n2") %</td>
+                        <td style="text-align:right;">@row.ForecastedOccPercent.ToString("n2") %</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.TotalRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.TotalRegistration)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.InHouseRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.StayOverRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.DueOutRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.CheckOutRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.SixPMRoom)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.RealTimeAvailable)</strong></td>
+                    <td style="text-align:right;"><strong>@dailyInventoryRows.Sum(r => r.ForecastedAvailable)</strong></td>
+                    <td style="text-align:right;"><strong>@DailyTotalOccPercent(r => r.RealTimeAvailable).ToString("n2") %</strong></td>
+                    <td style="text-align:right;"><strong>@DailyTotalOccPercent(r => r.ForecastedAvailable).ToString("n2") %</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="ri-chart-card" style="display:flex; gap:24px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:280px;">
+                <div class="chart-title">Real Time Occupancy</div>
+                <DxPieChart Data="@RealTimeOccupancyData" Height="280px" Width="100%"
+                            CustomizeSeriesPoint="@CustomizeOccupancyPointColor">
+                    <DxChartLegend Visible="false" />
+                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Real Time Occupancy">
+                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                            <DxChartSeriesLabelConnector Visible="true" />
+                        </DxChartSeriesLabel>
+                    </DxPieChartSeries>
+                </DxPieChart>
+                <div class="legend-manual">
+                    @foreach (var (slice, idx) in RealTimeOccupancyData.Select((s, i) => (s, i)))
+                    {
+                        <span class="leg-item">
+                            <span class="dot" style="background:@(idx == 0 ? "#43a047" : "#e53935");"></span>
+                            @slice.Name: @slice.Value.ToString("n2") %
+                        </span>
+                    }
+                </div>
+            </div>
+            <div style="flex:1; min-width:280px;">
+                <div class="chart-title">Forcasted Occupancy</div>
+                <DxPieChart Data="@ForecastedOccupancyData" Height="280px" Width="100%"
+                            CustomizeSeriesPoint="@CustomizeOccupancyPointColor">
+                    <DxChartLegend Visible="false" />
+                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Forcasted Occupancy">
+                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                            <DxChartSeriesLabelConnector Visible="true" />
+                        </DxChartSeriesLabel>
+                    </DxPieChartSeries>
+                </DxPieChart>
+                <div class="legend-manual">
+                    @foreach (var (slice, idx) in ForecastedOccupancyData.Select((s, i) => (s, i)))
+                    {
+                        <span class="leg-item">
+                            <span class="dot" style="background:@(idx == 0 ? "#43a047" : "#e53935");"></span>
+                            @slice.Name: @slice.Value.ToString("n2") %
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
 @code {
     private int activeTabIndex = 0;
@@ -247,7 +422,7 @@
 
     private List<RoomInventoryRow> inventoryRows = new();
     private Dictionary<int, string> remarks = new();
-    private bool showPrintInfo;
+    private bool showPrintPreview;
     private System.Drawing.Color chartColor = System.Drawing.Color.FromArgb(0x44, 0x72, 0xc4);
 
     private List<DailyRoomInventoryRow> dailyInventoryRows = new();
@@ -379,7 +554,7 @@
 
     private void Refresh() => GenerateInventory();
 
-    private void OpenPrintPreview() => showPrintInfo = true;
+    private void OpenPrintPreview() => showPrintPreview = true;
 
     private void ClosePage() => NavigationManager.NavigateTo("/dashboard");
 

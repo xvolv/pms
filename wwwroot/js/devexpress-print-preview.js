@@ -66,6 +66,15 @@ window.DxDocViewer = {
         });
 
         var printStyles = '<style>' +
+            // The copied stylesheets include devexpress-print-preview.css, whose
+            // own @media print rules hide the whole page except
+            // .dx-doc-viewer-backdrop (the fallback path for a plain
+            // window.print()). This iframe's body IS already just the isolated
+            // print content - it never has that backdrop wrapper - so that
+            // inherited rule would hide everything with nothing left to
+            // restore, printing a blank page. Force it back to visible here,
+            // after the copied sheets so this wins the cascade.
+            '@media print { body, body * { visibility: visible !important; } } ' +
             '@page { size: auto; margin: 8mm 10mm; } ' +
             'html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; } ' +
             '.dx-doc-page-sheet { box-shadow: none !important; width: 100% !important; min-height: auto !important; padding: 0 !important; margin: 0 !important; } ' +
@@ -77,10 +86,37 @@ window.DxDocViewer = {
         doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Document</title>' + styles + printStyles + '</head><body>' + clone.outerHTML + '</body></html>');
         doc.close();
 
-        setTimeout(function () {
+        // Wait for the injected stylesheets to actually finish loading before
+        // printing, instead of a fixed delay. One of them (bootstrap-icons) is
+        // fetched from a CDN, so a fixed timeout races the network and can
+        // fire print() against an unstyled/unpainted document - producing a
+        // blank page intermittently depending on cache/network timing rather
+        // than which page triggered it.
+        var linkEls = Array.prototype.slice.call(doc.querySelectorAll('link[rel="stylesheet"]'));
+        var pending = linkEls.length;
+        var printed = false;
+        function triggerPrint() {
+            if (printed) return;
+            printed = true;
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
-        }, 300);
+        }
+        function onOneSettled() {
+            pending--;
+            if (pending <= 0) {
+                setTimeout(triggerPrint, 50);
+            }
+        }
+        if (pending === 0) {
+            setTimeout(triggerPrint, 50);
+        } else {
+            linkEls.forEach(function (link) {
+                link.addEventListener('load', onOneSettled);
+                link.addEventListener('error', onOneSettled);
+            });
+        }
+        // Safety net in case a stylesheet never fires load/error.
+        setTimeout(triggerPrint, 2000);
     },
 
     /**

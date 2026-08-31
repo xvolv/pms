@@ -363,7 +363,8 @@
                                                                                                                                                         </div>
 
                                                                                                                                                         <!-- 25. Close Button (Red Circle with X) -->
-                                                                                                                                                        @* <button type="button" class="dx-doc-tb-btn btn-danger-close" style="margin-left: auto;" title="Close Print Preview" @onclick="CloseViewer">
+                                                                                                                                                        @* <button type="button" class="dx-doc-tb-btn btn-danger-close" style="margin-left: auto;" title="Close
+            Print Preview" @onclick="CloseViewer">
                     <i class="bi bi-x-circle-fill" style="font-size: 16px; color:#d32f2f;"></i>
                 </button> *@
                                                                                                                                                     </div>
@@ -383,7 +384,7 @@
                                                                                                                                                                     @if (searchTotalMatches > 0)
                                                                                                                                                                     {
                                                                                                                                                                         <span class="dx-doc-search-count">@searchCurrentIndex of @searchTotalMatches match@(searchTotalMatches > 1 ?
-                                                                                                                                                                                                                                                                                                                                                         "es" : "")</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "es" : "")</span>
                                                                                                                                                                         }
                     else if (!string.IsNullOrWhiteSpace(searchQuery))
                                                                                                                                                                         {
