@@ -166,8 +166,11 @@
                 <div class="filter-row">
                     <span class="filter-icon text-secondary"><i class="bi bi-person-fill"></i></span>
                     <span class="filter-label">Guest</span>
-                    <DxComboBox CssClass="erp-combobox" Data="@guestFilterList" @bind-Value="filterGuest" Width="100%"
-                                SizeMode="SizeMode.Small" />
+                    <div class="lookup-field" style="width: 100%; cursor: pointer;" @onclick="@(() => showGuestSearch = true)">
+                        <DxTextBox Text="@filterGuest" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" />
+                        <button type="button" class="lookup-toggle-btn" tabindex="-1">▾</button>
+                    </div>
                 </div>
                 <div class="filter-row">
                     <span class="filter-icon text-secondary"><i class="bi bi-star-fill text-secondary"></i></span>
@@ -288,7 +291,7 @@
                     }
                 </div>
 
-                <button type="button" class="toolbar-btn" @onclick="NoOp">
+                <button type="button" class="toolbar-btn" @onclick="OpenRegistrationsListPrint">
                     <div class="toolbar-icon"><i class="bi bi-printer-fill"></i></div>
                     <div class="toolbar-text">Print ▾</div>
                 </button>
@@ -578,12 +581,7 @@
     Customer="@(selectedReg?.Guest ?? "")"
     VoucherNo="CRV-56553" Date="@businessDate" RegNo="@(selectedReg?.Registration ?? "")"
     OnSave="@(() => { showCashReceipt = false; ShowInfo("Cash receipt saved."); })"
-    OnForeignCurrency="@(() => showForeignCurrency = true)"
-    OnOpenCustomerFind="@(() => showCrCustomerFind = true)" />
-
-<CrCustomerFindPopup
-    @bind-Visible="showCrCustomerFind"
-    OnOk="@(() => showCrCustomerFind = false)" />
+    OnForeignCurrency="@(() => showForeignCurrency = true)" />
 
 <ForeignCurrencyPopup
     @bind-Visible="showForeignCurrency"
@@ -642,6 +640,99 @@
         <div class="confirm-footer">
             <button type="button" class="btn btn-primary btn-sm" @onclick="ConfirmRoomAssignment">OK</button>
             <button type="button" class="btn btn-secondary btn-sm" @onclick="@(() => showRoomAssignConfirm = false)">Cancel</button>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ==================== REGISTRATIONS LIST PRINT PREVIEW MODAL ==================== -->
+<DxPopup @bind-Visible="showRegistrationsListPrint" HeaderText="Registrations List - Print" Width="980px"
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar" style="margin-bottom: 10px;">
+            <button type="button" class="ci-btn" onclick="window.print()">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print Document</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => showRegistrationsListPrint = false)">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+
+        <div class="reg-print-sheet" id="reg-list-print-area">
+            <div class="reg-print-header">
+                <div class="reg-print-hotel">TEST HOTEL</div>
+                <div class="reg-print-title">Registrations List</div>
+            </div>
+
+            <div class="reg-print-submeta">
+                <div class="reg-print-state">State = @(string.IsNullOrEmpty(filterState) || filterState == "All" ? "Inhouse" : filterState)</div>
+                <div class="reg-print-date">Date : @DateTime.Today.ToString("M/d/yyyy")</div>
+            </div>
+
+            <table class="reg-print-table">
+                <thead>
+                    <tr>
+                        <th style="width: 110px;">Registration</th>
+                        <th style="width: 55px; text-align: center;">Room</th>
+                        <th style="width: 95px;">Room Type</th>
+                        <th>Guest</th>
+                        <th>Company</th>
+                        <th style="width: 80px; text-align: center;">Arrival</th>
+                        <th style="width: 80px; text-align: center;">Departure</th>
+                        <th style="width: 75px; text-align: center;"># of Night</th>
+                        <th style="width: 75px;">Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (filteredRegistrations != null && filteredRegistrations.Any())
+                    {
+                        @foreach (var row in filteredRegistrations)
+                        {
+                            <tr>
+                                <td>@row.Registration</td>
+                                <td style="text-align: center;">@row.Room</td>
+                                <td>@row.RoomType</td>
+                                <td>@row.Guest</td>
+                                <td>@row.Company</td>
+                                <td style="text-align: center;">@row.Arrival.ToString("M/d/yyyy")</td>
+                                <td style="text-align: center;">@row.Departure.ToString("M/d/yyyy")</td>
+                                <td style="text-align: center;">@row.Nights</td>
+                                <td>@row.Payment</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" style="text-align:center; color:#888; padding:16px;">No registrations found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="reg-print-signatures">
+                <div class="reg-sig-col">
+                    <div class="reg-sig-line"></div>
+                    <div class="reg-sig-text">Prepared By</div>
+                </div>
+                <div class="reg-sig-col">
+                    <div class="reg-sig-line"></div>
+                    <div class="reg-sig-text">Checked By</div>
+                </div>
+                <div class="reg-sig-col">
+                    <div class="reg-sig-line"></div>
+                    <div class="reg-sig-text">Approved By</div>
+                </div>
+                <div class="reg-sig-col">
+                    <div class="reg-sig-line"></div>
+                    <div class="reg-sig-text">Authorized By</div>
+                </div>
+            </div>
+
+            <div class="reg-print-footer">
+                ERP System
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
@@ -815,6 +906,12 @@
     OnSelect="SelectRoom" />
 
 <!-- ========== GLOBAL LOOKUP SEARCH POPUPS ========== -->
+<GuestSearchPopup
+    @bind-Visible="showGuestSearch"
+    Guests="@guestLookupList"
+    OnSelect="SelectGuestFilter"
+    OnClear="ClearGuestFilter" />
+
 <CompanySearchPopup
     @bind-Visible="showCompanySearch"
     OnSelect="SelectCompanyFilter"
@@ -915,6 +1012,7 @@
     string activeAdvancedSearch = "";
     bool showAdvancedSearchMenu = false;
 
+    bool showGuestSearch = false;
     bool showCompanySearch = false;
     bool showAgentSearch = false;
     bool showSourceSearch = false;
@@ -924,6 +1022,18 @@
     List<string> rangeByList = new() { "", "Issued Date", "Arrival", "Departure" };
     List<string> stateFilterList = new() { "All", "Waiting List", "6PM", "Guaranteed", "Cancelled", "Checked In", "Checked Out", "Inhouse", "No show", "PM" };
     List<string> guestFilterList = new() { "", "Solomon Tuffa Bereket", "miskir engida engida", "Solman Jack Jemes", "Taddeses ARABA Mola", "teshome mola", "Leo Rojas", "nathan w/mickael", "muse zemedkun" };
+    List<GuestItem> guestLookupList = new()
+    {
+        new() { FirstName = "Leo", MiddleName = "Rojas" },
+        new() { FirstName = "teshome", MiddleName = "mola" },
+        new() { FirstName = "Solomon", MiddleName = "Tuffa Bereket" },
+        new() { FirstName = "miskir", MiddleName = "engida engida" },
+        new() { FirstName = "Taddeses", MiddleName = "ARABA Mola" },
+        new() { FirstName = "Solman", MiddleName = "Jack Jemes" },
+        new() { FirstName = "nathan", MiddleName = "w/mickael" },
+        new() { FirstName = "abel", MiddleName = "kaleab" },
+        new() { FirstName = "muse", MiddleName = "zemedkun" }
+    };
     List<string> companyFilterList = new() { "", "Fish", "MISIKIR LTD", "MELAKE LTD", "ZERIHUN GIRMA W/GIORGIS", "ABENEZER LTD", "TESLA MOTORS" };
 
     List<RegistrationRow> allRegistrations = new();
@@ -994,6 +1104,7 @@
     bool showRateSummaryPreview = false;
     bool showRegistrationCardPreview = false;
     bool showConfirmationCardPreview = false;
+    bool showRegistrationsListPrint = false;
 
     List<AccompanyGuestRow> accompanyGuests = new();
     AccompanyGuestRow? selectedAccompanyGuest;
@@ -1003,7 +1114,6 @@
     EditDetailModel editDetail = new();
     List<RoomChargeRow> roomChargeRows = new();
     UserItem? selectedUserItem;
-    bool showCrCustomerFind = false;
     bool showBtGuestFind = false;
 
     Dictionary<string, string> stateColors = new()
@@ -1084,6 +1194,7 @@
     }
 
     void NoOp() { }
+    void OpenRegistrationsListPrint() { showRegistrationsListPrint = true; }
     void CloseMenus() { showActivitiesMenu = false; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
     void ToggleActivities() { showActivitiesMenu = !showActivitiesMenu; showAmendmentMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
     void ToggleAmendment() { showAmendmentMenu = !showAmendmentMenu; showActivitiesMenu = false; showOptionsMenu = false; showBillingMenu = false; showPreviewMenu = false; showAdvancedSearchMenu = false; }
@@ -1192,6 +1303,19 @@
                 ApplyFilters();
                 break;
         }
+    }
+
+    void SelectGuestFilter(GuestItem g)
+    {
+        filterGuest = g.FullName;
+        showGuestSearch = false;
+        ApplyFilters();
+    }
+    void ClearGuestFilter()
+    {
+        filterGuest = null;
+        showGuestSearch = false;
+        ApplyFilters();
     }
 
     void SelectCompanyFilter(CustomerItem c)
@@ -1977,7 +2101,7 @@
                 return false;
 
             // Guest filter
-            if (!string.IsNullOrWhiteSpace(filterGuest) && r.Guest != filterGuest)
+            if (!string.IsNullOrWhiteSpace(filterGuest) && (string.IsNullOrEmpty(r.Guest) || !r.Guest.Contains(filterGuest, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
             // State filter

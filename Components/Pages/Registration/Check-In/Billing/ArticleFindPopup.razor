@@ -1,45 +1,182 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup @bind-Visible="Visible" HeaderText="Article" Width="420px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible" HeaderText="Articles" Width="480px"
+         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
     <BodyContentTemplate>
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <DxTextBox Width="100%" SizeMode="SizeMode.Small" />
-            <DxButton Text="Find" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" />
-        </div>
-        <table class="multi-table" style="width:100%;">
-            <thead><tr><th>Code</th><th>Name</th></tr></thead>
-            <tbody>
-                @foreach (var a in Articles)
-                {
-                    <tr style="cursor:pointer;" @onclick="() => HandleSelect(a)">
-                        <td>@a.Code</td>
-                        <td>@a.Name</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <div style="margin-top:10px; text-align:right;">
-            <DxButton Text="Clear" SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
-                      Click="HandleClear" />
+        <div class="article-find-container">
+            <div class="article-find-search-row">
+                <input class="article-find-input" placeholder="Search article..." @bind="searchText" @bind:event="oninput" />
+                <button type="button" class="article-find-btn" @onclick="DoSearch">Find</button>
+            </div>
+
+            <div class="article-table-wrapper">
+                <table class="article-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 24px;"></th>
+                            <th style="width: 140px;">Code</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in FilteredArticles)
+                        {
+                            <tr class="@(selectedArticle == a ? "selected-row" : "")"
+                                @onclick="() => selectedArticle = a"
+                                @ondblclick="() => HandleSelect(a)">
+                                <td class="arrow-cell">@(selectedArticle == a ? "▶" : "")</td>
+                                <td>@a.Code</td>
+                                <td>@a.Name</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="article-find-footer">
+                <button type="button" class="article-clear-btn" @onclick="HandleClear">Clear</button>
+            </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
+<style>
+    .article-find-container {
+        padding: 4px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .article-find-search-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+    .article-find-input {
+        flex: 1;
+        height: 26px;
+        padding: 2px 6px;
+        font-size: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 2px;
+        outline: none;
+    }
+    .article-find-input:focus {
+        border-color: #3b82f6;
+    }
+    .article-find-btn {
+        padding: 2px 14px;
+        height: 26px;
+        font-size: 12px;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+    .article-find-btn:hover {
+        background: #e2e8f0;
+    }
+    .article-table-wrapper {
+        border: 1px solid #cbd5e1;
+        max-height: 240px;
+        overflow-y: auto;
+        background: #fff;
+    }
+    .article-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    .article-table th {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        text-align: left;
+        padding: 4px 8px;
+        border-bottom: 1px solid #cbd5e1;
+        border-right: 1px solid #e2e8f0;
+    }
+    .article-table td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+        color: #1e293b;
+    }
+    .article-table tr {
+        cursor: pointer;
+    }
+    .article-table tr:hover {
+        background: #f8fafc;
+    }
+    .article-table tr.selected-row {
+        background: #e0f2fe !important;
+        color: #0369a1;
+        font-weight: 500;
+    }
+    .article-table tr.selected-row td {
+        color: #0369a1;
+    }
+    .arrow-cell {
+        text-align: center;
+        color: #0284c7;
+        font-size: 9px;
+        padding: 2px 4px !important;
+    }
+    .article-find-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    .article-clear-btn {
+        padding: 3px 18px;
+        font-size: 12px;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+    .article-clear-btn:hover {
+        background: #f1f5f9;
+    }
+</style>
+
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
-    [Parameter] public List<ArticleItem> Articles { get; set; } = new();
+    [Parameter] public List<ArticleItem> Articles { get; set; } = new()
+    {
+        new() { Code = "RC-0001-26", Name = "ROOM CHARGE" },
+        new() { Code = "BF-0002-26", Name = "BREAKFAST" },
+        new() { Code = "LD-0003-26", Name = "LAUNDRY" },
+        new() { Code = "MB-0004-26", Name = "MINIBAR" },
+        new() { Code = "PK-0005-26", Name = "BED AND BREAKFAST" },
+        new() { Code = "SP-0006-26", Name = "SPA SERVICE" },
+        new() { Code = "TR-0007-26", Name = "AIRPORT TRANSFER" }
+    };
     [Parameter] public EventCallback<string?> OnSelect { get; set; }
+
+    string searchText = "";
+    ArticleItem? selectedArticle;
+
+    IEnumerable<ArticleItem> FilteredArticles => string.IsNullOrWhiteSpace(searchText)
+        ? Articles
+        : Articles.Where(a => (a.Code != null && a.Code.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                           || (a.Name != null && a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    void DoSearch()
+    {
+        StateHasChanged();
+    }
 
     async Task HandleSelect(ArticleItem a)
     {
+        selectedArticle = a;
         await OnSelect.InvokeAsync(a.Name);
         await VisibleChanged.InvokeAsync(false);
     }
+
     async Task HandleClear()
     {
+        selectedArticle = null;
         await OnSelect.InvokeAsync(null);
         await VisibleChanged.InvokeAsync(false);
     }
