@@ -328,6 +328,132 @@
 
         </DxTabs>
     </div>
+
+    <DevExpressPrintPreview
+        @bind-Visible="showPrintPreview"
+        Title="Print Dialog"
+        DocumentTitle="Dashboard"
+        PrintElementId="dashboard-print-area"
+        IsMaximized="true">
+
+        <div class="dx-report-header">
+            <div class="dx-report-hotel-title">@(selectedDashboardHotel ?? "MAIN TEST HOTEL")</div>
+            <div class="dx-report-doc-title">Dashboard</div>
+        </div>
+
+        <div class="dx-report-meta-row" style="justify-content: flex-end;">
+            <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+        </div>
+
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th style="width: 45px; text-align: center;">SN</th>
+                    <th>Task</th>
+                    <th style="width: 90px; text-align: right;">Statistics</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in taskItems)
+                {
+                    <tr>
+                        <td style="text-align: center;">@row.sn</td>
+                        <td>@row.Task</td>
+                        <td style="text-align: right;">@row.Statistics</td>
+                        <td>@row.Remark</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <table class="dx-report-table" style="margin-top: 16px;">
+            <thead>
+                <tr>
+                    <th style="width: 45px; text-align: center;">SN</th>
+                    <th>Description</th>
+                    <th style="width: 80px; text-align: right;">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in roomStatsItems)
+                {
+                    <tr>
+                        <td style="text-align: center;">@row.SN</td>
+                        <td>@row.Description</td>
+                        <td style="text-align: right;">@row.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top: 16px;">
+            <div style="flex:1; min-width:280px;">
+                <div class="chart-title">Today's Room Status</div>
+                <DxPieChart Data="@roomStatusData" Height="260px" Width="100%">
+                    <DxChartLegend Visible="false" />
+                    <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
+                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                            <DxChartSeriesLabelConnector Visible="true" />
+                        </DxChartSeriesLabel>
+                    </DxPieChartSeries>
+                </DxPieChart>
+                <div class="legend-manual">
+                    @foreach (var (slice, idx) in roomStatusData.Select((s, i) => (s, i)))
+                    {
+                        <span class="leg-item">
+                            <span class="dot" style="background:@GetPaletteColor(idx);"></span>
+                            @slice.Name: @slice.Value.ToString("n2") %
+                        </span>
+                    }
+                </div>
+            </div>
+            <div style="flex:1; min-width:280px;">
+                <div class="chart-title">Room Occupancy (Today)</div>
+                <DxPieChart Data="@occupancyData" Height="260px" Width="100%">
+                    <DxChartLegend Visible="false" />
+                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                        <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                            <DxChartSeriesLabelConnector Visible="true" />
+                        </DxChartSeriesLabel>
+                    </DxPieChartSeries>
+                </DxPieChart>
+                <div class="legend-manual">
+                    @foreach (var (slice, idx) in occupancyData.Select((s, i) => (s, i)))
+                    {
+                        <span class="leg-item">
+                            <span class="dot" style="background:@(idx == 0 ? "#1e88e5" : "#c62828");"></span>
+                            @slice.Name: @slice.Value.ToString("n2") %
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <div class="chart-title">Reservations (@selectedYear) Total=@totalReservations</div>
+            <DxChart Data="@reservationData" Height="300px" Width="100%">
+                <DxChartLegend Visible="true" HorizontalAlignment="HorizontalAlignment.Right" />
+                <DxChartArgumentAxis>
+                    <DxChartAxisLabel />
+                </DxChartArgumentAxis>
+                <DxChartValueAxis>
+                    <DxChartAxisRange StartValue="0" EndValue="@ReservationAxisMax" />
+                </DxChartValueAxis>
+                <DxChartSplineAreaSeries T="ReservationPoint" TArgument="DateTime" TValue="int"
+                                         ArgumentField="@(x => x.Month)" ValueField="@(x => x.Count)" Name="Reservations"
+                                         Color="@reservationLineColor">
+                    <DxChartSeriesPoint Visible="true" />
+                </DxChartSplineAreaSeries>
+            </DxChart>
+        </div>
+
+        <div class="dx-report-footer">
+            <span>ERP System</span>
+        </div>
+    </DevExpressPrintPreview>
 @code {
 
     int selectedYear = DateTime.Today.Year;
@@ -363,9 +489,11 @@
         StateHasChanged();
     }
 
+    bool showPrintPreview;
+
     void OnPrintTasks()
     {
-        // TODO: print logic
+        showPrintPreview = true;
     }
 
     void OnExportTasks()
