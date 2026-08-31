@@ -118,7 +118,110 @@
         }
         else
         {
-            <div class="rt-placeholder">Daily Room Inventory isn't set up yet.</div>
+            <div class="na-step-card">
+                <div class="rt-grid-area ri-table-wrap">
+                    <table class="ri-table">
+                        <thead>
+                            <tr>
+                                <th class="ri-sticky-col">Room Type</th>
+                                <th>Total Room</th>
+                                <th>Total Registration</th>
+                                <th>InHouse Room</th>
+                                <th>Stay Over Room</th>
+                                <th>Due Out Room</th>
+                                <th>Check Out Room</th>
+                                <th>6PM Room</th>
+                                <th>Real Time Available</th>
+                                <th>Forcasted Available</th>
+                                <th>Real Time Occ.</th>
+                                <th>Forcasted Occ.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in dailyInventoryRows)
+                            {
+                                <tr>
+                                    <td class="ri-sticky-col">@row.RoomType</td>
+                                    <td>@row.TotalRoom</td>
+                                    <td>@row.TotalRegistration</td>
+                                    <td>@row.InHouseRoom</td>
+                                    <td>@row.StayOverRoom</td>
+                                    <td>@row.DueOutRoom</td>
+                                    <td>@row.CheckOutRoom</td>
+                                    <td>@row.SixPMRoom</td>
+                                    <td>@row.RealTimeAvailable</td>
+                                    <td>@row.ForecastedAvailable</td>
+                                    <td>@row.RealTimeOccPercent.ToString("n2") %</td>
+                                    <td>@row.ForecastedOccPercent.ToString("n2") %</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="ri-total-row">
+                                <td class="ri-sticky-col">Total</td>
+                                <td>@dailyInventoryRows.Sum(r => r.TotalRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.TotalRegistration)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.InHouseRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.StayOverRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.DueOutRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.CheckOutRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.SixPMRoom)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.RealTimeAvailable)</td>
+                                <td>@dailyInventoryRows.Sum(r => r.ForecastedAvailable)</td>
+                                <td>@DailyTotalOccPercent(r => r.RealTimeAvailable).ToString("n2") %</td>
+                                <td>@DailyTotalOccPercent(r => r.ForecastedAvailable).ToString("n2") %</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="ri-chart-card" style="display:flex; gap:24px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:280px;">
+                    <div class="chart-title">Real Time Occupancy</div>
+                    <DxPieChart Data="@RealTimeOccupancyData" Height="320px" Width="100%"
+                                CustomizeSeriesPoint="@CustomizeOccupancyPointColor">
+                        <DxChartLegend Visible="false" />
+                        <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                          ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Real Time Occupancy">
+                            <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                <DxChartSeriesLabelConnector Visible="true" />
+                            </DxChartSeriesLabel>
+                        </DxPieChartSeries>
+                    </DxPieChart>
+                    <div class="legend-manual">
+                        @foreach (var (slice, idx) in RealTimeOccupancyData.Select((s, i) => (s, i)))
+                        {
+                            <span class="leg-item">
+                                <span class="dot" style="background:@(idx == 0 ? "#43a047" : "#e53935");"></span>
+                                @slice.Name: @slice.Value.ToString("n2") %
+                            </span>
+                        }
+                    </div>
+                </div>
+                <div style="flex:1; min-width:280px;">
+                    <div class="chart-title">Forcasted Occupancy</div>
+                    <DxPieChart Data="@ForecastedOccupancyData" Height="320px" Width="100%"
+                                CustomizeSeriesPoint="@CustomizeOccupancyPointColor">
+                        <DxChartLegend Visible="false" />
+                        <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
+                                          ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Forcasted Occupancy">
+                            <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
+                                <DxChartSeriesLabelConnector Visible="true" />
+                            </DxChartSeriesLabel>
+                        </DxPieChartSeries>
+                    </DxPieChart>
+                    <div class="legend-manual">
+                        @foreach (var (slice, idx) in ForecastedOccupancyData.Select((s, i) => (s, i)))
+                        {
+                            <span class="leg-item">
+                                <span class="dot" style="background:@(idx == 0 ? "#43a047" : "#e53935");"></span>
+                                @slice.Name: @slice.Value.ToString("n2") %
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
         }
     </div>
 </div>
@@ -147,11 +250,46 @@
     private bool showPrintInfo;
     private System.Drawing.Color chartColor = System.Drawing.Color.FromArgb(0x44, 0x72, 0xc4);
 
+    private List<DailyRoomInventoryRow> dailyInventoryRows = new();
+
     private int SelectedMonthNumber => months.IndexOf(selectedMonth ?? "January") + 1;
     private int DaysInMonth => DateTime.DaysInMonth(selectedYear, SelectedMonthNumber);
 
     private List<RoomInventoryChartPoint> ChartData =>
         Enumerable.Range(1, DaysInMonth).Select(d => new RoomInventoryChartPoint { Day = d, Total = GetTotal(d) }).ToList();
+
+    private decimal DailyTotalOccPercent(Func<DailyRoomInventoryRow, int> availableSelector)
+    {
+        var totalRooms = dailyInventoryRows.Sum(r => r.TotalRoom);
+        var totalAvailable = dailyInventoryRows.Sum(availableSelector);
+        return totalRooms == 0 ? 0 : Math.Round((decimal)totalAvailable / totalRooms * 100, 2);
+    }
+
+    private List<OccupancySlice> BuildOccupancyPie(Func<DailyRoomInventoryRow, int> availableSelector)
+    {
+        var totalRooms = dailyInventoryRows.Sum(r => r.TotalRoom);
+        var available = dailyInventoryRows.Sum(availableSelector);
+        var occupied = totalRooms - available;
+        decimal availPct = totalRooms == 0 ? 0 : Math.Round((decimal)available / totalRooms * 100, 2);
+        decimal occPct = totalRooms == 0 ? 0 : Math.Round((decimal)occupied / totalRooms * 100, 2);
+
+        return new List<OccupancySlice>
+        {
+            new() { Name = $"Availability ({available})", Value = availPct },
+            new() { Name = $"Occupancy ({occupied})", Value = occPct },
+        };
+    }
+
+    private List<OccupancySlice> RealTimeOccupancyData => BuildOccupancyPie(r => r.RealTimeAvailable);
+    private List<OccupancySlice> ForecastedOccupancyData => BuildOccupancyPie(r => r.ForecastedAvailable);
+
+    private void CustomizeOccupancyPointColor(DevExpress.Blazor.ChartSeriesPointCustomizationSettings settings)
+    {
+        var argument = settings.Point.Argument?.ToString() ?? "";
+        settings.PointAppearance.Color = argument.StartsWith("Availability")
+            ? System.Drawing.Color.FromArgb(0x43, 0xa0, 0x47)
+            : System.Drawing.Color.FromArgb(0xe5, 0x39, 0x35);
+    }
 
     protected override void OnInitialized()
     {
@@ -160,6 +298,7 @@
         selectedMonth = months[DateTime.Today.Month - 1];
         years = Enumerable.Range(DateTime.Today.Year - 1, 4).ToList();
         GenerateInventory();
+        GenerateDailyInventory();
     }
 
     private void GenerateInventory()
@@ -193,6 +332,39 @@
             row.DailyCounts[day] = count;
     }
 
+    private void GenerateDailyInventory()
+    {
+        dailyInventoryRows = new List<DailyRoomInventoryRow>
+        {
+            new()
+            {
+                RoomType = "Standard",
+                TotalRoom = 7,
+                TotalRegistration = 1,
+                InHouseRoom = 1,
+                StayOverRoom = 1,
+                DueOutRoom = 0,
+                CheckOutRoom = 0,
+                SixPMRoom = 0,
+                RealTimeAvailable = 6,
+                ForecastedAvailable = 6,
+            },
+            new()
+            {
+                RoomType = "Delux",
+                TotalRoom = 7,
+                TotalRegistration = 0,
+                InHouseRoom = 0,
+                StayOverRoom = 0,
+                DueOutRoom = 0,
+                CheckOutRoom = 0,
+                SixPMRoom = 0,
+                RealTimeAvailable = 7,
+                ForecastedAvailable = 7,
+            },
+        };
+    }
+
     private int GetTotal(int day) => inventoryRows.Sum(r => r.DailyCounts.TryGetValue(day, out var c) ? c : 0);
 
     private string GetRemark(int day) => remarks.TryGetValue(day, out var r) ? r : "";
@@ -215,5 +387,31 @@
     {
         public int Day { get; set; }
         public int Total { get; set; }
+    }
+
+    private class DailyRoomInventoryRow
+    {
+        public string RoomType { get; set; } = "";
+        public int TotalRoom { get; set; }
+        public int TotalRegistration { get; set; }
+        public int InHouseRoom { get; set; }
+        public int StayOverRoom { get; set; }
+        public int DueOutRoom { get; set; }
+        public int CheckOutRoom { get; set; }
+        public int SixPMRoom { get; set; }
+        public int RealTimeAvailable { get; set; }
+        public int ForecastedAvailable { get; set; }
+
+        public decimal RealTimeOccPercent =>
+            TotalRoom == 0 ? 0 : Math.Round((decimal)RealTimeAvailable / TotalRoom * 100, 2);
+
+        public decimal ForecastedOccPercent =>
+            TotalRoom == 0 ? 0 : Math.Round((decimal)ForecastedAvailable / TotalRoom * 100, 2);
+    }
+
+    private class OccupancySlice
+    {
+        public string Name { get; set; } = "";
+        public decimal Value { get; set; }
     }
 }
