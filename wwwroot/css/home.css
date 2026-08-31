@@ -409,6 +409,13 @@
 
     overflow-y: auto;
 }
+.right-panel::-webkit-scrollbar {
+    width: 8px;
+}
+.right-panel::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 46%, 0.637);
+    border-radius: 0px;
+}
 
 .chart-card {
     background: #fff;
