@@ -1,30 +1,13 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup Visible="@Visible" VisibleChanged="OnPopupVisibleChanged"
-         HeaderText="Rate Summary" Width="900px"
-         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
-    <BodyContentTemplate>
-
-        <!-- Toolbar -->
-        <div class="pf-toolbar">
-            <button type="button" class="pf-btn" @onclick="HandleRefresh">
-                <div class="pf-btn-icon pf-icon-green"><i class="bi bi-arrow-clockwise"></i></div>
-                <div class="pf-btn-text">Refresh</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="@(() => {})">
-                <div class="pf-btn-icon"><i class="bi bi-file-earmark-excel"></i></div>
-                <div class="pf-btn-text">Excel</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="@(() => {})">
-                <div class="pf-btn-icon"><i class="bi bi-printer"></i></div>
-                <div class="pf-btn-text">Print</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="HandleClose">
-                <div class="pf-btn-icon pf-icon-red"><i class="bi bi-x-lg"></i></div>
-                <div class="pf-btn-text">Close</div>
-            </button>
-        </div>
+<DevExpressPrintPreview Visible="@Visible"
+                         VisibleChanged="OnPopupVisibleChanged"
+                         OnClose="HandleClose"
+                         OnClosed="HandleClose"
+                         Title="Print Dialog"
+                         DocumentTitle="Rate Summary"
+                         PrintElementId="rate-summary-doc-print-area">
 
         <!-- Header info grid -->
         <div class="pf-header-grid" style="grid-template-columns: 90px 1fr 110px 1fr 80px 1fr;">
@@ -117,8 +100,7 @@
             </DxGrid>
         }
 
-    </BodyContentTemplate>
-</DxPopup>
+</DevExpressPrintPreview>
 
 <style>
     .pf-toolbar {

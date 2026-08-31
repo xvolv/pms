@@ -1,15 +1,13 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup Visible="@Visible"
-         VisibleChanged="OnPopupVisibleChanged"
-         HeaderText="Registration Card"
-         Width="820px"
-         CloseOnOutsideClick="false"
-         ShowCloseButton="true"
-         CloseOnEscape="true">
-
-    <BodyContentTemplate>
+<DevExpressPrintPreview Visible="@Visible"
+                         VisibleChanged="OnPopupVisibleChanged"
+                         OnClose="HandleClose"
+                         OnClosed="HandleClose"
+                         Title="Print Dialog"
+                         DocumentTitle="Registration Card"
+                         PrintElementId="registration-card-print-area">
 
         <div class="rc-card">
 
@@ -646,9 +644,7 @@
 
         </div>
 
-    </BodyContentTemplate>
-
-</DxPopup>
+</DevExpressPrintPreview>
 
 
 <style>

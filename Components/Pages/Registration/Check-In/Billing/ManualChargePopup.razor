@@ -353,87 +353,80 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<!-- ==================== RATE SUMMARY PRINT REPORT MODAL ==================== -->
-<DxPopup @bind-Visible="showRateSummaryPrint" HeaderText="Rate Summary - Print" Width="980px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
-    <BodyContentTemplate>
-        <div class="amend-toolbar" style="margin-bottom: 10px;">
-            <button type="button" class="ci-btn" onclick="window.print()">
-                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Print Document</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="@(() => showRateSummaryPrint = false)">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
+<!-- ==================== RATE SUMMARY PRINT REPORT DEVEXPRESS PREVIEW ==================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showRateSummaryPrint"
+    Title="Print Dialog"
+    DocumentTitle="Rate Summary"
+    PrintElementId="rate-summary-print-area">
+
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">TEST HOTEL</div>
+        <div class="dx-report-doc-title">Rate Summary</div>
+    </div>
+
+    <div class="dx-report-meta-row">
+        <span></span>
+        <span>Date: @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th style="width: 35px; text-align:center;">SN</th>
+                <th style="width: 75px;">Day</th>
+                <th style="width: 85px;">Date</th>
+                <th style="width: 75px; text-align: center;">Rate Code</th>
+                <th style="text-align: right;">Room Revenue</th>
+                <th style="text-align: right;">Package</th>
+                <th style="text-align: right;">Subtotal</th>
+                <th style="text-align: right;">Service Charge</th>
+                <th style="text-align: right;">VAT</th>
+                <th style="text-align: right;">Grand Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in RateRows)
+            {
+                <tr>
+                    <td style="text-align: center;">@row.SN</td>
+                    <td>@row.Day</td>
+                    <td>@row.Date.ToString("M/d/yyyy")</td>
+                    <td style="text-align: center;">@row.RateCode</td>
+                    <td style="text-align: right;">@row.RoomRevenue.ToString("F2")</td>
+                    <td style="text-align: right;">@row.Package.ToString("F2")</td>
+                    <td style="text-align: right;">@row.Subtotal.ToString("F2")</td>
+                    <td style="text-align: right;">@row.ServiceCharge.ToString("F2")</td>
+                    <td style="text-align: right;">@row.Vat.ToString("F2")</td>
+                    <td style="text-align: right;">@row.GrandTotal.ToString("F2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
         </div>
-
-        <div class="rate-print-sheet" id="rate-summary-print-area">
-            <div class="print-header-block">
-                <div class="print-hotel-name">TEST HOTEL</div>
-                <div class="print-doc-title">Rate Summary</div>
-                <div class="print-date-line">Date : @DateTime.Today.ToString("M/d/yyyy")</div>
-            </div>
-
-            <table class="print-grid-table">
-                <thead>
-                    <tr>
-                        <th style="width: 35px;">SN</th>
-                        <th style="width: 75px;">Day</th>
-                        <th style="width: 85px;">Date</th>
-                        <th style="width: 75px; text-align: center;">Rate Code</th>
-                        <th style="text-align: right;">Room Revenue</th>
-                        <th style="text-align: right;">Package</th>
-                        <th style="text-align: right;">Subtotal</th>
-                        <th style="text-align: right;">Service Charge</th>
-                        <th style="text-align: right;">VAT</th>
-                        <th style="text-align: right;">Grand Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in RateRows)
-                    {
-                        <tr>
-                            <td style="text-align: center;">@row.SN</td>
-                            <td>@row.Day</td>
-                            <td>@row.Date.ToString("M/d/yyyy")</td>
-                            <td style="text-align: center;">@row.RateCode</td>
-                            <td style="text-align: right;">@row.RoomRevenue.ToString("F2")</td>
-                            <td style="text-align: right;">@row.Package.ToString("F2")</td>
-                            <td style="text-align: right;">@row.Subtotal.ToString("F2")</td>
-                            <td style="text-align: right;">@row.ServiceCharge.ToString("F2")</td>
-                            <td style="text-align: right;">@row.Vat.ToString("F2")</td>
-                            <td style="text-align: right;">@row.GrandTotal.ToString("F2")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="print-signatures-row">
-                <div class="print-sig-col">
-                    <div class="sig-line"></div>
-                    <div class="sig-lbl">Prepared By</div>
-                </div>
-                <div class="print-sig-col">
-                    <div class="sig-line"></div>
-                    <div class="sig-lbl">Checked By</div>
-                </div>
-                <div class="print-sig-col">
-                    <div class="sig-line"></div>
-                    <div class="sig-lbl">Approved By</div>
-                </div>
-                <div class="print-sig-col">
-                    <div class="sig-line"></div>
-                    <div class="sig-lbl">Authorized By</div>
-                </div>
-            </div>
-
-            <div class="print-footer-brand">
-                ERP System
-            </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
         </div>
-    </BodyContentTemplate>
-</DxPopup>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
     <style>
         /* Manual Charge Modal Styles */

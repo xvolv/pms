@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using CNET_V7_Domain.Misc;
 using CNET_V7_Domain.Misc.PmsDTO;
 namespace ERP.V7.WebPMS.Services.Dashboard
@@ -53,7 +53,7 @@ namespace ERP.V7.WebPMS.Services.Dashboard
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "PMS Dashboard API call failed.");
-                throw;
+                return null;
             }
         }
 

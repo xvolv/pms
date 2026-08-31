@@ -1,30 +1,13 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup Visible="@Visible" VisibleChanged="OnPopupVisibleChanged"
-         HeaderText="Confirmation Card" Width="820px"
-         CloseOnOutsideClick="false" ShowCloseButton="true" CloseOnEscape="true">
-    <BodyContentTemplate>
-
-        <!-- Toolbar -->
-        <div class="pf-toolbar">
-            <button type="button" class="pf-btn" @onclick="@(() => {})">
-                <div class="pf-btn-icon"><i class="bi bi-printer"></i></div>
-                <div class="pf-btn-text">Print</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="@(() => {})">
-                <div class="pf-btn-icon"><i class="bi bi-filetype-pdf"></i></div>
-                <div class="pf-btn-text">PDF</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="@(() => {})">
-                <div class="pf-btn-icon"><i class="bi bi-envelope"></i></div>
-                <div class="pf-btn-text">Email</div>
-            </button>
-            <button type="button" class="pf-btn" @onclick="HandleClose">
-                <div class="pf-btn-icon pf-icon-red"><i class="bi bi-x-lg"></i></div>
-                <div class="pf-btn-text">Close</div>
-            </button>
-        </div>
+<DevExpressPrintPreview Visible="@Visible"
+                         VisibleChanged="OnPopupVisibleChanged"
+                         OnClose="HandleClose"
+                         OnClosed="HandleClose"
+                         Title="Print Dialog"
+                         DocumentTitle="Reservation Confirmation"
+                         PrintElementId="confirmation-card-print-area">
 
         <!-- ========== CONFIRMATION CARD (Letter Style) ========== -->
         <div class="conf-card">
@@ -161,8 +144,7 @@
 
         </div>
 
-    </BodyContentTemplate>
-</DxPopup>
+</DevExpressPrintPreview>
 
 <style>
     /* ===== Toolbar (kept same) ===== */
