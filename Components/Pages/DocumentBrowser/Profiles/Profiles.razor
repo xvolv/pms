@@ -300,47 +300,47 @@
         <div class="db-pr-grid-area position-relative">
             @if (IsLoading)
             {
-                <div class="db-pr-loading-overlay">
-                    <LoadingSpinner Text="@($"Loading {ProfileType} records...")" />
+                <LoadingSpinner Height="350px" Text="@($"Loading {ProfileType} records...")" />
+            }
+            else
+            {
+                <DxGrid Data="@FilteredData"
+                        KeyFieldName="Id"
+                        ShowFilterRow="@(SearchBy == "Show Filter Panel")"
+                        PageSize="20"
+                        CssClass="db-pr-grid"
+                        SelectionMode="GridSelectionMode.Single"
+                        SelectedDataItem="@SelectedItem"
+                        SelectedDataItemChanged="@(e => SelectedItem = (VwConsigneeViewDTO?)e)">
+                    <Columns>
+                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="120" />
+                        <DxGridDataColumn FieldName="FullName" Caption="Full Name" Width="260" />
+                        
+                        @if (GslTypeId == 27 || GslTypeId == 30)
+                        {
+                            <!-- Guest & Contact columns -->
+                            <DxGridDataColumn FieldName="StartDate" Caption="DOB" Width="110" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="Nationality" Caption="Nationality" Width="130" />
+                            <DxGridDataColumn FieldName="NationalId" Caption="National ID" Width="130" />
+                            <DxGridDataColumn FieldName="GenderDescription" Caption="Gender" Width="90" />
+                        }
+                        else
+                        {
+                            <!-- Company, Agent, Group, Source columns -->
+                            <DxGridDataColumn FieldName="Tin" Caption="TIN" Width="120" />
+                            <DxGridDataColumn FieldName="BusinessTypeDesc" Caption="Business Type" Width="160" />
+                        }
+                        
+                        <DxGridDataColumn FieldName="ChildPreferenceDescrption" Caption="Category" Width="130" />
+                        <DxGridDataColumn FieldName="ObjectStateDescription" Caption="State" Width="110" />
+                        <DxGridDataColumn FieldName="Phone1" Caption="Phone" Width="130" />
+                        <DxGridDataColumn FieldName="City" Caption="City" Width="130" />
+                    </Columns>
+                </DxGrid>
+                <div class="db-pr-record-info">
+                    Record @(FilteredData.Count == 0 ? 0 : (SelectedItemIndex >= 0 ? SelectedItemIndex + 1 : 1)) of @FilteredData.Count
                 </div>
             }
-
-            <DxGrid Data="@FilteredData"
-                    KeyFieldName="Id"
-                    ShowFilterRow="@(SearchBy == "Show Filter Panel")"
-                    PageSize="20"
-                    CssClass="db-pr-grid"
-                    SelectionMode="GridSelectionMode.Single"
-                    SelectedDataItem="@SelectedItem"
-                    SelectedDataItemChanged="@(e => SelectedItem = (VwConsigneeViewDTO?)e)">
-                <Columns>
-                    <DxGridDataColumn FieldName="Code" Caption="Code" Width="120" />
-                    <DxGridDataColumn FieldName="FullName" Caption="Full Name" Width="260" />
-                    
-                    @if (GslTypeId == 27 || GslTypeId == 30)
-                    {
-                        <!-- Guest & Contact columns -->
-                        <DxGridDataColumn FieldName="StartDate" Caption="DOB" Width="110" DisplayFormat="d" />
-                        <DxGridDataColumn FieldName="Nationality" Caption="Nationality" Width="130" />
-                        <DxGridDataColumn FieldName="NationalId" Caption="National ID" Width="130" />
-                        <DxGridDataColumn FieldName="GenderDescription" Caption="Gender" Width="90" />
-                    }
-                    else
-                    {
-                        <!-- Company, Agent, Group, Source columns -->
-                        <DxGridDataColumn FieldName="Tin" Caption="TIN" Width="120" />
-                        <DxGridDataColumn FieldName="BusinessTypeDesc" Caption="Business Type" Width="160" />
-                    }
-                    
-                    <DxGridDataColumn FieldName="ChildPreferenceDescrption" Caption="Category" Width="130" />
-                    <DxGridDataColumn FieldName="ObjectStateDescription" Caption="State" Width="110" />
-                    <DxGridDataColumn FieldName="Phone1" Caption="Phone" Width="130" />
-                    <DxGridDataColumn FieldName="City" Caption="City" Width="130" />
-                </Columns>
-            </DxGrid>
-            <div class="db-pr-record-info">
-                Record @(FilteredData.Count == 0 ? 0 : (SelectedItemIndex >= 0 ? SelectedItemIndex + 1 : 1)) of @FilteredData.Count
-            </div>
         </div>
 
         <!-- Right detail panel — collapsible, closed by default -->
@@ -431,7 +431,7 @@
     List<SystemConstantDTO> ObjectStateList = new();
     List<RequestedServiceModel> RequestedServices = new();
 
-    bool IsLoading = false;
+    bool IsLoading = true;
     DateTime? ServerTime = DateTime.Today;
 
     int SelectedItemIndex => SelectedItem != null ? FilteredData.IndexOf(SelectedItem) : -1;
@@ -648,6 +648,8 @@
     async Task OnDateCriteriaChanged(string newCriteria)
     {
         DateCriteria = newCriteria;
+        IsLoading = true;
+        StateHasChanged();
         await ApplyDateCriteriaDefaultsAsync();
         await LoadDataAsync();
     }
@@ -697,6 +699,7 @@
     // ---- Lifecycle ----
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         ResolveGslTypeId();
         _lastLoadedGslTypeId = GslTypeId;
         await LoadLookupsAsync();
@@ -709,6 +712,8 @@
         ResolveGslTypeId();
         if (_lastLoadedGslTypeId != GslTypeId)
         {
+            IsLoading = true;
+            StateHasChanged();
             _lastLoadedGslTypeId = GslTypeId;
             await LoadLookupsAsync();
             await LoadDataAsync();
