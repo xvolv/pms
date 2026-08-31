@@ -2,6 +2,7 @@ using ERP.V7.WebPMS.Components;
 using ERP.V7.WebPMS.Services;
 using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services;
 using ERP.V7.WebPMS.Services.Dashboard;
+using ERP.V7.WebPMS.Services.DocumentBrowser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDevExpressBlazor();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IDocumentBrowserService, DocumentBrowserService>();
 builder.Services.AddScoped<PackageDetailService>();
 builder.Services.AddScoped<PackageHeaderService>();
 builder.Services.AddScoped<FolioService>();
