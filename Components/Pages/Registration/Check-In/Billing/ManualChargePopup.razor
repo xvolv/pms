@@ -1,117 +1,213 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 
-<DxPopup @bind-Visible="Visible" HeaderText="Manual Charge" Width="860px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<!-- ==================== MAIN MANUAL CHARGE POPUP ==================== -->
+<DxPopup @bind-Visible="Visible" HeaderText="Manual Charge" Width="1020px" CloseOnOutsideClick="false"
+         ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
-        <div class="amend-toolbar">
-            <button type="button" class="toolbar-btn" @onclick="HandleNew">
-                <div class="toolbar-icon"><i class="bi bi-file-earmark-plus"></i></div>
-                <div class="toolbar-text">New</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="HandleSave">
-                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
-                <div class="toolbar-text">Save</div>
-            </button>
-            <button type="button" class="toolbar-btn" @onclick="HandleClose">
-                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="toolbar-text">Close</div>
-            </button>
+        <!-- Top Toolbar -->
+        <div class="amend-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" class="ci-btn" @onclick="HandleNew">
+                    <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-file-earmark-plus"></i></div>
+                    <div class="ci-text">New</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="HandleSave">
+                    <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                    <div class="ci-text">Save</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="OpenRateSummary">
+                    <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-card-checklist"></i></div>
+                    <div class="ci-text">Rate Summary</div>
+                </button>
+            </div>
+
+            <!-- Guest & TIN info in Toolbar -->
+            <div style="display:flex; gap:8px; align-items:center;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; color:#475569; font-weight:500;">Guest</span>
+                    <input class="mc-input-sm" style="width: 120px;" @bind="GuestCode" />
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; color:#475569; font-weight:500;">Company</span>
+                    <input class="mc-input-sm" style="width: 120px;" @bind="Company" />
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; color:#475569; font-weight:500;">TIN No.</span>
+                    <input class="mc-input-sm" style="width: 110px;" @bind="TinNo" />
+                </div>
+                <div style="display:flex; align-items:center; gap:4px; margin-left:4px;">
+                    <label class="mc-check-lbl">
+                        Is TIN No. Mandatory?
+                        <input type="checkbox" style="margin-left: 4px;" @bind="IsTinMandatory" />
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <button type="button" class="ci-btn" @onclick="HandleClose">
+                    <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                    <div class="ci-text">Close</div>
+                </button>
+            </div>
         </div>
-        <div style="display:flex; gap:12px;">
-            <div style="flex:1.2;">
-                <div class="amend-form" style="border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
-                    <div class="amend-row"><label>Article</label>
-                        <div class="input-with-btn">
-                            <DxComboBox CssClass="erp-combobox" Data="@Articles.Select(a => a.Name).ToList()" Value="@Article"
-                                        ValueChanged="@((string? v) => ArticleChanged.InvokeAsync(v))"
-                                        SizeMode="SizeMode.Small" />
-                            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary"
-                                      Click="HandleOpenArticleFind" />
+
+        <!-- Main Body Panels -->
+        <div class="mc-body-grid">
+            <!-- Left Column -->
+            <div class="mc-left-panel">
+                <div class="mc-form-card">
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Article</label>
+                        <div class="lookup-field" style="flex:1;">
+                            <DxTextBox @bind-Text="Article" ReadOnly="true" Width="100%"
+                                       CssClass="erp-combobox lookup-input" Click="HandleOpenArticleFind" />
+                            <button type="button" class="lookup-toggle-btn" @onclick="HandleOpenArticleFind">▾</button>
                         </div>
                     </div>
-                    <div class="amend-row"><label>Qty.</label>
-                        <DxSpinEdit CssClass="dx-input-num" Value="@Qty" ValueChanged="@((int v) => QtyChanged.InvokeAsync(v))"
-                                    MinValue="1" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Qty.</label>
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Qty"
+                                    ValueChanged="@((int v) => { Qty = v; RecalculateLineTotal(); })" MinValue="1"
+                                    SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>Amount</label>
-                        <DxSpinEdit CssClass="dx-input-num" Value="@Amount" ValueChanged="@((decimal v) => AmountChanged.InvokeAsync(v))"
-                                    MinValue="0" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Amount</label>
+                        <DxSpinEdit CssClass="dx-input-num" Value="@Amount"
+                                    ValueChanged="@((decimal v) => { Amount = v; RecalculateLineTotal(); })" MinValue="0"
+                                    SizeMode="SizeMode.Small" DisplayFormat="N2" />
                     </div>
-                    <div class="amend-row"><label>Total</label>
-                        <DxTextBox Text="@((Qty * (Amount > 0 ? Amount : 0)).ToString("N2"))" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Total</label>
+                        <input class="mc-input" value="@LineTotal.ToString("N2")" readonly
+                               style="background: #f8fafc;" />
                     </div>
-                    <div class="amend-row"><label>Remark</label>
-                        <DxTextBox Text="@Remark" TextChanged="@((string v) => RemarkChanged.InvokeAsync(v))" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Note</label>
+                        <input class="mc-input" @bind="Note" />
+                    </div>
+                    <div class="mc-form-row">
+                        <label class="mc-lbl">Remark</label>
+                        <input class="mc-input" @bind="Remark" />
                     </div>
                 </div>
-                <div style="margin:8px 0; display:flex; gap:6px;">
-                    <DxButton Text="Add" RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Small" Click="HandleAddLine" />
-                    <DxButton Text="Remove" RenderStyle="ButtonRenderStyle.Danger" SizeMode="SizeMode.Small" Click="HandleRemoveLine" />
+
+                <!-- Add / Remove Buttons -->
+                <div class="mc-action-btns">
+                    <button type="button" class="mc-table-btn" @onclick="HandleAddLine">
+                        <i class="bi bi-plus-circle text-primary"></i> Add
+                    </button>
+                    <button type="button" class="mc-table-btn" @onclick="HandleRemoveLine">
+                        <i class="bi bi-dash-circle text-primary"></i> Remove
+                    </button>
                 </div>
-                <table class="multi-table" style="width:100%;">
-                    <thead>
-                        <tr><th>SN</th><th>Description</th><th>Unit Price</th><th>Qty</th><th>Tax</th><th>Total Price</th></tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var line in Lines)
-                        {
-                            <tr class="@(SelectedLine == line ? "row-selected" : "")"
-                                @onclick="() => SelectedLineChanged.InvokeAsync(line)">
-                                <td>@line.SN</td>
-                                <td>@line.Description</td>
-                                <td>@line.UnitPrice.ToString("N2")</td>
-                                <td>@line.Qty</td>
-                                <td>@line.Tax.ToString("N2")</td>
-                                <td>@line.TotalPrice.ToString("N2")</td>
+
+                <!-- Table -->
+                <div class="mc-table-container">
+                    <table class="mc-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35px;">SN</th>
+                                <th>Description</th>
+                                <th style="width: 85px; text-align: right;">Unit Price</th>
+                                <th style="width: 45px; text-align: center;">Qty</th>
+                                <th style="width: 70px; text-align: right;">Tax</th>
+                                <th style="width: 85px; text-align: right;">Total Price</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @if (!Lines.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" style="text-align:center; color:#94a3b8; padding: 24px;">No charge items added</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var line in Lines)
+                                {
+                                    <tr class="@(SelectedLine == line ? "mc-row-selected" : "")"
+                                        @onclick="() => SelectedLine = line">
+                                        <td style="text-align: center;">@line.SN</td>
+                                        <td>@line.Description</td>
+                                        <td style="text-align: right;">@line.UnitPrice.ToString("N2")</td>
+                                        <td style="text-align: center;">@line.Qty</td>
+                                        <td style="text-align: right;">@line.Tax.ToString("N2")</td>
+                                        <td style="text-align: right;">@line.TotalPrice.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div style="width:280px; border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
-                <div class="amend-form">
-                    <div class="amend-row"><label>Date</label>
+
+            <!-- Right Column -->
+            <div class="mc-right-panel">
+                <div class="mc-form-card">
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Date</label>
                         <DxDateEdit @bind-Date="Date" SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>No.</label>
-                        <DxTextBox @bind-Text="No" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">No.</label>
+                        <input class="mc-input" value="@No" readonly style="background: #f8fafc;" />
                     </div>
-                    <div class="amend-row"><label>Charge Type</label>
-                        <DxComboBox CssClass="erp-combobox" Data="@ChargeTypes" @bind-Value="ChargeType" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Charge Type</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@ChargeTypes" @bind-Value="ChargeType"
+                                    SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>Transaction Type</label>
-                        <DxTextBox @bind-Text="TransactionType" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Transaction Type</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@TransactionTypes"
+                                    @bind-Value="TransactionType" SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>Currency</label>
-                        <DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Currency</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="Currency"
+                                    SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>Registration</label>
-                        <DxTextBox @bind-Text="Registration" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Registration</label>
+                        <input class="mc-input" value="@Registration" readonly style="background: #f8fafc;" />
                     </div>
-                    <div class="amend-row"><label>Room</label>
-                        <DxTextBox @bind-Text="Room" SizeMode="SizeMode.Small" ReadOnly="true" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Room</label>
+                        <input class="mc-input" value="@Room" readonly style="background: #f8fafc;" />
                     </div>
-                    <div class="amend-row"><label>Reference</label>
-                        <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Reference</label>
+                        <input class="mc-input" @bind="Reference" />
                     </div>
-                    <div class="amend-row"><label>Window</label>
-                        <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                    <div class="mc-form-row">
+                        <label class="mc-lbl-r">Window</label>
+                        <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window"
+                                    SizeMode="SizeMode.Small" />
                     </div>
-                    <div class="amend-row"><label>Subtotal</label>
-                        <DxTextBox Text="@Subtotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
-                    </div>
-                    <div class="amend-row"><label>Discount</label>
-                        <DxTextBox Text="@Discount.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
-                    </div>
-                    <div class="amend-row"><label>Additional Charge</label>
-                        <DxTextBox Text="@AdditionalCharge.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
-                    </div>
-                    <div class="amend-row"><label>VAT 15%</label>
-                        <DxTextBox Text="@Vat.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
-                    </div>
-                    <div class="amend-row"><label>Grand Total</label>
-                        <DxTextBox Text="@GrandTotal.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
+
+                    <!-- Totals Block with Shaded Slate Headers -->
+                    <div class="mc-totals-section">
+                        <div class="mc-total-row">
+                            <span class="mc-total-lbl">Subtotal</span>
+                            <input class="mc-total-val" value="@Subtotal.ToString("N2")" readonly />
+                        </div>
+                        <div class="mc-total-row">
+                            <span class="mc-total-lbl">Discount</span>
+                            <input class="mc-total-val" value="@Discount.ToString("N2")" readonly />
+                        </div>
+                        <div class="mc-total-row">
+                            <span class="mc-total-lbl">Additional Charge</span>
+                            <input class="mc-total-val" value="@AdditionalCharge.ToString("N2")" readonly />
+                        </div>
+                        <div class="mc-total-row">
+                            <span class="mc-total-lbl">VAT</span>
+                            <input class="mc-total-val" value="@Vat.ToString("N2")" readonly />
+                        </div>
+                        <div class="mc-total-row">
+                            <span class="mc-total-lbl">Grand Total</span>
+                            <input class="mc-total-val" value="@GrandTotal.ToString("N2")" readonly />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,55 +215,639 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<ArticleFindPopup
-    @bind-Visible="showArticleFind"
-    Articles="@Articles"
-    OnSelect="HandleSelectArticle" />
+<!-- ==================== ARTICLE FIND POPUP ==================== -->
+<ArticleFindPopup @bind-Visible="showArticleFind" Articles="@Articles" OnSelect="HandleSelectArticle" />
+
+<!-- ==================== RATE SUMMARY MODAL ==================== -->
+<DxPopup @bind-Visible="showRateSummary" HeaderText="Rate Summery" Width="960px" CloseOnOutsideClick="false"
+         ShowCloseButton="false" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <div class="rs-modal-container">
+            <!-- Rate Summary Toolbar -->
+            <div class="amend-toolbar">
+                <button type="button" class="ci-btn" @onclick="OpenDailyRateDetail">
+                    <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-file-earmark-text"></i></div>
+                    <div class="ci-text">Detail</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="OpenRateSummaryPrint">
+                    <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-printer"></i></div>
+                    <div class="ci-text">Print</div>
+                </button>
+                <button type="button" class="ci-btn" @onclick="@(() => showRateSummary = false)">
+                    <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                    <div class="ci-text">Close</div>
+                </button>
+            </div>
+
+            <!-- Rate Summary Table -->
+            <div class="rs-table-wrapper">
+                <table class="rs-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35px;">SN</th>
+                            <th style="width: 80px;">Day</th>
+                            <th style="width: 90px;">Date</th>
+                            <th style="width: 75px; text-align: center;">Rate Code</th>
+                            <th style="text-align: right;">Room Revenue</th>
+                            <th style="text-align: right;">Package</th>
+                            <th style="text-align: right;">Subtotal</th>
+                            <th style="text-align: right;">Service Charge</th>
+                            <th style="text-align: right;">VAT</th>
+                            <th style="text-align: right;">Grand Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in RateRows)
+                        {
+                            <tr class="@(selectedRateRow == row ? "rs-row-selected" : "")"
+                                @onclick="() => selectedRateRow = row" @ondblclick="OpenDailyRateDetail">
+                                <td style="text-align: center;">@row.SN</td>
+                                <td>@row.Day</td>
+                                <td>@row.Date.ToString("M/d/yyyy")</td>
+                                <td style="text-align: center;">@row.RateCode</td>
+                                <td style="text-align: right;">@row.RoomRevenue.ToString("F2")</td>
+                                <td style="text-align: right;">@row.Package.ToString("F2")</td>
+                                <td style="text-align: right;">@row.Subtotal.ToString("F2")</td>
+                                <td style="text-align: right;">@row.ServiceCharge.ToString("F2")</td>
+                                <td style="text-align: right;">@row.Vat.ToString("F2")</td>
+                                <td style="text-align: right;">@row.GrandTotal.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Summary Section -->
+            <div class="rs-bottom-summary">
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Total Cost of Stay</span>
+                    <input class="rs-sum-val" value="@TotalCostOfStay.ToString("F2")" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Total Deducted</span>
+                    <input class="rs-sum-val" value="@TotalDeducted.ToString("F2")" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Outstanding Stay Total</span>
+                    <input class="rs-sum-val" value="@OutstandingStayTotal.ToString("F2")" readonly />
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ==================== DAILY RATE DETAIL MODAL ==================== -->
+<DxPopup @bind-Visible="showDailyRateDetail" HeaderText="Daily Rate Detail" Width="680px" CloseOnOutsideClick="false"
+         ShowCloseButton="false" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <div class="dr-modal-container">
+            <div class="amend-toolbar" style="margin-bottom: 8px;">
+                <button type="button" class="ci-btn" @onclick="@(() => showDailyRateDetail = false)">
+                    <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                    <div class="ci-text">Close</div>
+                </button>
+            </div>
+
+            <div class="dr-table-wrapper">
+                <table class="rs-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Article Code</th>
+                            <th>Description</th>
+                            <th style="width: 130px; text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="rs-row-selected">
+                            <td>@(selectedRateRow?.RateCode ?? "4")</td>
+                            <td>Room Revenue</td>
+                            <td style="text-align: right;">@((selectedRateRow?.GrandTotal ?? 100.00m).ToString("F2"))</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rs-bottom-summary" style="margin-top: 14px;">
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Sub Total</span>
+                    <input class="rs-sum-val" value="@((selectedRateRow?.Subtotal ?? 86.96m).ToString("F2"))" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Ser. Charge</span>
+                    <input class="rs-sum-val" value="@((selectedRateRow?.ServiceCharge ?? 0.00m).ToString("F2"))" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Discount</span>
+                    <input class="rs-sum-val" value="0.00" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">VAT</span>
+                    <input class="rs-sum-val" value="@((selectedRateRow?.Vat ?? 13.04m).ToString("F2"))" readonly />
+                </div>
+                <div class="rs-sum-row">
+                    <span class="rs-sum-lbl">Grand Total</span>
+                    <input class="rs-sum-val" value="@((selectedRateRow?.GrandTotal ?? 100.00m).ToString("F2"))" readonly />
+                </div>
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+<!-- ==================== RATE SUMMARY PRINT REPORT MODAL ==================== -->
+<DxPopup @bind-Visible="showRateSummaryPrint" HeaderText="Rate Summary - Print" Width="980px"
+         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+    <BodyContentTemplate>
+        <div class="amend-toolbar" style="margin-bottom: 10px;">
+            <button type="button" class="ci-btn" onclick="window.print()">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-printer"></i></div>
+                <div class="ci-text">Print Document</div>
+            </button>
+            <button type="button" class="ci-btn" @onclick="@(() => showRateSummaryPrint = false)">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
+            </button>
+        </div>
+
+        <div class="rate-print-sheet" id="rate-summary-print-area">
+            <div class="print-header-block">
+                <div class="print-hotel-name">TEST HOTEL</div>
+                <div class="print-doc-title">Rate Summary</div>
+                <div class="print-date-line">Date : @DateTime.Today.ToString("M/d/yyyy")</div>
+            </div>
+
+            <table class="print-grid-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35px;">SN</th>
+                        <th style="width: 75px;">Day</th>
+                        <th style="width: 85px;">Date</th>
+                        <th style="width: 75px; text-align: center;">Rate Code</th>
+                        <th style="text-align: right;">Room Revenue</th>
+                        <th style="text-align: right;">Package</th>
+                        <th style="text-align: right;">Subtotal</th>
+                        <th style="text-align: right;">Service Charge</th>
+                        <th style="text-align: right;">VAT</th>
+                        <th style="text-align: right;">Grand Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in RateRows)
+                    {
+                        <tr>
+                            <td style="text-align: center;">@row.SN</td>
+                            <td>@row.Day</td>
+                            <td>@row.Date.ToString("M/d/yyyy")</td>
+                            <td style="text-align: center;">@row.RateCode</td>
+                            <td style="text-align: right;">@row.RoomRevenue.ToString("F2")</td>
+                            <td style="text-align: right;">@row.Package.ToString("F2")</td>
+                            <td style="text-align: right;">@row.Subtotal.ToString("F2")</td>
+                            <td style="text-align: right;">@row.ServiceCharge.ToString("F2")</td>
+                            <td style="text-align: right;">@row.Vat.ToString("F2")</td>
+                            <td style="text-align: right;">@row.GrandTotal.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="print-signatures-row">
+                <div class="print-sig-col">
+                    <div class="sig-line"></div>
+                    <div class="sig-lbl">Prepared By</div>
+                </div>
+                <div class="print-sig-col">
+                    <div class="sig-line"></div>
+                    <div class="sig-lbl">Checked By</div>
+                </div>
+                <div class="print-sig-col">
+                    <div class="sig-line"></div>
+                    <div class="sig-lbl">Approved By</div>
+                </div>
+                <div class="print-sig-col">
+                    <div class="sig-line"></div>
+                    <div class="sig-lbl">Authorized By</div>
+                </div>
+            </div>
+
+            <div class="print-footer-brand">
+                ERP System
+            </div>
+        </div>
+    </BodyContentTemplate>
+</DxPopup>
+
+    <style>
+        /* Manual Charge Modal Styles */
+        .mc-field-inline {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mc-field-lbl {
+            font-size: 11px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .mc-input-sm {
+            height: 22px;
+            padding: 1px 4px;
+            font-size: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            background: #fff;
+        }
+
+        .mc-check-lbl {
+            font-size: 11px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .mc-body-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 12px;
+        }
+
+        .mc-left-panel,
+        .mc-right-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mc-form-card {
+            border: 1px solid #c8cdd4;
+            border-radius: 3px;
+            padding: 8px 10px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .mc-form-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mc-lbl {
+            width: 60px;
+            font-size: 11.5px;
+            color: #334155;
+            flex-shrink: 0;
+        }
+
+        .mc-lbl-r {
+            width: 105px;
+            font-size: 11.5px;
+            color: #334155;
+            flex-shrink: 0;
+        }
+
+        .mc-input {
+            flex: 1;
+            height: 22px;
+            padding: 1px 6px;
+            font-size: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+
+        .mc-action-btns {
+            display: flex;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .mc-table-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 12px;
+            font-size: 11.5px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .mc-table-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .mc-table-container {
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .mc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .mc-table th {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 600;
+            padding: 5px 8px;
+            border-bottom: 1px solid #cbd5e1;
+            border-right: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .mc-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            border-right: 1px solid #f1f5f9;
+            color: #1e293b;
+        }
+
+        .mc-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .mc-row-selected {
+            background: #e0f2fe !important;
+            color: #0369a1 !important;
+        }
+
+        /* Shaded Slate Blue Totals Section */
+        .mc-totals-section {
+            margin-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mc-total-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mc-total-lbl {
+            width: 110px;
+            background: #b0c4de;
+            color: #1e293b;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 2px;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .mc-total-val {
+            flex: 1;
+            height: 22px;
+            padding: 1px 6px;
+            font-size: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            background: #ffffff;
+            text-align: right;
+            font-family: inherit;
+        }
+
+        /* Rate Summary Modal Styles */
+        .rs-modal-container {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .rs-table-wrapper {
+            border: 1px solid #cbd5e1;
+            max-height: 380px;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .rs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .rs-table th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 5px 8px;
+            border-bottom: 1px solid #cbd5e1;
+            border-right: 1px solid #cbd5e1;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .rs-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .rs-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .rs-row-selected {
+            background: #0078d4 !important;
+            color: #ffffff !important;
+        }
+
+        .rs-row-selected td {
+            color: #ffffff !important;
+        }
+
+        .rs-bottom-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            margin-top: 10px;
+        }
+
+        .rs-sum-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rs-sum-lbl {
+            font-size: 11.5px;
+            color: #334155;
+            font-weight: 500;
+            min-width: 140px;
+            text-align: right;
+        }
+
+        .rs-sum-val {
+            width: 130px;
+            height: 22px;
+            padding: 1px 6px;
+            font-size: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 2px;
+            background: #ffffff;
+            text-align: right;
+        }
+
+        /* Print Preview Styles */
+        .rate-print-sheet {
+            border: 1px dashed #94a3b8;
+            padding: 24px 30px;
+            background: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .print-header-block {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .print-hotel-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .print-doc-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .print-date-line {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .print-grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 40px;
+        }
+
+        .print-grid-table th {
+            background: #f1f5f9;
+            border: 1px solid #64748b;
+            padding: 4px 6px;
+            font-weight: 600;
+        }
+
+        .print-grid-table td {
+            border: 1px solid #94a3b8;
+            padding: 3px 6px;
+        }
+
+        .print-signatures-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 50px;
+            padding-top: 20px;
+        }
+
+        .print-sig-col {
+            text-align: center;
+        }
+
+        .sig-line {
+            border-top: 1.5px solid #334155;
+            margin-bottom: 6px;
+        }
+
+        .sig-lbl {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .print-footer-brand {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #475569;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+        }
+    </style>
 
 @code {
     [Parameter] public bool Visible { get; set; }
     [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
     [Parameter] public RegistrationRow? TargetRegistration { get; set; }
 
-    [Parameter] public string? Article { get; set; }
+    [Parameter] public string? Article { get; set; } = "ROOM CHARGE";
     [Parameter] public EventCallback<string?> ArticleChanged { get; set; }
     [Parameter] public int Qty { get; set; } = 1;
     [Parameter] public EventCallback<int> QtyChanged { get; set; }
-    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public decimal Amount { get; set; } = 0.00m;
     [Parameter] public EventCallback<decimal> AmountChanged { get; set; }
+    [Parameter] public string Note { get; set; } = "";
     [Parameter] public string Remark { get; set; } = "";
     [Parameter] public EventCallback<string> RemarkChanged { get; set; }
 
+    [Parameter] public string GuestCode { get; set; } = "67";
+    [Parameter] public string Company { get; set; } = "";
+    [Parameter] public string TinNo { get; set; } = "";
+    [Parameter] public bool IsTinMandatory { get; set; } = false;
+
     [Parameter] public DateTime? Date { get; set; } = DateTime.Today;
-    [Parameter] public string No { get; set; } = "";
+    [Parameter] public string No { get; set; } = "DRC-00003-26";
     [Parameter] public string? ChargeType { get; set; } = "Room Charge";
     [Parameter] public string TransactionType { get; set; } = "Credit Sales";
     [Parameter] public string? Currency { get; set; } = "Birr";
-    [Parameter] public string Registration { get; set; } = "";
-    [Parameter] public string Room { get; set; } = "";
+    [Parameter] public string Registration { get; set; } = "REG-00008-26";
+    [Parameter] public string Room { get; set; } = "107";
     [Parameter] public string Reference { get; set; } = "";
     [Parameter] public string? Window { get; set; } = "Window 1";
-    [Parameter] public decimal Subtotal { get; set; }
-    [Parameter] public decimal Discount { get; set; }
-    [Parameter] public decimal AdditionalCharge { get; set; }
-    [Parameter] public decimal Vat { get; set; }
-    [Parameter] public decimal GrandTotal { get; set; }
+    [Parameter] public decimal Subtotal { get; set; } = 0.00m;
+    [Parameter] public decimal Discount { get; set; } = 0.00m;
+    [Parameter] public decimal AdditionalCharge { get; set; } = 0.00m;
+    [Parameter] public decimal Vat { get; set; } = 0.00m;
+    [Parameter] public decimal GrandTotal { get; set; } = 0.00m;
 
     [Parameter] public List<ManualChargeLine> Lines { get; set; } = new();
     [Parameter] public ManualChargeLine? SelectedLine { get; set; }
     [Parameter] public EventCallback<ManualChargeLine?> SelectedLineChanged { get; set; }
 
-    [Parameter] public List<ArticleItem> Articles { get; set; } = new()
+    [Parameter]
+    public List<ArticleItem> Articles { get; set; } = new()
     {
-        new() { Code = "SE-00001", Name = "ROOM CHARGE" },
-        new() { Code = "SE-00002", Name = "BREAKFAST" },
-        new() { Code = "SE-00003", Name = "LAUNDRY" },
-        new() { Code = "SE-00004", Name = "MINIBAR" },
-        new() { Code = "R-0001", Name = "BED AND BREAKFAST" }
+        new() { Code = "RC-0001-26", Name = "ROOM CHARGE" },
+        new() { Code = "BF-0002-26", Name = "BREAKFAST" },
+        new() { Code = "LD-0003-26", Name = "LAUNDRY" },
+        new() { Code = "MB-0004-26", Name = "MINIBAR" },
+        new() { Code = "PK-0005-26", Name = "BED AND BREAKFAST" },
+        new() { Code = "SP-0006-26", Name = "SPA SERVICE" },
+        new() { Code = "TR-0007-26", Name = "AIRPORT TRANSFER" }
     };
+
     [Parameter] public List<string> ChargeTypes { get; set; } = new() { "Room Charge", "Package Charge", "Extra Charge" };
-    [Parameter] public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
-    [Parameter] public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
+    [Parameter] public List<string> TransactionTypes { get; set; } = new() { "Credit Sales", "Cash Sales" };
+    [Parameter]
+    public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound",
+"Dirham" };
+    [Parameter]
+    public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4",
+"Window 5", "Window 6", "Window 7" };
 
     [Parameter] public EventCallback OnNew { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
@@ -176,18 +856,68 @@
     [Parameter] public EventCallback OnOpenArticleFind { get; set; }
 
     bool showArticleFind = false;
+    bool showRateSummary = false;
+    bool showDailyRateDetail = false;
+    bool showRateSummaryPrint = false;
+
+    decimal LineTotal => Qty * (Amount > 0 ? Amount : 0);
+
+    List<RateSummaryModelRow> RateRows = new();
+    RateSummaryModelRow? selectedRateRow;
+
+    decimal TotalCostOfStay => RateRows.Sum(r => r.GrandTotal);
+    decimal TotalDeducted => 0.00m;
+    decimal OutstandingStayTotal => TotalCostOfStay - TotalDeducted;
 
     protected override void OnParametersSet()
     {
         if (TargetRegistration != null)
         {
-            if (string.IsNullOrEmpty(Registration)) Registration = TargetRegistration.Registration ?? "";
-            if (string.IsNullOrEmpty(Room)) Room = (TargetRegistration.Room ?? "").Replace("#", "");
+            if (string.IsNullOrEmpty(Registration)) Registration = TargetRegistration.Registration ?? "REG-00008-26";
+            if (string.IsNullOrEmpty(Room)) Room = (TargetRegistration.Room ?? "107").Replace("#", "");
+            if (string.IsNullOrEmpty(Company)) Company = TargetRegistration.Company ?? "";
+            if (string.IsNullOrEmpty(GuestCode)) GuestCode = TargetRegistration.SN.ToString();
         }
         if (string.IsNullOrEmpty(No))
         {
-            No = $"WDRC-{Random.Shared.Next(1000, 9999)}-17";
+            No = $"DRC-00003-26";
         }
+        BuildRateSummaryRows();
+    }
+
+    void BuildRateSummaryRows()
+    {
+        RateRows.Clear();
+        var baseDate = TargetRegistration?.Arrival ?? new DateTime(2026, 8, 27);
+        int nights = 15;
+        if (TargetRegistration != null)
+        {
+            nights = Math.Max(1, (int)(TargetRegistration.Departure - TargetRegistration.Arrival).TotalDays);
+        }
+
+        for (int i = 0; i < nights; i++)
+        {
+            var date = baseDate.AddDays(i);
+            RateRows.Add(new RateSummaryModelRow
+            {
+                SN = i + 1,
+                Day = date.ToString("dddd"),
+                Date = date,
+                RateCode = "2",
+                RoomRevenue = 86.96m,
+                Package = 0.00m,
+                Subtotal = 86.96m,
+                ServiceCharge = 0.00m,
+                Vat = 13.04m,
+                GrandTotal = 100.00m
+            });
+        }
+        selectedRateRow = RateRows.FirstOrDefault();
+    }
+
+    void RecalculateLineTotal()
+    {
+        StateHasChanged();
     }
 
     void RecalculateTotals()
@@ -201,9 +931,10 @@
 
     async Task HandleNew()
     {
-        Article = null;
+        Article = "ROOM CHARGE";
         Qty = 1;
         Amount = 0;
+        Note = "";
         Remark = "";
         Lines.Clear();
         SelectedLine = null;
@@ -219,9 +950,8 @@
         }
         else if (!string.IsNullOrWhiteSpace(Article))
         {
-            var art = Articles.FirstOrDefault(a => a.Name == Article || a.Code == Article);
-            var desc = art?.Name ?? Article;
-            var unit = Amount > 0 ? Amount : 948.62m;
+            var desc = Article;
+            var unit = Amount > 0 ? Amount : 100.00m;
             var tax = Math.Round(unit * Qty * 0.15m, 2);
             Lines.Add(new ManualChargeLine
             {
@@ -252,10 +982,9 @@
         }
     }
 
-    async Task HandleOpenArticleFind()
+    void HandleOpenArticleFind()
     {
-        if (OnOpenArticleFind.HasDelegate) await OnOpenArticleFind.InvokeAsync();
-        else showArticleFind = true;
+        showArticleFind = true;
     }
 
     void HandleSelectArticle(string? artName)
@@ -268,6 +997,36 @@
         showArticleFind = false;
     }
 
+    void OpenRateSummary()
+    {
+        showRateSummary = true;
+    }
+
+    void OpenDailyRateDetail()
+    {
+        if (selectedRateRow == null && RateRows.Any()) selectedRateRow = RateRows.First();
+        showDailyRateDetail = true;
+    }
+
+    void OpenRateSummaryPrint()
+    {
+        showRateSummaryPrint = true;
+    }
+
     async Task HandleSave() => await OnSave.InvokeAsync();
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
+
+    public class RateSummaryModelRow
+    {
+        public int SN { get; set; }
+        public string Day { get; set; } = "";
+        public DateTime Date { get; set; }
+        public string RateCode { get; set; } = "";
+        public decimal RoomRevenue { get; set; }
+        public decimal Package { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal ServiceCharge { get; set; }
+        public decimal Vat { get; set; }
+        public decimal GrandTotal { get; set; }
+    }
 }

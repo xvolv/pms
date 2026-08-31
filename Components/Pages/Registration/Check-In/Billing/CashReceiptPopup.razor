@@ -1,102 +1,117 @@
 @using DevExpress.Blazor
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
+@using ERP.V7.WebPMS.Components.Shared
 
-<DxPopup @bind-Visible="Visible" HeaderText="@Title" Width="640px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
+<DxPopup @bind-Visible="Visible" HeaderText="@Title" Width="760px" CloseOnOutsideClick="false"
+         ShowCloseButton="false" CloseOnEscape="false">
     <BodyContentTemplate>
+        <!-- Toolbar matching Profile Amendment styles -->
         <div class="amend-toolbar">
-            <button type="button" class="toolbar-btn" @onclick="HandleSave">
-                <div class="toolbar-icon"><i class="bi bi-floppy"></i></div>
-                <div class="toolbar-text">Save</div>
+            <button type="button" class="ci-btn" @onclick="HandleSave">
+                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-floppy"></i></div>
+                <div class="ci-text">Save</div>
             </button>
             @if (ShowForeignCurrency)
             {
-                <button type="button" class="toolbar-btn" @onclick="HandleForeignCurrency">
-                    <div class="toolbar-icon"><i class="bi bi-currency-exchange"></i></div>
-                    <div class="toolbar-text">Foreign<br/>Currency</div>
+                <button type="button" class="ci-btn" @onclick="HandleForeignCurrency">
+                    <div class="ci-icon" style="color:#e0a52c;"><i class="bi bi-currency-exchange"></i></div>
+                    <div class="ci-text">Foreign Currency</div>
                 </button>
             }
-            <button type="button" class="toolbar-btn" @onclick="HandleClose">
-                <div class="toolbar-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="toolbar-text">Close</div>
+            <button type="button" class="ci-btn" @onclick="HandleClose">
+                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
+                <div class="ci-text">Close</div>
             </button>
         </div>
+
+        <!-- Form Panels Grid -->
         <div style="display:flex; gap:12px;">
-            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px;">
-                <div class="amend-row"><label>Customer</label>
-                    <div class="input-with-btn">
-                        <DxComboBox CssClass="erp-combobox" Data="@Customers.Select(c => c.Name).ToList()" @bind-Value="Customer" SizeMode="SizeMode.Small" />
-                        @if (ShowCustomerFind)
-                        {
-                            <DxButton Text="..." SizeMode="SizeMode.Small" RenderStyle="ButtonRenderStyle.Secondary" Click="HandleOpenCustomerFind" />
-                        }
+            <!-- Left Panel -->
+            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
+                <div class="amend-row">
+                    <label>Customer</label>
+                    <div class="lookup-field">
+                        <DxTextBox @bind-Text="Customer" ReadOnly="true" Width="100%"
+                                   CssClass="erp-combobox lookup-input" Click="HandleOpenCustomerFind" />
+                        <button type="button" class="lookup-toggle-btn"
+                                @onclick="HandleOpenCustomerFind">▾</button>
                     </div>
                 </div>
-                <div class="amend-row"><label>Payment Type</label>
-                    <DxComboBox CssClass="erp-combobox" Data="@PaymentMethods" @bind-Value="PaymentType" SizeMode="SizeMode.Small" />
+                <div class="amend-row">
+                    <label>Payment Type</label>
+                    <DxComboBox CssClass="erp-combobox" Data="@PaymentMethods" @bind-Value="PaymentType"
+                                SizeMode="SizeMode.Small" />
                 </div>
-                <div class="amend-row"><label>Currency</label>
-                    <DxComboBox CssClass="erp-combobox" Data="@Currencies" @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                <div class="amend-row">
+                    <label>Currency</label>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <DxComboBox CssClass="erp-combobox" style="flex:1;" Data="@Currencies"
+                                    @bind-Value="Currency" SizeMode="SizeMode.Small" />
+                        <span style="font-size:11.5px; color:#555; white-space:nowrap;">Ex. Rate</span>
+                        <DxTextBox Text="@ExRate.ToString()" SizeMode="SizeMode.Small" ReadOnly="true" style="width:60px;" />
+                    </div>
                 </div>
-                <div class="amend-row"><label>Ex. Rate</label>
-                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="ExRate" SizeMode="SizeMode.Small" />
+                <div class="amend-row">
+                    <label>Amount</label>
+                    <DxSpinEdit CssClass="dx-input-num" Value="@Amount"
+                                ValueChanged="@((decimal v) => { Amount = v; TotalAmount = v; })"
+                                MinValue="0" SizeMode="SizeMode.Small" DisplayFormat="N2" />
                 </div>
-                <div class="amend-row"><label>Amount</label>
-                    <DxSpinEdit CssClass="dx-input-num" @bind-Value="Amount" SizeMode="SizeMode.Small" />
-                </div>
-                <div class="amend-row"><label>Total Amount</label>
+                <div class="amend-row">
+                    <label>Total Amount</label>
                     <DxTextBox Text="@TotalAmount.ToString("N2")" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
                 @if (ShowNetOff)
                 {
-                    <div class="amend-row"><label></label>
+                    <div class="amend-row">
+                        <label></label>
                         <DxCheckBox @bind-Checked="NetOff">Net Off</DxCheckBox>
                     </div>
                 }
             </div>
-            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px;">
-                <div class="amend-row"><label>Voucher No.</label>
+
+            <!-- Right Panel -->
+            <div class="amend-form" style="flex:1; border:1px solid #c8cdd4; padding:8px; border-radius:2px;">
+                <div class="amend-row">
+                    <label>Voucher No.</label>
                     <DxTextBox @bind-Text="VoucherNo" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
-                <div class="amend-row"><label>Date</label>
+                <div class="amend-row">
+                    <label>Date</label>
                     <DxDateEdit @bind-Date="Date" SizeMode="SizeMode.Small" />
                 </div>
-                <div class="amend-row"><label>Reg. No</label>
+                <div class="amend-row">
+                    <label>Reg. No</label>
                     <DxTextBox @bind-Text="RegNo" SizeMode="SizeMode.Small" ReadOnly="true" />
                 </div>
-                <div class="amend-row"><label>Window</label>
-                    <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window" SizeMode="SizeMode.Small" />
+                <div class="amend-row">
+                    <label>Window</label>
+                    <DxComboBox CssClass="erp-combobox" Data="@WindowList" @bind-Value="Window"
+                                SizeMode="SizeMode.Small" />
                 </div>
-                <div class="amend-row"><label>Reference</label>
+                <div class="amend-row">
+                    <label>Reference</label>
                     <DxTextBox @bind-Text="Reference" SizeMode="SizeMode.Small" />
                 </div>
             </div>
         </div>
+
+        <!-- Bottom Purpose Panel -->
         <div class="amend-form" style="margin-top:8px;">
-            <div class="amend-row"><label>Purpose</label>
+            <div class="amend-row" style="grid-template-columns: 80px 1fr;">
+                <label style="text-align:left;">Purpose</label>
                 <DxMemo @bind-Text="Purpose" Rows="2" SizeMode="SizeMode.Small" />
-            </div>
-            <div class="amend-row"><label>Remark</label>
-                <DxTextBox @bind-Text="Remark" SizeMode="SizeMode.Small" />
             </div>
         </div>
     </BodyContentTemplate>
 </DxPopup>
 
-<!-- Embedded Foreign Currency Popup -->
-<ForeignCurrencyPopup
-    @bind-Visible="showForeignCurrency"
-    VoucherNo="@VoucherNo"
-    Payment="@Amount"
-    Currencies="@Currencies"
-    OnSave="@(() => showForeignCurrency = false)" />
+<!-- Embedded Global Company / Customer Search Modal -->
+<CompanySearchPopup @bind-Visible="showCompanySearch" OnSelect="HandleSelectCompany" />
 
-<!-- Embedded Customer Find Popup -->
-<CrCustomerFindPopup
-    @bind-Visible="showCustomerFind"
-    Customers="@Customers"
-    @bind-SelectedCustomer="selectedCustomerItem"
-    OnOk="HandleSelectCustomer" />
+<!-- Embedded Foreign Currency Popup -->
+<ForeignCurrencyPopup @bind-Visible="showForeignCurrency" VoucherNo="@VoucherNo" Payment="@Amount"
+                      Currencies="@Currencies" OnSave="@(() => showForeignCurrency = false)" />
 
 @code {
     [Parameter] public bool Visible { get; set; }
@@ -107,85 +122,88 @@
     [Parameter] public bool ShowNetOff { get; set; } = false;
     [Parameter] public bool ShowCustomerFind { get; set; } = true;
 
-    [Parameter] public string Customer { get; set; } = "";
+    [Parameter] public string Customer { get; set; } = "BEREKET";
+    [Parameter] public EventCallback<string> CustomerChanged { get; set; }
     [Parameter] public string? PaymentType { get; set; } = "Cash";
     [Parameter] public string? Currency { get; set; } = "Birr";
     [Parameter] public decimal ExRate { get; set; } = 1;
-    [Parameter] public decimal Amount { get; set; } = 3744.03m;
-    [Parameter] public decimal TotalAmount { get; set; } = 3744.03m;
-    [Parameter] public string VoucherNo { get; set; } = "";
+    [Parameter] public decimal Amount { get; set; } = 300.00m;
+    [Parameter] public decimal TotalAmount { get; set; } = 300.00m;
+    [Parameter] public string VoucherNo { get; set; } = "CRV-00000-26";
     [Parameter] public DateTime? Date { get; set; } = DateTime.Today;
-    [Parameter] public string RegNo { get; set; } = "";
-    [Parameter] public string? Window { get; set; } = "Window 1";
+    [Parameter] public string RegNo { get; set; } = "REG-00008-26";
+    [Parameter] public string? Window { get; set; } = "All";
     [Parameter] public string Reference { get; set; } = "";
-    [Parameter] public string Purpose { get; set; } = "";
+    [Parameter] public string Purpose { get; set; } = "Payment for REG-00008-26 Room = 107";
     [Parameter] public string Remark { get; set; } = "";
-    [Parameter] public bool NetOff { get; set; } = true;
+    [Parameter] public bool NetOff { get; set; } = false;
 
     [Parameter] public List<CustomerFindItem> Customers { get; set; } = new();
     [Parameter] public List<string> PaymentMethods { get; set; } = new() { "Cash", "Check", "CPO", "Credit Card", "Debit Card", "Gift Card", "Entertainment" };
-    [Parameter] public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound", "Dirham" };
-    [Parameter] public List<string> WindowList { get; set; } = new() { "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
+    [Parameter]
+    public List<string> Currencies { get; set; } = new() { "Birr", "US Dollar", "Euro", "Yen", "Yuan", "Pound",
+"Dirham" };
+    [Parameter] public List<string> WindowList { get; set; } = new() { "All", "Window 1", "Window 2", "Window 3", "Window 4", "Window 5", "Window 6", "Window 7" };
 
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnForeignCurrency { get; set; }
     [Parameter] public EventCallback OnOpenCustomerFind { get; set; }
 
     bool showForeignCurrency = false;
-    bool showCustomerFind = false;
-    CustomerFindItem? selectedCustomerItem;
+    bool showCompanySearch = false;
 
     protected override void OnParametersSet()
     {
         if (TargetRegistration != null)
         {
-            if (string.IsNullOrEmpty(Customer)) Customer = TargetRegistration.Guest ?? "";
-            if (string.IsNullOrEmpty(RegNo)) RegNo = TargetRegistration.Registration ?? "";
+            if (string.IsNullOrEmpty(Customer) || Customer == "BEREKET")
+            {
+                Customer = TargetRegistration.Guest ?? "BEREKET";
+            }
+            if (string.IsNullOrEmpty(RegNo) || RegNo == "REG-00008-26")
+            {
+                RegNo = TargetRegistration.Registration ?? "REG-00008-26";
+            }
+            if (string.IsNullOrEmpty(Purpose))
+            {
+                var room = (TargetRegistration.Room ?? "").Replace("#", "");
+                Purpose = $"Payment for {RegNo} Room = {room}";
+            }
         }
 
         if (string.IsNullOrEmpty(VoucherNo))
         {
             VoucherNo = Title.Contains("Rebate", StringComparison.OrdinalIgnoreCase) ? $"WCNO-{Random.Shared.Next(100, 999)}-17" :
                         Title.Contains("Paid Out", StringComparison.OrdinalIgnoreCase) ? $"POV-{Random.Shared.Next(100, 999)}-17" :
-                        $"CRV-{Random.Shared.Next(50000, 99999)}";
-        }
-
-        if (!Customers.Any())
-        {
-            Customers = new List<CustomerFindItem>
-            {
-                new() { Code = "PCU-00001", Name = "TIGIST ASMAMAW", IdNumber = "" },
-                new() { Code = "WPGU-00001-17", Name = "TEST GUEST WASA", IdNumber = "123456" },
-                new() { Code = "WPGU-00002-17", Name = "TAHER NAGUIB ALI", IdNumber = "D02018" },
-                new() { Code = "WPGU-00003-17", Name = "OUDINE FATHIA DJAMA", IdNumber = "D02020" },
-                new() { Code = "WPGU-00004-17", Name = "DJAMA MOHAMED ALI", IdNumber = "D02362" },
-                new() { Code = "WPGU-00005-17", Name = "DOUALEH DOUALEH AHMED", IdNumber = "D01950" },
-                new() { Code = "WPGU-00007-17", Name = "ONEN TONNYYY", IdNumber = "263805" },
-                new() { Code = "WPGU-00008-17", Name = "DAVID NIJIRI WAWERU", IdNumber = "C042628" },
-                new() { Code = "WPGU-00010-17", Name = "SINGH KUNWAR SURENDRA", IdNumber = "J8124701" },
-                new() { Code = RegNo, Name = Customer, IdNumber = "" }
-            };
+                        $"CRV-00000-26";
         }
     }
 
     async Task HandleSave() => await OnSave.InvokeAsync();
+
     async Task HandleForeignCurrency()
     {
         if (OnForeignCurrency.HasDelegate) await OnForeignCurrency.InvokeAsync();
         else showForeignCurrency = true;
     }
+
     async Task HandleOpenCustomerFind()
     {
-        if (OnOpenCustomerFind.HasDelegate) await OnOpenCustomerFind.InvokeAsync();
-        else showCustomerFind = true;
+        showCompanySearch = true;
     }
-    void HandleSelectCustomer()
+
+    async Task HandleSelectCompany(CustomerItem item)
     {
-        if (selectedCustomerItem != null)
+        if (item != null)
         {
-            Customer = selectedCustomerItem.Name;
+            Customer = !string.IsNullOrEmpty(item.FirstName) ? item.FirstName : item.Code;
+            await CustomerChanged.InvokeAsync(Customer);
         }
-        showCustomerFind = false;
+        showCompanySearch = false;
     }
+
     async Task HandleClose() => await VisibleChanged.InvokeAsync(false);
 }
+
+
+
