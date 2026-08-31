@@ -252,8 +252,7 @@
                                                                                         <button type="button" class="dx-doc-tb-btn" title="Next Page" disabled="@(currentPage >= TotalPages)"
                                                                                                 @onclick="GoNextPage">
                                                                                             <i class="bi bi-chevron-right" style="color:#0288d1; font-weight:bold;"></i>
-                                                                                        </button>
-                                                                                        <button type="button" class="dx-doc-tb-btn" title="Last Page" disabled="@(currentPage >= TotalPages)"
+                                                                                        </button>                                                                                        <button type="button" class="dx-doc-tb-btn" title="Last Page" disabled="@(currentPage >= TotalPages)"
                                                                                                 @onclick="GoLastPage">
                                                                                             <i class="bi bi-chevron-bar-right" style="color:#0288d1; font-weight:bold;"></i>
                                                                                         </button>
@@ -270,249 +269,360 @@
                                                                                             @if (showLayoutMenu)
                                                                                             {
                                                                                                 <div class="dx-doc-dropdown-menu" style="left:0;">
-                                                                                                    <button type="button" @onclick="@(() => SetLayoutMode(false))"><i class="bi bi-file-earmark"></i>
-                                                                                                        Single Page View</button>
-                                                                                                        <button type="button" @onclick="@(() => SetLayoutMode(true))"><i class="bi bi-grid-fill"></i>
-                                                                                                            Continuous Multi-Page</button>
-                                                                                                        </div>
-                                                                                                    }
+                                                                                                    <button type="button" @onclick="@(() => SetLayoutMode(false))"><i class="bi bi-file-earmark"></i> Single Page View</button>
+                                                                                                    <button type="button" @onclick="@(() => SetLayoutMode(true))"><i class="bi bi-grid-fill"></i> Continuous Multi-Page</button>
                                                                                                 </div>
+                                                                                            }
+                                                                                        </div>
 
-                                                                                                <!-- 20. Color / Background Mode -->
-                                                                                                <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
-                                                                                                    <button type="button" class="dx-doc-tb-btn @(showColorMenu ? "active" : "")" title="Color & Background"
-                                                                                                            @onclick="@(() => ToggleSubMenu("color"))">
-                                                                                                        <i class="bi bi-palette" style="font-size: 13px; color:#2e7d32;"></i>
-                                                                                                        <span style="font-size: 9px; margin-left: 2px;">▾</span>
-                                                                                                    </button>
-                                                                                                    @if (showColorMenu)
-                                                                                                    {
-                                                                                                        <div class="dx-doc-dropdown-menu" style="left:0;">
-                                                                                                            <button type="button" @onclick="@(() => SetColorMode("color"))"><i
-                                                                                                                class="bi bi-circle-fill text-primary"></i> Full Color Mode</button>
-                                                                                                                <button type="button" @onclick="@(() => SetColorMode("grayscale"))"><i
-                                                                                                                    class="bi bi-circle-half text-secondary"></i> Grayscale Mode</button>
-                                                                                                                    <button type="button" @onclick="@(() => SetColorMode("sepia"))"><i
-                                                                                                                        class="bi bi-circle-fill text-warning"></i> Warm Sepia</button>
-                                                                                                                        <button type="button" @onclick="@(() => SetColorMode("contrast"))"><i
-                                                                                                                            class="bi bi-circle-half text-dark"></i> High Contrast</button>
-                                                                                                                            <button type="button" @onclick="@(() => SetColorMode("invert"))"><i
-                                                                                                                                class="bi bi-circle text-info"></i> Invert Colors</button>
-                                                                                                                            </div>
+                                                                                        <!-- 20. Color / Background Mode with 3 Tabs -->
+                                                                                        <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
+                                                                                            <button type="button" class="dx-doc-tb-btn @(showColorMenu ? "active" : "")" title="Color & Background / Page Color"
+                                                                                                    @onclick="@(() => ToggleSubMenu("color"))">
+                                                                                                <i class="bi bi-palette" style="font-size: 13px; color:#2e7d32;"></i>
+                                                                                                <span style="font-size: 9px; margin-left: 2px;">▾</span>
+                                                                                            </button>
+                                                                                            @if (showColorMenu)
+                                                                                            {
+                                                                                                <div class="dx-color-picker-box dx-doc-dropdown-menu" style="left:0; padding:0;">
+                                                                                                    <!-- Tabs: Custom | Web | System -->
+                                                                                                    <div class="dx-color-tabs">
+                                                                                                        <button type="button" class="dx-color-tab-btn @(activeColorTab == "custom" ? "active" : "")"
+                                                                                                                @onclick="@(() => activeColorTab = "custom")">Custom</button>
+                                                                                                        <button type="button" class="dx-color-tab-btn @(activeColorTab == "web" ? "active" : "")"
+                                                                                                                @onclick="@(() => activeColorTab = "web")">Web</button>
+                                                                                                        <button type="button" class="dx-color-tab-btn @(activeColorTab == "system" ? "active" : "")"
+                                                                                                                @onclick="@(() => activeColorTab = "system")">System</button>
+                                                                                                    </div>
+                                                                                                    
+                                                                                                    <div class="dx-color-tab-body">
+                                                                                                        @if (activeColorTab == "custom")
+                                                                                                        {
+                                                                                                            <div class="dx-color-section-title">Theme Colors</div>
+                                                                                                            <div class="dx-theme-matrix">
+                                                                                                                @foreach (var col in ThemeColorMatrix)
+                                                                                                                {
+                                                                                                                    <div class="dx-theme-col">
+                                                                                                                        @foreach (var hex in col)
+                                                                                                                        {
+                                                                                                                            <div class="dx-color-cell" style="background-color: @hex;"
+                                                                                                                                 title="@hex" @onclick="@(() => ApplyDocumentColor(hex))"></div>
                                                                                                                         }
                                                                                                                     </div>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                            
+                                                                                                            <div class="dx-color-section-title">Standard Colors</div>
+                                                                                                            <div class="dx-standard-row">
+                                                                                                                @foreach (var hex in StandardColorsList)
+                                                                                                                {
+                                                                                                                    <div class="dx-color-cell" style="background-color: @hex;"
+                                                                                                                         title="@hex" @onclick="@(() => ApplyDocumentColor(hex))"></div>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                            
+                                                                                                            <label class="dx-more-colors-btn">
+                                                                                                                <i class="bi bi-grid-3x3-gap-fill" style="color:#e91e63;"></i>
+                                                                                                                <span>More Colors...</span>
+                                                                                                                <input type="color" style="opacity:0; position:absolute; left:0; top:0; width:100%; height:100%; cursor:pointer;"
+                                                                                                                       @onchange="OnCustomColorPickerChanged" />
+                                                                                                            </label>
+                                                                                                        }
+                                                                                                        else if (activeColorTab == "web")
+                                                                                                        {
+                                                                                                            <div class="dx-color-list-scroll">
+                                                                                                                @foreach (var item in WebColorsList)
+                                                                                                                {
+                                                                                                                    <div class="dx-color-list-item" @onclick="@(() => ApplyDocumentColor(item.Value))">
+                                                                                                                        <div class="dx-color-swatch-rect" style="background-color: @item.Value;"></div>
+                                                                                                                        <span>@item.Key</span>
+                                                                                                                    </div>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        }
+                                                                                                        else if (activeColorTab == "system")
+                                                                                                        {
+                                                                                                            <div class="dx-color-list-scroll">
+                                                                                                                @foreach (var item in SystemColorsList)
+                                                                                                                {
+                                                                                                                    <div class="dx-color-list-item" @onclick="@(() => ApplyDocumentColor(item.Value))">
+                                                                                                                        <div class="dx-color-swatch-rect" style="background-color: @item.Value;"></div>
+                                                                                                                        <span>@item.Key</span>
+                                                                                                                    </div>
+                                                                                                                }
+                                                                                                            </div>
+                                                                                                        }
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            }
+                                                                                        </div>
 
-                                                                                                                    <!-- 21. Watermark Toggle & Settings -->
-                                                                                                                    <button type="button" class="dx-doc-tb-btn @(showWatermark ? "active" : "")" title="Watermark Settings"
-                                                                                                                            @onclick="@(() => { showWatermarkModal = !showWatermarkModal; CloseAllMenus(); })">
-                                                                                                                        <i class="bi bi-card-text" style="font-size: 13px; color:#c2185b;"></i>
-                                                                                                                    </button>
+                                                                                        <!-- 21. Watermark Toggle & Settings -->
+                                                                                        <button type="button" class="dx-doc-tb-btn @(showWatermark ? "active" : "")" title="Watermark Settings"
+                                                                                                @onclick="@(() => { showWatermarkModal = !showWatermarkModal; CloseAllMenus(); })">
+                                                                                            <i class="bi bi-card-text" style="font-size: 13px; color:#c2185b;"></i>
+                                                                                        </button>
 
-                                                                                                                    <span class="dx-doc-tb-divider"></span>
+                                                                                        <span class="dx-doc-tb-divider"></span>
 
-                                                                                                                    <!-- 22. DIRECT EXPORT TO EXCEL XLSX BUTTON (With XLSX green icon) -->
-                                                                                                                    <button type="button" class="dx-doc-tb-btn" title="Export directly to Excel Spreadsheet (*.xlsx)"
-                                                                                                                            @onclick="@(() => ExportDocument("xlsx"))" style="background:#e8f5e9; border-color:#a5d6a7;">
-                                                                                                                        <i class="bi bi-filetype-xlsx" style="font-size: 15px; color:#1b5e20; font-weight:bold;"></i>
-                                                                                                                    </button>
+                                                                                        <!-- 22. DIRECT EXPORT TO EXCEL XLSX BUTTON (With XLSX green icon) -->
+                                                                                        <button type="button" class="dx-doc-tb-btn" title="Export directly to Excel Spreadsheet (*.xlsx)"
+                                                                                                @onclick="@(() => ExportDocument("xlsx"))" style="background:#e8f5e9; border-color:#a5d6a7;">
+                                                                                            <i class="bi bi-filetype-xlsx" style="font-size: 15px; color:#1b5e20; font-weight:bold;"></i>
+                                                                                        </button>
 
-                                                                                                                    <!-- 23. Export Document Dropdown -->
-                                                                                                                    <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
-                                                                                                                        <button type="button" class="dx-doc-tb-btn @(showExportMenu ? "active" : "")" title="Export Document"
-                                                                                                                                @onclick="@(() => ToggleSubMenu("export"))">
-                                                                                                                            <i class="bi bi-box-arrow-up-right" style="font-size: 13px; color:#0d6efd;"></i>
-                                                                                                                            <span style="font-size: 10px; margin-left: 2px;">▾</span>
-                                                                                                                        </button>
-                                                                                                                        @if (showExportMenu)
-                                                                                                                        {
-                                                                                                                            <div class="dx-doc-dropdown-menu menu-align-right">
-                                                                                                                                <button type="button" @onclick="@(() => ExportDocument("xlsx"))"><i
-                                                                                                                                    class="bi bi-filetype-xlsx text-success"></i> Excel Spreadsheet (*.xlsx)</button>
-                                                                                                                                    <button type="button" @onclick="@(() => ExportDocument("pdf"))"><i
-                                                                                                                                        class="bi bi-filetype-pdf text-danger"></i> PDF Document (*.pdf)</button>
-                                                                                                                                        <button type="button" @onclick="@(() => ExportDocument("csv"))"><i
-                                                                                                                                            class="bi bi-filetype-csv text-success"></i> CSV Document (*.csv)</button>
-                                                                                                                                            <button type="button" @onclick="@(() => ExportDocument("doc"))"><i
-                                                                                                                                                class="bi bi-filetype-doc text-primary"></i> Microsoft Word (*.doc)</button>
-                                                                                                                                                <button type="button" @onclick="@(() => ExportDocument("html"))"><i
-                                                                                                                                                    class="bi bi-filetype-html text-danger"></i> HTML Web Archive (*.html)</button>
-                                                                                                                                                    <button type="button" @onclick="@(() => ExportDocument("txt"))"><i
-                                                                                                                                                        class="bi bi-file-earmark-text text-secondary"></i> Plain Text Document (*.txt)</button>
-                                                                                                                                                    </div>
-                                                                                                                                                }
-                                                                                                                                            </div>
+                                                                                        <!-- 23. Export Document Dropdown -->
+                                                                                        <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
+                                                                                            <button type="button" class="dx-doc-tb-btn @(showExportMenu ? "active" : "")" title="Export Document..."
+                                                                                                    @onclick="@(() => ToggleSubMenu("export"))">
+                                                                                                <i class="bi bi-box-arrow-up-right" style="font-size: 13px; color:#0288d1;"></i>
+                                                                                                <span style="font-size: 9px; margin-left: 2px;">▾</span>
+                                                                                            </button>
+                                                                                            @if (showExportMenu)
+                                                                                            {
+                                                                                                <div class="dx-doc-dropdown-menu menu-align-right">
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("pdf"))"><i class="bi bi-filetype-pdf text-danger"></i> PDF Document (*.pdf)</button>
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("xlsx"))"><i class="bi bi-filetype-xlsx text-success"></i> Excel Spreadsheet (*.xlsx)</button>
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("csv"))"><i class="bi bi-filetype-csv text-success"></i> CSV (Comma delimited) (*.csv)</button>
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("docx"))"><i class="bi bi-filetype-docx text-primary"></i> Word Document (*.doc)</button>
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("html"))"><i class="bi bi-filetype-html text-warning"></i> HTML Web Page (*.html)</button>
+                                                                                                    <button type="button" @onclick="@(() => ExportDocument("txt"))"><i class="bi bi-filetype-txt text-secondary"></i> Plain Text (*.txt)</button>
+                                                                                                </div>
+                                                                                            }
+                                                                                        </div>
 
-                                                                                                                                            <!-- 24. Send via Email -->
-                                                                                                                                            <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
-                                                                                                                                                <button type="button" class="dx-doc-tb-btn @(showEmailMenu ? "active" : "")" title="Send via Email"
-                                                                                                                                                        @onclick="@(() => ToggleSubMenu("email"))">
-                                                                                                                                                    <i class="bi bi-envelope" style="font-size: 14px; color:#0288d1;"></i>
-                                                                                                                                                    <span style="font-size: 9px; margin-left: 2px;">▾</span>
-                                                                                                                                                </button>
-                                                                                                                                                @if (showEmailMenu)
-                                                                                                                                                {
-                                                                                                                                                    <div class="dx-doc-dropdown-menu menu-align-right">
-                                                                                                                                                        <button type="button" @onclick="@(() => SendEmailWithFormat("PDF"))"><i
-                                                                                                                                                            class="bi bi-filetype-pdf text-danger"></i> Send as PDF</button>
-                                                                                                                                                            <button type="button" @onclick="@(() => SendEmailWithFormat("Excel"))"><i
-                                                                                                                                                                class="bi bi-filetype-xlsx text-success"></i> Send as Excel</button>
-                                                                                                                                                                <button type="button" @onclick="@(() => SendEmailWithFormat("CSV"))"><i
-                                                                                                                                                                    class="bi bi-filetype-csv text-success"></i> Send as CSV</button>
-                                                                                                                                                                </div>
-                                                                                                                                                            }
-                                                                                                                                                        </div>
+                                                                                        <!-- 24. Send via Email Dropdown -->
+                                                                                        <div class="dx-doc-menu-item" @onclick:stopPropagation="true">
+                                                                                            <button type="button" class="dx-doc-tb-btn @(showEmailMenu ? "active" : "")" title="Send via Email"
+                                                                                                    @onclick="@(() => ToggleSubMenu("email"))">
+                                                                                                <i class="bi bi-envelope" style="font-size: 14px; color:#0288d1;"></i>
+                                                                                                <span style="font-size: 9px; margin-left: 2px;">▾</span>
+                                                                                            </button>
+                                                                                            @if (showEmailMenu)
+                                                                                            {
+                                                                                                <div class="dx-doc-dropdown-menu menu-align-right">
+                                                                                                    <button type="button" @onclick="@(() => SendEmailWithFormat("PDF"))"><i class="bi bi-filetype-pdf text-danger"></i> Send as PDF</button>
+                                                                                                    <button type="button" @onclick="@(() => SendEmailWithFormat("Excel"))"><i class="bi bi-filetype-xlsx text-success"></i> Send as Excel</button>
+                                                                                                    <button type="button" @onclick="@(() => SendEmailWithFormat("CSV"))"><i class="bi bi-filetype-csv text-success"></i> Send as CSV</button>
+                                                                                                </div>
+                                                                                            }
+                                                                                        </div>
 
-                                                                                                                                                        <!-- 25. Close Button (Red Circle with X) -->
-                                                                                                                                                        @* <button type="button" class="dx-doc-tb-btn btn-danger-close" style="margin-left: auto;" title="Close
-            Print Preview" @onclick="CloseViewer">
-                    <i class="bi bi-x-circle-fill" style="font-size: 16px; color:#d32f2f;"></i>
-                </button> *@
-                                                                                                                                                    </div>
+                                                                                        <!-- 25. Close Button (Red Circle with X) -->
+                                                                                        @* <button type="button" class="dx-doc-tb-btn btn-danger-close" style="margin-left: auto;" title="Close Print Preview" @onclick="CloseViewer">
+                                                                                            <i class="bi bi-x-circle-fill" style="font-size: 16px; color:#d32f2f;"></i>
+                                                                                        </button> *@
+                                                                                    </div>
 
-                                                                                                                                                    <!-- 3.1 Search / Find Interactive Bar -->
-                                                                                                                                                    @if (showSearchBar)
-                                                                                                                                                    {
-                                                                                                                                                        <div class="dx-doc-search-bar">
-                                                                                                                                                            <i class="bi bi-binoculars text-secondary"></i>
-                                                                                                                                                            <span>Find:</span>
-                                                                                                                                                            <input type="text" class="dx-doc-search-input" placeholder="Search text..." @bind="searchQuery"
-                                                                                                                                                                   @bind:event="oninput" @onkeyup="OnSearchKeyUp" />
-                                                                                                                                                            <button type="button" class="dx-doc-search-btn" @onclick="FindNextMatch"><i class="bi bi-chevron-down"></i>
-                                                                                                                                                                Next</button>
-                                                                                                                                                                <button type="button" class="dx-doc-search-btn" @onclick="FindPrevMatch"><i class="bi bi-chevron-up"></i>
-                                                                                                                                                                    Previous</button>
-                                                                                                                                                                    @if (searchTotalMatches > 0)
-                                                                                                                                                                    {
-                                                                                                                                                                        <span class="dx-doc-search-count">@searchCurrentIndex of @searchTotalMatches match@(searchTotalMatches > 1 ?
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "es" : "")</span>
-                                                                                                                                                                        }
-                    else if (!string.IsNullOrWhiteSpace(searchQuery))
-                                                                                                                                                                        {
-                                                                                                                                                                            <span class="dx-doc-search-count text-danger">No matches</span>
-                                                                                                                                                                        }
-                                                                                                                                                                        <button type="button" class="dx-doc-wnd-btn ms-auto" title="Close Search"
-                                                                                                                                                                                @onclick="@(async () => { showSearchBar = false; await ClearSearch(); })">
-                                                                                                                                                                            <i class="bi bi-x-lg"></i>
-                                                                                                                                                                        </button>
-                                                                                                                                                                    </div>
-                                                                                                                                                                }
+                                                                                    <!-- 3.1 Search / Find Interactive Bar -->
+                                                                                    @if (showSearchBar)
+                                                                                    {
+                                                                                        <div class="dx-doc-search-bar">
+                                                                                            <i class="bi bi-binoculars text-secondary"></i>
+                                                                                            <span>Find:</span>
+                                                                                            <input type="text" class="dx-doc-search-input" placeholder="Search text..." @bind="searchQuery"
+                                                                                                   @bind:event="oninput" @onkeyup="OnSearchKeyUp" />
+                                                                                            <button type="button" class="dx-doc-search-btn" @onclick="FindNextMatch"><i class="bi bi-chevron-down"></i> Next</button>
+                                                                                            <button type="button" class="dx-doc-search-btn" @onclick="FindPrevMatch"><i class="bi bi-chevron-up"></i> Previous</button>
+                                                                                            @if (searchTotalMatches > 0)
+                                                                                            {
+                                                                                                <span class="dx-doc-search-count">@searchCurrentIndex of @searchTotalMatches match@(searchTotalMatches > 1 ? "es" : "")</span>
+                                                                                            }
+                                                                                            else if (!string.IsNullOrWhiteSpace(searchQuery))
+                                                                                            {
+                                                                                                <span class="dx-doc-search-count text-danger">No matches</span>
+                                                                                            }
+                                                                                            <button type="button" class="dx-doc-wnd-btn ms-auto" title="Close Search"
+                                                                                                    @onclick="@(async () => { showSearchBar = false; await ClearSearch(); })">
+                                                                                                <i class="bi bi-x-lg"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    }
 
-                                                                                                                                                                <!-- 3.2 Page Setup Modal -->
-                                                                                                                                                                @if (showPageSetupModal)
-                                                                                                                                                                {
-                                                                                                                                                                    <div class="dx-doc-modal-overlay">
-                                                                                                                                                                        <div class="dx-doc-modal-header">
-                                                                                                                                                                            <span><i class="bi bi-file-earmark-ruled me-1 text-primary"></i> Page Setup</span>
-                                                                                                                                                                            <button type="button" class="dx-doc-wnd-btn" @onclick="@(() => showPageSetupModal = false)"><i
-                                                                                                                                                                                class="bi bi-x-lg"></i></button>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            <div class="dx-doc-modal-body">
-                                                                                                                                                                                <div class="dx-doc-modal-row">
-                                                                                                                                                                                    <label>Orientation:</label>
-                                                                                                                                                                                    <div>
-                                                                                                                                                                                        <label class="me-3"><input type="radio" name="orient" checked="@(!isLandscape)"
-                                                                                                                                                                                                                       @onchange="@(() => isLandscape = false)" /> Portrait</label>
-                                                                                                                                                                                            <label><input type="radio" name="orient" checked="@isLandscape"
-                                                                                                                                                                                                              @onchange="@(() => isLandscape = true)" /> Landscape</label>
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                        <div class="dx-doc-modal-row">
-                                                                                                                                                                                            <label>Margin Guides:</label>
-                                                                                                                                                                                            <label><input type="checkbox" checked="@showMarginGuides"
-                                                                                                                                                                                                              @onchange="@(() => showMarginGuides = !showMarginGuides)" /> Show Margin Guides</label>
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                            <div class="dx-doc-modal-row">
-                                                                                                                                                                                                <label>Header & Footer:</label>
-                                                                                                                                                                                                <label><input type="checkbox" checked="@showHeaderFooter"
-                                                                                                                                                                                                                  @onchange="@(() => showHeaderFooter = !showHeaderFooter)" /> Show Header/Footer</label>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                            <div class="dx-doc-modal-footer">
-                                                                                                                                                                                                <button type="button" class="dx-doc-search-btn"
-                                                                                                                                                                                                        @onclick="@(() => showPageSetupModal = false)">OK</button>
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                    }
+                                                                                    <!-- 3.2 Authentic DevExpress Page Setup Modal (Matching Image) -->
+                                                                                    @if (showPageSetupModal)
+                                                                                    {
+                                                                                        <div class="dx-ps-overlay" @onclick:stopPropagation="true">
+                                                                                            <div class="dx-ps-titlebar">
+                                                                                                <span>Page Setup</span>
+                                                                                                <button type="button" class="dx-ps-close-btn" @onclick="CancelPageSetup">
+                                                                                                    <i class="bi bi-x-lg"></i>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                            <div class="dx-ps-content">
+                                                                                                <!-- Left: Live Preview Sheet -->
+                                                                                                <div class="dx-ps-left">
+                                                                                                    <div class="dx-ps-preview-sheet @(tempLandscape ? "landscape" : "portrait")">
+                                                                                                        <div class="dx-ps-preview-inner-margin" style="top:@(tempMarginTop * 25)px; bottom:@(tempMarginBottom * 25)px; left:@(tempMarginLeft * 25)px; right:@(tempMarginRight * 25)px;"></div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                
+                                                                                                <!-- Right: Paper & Margins Form -->
+                                                                                                <div class="dx-ps-right">
+                                                                                                    <!-- Paper Group -->
+                                                                                                    <div class="dx-ps-group">
+                                                                                                        <div class="dx-ps-group-title">Paper</div>
+                                                                                                        <div class="dx-ps-row">
+                                                                                                            <span class="dx-ps-label">Size:</span>
+                                                                                                            <select class="dx-ps-select" style="flex:1;" value="@tempPaperSize" @onchange="OnPaperSizeChanged">
+                                                                                                                <option value="A4">A4</option>
+                                                                                                                <option value="Letter">Letter</option>
+                                                                                                                <option value="Legal">Legal</option>
+                                                                                                                <option value="Executive">Executive</option>
+                                                                                                                <option value="A3">A3</option>
+                                                                                                                <option value="A5">A5</option>
+                                                                                                                <option value="B5">B5</option>
+                                                                                                            </select>
+                                                                                                        </div>
+                                                                                                        <div style="display:flex; gap:12px; align-items:flex-start;">
+                                                                                                            <div style="flex:1;">
+                                                                                                                <div class="dx-ps-row">
+                                                                                                                    <span class="dx-ps-label">Unit:</span>
+                                                                                                                    <select class="dx-ps-select" style="flex:1;" value="@tempUnit" @onchange="OnUnitChanged">
+                                                                                                                        <option value="Inch">Inch</option>
+                                                                                                                        <option value="Millimeter">Millimeter</option>
+                                                                                                                        <option value="Centimeter">Centimeter</option>
+                                                                                                                    </select>
+                                                                                                                </div>
+                                                                                                                <div class="dx-ps-row">
+                                                                                                                    <span class="dx-ps-label">Width:</span>
+                                                                                                                    <input type="text" class="dx-ps-input" style="flex:1;" value="@tempWidthDisplay" readonly />
+                                                                                                                </div>
+                                                                                                                <div class="dx-ps-row">
+                                                                                                                    <span class="dx-ps-label">Height:</span>
+                                                                                                                    <input type="text" class="dx-ps-input" style="flex:1;" value="@tempHeightDisplay" readonly />
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <!-- Orientation Buttons -->
+                                                                                                            <div class="dx-ps-orient-container">
+                                                                                                                <button type="button" class="dx-ps-orient-btn @(!tempLandscape ? "active" : "")" @onclick="@(() => SetTempOrientation(false))">
+                                                                                                                    <div class="dx-ps-orient-icon portrait">
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                    </div>
+                                                                                                                    <span>Portrait</span>
+                                                                                                                </button>
+                                                                                                                <button type="button" class="dx-ps-orient-btn @(tempLandscape ? "active" : "")" @onclick="@(() => SetTempOrientation(true))">
+                                                                                                                    <div class="dx-ps-orient-icon landscape">
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                        <div class="dx-ps-orient-icon-line"></div>
+                                                                                                                    </div>
+                                                                                                                    <span>Landscape</span>
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    
+                                                                                                    <!-- Page Margins Group -->
+                                                                                                    <div class="dx-ps-group">
+                                                                                                        <div class="dx-ps-group-title">Page Margins</div>
+                                                                                                        <div class="dx-ps-margins-grid">
+                                                                                                            <div class="dx-ps-margin-item">
+                                                                                                                <span class="dx-ps-label">Left:</span>
+                                                                                                                <input type="number" step="0.05" min="0" max="2" class="dx-ps-input" style="flex:1;" @bind="tempMarginLeft" />
+                                                                                                            </div>
+                                                                                                            <div class="dx-ps-margin-item">
+                                                                                                                <span class="dx-ps-label">Right:</span>
+                                                                                                                <input type="number" step="0.05" min="0" max="2" class="dx-ps-input" style="flex:1;" @bind="tempMarginRight" />
+                                                                                                            </div>
+                                                                                                            <div class="dx-ps-margin-item">
+                                                                                                                <span class="dx-ps-label">Top:</span>
+                                                                                                                <input type="number" step="0.05" min="0" max="2" class="dx-ps-input" style="flex:1;" @bind="tempMarginTop" />
+                                                                                                            </div>
+                                                                                                            <div class="dx-ps-margin-item">
+                                                                                                                <span class="dx-ps-label">Bottom:</span>
+                                                                                                                <input type="number" step="0.05" min="0" max="2" class="dx-ps-input" style="flex:1;" @bind="tempMarginBottom" />
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="dx-ps-footer">
+                                                                                                <button type="button" class="dx-ps-btn primary" @onclick="ApplyPageSetup">OK</button>
+                                                                                                <button type="button" class="dx-ps-btn" @onclick="CancelPageSetup">Cancel</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
 
-                                                                                                                                                                                    <!-- 3.3 Watermark Settings Modal -->
-                                                                                                                                                                                    @if (showWatermarkModal)
-                                                                                                                                                                                    {
-                                                                                                                                                                                        <div class="dx-doc-modal-overlay">
-                                                                                                                                                                                            <div class="dx-doc-modal-header">
-                                                                                                                                                                                                <span><i class="bi bi-brush me-1 text-danger"></i> Watermark Settings</span>
-                                                                                                                                                                                                <button type="button" class="dx-doc-wnd-btn" @onclick="@(() => showWatermarkModal = false)"><i
-                                                                                                                                                                                                    class="bi bi-x-lg"></i></button>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                <div class="dx-doc-modal-body">
-                                                                                                                                                                                                    <div class="dx-doc-modal-row">
-                                                                                                                                                                                                        <label>Enable Watermark:</label>
-                                                                                                                                                                                                        <input type="checkbox" checked="@showWatermark"
-                                                                                                                                                                                                               @onchange="@(() => showWatermark = !showWatermark)" />
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="dx-doc-modal-row">
-                                                                                                                                                                                                        <label>Watermark Text:</label>
-                                                                                                                                                                                                        <input type="text" class="dx-doc-search-input" @bind="watermarkTextValue"
-                                                                                                                                                                                                               placeholder="e.g. NON FISCAL / DRAFT" />
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="dx-doc-modal-row">
-                                                                                                                                                                                                        <label>Preset:</label>
-                                                                                                                                                                                                        <select class="dx-doc-zoom-select" @onchange="OnWatermarkPresetChanged">
-                                                                                                                                                                                                            <option value="NON FISCAL">NON FISCAL</option>
-                                                                                                                                                                                                            <option value="ATTACHMENT">ATTACHMENT</option>
-                                                                                                                                                                                                            <option value="DRAFT">DRAFT</option>
-                                                                                                                                                                                                            <option value="CONFIDENTIAL">CONFIDENTIAL</option>
-                                                                                                                                                                                                            <option value="COPY">COPY</option>
-                                                                                                                                                                                                        </select>
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                                <div class="dx-doc-modal-footer">
-                                                                                                                                                                                                    <button type="button" class="dx-doc-search-btn" @onclick="ApplyWatermark">Apply</button>
-                                                                                                                                                                                                    <button type="button" class="dx-doc-search-btn"
-                                                                                                                                                                                                            @onclick="@(() => showWatermarkModal = false)">Close</button>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        }
+                                                                                    <!-- 3.3 Watermark Settings Modal -->
+                                                                                    @if (showWatermarkModal)
+                                                                                    {
+                                                                                        <div class="dx-doc-modal-overlay">
+                                                                                            <div class="dx-doc-modal-header">
+                                                                                                <span><i class="bi bi-brush me-1 text-danger"></i> Watermark Settings</span>
+                                                                                                <button type="button" class="dx-doc-wnd-btn" @onclick="@(() => showWatermarkModal = false)"><i class="bi bi-x-lg"></i></button>
+                                                                                            </div>
+                                                                                            <div class="dx-doc-modal-body">
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Enable Watermark:</label>
+                                                                                                    <input type="checkbox" checked="@showWatermark" @onchange="@(() => showWatermark = !showWatermark)" />
+                                                                                                </div>
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Watermark Text:</label>
+                                                                                                    <input type="text" class="dx-doc-search-input" @bind="watermarkTextValue" placeholder="e.g. NON FISCAL / DRAFT" />
+                                                                                                </div>
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Preset:</label>
+                                                                                                    <select class="dx-doc-zoom-select" @onchange="OnWatermarkPresetChanged">
+                                                                                                        <option value="NON FISCAL">NON FISCAL</option>
+                                                                                                        <option value="ATTACHMENT">ATTACHMENT</option>
+                                                                                                        <option value="DRAFT">DRAFT</option>
+                                                                                                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+                                                                                                        <option value="COPY">COPY</option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="dx-doc-modal-footer">
+                                                                                                <button type="button" class="dx-doc-search-btn" @onclick="ApplyWatermark">Apply</button>
+                                                                                                <button type="button" class="dx-doc-search-btn" @onclick="@(() => showWatermarkModal = false)">Close</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
 
-                                                                                                                                                                                        <!-- 3.4 Parameters & Document Options Modal -->
-                                                                                                                                                                                        @if (showParamsModal)
-                                                                                                                                                                                        {
-                                                                                                                                                                                            <div class="dx-doc-modal-overlay">
-                                                                                                                                                                                                <div class="dx-doc-modal-header">
-                                                                                                                                                                                                    <span><i class="bi bi-sliders2 me-1 text-warning"></i> Report Parameters</span>
-                                                                                                                                                                                                    <button type="button" class="dx-doc-wnd-btn" @onclick="@(() => showParamsModal = false)"><i
-                                                                                                                                                                                                        class="bi bi-x-lg"></i></button>
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="dx-doc-modal-body">
-                                                                                                                                                                                                        <div class="dx-doc-modal-row">
-                                                                                                                                                                                                            <label>Document Title:</label>
-                                                                                                                                                                                                            <input type="text" class="dx-doc-search-input" @bind="docTitleValue" />
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                        <div class="dx-doc-modal-row">
-                                                                                                                                                                                                            <label>Report Date:</label>
-                                                                                                                                                                                                            <span>@DateTime.Today.ToString("M/d/yyyy")</span>
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                        <div class="dx-doc-modal-row">
-                                                                                                                                                                                                            <label>Color Mode:</label>
-                                                                                                                                                                                                            <span>@colorModeClass</span>
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                    <div class="dx-doc-modal-footer">
-                                                                                                                                                                                                        <button type="button" class="dx-doc-search-btn"
-                                                                                                                                                                                                                @onclick="@(() => showParamsModal = false)">Close</button>
-                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                </div>
+                                                                                    <!-- 3.4 Parameters & Document Options Modal -->
+                                                                                    @if (showParamsModal)
+                                                                                    {
+                                                                                        <div class="dx-doc-modal-overlay">
+                                                                                            <div class="dx-doc-modal-header">
+                                                                                                <span><i class="bi bi-sliders2 me-1 text-warning"></i> Report Parameters</span>
+                                                                                                <button type="button" class="dx-doc-wnd-btn" @onclick="@(() => showParamsModal = false)"><i class="bi bi-x-lg"></i></button>
+                                                                                            </div>
+                                                                                            <div class="dx-doc-modal-body">
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Document Title:</label>
+                                                                                                    <input type="text" class="dx-doc-search-input" @bind="docTitleValue" />
+                                                                                                </div>
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Report Date:</label>
+                                                                                                    <span>@DateTime.Today.ToString("M/d/yyyy")</span>
+                                                                                                </div>
+                                                                                                <div class="dx-doc-modal-row">
+                                                                                                    <label>Color Mode:</label>
+                                                                                                    <span>@colorModeClass</span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="dx-doc-modal-footer">
+                                                                                                <button type="button" class="dx-doc-search-btn" @onclick="@(() => showParamsModal = false)">Close</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
                                                                                                                                                                                             }
 
                                                                                                                                                                                             <!-- 4. Document Canvas Workspace -->
                                                                                                                                                                                             <div class="dx-doc-workspace @(isHandTool ? "is-hand-tool" : "") @(isMultiPage ? "multi-page-mode" : "")"
                                                                                                                                                                                                  @onclick="CloseAllMenus">
                                                                                                                                                                                                 <div class="dx-doc-sheet-wrapper" style="transform: scale(@(zoomLevel / 100.0));">
-                                                                                                                                                                                                    <div class="dx-doc-page-sheet @(isLandscape ? "landscape" : "") @colorModeClass" id="@PrintElementId">
+                                                                                                                                                                                                    <div class="dx-doc-page-sheet @(isLandscape ? "landscape" : "") @colorModeClass" id="@PrintElementId"
+                                                                                                                                                                                                        style="@(string.IsNullOrEmpty(customSheetBgColor) ? "" : $"background-color:{customSheetBgColor} !important;")">
 
                                                                                                                                                                                                         <!-- DevExpress Margin Guides -->
                                                                                                                                                                                                         @if (showMarginGuides)
                                                                                                                                                                                                         {
-                                                                                                                                                                                                            <div class="dx-doc-margin-guides"></div>
+                                                                                                                                                                                                            <div class="dx-doc-margin-guides" style="top:@(appliedMarginTop * 96)px; bottom:@(appliedMarginBottom * 96)px; left:@(appliedMarginLeft * 96)px; right:@(appliedMarginRight * 96)px;"></div>
                                                                                                                                                                                                         }
 
                                                                                                                                                                                                         <!-- Watermark -->
@@ -601,6 +711,103 @@
     private string? uploadedFileContent = null;
     private string? uploadedFileName = null;
 
+    // Color Picker States & Tabs
+    private string activeColorTab = "custom";
+    private string customSheetBgColor = "";
+
+    // Theme Colors Matrix (10 columns x 6 rows)
+    private static readonly string[][] ThemeColorMatrix = new string[][]
+    {
+        new string[] { "#ffffff", "#f2f2f2", "#d9d9d9", "#bfbfbf", "#a6a6a6", "#7f7f7f" },
+        new string[] { "#000000", "#7f7f7f", "#595959", "#3f3f3f", "#262626", "#0c0c0c" },
+        new string[] { "#eeece1", "#ddd9c3", "#c4bd97", "#948a54", "#494429", "#1d1b10" },
+        new string[] { "#1f497d", "#dce6f1", "#b8cce4", "#95b3d7", "#366092", "#244062" },
+        new string[] { "#4f81bd", "#dbe5f1", "#b8cce4", "#8db3e2", "#376092", "#254061" },
+        new string[] { "#c0504d", "#f2dcdb", "#e6b8b7", "#d99694", "#963634", "#632523" },
+        new string[] { "#9bbb59", "#ebf1dd", "#d7e3bc", "#c3d69b", "#77933c", "#4f6228" },
+        new string[] { "#8064a2", "#e5e0ec", "#ccc1da", "#b2a2c7", "#60497a", "#403151" },
+        new string[] { "#4bacc6", "#dbeef3", "#b7dde8", "#92cddc", "#31859b", "#215967" },
+        new string[] { "#f79646", "#fdeada", "#fcd5b5", "#fac08f", "#e36c09", "#974806" }
+    };
+
+    // Standard Colors Row (10 vibrant colors)
+    private static readonly string[] StandardColorsList = new string[]
+    {
+        "#c00000", "#ff0000", "#ffc000", "#ffff00", "#92d050", "#00b050", "#00b0f0", "#0070c0", "#002060", "#7030a0"
+    };
+
+    // Web Colors List (Key: Name, Value: Hex/CSS)
+    private static readonly Dictionary<string, string> WebColorsList = new Dictionary<string, string>
+    {
+        { "Transparent", "transparent" }, { "Black", "#000000" }, { "DimGray", "#696969" }, { "Gray", "#808080" },
+        { "DarkGray", "#a9a9a9" }, { "Silver", "#c0c0c0" }, { "LightGray", "#d3d3d3" }, { "Gainsboro", "#dcdcdc" },
+        { "WhiteSmoke", "#f5f5f5" }, { "White", "#ffffff" }, { "AliceBlue", "#f0f8ff" }, { "AntiqueWhite", "#faebd7" },
+        { "Aqua", "#00ffff" }, { "Aquamarine", "#7fffd4" }, { "Azure", "#f0ffff" }, { "Beige", "#f5f5dc" },
+        { "Bisque", "#ffe4c4" }, { "BlanchedAlmond", "#ffebcd" }, { "Blue", "#0000ff" }, { "BlueViolet", "#8a2be2" },
+        { "Brown", "#a52a2a" }, { "BurlyWood", "#deb887" }, { "CadetBlue", "#5f9ea0" }, { "Chartreuse", "#7fff00" },
+        { "Chocolate", "#d2691e" }, { "Coral", "#ff7f50" }, { "CornflowerBlue", "#6495ed" }, { "Cornsilk", "#fff8dc" },
+        { "Crimson", "#dc143c" }, { "Cyan", "#00ffff" }, { "DarkBlue", "#00008b" }, { "DarkCyan", "#008b8b" },
+        { "DarkGoldenrod", "#b8860b" }, { "DarkGreen", "#006400" }, { "DarkKhaki", "#bdb76b" }, { "DarkMagenta", "#8b008b" },
+        { "DarkOliveGreen", "#556b2f" }, { "DarkOrange", "#ff8c00" }, { "DarkOrchid", "#9932cc" }, { "DarkRed", "#8b0000" },
+        { "DarkSalmon", "#e9967a" }, { "DarkSeaGreen", "#8fbc8f" }, { "DarkSlateBlue", "#483d8b" }, { "DarkSlateGray", "#2f4f4f" },
+        { "DarkTurquoise", "#00ced1" }, { "DarkViolet", "#9400d3" }, { "DeepPink", "#ff1493" }, { "DeepSkyBlue", "#00bfff" },
+        { "DodgerBlue", "#1e90ff" }, { "Firebrick", "#b22222" }, { "FloralWhite", "#fffaf0" }, { "ForestGreen", "#228b22" },
+        { "Fuchsia", "#ff00ff" }, { "Gold", "#ffd700" }, { "Goldenrod", "#daa520" }, { "Green", "#008000" },
+        { "GreenYellow", "#adff2f" }, { "Honeydew", "#f0fff0" }, { "HotPink", "#ff69b4" }, { "IndianRed", "#cd5c5c" },
+        { "Indigo", "#4b0082" }, { "Ivory", "#fffff0" }, { "Khaki", "#f0e68c" }, { "Lavender", "#e6e6fa" },
+        { "LavenderBlush", "#fff0f5" }, { "LawnGreen", "#7cfc00" }, { "LemonChiffon", "#fffacd" }, { "LightBlue", "#add8e6" },
+        { "LightCoral", "#f08080" }, { "LightCyan", "#e0ffff" }, { "LightGoldenrodYellow", "#fafad2" }, { "LightGreen", "#90ee90" },
+        { "LightPink", "#ffb6c1" }, { "LightSalmon", "#ffa07a" }, { "LightSeaGreen", "#20b2aa" }, { "LightSkyBlue", "#87cefa" },
+        { "LightSlateGray", "#778899" }, { "LightSteelBlue", "#b0c4de" }, { "LightYellow", "#ffffe0" }, { "Lime", "#00ff00" },
+        { "LimeGreen", "#32cd32" }, { "Linen", "#faf0e6" }, { "Magenta", "#ff00ff" }, { "Maroon", "#800000" },
+        { "MediumAquamarine", "#66cdaa" }, { "MediumBlue", "#0000cd" }, { "MediumOrchid", "#ba55d3" }, { "MediumPurple", "#9370db" },
+        { "MediumSeaGreen", "#3cb371" }, { "MediumSlateBlue", "#7b68ee" }, { "MediumSpringGreen", "#00fa9a" }, { "MediumTurquoise", "#48d1cc" },
+        { "MediumVioletRed", "#c71585" }, { "MidnightBlue", "#191970" }, { "MintCream", "#f5fffa" }, { "MistyRose", "#ffe4e1" },
+        { "Moccasin", "#ffe4b5" }, { "NavajoWhite", "#ffdead" }, { "Navy", "#000080" }, { "OldLace", "#fdf5e6" },
+        { "Olive", "#808000" }, { "OliveDrab", "#6b8e23" }, { "Orange", "#ffa500" }, { "OrangeRed", "#ff4500" },
+        { "Orchid", "#da70d6" }, { "PaleGoldenrod", "#eee8aa" }, { "PaleGreen", "#98fb98" }, { "PaleTurquoise", "#afeeee" },
+        { "PaleVioletRed", "#db7093" }, { "PapayaWhip", "#ffefd5" }, { "PeachPuff", "#ffdab9" }, { "Peru", "#cd853f" },
+        { "Pink", "#ffc0cb" }, { "Plum", "#dda0dd" }, { "PowderBlue", "#b0e0e6" }, { "Purple", "#800080" },
+        { "Red", "#ff0000" }, { "RosyBrown", "#bc8f8f" }, { "RoyalBlue", "#4169e1" }, { "SaddleBrown", "#8b4513" },
+        { "Salmon", "#fa8072" }, { "SandyBrown", "#f4a460" }, { "SeaGreen", "#2e8b57" }, { "SeaShell", "#fff5ee" },
+        { "Sienna", "#a0522d" }, { "SkyBlue", "#87ceeb" }, { "SlateBlue", "#6a5acd" }, { "SlateGray", "#708090" },
+        { "Snow", "#fffafa" }, { "SpringGreen", "#00ff7f" }, { "SteelBlue", "#4682b4" }, { "Tan", "#d2b48c" },
+        { "Teal", "#008080" }, { "Thistle", "#d8bfd8" }, { "Tomato", "#ff6347" }, { "Turquoise", "#40e0d0" },
+        { "Violet", "#ee82ee" }, { "Wheat", "#f5deb3" }, { "Yellow", "#ffff00" }, { "YellowGreen", "#9acd32" }
+    };
+
+    // System Colors List
+    private static readonly Dictionary<string, string> SystemColorsList = new Dictionary<string, string>
+    {
+        { "ActiveBorder", "#b4b4b4" }, { "ActiveCaption", "#99b4d1" }, { "ActiveCaptionText", "#000000" },
+        { "AppWorkspace", "#ababab" }, { "Control", "#f0f0f0" }, { "ControlDark", "#a0a0a0" },
+        { "ControlDarkDark", "#696969" }, { "ControlLight", "#e3e3e3" }, { "ControlLightLight", "#ffffff" },
+        { "ControlText", "#000000" }, { "Desktop", "#000000" }, { "GrayText", "#6d6d6d" },
+        { "Highlight", "#3399ff" }, { "HighlightText", "#ffffff" }, { "HotTrack", "#0066cc" },
+        { "InactiveBorder", "#f4f7fc" }, { "InactiveCaption", "#bfcddb" }, { "InactiveCaptionText", "#000000" },
+        { "Info", "#ffffe1" }, { "InfoText", "#000000" }, { "Menu", "#f0f0f0" },
+        { "MenuBar", "#f0f0f0" }, { "MenuHighlight", "#3399ff" }, { "MenuText", "#000000" },
+        { "ScrollBar", "#c8c8c8" }, { "Window", "#ffffff" }, { "WindowFrame", "#646464" }, { "WindowText", "#000000" }
+    };
+
+    // Page Setup Temp State
+    private string tempPaperSize = "A4";
+    private string tempUnit = "Inch";
+    private bool tempLandscape = false;
+    private double tempMarginLeft = 0.35;
+    private double tempMarginRight = 0.25;
+    private double tempMarginTop = 0.25;
+    private double tempMarginBottom = 0.44;
+    private string tempWidthDisplay = "8.27 \"";
+    private string tempHeightDisplay = "11.69 \"";
+
+    // Applied Page Setup State
+    private string appliedPaperSize = "A4";
+    private double appliedMarginLeft = 0.35;
+    private double appliedMarginRight = 0.25;
+    private double appliedMarginTop = 0.25;
+    private double appliedMarginBottom = 0.44;
+
     // Menus and Dialog states
     private string? activeMenu = null;
     private bool showExportMenu = false;
@@ -628,6 +835,100 @@
         isGrayscale = IsGrayscale;
         isMaximized = IsMaximized;
         colorModeClass = isGrayscale ? "grayscale-mode" : "";
+        tempLandscape = isLandscape;
+        UpdateDimensionsDisplay();
+    }
+
+    private void ApplyDocumentColor(string color)
+    {
+        customSheetBgColor = color;
+        CloseAllMenus();
+    }
+
+    private void OnCustomColorPickerChanged(ChangeEventArgs e)
+    {
+        var hex = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(hex))
+        {
+            ApplyDocumentColor(hex);
+        }
+    }
+
+    private void SetTempOrientation(bool landscape)
+    {
+        tempLandscape = landscape;
+        UpdateDimensionsDisplay();
+    }
+
+    private void OnPaperSizeChanged(ChangeEventArgs e)
+    {
+        tempPaperSize = e.Value?.ToString() ?? "A4";
+        UpdateDimensionsDisplay();
+    }
+
+    private void OnUnitChanged(ChangeEventArgs e)
+    {
+        tempUnit = e.Value?.ToString() ?? "Inch";
+        UpdateDimensionsDisplay();
+    }
+
+    private void UpdateDimensionsDisplay()
+    {
+        double baseW = 8.27;
+        double baseH = 11.69;
+        switch (tempPaperSize.ToUpperInvariant())
+        {
+            case "LETTER": baseW = 8.5; baseH = 11.0; break;
+            case "LEGAL": baseW = 8.5; baseH = 14.0; break;
+            case "EXECUTIVE": baseW = 7.25; baseH = 10.5; break;
+            case "A3": baseW = 11.69; baseH = 16.54; break;
+            case "A5": baseW = 5.83; baseH = 8.27; break;
+            case "B5": baseW = 6.93; baseH = 9.84; break;
+            case "A4":
+            default: baseW = 8.27; baseH = 11.69; break;
+        }
+
+        double w = tempLandscape ? baseH : baseW;
+        double h = tempLandscape ? baseW : baseH;
+
+        if (tempUnit == "Millimeter")
+        {
+            tempWidthDisplay = $"{(w * 25.4):0.##} mm";
+            tempHeightDisplay = $"{(h * 25.4):0.##} mm";
+        }
+        else if (tempUnit == "Centimeter")
+        {
+            tempWidthDisplay = $"{(w * 2.54):0.##} cm";
+            tempHeightDisplay = $"{(h * 2.54):0.##} cm";
+        }
+        else
+        {
+            tempWidthDisplay = $"{w:0.##} \"";
+            tempHeightDisplay = $"{h:0.##} \"";
+        }
+    }
+
+    private void ApplyPageSetup()
+    {
+        isLandscape = tempLandscape;
+        appliedPaperSize = tempPaperSize;
+        appliedMarginLeft = tempMarginLeft;
+        appliedMarginRight = tempMarginRight;
+        appliedMarginTop = tempMarginTop;
+        appliedMarginBottom = tempMarginBottom;
+        showPageSetupModal = false;
+    }
+
+    private void CancelPageSetup()
+    {
+        tempLandscape = isLandscape;
+        tempPaperSize = appliedPaperSize;
+        tempMarginLeft = appliedMarginLeft;
+        tempMarginRight = appliedMarginRight;
+        tempMarginTop = appliedMarginTop;
+        tempMarginBottom = appliedMarginBottom;
+        UpdateDimensionsDisplay();
+        showPageSetupModal = false;
     }
 
     private void ToggleMenu(string menuName)
