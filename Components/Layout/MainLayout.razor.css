@@ -1,16 +1,39 @@
+/* .page is a row at every width, not just desktop. The collapsed sidebar
+   (the 38px rail) is always a real flex item here, so it always reserves
+   its own space and main is never guessing at a padding value to avoid
+   sitting underneath it — that guesswork is exactly what broke per-page
+   (see the removed home.css padding override, and the 641-1404px range
+   below, which used to rely on manually matching a fixed-position rail's
+   width instead of just letting flex reserve it). Only the *expanded*
+   panel (38px -> 280px) still needs to overlay on narrow screens, handled
+   in the max-width:1404.98px block below. */
 .page {
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 }
 
 main {
+    position: relative;
     flex: 1;
+    min-width: 0;
 }
 
 .sidebar {
     background-color: #f5f6f8;
     border-right: 1px solid #d3d3d3;
+    flex-shrink: 0;
+    width: 280px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-collapsed .sidebar {
+    width: 38px;
 }
 
 .top-row {
@@ -50,18 +73,19 @@ main {
     }
 }
 
-/* Sidebar-as-overlay range. Anything narrower than the "desktop push" query
-   below (now ≥1405px, was ≥1100px) gets an off-canvas drawer instead: fixed
-   position + translateX slide, so opening it lays on top of the content
-   instead of squeezing main/article into a narrower column. At these widths
-   .page is still its base flex-direction: column, so main naturally takes
-   the full width regardless of the sidebar's open/closed state.
+/* Sidebar-as-overlay range: only while *expanded*. The collapsed rail
+   (38px) stays a normal in-flow flex item at every width (see the base
+   .sidebar / .sidebar-collapsed .sidebar rules above) — it never needs an
+   overlay because 38px never runs out of room, so main always reserves
+   exactly its width via flex and needs no padding tuned to match it.
+   Only the *expanded* 280px panel still overlays here instead of pushing
+   main into a narrow column.
    Raised specifically past common laptop widths (1366px, 1400px) — those
    were exactly wide enough to look "desktop", but not wide enough to give
    up 280px to a pushed sidebar without .top-header's fixed-width calendar/
    logo columns overflowing (the logo going invisible/half-cut-off bug). */
 @media (max-width: 1404.98px) {
-    .sidebar {
+    .page:not(.sidebar-collapsed) .sidebar {
         position: fixed;
         top: 0;
         left: 0;
@@ -69,19 +93,8 @@ main {
         max-width: 85vw;
         height: 100vh;
         z-index: 999999;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
         overflow: hidden;
-    }
-
-    /* Collapsing no longer slides the sidebar fully off-screen — the rail
-       (section selector strip) has to stay visible and clickable even when
-       "closed", so collapsing just shrinks the sidebar's width down to the
-       rail's own width (38px). The rail is a fixed-width flex child inside
-       .sidebar-shell, so the panel next to it is squeezed to 0 automatically
-       once the sidebar itself is only as wide as the rail. */
-    .sidebar-collapsed .sidebar {
-        width: 38px;
     }
 
     /* left: 280px by default (open state) hugs the sidebar's right edge, same
@@ -115,8 +128,10 @@ main {
     }
 }
 
-/* Sticky top-row / article padding — unrelated to the sidebar push-vs-overlay
-   split above, kept at its original narrower threshold. */
+/* Sticky top-row, plus breathing room from the rail's edge. Not !important:
+   the rail's own space is now guaranteed by flex (see .sidebar above), so
+   this is purely cosmetic and safe for a page to override — worst case is
+   content sitting flush against the rail, never underneath it. */
 @media (min-width: 641px) {
     .top-row {
         position: sticky;
@@ -132,45 +147,18 @@ main {
 
     .top-row,
     article {
-        padding-left: 2rem !important;
-        /* padding-right: 1.5rem !important; */
+        padding-left: 1.5rem;
     }
 }
 
-/* Desktop "push" sidebar: always visible, collapses via negative margin-left,
-   shares the row with main via .page { flex-direction: row }. Raised from
-   ≥1100px to ≥1405px — below that, the overlay query above takes over,
-   since those widths don't reliably have 280px of surplus room to give up
-   without squeezing .top-header's fixed-width columns. */
+/* Desktop "push" sidebar range: the expanded 280px panel pushes main over
+   instead of overlaying it (unlike the max-width:1404.98px block above).
+   Raised from ≥1100px to ≥1405px — below that, those widths don't reliably
+   have 280px of surplus room to give up without squeezing .top-header's
+   fixed-width calendar/logo columns. Sidebar width/position and main's
+   flex:1 are already unconditional above; only the toggle button still
+   needs its own rule here. */
 @media (min-width: 1405px) {
-    .page {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 280px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 100;
-        flex-shrink: 0;
-        overflow: hidden;
-    }
-
-    /* Collapsing shrinks the sidebar down to just the rail's width (38px)
-       instead of pushing it fully off-screen via margin-left, so the rail
-       (section selector strip) stays visible and clickable while "closed". */
-    .sidebar-collapsed .sidebar {
-        width: 38px;
-    }
-
-    main {
-        position: relative;
-        flex: 1;
-        min-width: 0;
-    }
-
     /* position: fixed (was absolute, anchored to main — which scrolls with
        the page, so the button scrolled away with the content instead of
        staying put like it does on mobile). Being fixed means "left" is now

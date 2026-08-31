@@ -1,0 +1,89 @@
+@inject RecentPagesService RecentPagesService
+@implements IDisposable
+
+<div class="main-menu-container">
+    <div class="menu-header">
+        <span class="menu-title">Favorites</span>
+        <button class="expand-all-btn" @onclick="ToggleExpandAll">
+            <span>@(allExpanded ? "Collapse All" : "Expand All")</span>
+            <i class="bi @(allExpanded ? "bi-chevron-up" : "bi-chevron-down") ms-1"></i>
+        </button>
+    </div>
+
+    <div class="menu-scrollable">
+        <!-- Recent Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleRecent">
+                <i class="bi bi-chevron-right chevron-icon @(isRecentExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-clock-history group-icon"></i>
+                <span class="group-title">Recent</span>
+            </div>
+            @if (isRecentExpanded)
+            {
+                <div class="group-items">
+                    @if (RecentPagesService.RecentItems.Any())
+                    {
+                        @foreach (var item in RecentPagesService.RecentItems)
+                        {
+                            <NavLink class="menu-item" href="@item.Href">
+                                <i class="@item.Icon item-icon"></i>
+                                <span>@item.Name</span>
+                            </NavLink>
+                        }
+                    }
+                    else
+                    {
+                        <div class="sidebar-placeholder">
+                            <i class="bi bi-clock-history"></i>
+                            <p>Pages you open will show up here.</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Favorites Group -->
+        <div class="menu-group">
+            <div class="group-header" @onclick="ToggleFavorites">
+                <i class="bi bi-chevron-right chevron-icon @(isFavoritesExpanded ? "expanded" : "")"></i>
+                <i class="bi bi-star-fill group-icon"></i>
+                <span class="group-title">Favorites</span>
+            </div>
+            @if (isFavoritesExpanded)
+            {
+                <div class="group-items">
+                    <div class="sidebar-placeholder">
+                        <i class="bi bi-star"></i>
+                        <p>Star items to pin them here.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isRecentExpanded = true;
+    private bool isFavoritesExpanded = false;
+    private bool allExpanded = true;
+
+    protected override void OnInitialized()
+    {
+        RecentPagesService.OnChange += StateHasChanged;
+    }
+
+    private void ToggleRecent() => isRecentExpanded = !isRecentExpanded;
+    private void ToggleFavorites() => isFavoritesExpanded = !isFavoritesExpanded;
+
+    private void ToggleExpandAll()
+    {
+        allExpanded = !allExpanded;
+        isRecentExpanded = allExpanded;
+        isFavoritesExpanded = allExpanded;
+    }
+
+    public void Dispose()
+    {
+        RecentPagesService.OnChange -= StateHasChanged;
+    }
+}

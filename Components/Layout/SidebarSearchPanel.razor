@@ -4,21 +4,53 @@
     </div>
 
     <div class="menu-scrollable">
+
         <div class="sidebar-search-box">
             <i class="bi bi-search"></i>
+
             <input type="text" placeholder="Search menu..." @bind="query" @bind:event="oninput" />
         </div>
 
         @if (!string.IsNullOrWhiteSpace(query))
         {
-            <div class="sidebar-placeholder">
-                <i class="bi bi-search"></i>
-                <p>No results for "@query".</p>
-            </div>
+            var matches = FindMatches();
+
+            @if (matches.Any())
+            {
+                <div class="group-items group-items-flat">
+
+                    @foreach (var menu in matches)
+                    {
+                        <NavLink class="menu-item" href="@menu.Href">
+
+                            <i class="@menu.Icon item-icon"></i>
+
+                            <span>@menu.Name</span>
+
+                        </NavLink>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="sidebar-placeholder">
+                    <i class="bi bi-search"></i>
+                    <p>No results for "@query".</p>
+                </div>
+            }
         }
+
     </div>
 </div>
 
 @code {
     private string query = "";
+    private IEnumerable<MenuItem> FindMatches()
+    {
+        string? search = query.Trim();
+
+        return MenuCatalog.Items.Where(m =>
+            m.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+    }
 }

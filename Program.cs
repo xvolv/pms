@@ -15,6 +15,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<PackageDetailService>();
 builder.Services.AddScoped<PackageHeaderService>();
 builder.Services.AddScoped<FolioService>();
+builder.Services.AddScoped<RecentPagesService>();
 
 var app = builder.Build();
 

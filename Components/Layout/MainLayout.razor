@@ -1,4 +1,7 @@
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject RecentPagesService RecentPagesService
+@implements IDisposable
 
 <div class="page @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
     <div class="sidebar">
@@ -27,6 +30,23 @@
 @code {
     private bool isSidebarCollapsed = true;
 
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        TrackCurrentLocation();
+    }
+
+    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        TrackCurrentLocation();
+    }
+
+    private void TrackCurrentLocation()
+    {
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        RecentPagesService.Track(relativePath);
+    }
+
     private void ToggleSidebar()
     {
         isSidebarCollapsed = !isSidebarCollapsed;
@@ -35,5 +55,10 @@
     private void ExpandSidebar()
     {
         isSidebarCollapsed = false;
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 }
