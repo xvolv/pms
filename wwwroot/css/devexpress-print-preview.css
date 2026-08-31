@@ -1,0 +1,660 @@
+/* ==========================================================================
+   DevExpress Document Viewer / Print Preview Styling
+   Authentic DevExpress XtraReports Document Viewer UI
+   ========================================================================== */
+
+.dx-doc-viewer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.dx-doc-viewer-window {
+    width: 95vw;
+    max-width: 1150px;
+    height: 92vh;
+    max-height: 900px;
+    background: #f0f0f0;
+    border: 1px solid #707070;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 12px;
+    color: #222;
+    border-radius: 4px;
+    overflow: hidden;
+    user-select: none;
+}
+
+.dx-doc-viewer-window.is-maximized {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+
+/* 1. Title Bar */
+.dx-doc-titlebar {
+    height: 28px;
+    background: linear-gradient(180deg, #fdfdfd 0%, #e8e8e8 100%);
+    border-bottom: 1px solid #c0c0c0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px 0 8px;
+}
+
+.dx-doc-title-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #333;
+}
+
+.dx-doc-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #d32f2f;
+    font-size: 14px;
+}
+
+.dx-doc-title-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.dx-doc-wnd-btn {
+    width: 22px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #303030;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 0;
+}
+
+.dx-doc-wnd-btn:hover {
+    background: #e0e0e0;
+}
+
+/* .dx-doc-wnd-btn.btn-close:hover {
+    background: #e81123;
+    color: #fff;
+} */
+
+/* 2. Menu Bar */
+.dx-doc-menubar {
+    height: 24px;
+    background: #f7f7f7;
+    border-bottom: 1px solid #d4d4d4;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    position: relative;
+    z-index: 1000;
+    overflow: visible;
+}
+
+.dx-doc-menu-item {
+    position: relative;
+}
+
+.dx-doc-menu-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #222;
+    cursor: pointer;
+    border-radius: 2px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.dx-doc-menu-btn:hover,
+.dx-doc-menu-btn.active {
+    background: #e2e9f3;
+    border-color: #a0bce0;
+}
+
+.dx-doc-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    background: #ffffff;
+    border: 1px solid #7a7a7a;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+    min-width: 190px;
+    z-index: 11000;
+    padding: 4px 0;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.dx-doc-dropdown-menu.menu-align-right {
+    left: auto;
+    right: 0;
+}
+
+.dx-doc-dropdown-menu button {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.dx-doc-dropdown-menu button:hover {
+    background: #e5f1fb;
+    color: #000;
+}
+
+.dx-doc-dropdown-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 4px 0;
+}
+
+/* 3. DevExpress Document Viewer Toolbar */
+.dx-doc-toolbar {
+    height: 38px;
+    background: linear-gradient(180deg, #fdfdfd 0%, #ececec 100%);
+    border-bottom: 1px solid #b8b8b8;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 6px;
+    flex-wrap: nowrap;
+    position: relative;
+    z-index: 900;
+    overflow: visible;
+}
+
+.dx-doc-tb-btn {
+    height: 30px;
+    min-width: 28px;
+    padding: 0 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.1s ease;
+    flex-shrink: 0;
+}
+
+.dx-doc-tb-btn:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #e3edf8 100%);
+    border-color: #a2c1e8;
+}
+
+.dx-doc-tb-btn:active,
+.dx-doc-tb-btn.active {
+    background: linear-gradient(180deg, #cde3fa 0%, #b0d2f8 100%);
+    border-color: #79a7df;
+}
+
+.dx-doc-tb-btn.btn-danger-close {
+    color: #d32f2f;
+}
+
+.dx-doc-tb-btn.btn-danger-close:hover {
+    background: #fee;
+    border-color: #f99;
+}
+
+.dx-doc-tb-divider {
+    width: 1px;
+    height: 22px;
+    background: #c8c8c8;
+    margin: 0 3px;
+    flex-shrink: 0;
+}
+
+.dx-doc-zoom-select {
+    height: 24px;
+    font-size: 11px;
+    border: 1px solid #abadb3;
+    border-radius: 2px;
+    padding: 0 4px;
+    background: #fff;
+    outline: none;
+    min-width: 65px;
+    cursor: pointer;
+}
+
+.dx-doc-page-input {
+    width: 32px;
+    height: 22px;
+    text-align: center;
+    border: 1px solid #abadb3;
+    border-radius: 2px;
+    font-size: 11px;
+    margin: 0 2px;
+    background: #fff;
+}
+
+/* 3.1 Search / Find Toolbar Panel */
+.dx-doc-search-bar {
+    height: 32px;
+    background: #fdf2d0;
+    border-bottom: 1px solid #e0c878;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.dx-doc-search-input {
+    height: 22px;
+    font-size: 11px;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    padding: 0 6px;
+    min-width: 180px;
+    outline: none;
+}
+
+.dx-doc-search-btn {
+    height: 22px;
+    padding: 0 8px;
+    font-size: 11px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dx-doc-search-btn:hover {
+    background: #f0f0f0;
+}
+
+.dx-doc-search-count {
+    font-size: 11px;
+    color: #666;
+    margin: 0 4px;
+}
+
+/* 3.2 Sub-dialogs (Page Setup, Watermark, Parameters) */
+.dx-doc-modal-overlay {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 1px solid #707070;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    z-index: 10050;
+    border-radius: 3px;
+    min-width: 360px;
+    overflow: hidden;
+}
+
+.dx-doc-modal-header {
+    background: linear-gradient(180deg, #f7f7f7 0%, #e5e5e5 100%);
+    border-bottom: 1px solid #ccc;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.dx-doc-modal-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.dx-doc-modal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dx-doc-modal-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+/* 4. Canvas & Document Workspace */
+.dx-doc-workspace {
+    flex: 1;
+    background: #808080;
+    background: radial-gradient(circle at 50% 50%, #909090 0%, #707070 100%);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    position: relative;
+}
+
+.dx-doc-sheet-wrapper {
+    transition: transform 0.15s ease-out;
+    transform-origin: top center;
+    margin-bottom: 24px;
+}
+
+/* A4 Sheet Container */
+.dx-doc-page-sheet {
+    width: 794px;
+    /* A4 standard preview width */
+    min-height: 1123px;
+    /* A4 standard preview height */
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    padding: 38px 45px;
+    box-sizing: border-box;
+    position: relative;
+    color: #000;
+}
+
+.dx-doc-page-sheet.landscape {
+    width: 1123px;
+    min-height: 794px;
+    padding: 38px 45px;
+}
+
+.dx-doc-page-sheet.grayscale-mode {
+    filter: grayscale(100%);
+}
+
+.dx-doc-page-sheet.sepia-mode {
+    filter: sepia(65%) saturate(140%);
+}
+
+.dx-doc-page-sheet.invert-mode {
+    filter: invert(95%) hue-rotate(180deg);
+}
+
+.dx-doc-page-sheet.contrast-mode {
+    filter: contrast(160%);
+}
+
+.dx-doc-workspace.multi-page-mode .dx-doc-sheet-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* DevExpress Blue Dashed Margin Guides */
+.dx-doc-margin-guides {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    border: 1px dashed #2979ff;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+/* Watermark */
+.dx-doc-watermark {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 80px;
+    font-weight: 900;
+    color: rgba(210, 0, 0, 0.12);
+    pointer-events: none;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* 5. Bottom Status Bar */
+.dx-doc-statusbar {
+    height: 24px;
+    background: #ececec;
+    border-top: 1px solid #c0c0c0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    font-size: 11px;
+    color: #444;
+}
+
+.dx-doc-sb-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dx-doc-sb-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dx-doc-slider {
+    width: 110px;
+    height: 4px;
+    cursor: pointer;
+}
+
+.dx-doc-sb-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.dx-doc-sb-btn:hover {
+    color: #000;
+}
+
+/* ==========================================================================
+   Report Document Typography & Elements (Registration List / Hotel Reports)
+   ========================================================================== */
+
+.dx-report-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dx-report-hotel-title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+.dx-report-doc-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+}
+
+.dx-report-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #111;
+}
+
+.dx-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+    margin-bottom: 40px;
+}
+
+.dx-report-table th {
+    background: #d4d4d4;
+    color: #000;
+    font-weight: 700;
+    border: 1px solid #777;
+    padding: 4px 6px;
+    text-align: left;
+}
+
+.dx-report-table td {
+    border: 1px solid #999;
+    padding: 4px 6px;
+    color: #111;
+}
+
+.dx-report-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.dx-report-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.dx-report-sig-col {
+    text-align: center;
+    width: 21%;
+}
+
+.dx-report-sig-line {
+    border-top: 1.5px solid #000;
+    margin-bottom: 5px;
+}
+
+.dx-report-sig-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #222;
+}
+
+.dx-report-footer {
+    border-top: 1px dotted #888;
+    padding-top: 6px;
+    font-size: 10px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ==========================================================================
+   Print Rules
+   ========================================================================== */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    .dx-doc-viewer-backdrop,
+    .dx-doc-viewer-backdrop * {
+        visibility: visible !important;
+    }
+
+    .dx-doc-viewer-backdrop {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+
+    .dx-doc-viewer-window {
+        border: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        background: transparent !important;
+    }
+
+    .dx-doc-titlebar,
+    .dx-doc-menubar,
+    .dx-doc-toolbar,
+    .dx-doc-statusbar,
+    .dx-doc-margin-guides,
+    .dx-doc-wnd-btn {
+        display: none !important;
+    }
+
+    .dx-doc-workspace {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    .dx-doc-sheet-wrapper {
+        transform: none !important;
+        margin: 0 !important;
+    }
+
+    .dx-doc-page-sheet {
+        box-shadow: none !important;
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 15mm !important;
+        margin: 0 !important;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+}

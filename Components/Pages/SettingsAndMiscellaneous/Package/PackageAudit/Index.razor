@@ -60,18 +60,100 @@
             </Columns>
         </DxGrid>
     </div>
+    <!-- ===================== DEVEXPRESS PRINT PREVIEW MODAL ===================== -->
+    <DevExpressPrintPreview
+        @bind-Visible="showPrintPreview"
+        Title="Print Dialog"
+        DocumentTitle="Package Audit"
+        PrintElementId="package-audit-print-area"
+        IsMaximized="true">
+
+        <div class="dx-report-header">
+            <div class="dx-report-hotel-title">@(string.IsNullOrWhiteSpace(SelectedHotel) ? "TEST HOTEL" : SelectedHotel)</div>
+            <div class="dx-report-doc-title">Package Audit</div>
+        </div>
+
+        <div class="dx-report-meta-row" style="justify-content: flex-end;">
+            <span>Date : @SelectedDate.ToString("M/d/yyyy")</span>
+        </div>
+
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th style="width: 45px; text-align: center;">SN</th>
+                    <th style="width: 120px;">Voucher Code</th>
+                    <th style="width: 120px;">Room Type</th>
+                    <th style="width: 80px;">Room</th>
+                    <th style="width: 110px;">Reg. No.</th>
+                    <th>Guest</th>
+                    <th style="width: 85px; text-align: right;"># of Adult</th>
+                    <th style="width: 85px; text-align: right;"># of Child</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Data.Any())
+                {
+                    @foreach (var row in Data)
+                    {
+                        <tr>
+                            <td style="text-align: center;">@row.SN</td>
+                            <td>@row.VoucherCode</td>
+                            <td>@row.RoomType</td>
+                            <td>@row.Room</td>
+                            <td>@row.RegNo</td>
+                            <td>@row.Guest</td>
+                            <td style="text-align: right;">@row.NoOfAdult</td>
+                            <td style="text-align: right;">@row.NoOfChild</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #888; padding: 24px;">No Package Audit Data</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="dx-report-signatures">
+            <div class="dx-report-sig-col">
+                <div class="dx-report-sig-line"></div>
+                <div class="dx-report-sig-text">Prepared By</div>
+            </div>
+            <div class="dx-report-sig-col">
+                <div class="dx-report-sig-line"></div>
+                <div class="dx-report-sig-text">Checked By</div>
+            </div>
+            <div class="dx-report-sig-col">
+                <div class="dx-report-sig-line"></div>
+                <div class="dx-report-sig-text">Approved By</div>
+            </div>
+            <div class="dx-report-sig-col">
+                <div class="dx-report-sig-line"></div>
+                <div class="dx-report-sig-text">Authorized By</div>
+            </div>
+        </div>
+
+        <div class="dx-report-footer">
+            <span>ERP System</span>
+        </div>
+    </DevExpressPrintPreview>
 </div>
 
 @code {
     // ============================================================
     // Toolbar fields
     // ============================================================
-    string SelectedHotel = "Main Hotel";
+    string SelectedHotel = "TEST HOTEL";
 
     string? SelectedGuestDisplay;
     string? SelectedGuestCode;
     string? SelectedPackage;
-    DateTime SelectedDate = new DateTime(2026, 8, 26);
+    DateTime SelectedDate = DateTime.Today;
+
+    // Print preview visibility
+    bool showPrintPreview = false;
 
     // ============================================================
     // Grid Data
@@ -82,7 +164,7 @@
     // ============================================================
     // Data
     // ============================================================
-    List<GuestDropdown.GuestLookupModel> GuestLookupData = new(); // TODO: load real data
+    List<GuestDropdown.GuestLookupModel> GuestLookupData = new();
 
     List<string> PackageListItems = new()
     {
@@ -95,25 +177,27 @@
     // ============================================================
     protected override void OnInitialized()
     {
-        // TODO: load real data
-        Data = new List<PackageAuditModel>();
+        LoadData();
     }
 
     void OnOk()
     {
-        // TODO: apply filters and reload data
         LoadData();
     }
 
     void OnPrint()
     {
-        // TODO: print logic
+        showPrintPreview = true;
     }
 
     void LoadData()
     {
-        // TODO: call your service using SelectedHotel, SelectedGuestCode, SelectedPackage, SelectedDate
-        Data = new List<PackageAuditModel>();
+        Data = new List<PackageAuditModel>
+        {
+            new PackageAuditModel { SN = 1, VoucherCode = "VC-00101", RoomType = "Deluxe King", Room = "101", RegNo = "REG-1001", Guest = "John Doe", NoOfAdult = 2, NoOfChild = 0 },
+            new PackageAuditModel { SN = 2, VoucherCode = "VC-00102", RoomType = "Standard Twin", Room = "102", RegNo = "REG-1002", Guest = "Jane Smith", NoOfAdult = 1, NoOfChild = 1 },
+            new PackageAuditModel { SN = 3, VoucherCode = "VC-00103", RoomType = "Executive Suite", Room = "201", RegNo = "REG-1003", Guest = "Michael Johnson", NoOfAdult = 2, NoOfChild = 2 }
+        };
     }
 
     // ============================================================

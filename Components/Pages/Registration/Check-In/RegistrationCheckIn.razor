@@ -644,98 +644,87 @@
     </BodyContentTemplate>
 </DxPopup>
 
-<!-- ==================== REGISTRATIONS LIST PRINT PREVIEW MODAL ==================== -->
-<DxPopup @bind-Visible="showRegistrationsListPrint" HeaderText="Registrations List - Print" Width="980px"
-         CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">
-    <BodyContentTemplate>
-        <div class="amend-toolbar" style="margin-bottom: 10px;">
-            <button type="button" class="ci-btn" onclick="window.print()">
-                <div class="ci-icon" style="color:#1565c0;"><i class="bi bi-printer"></i></div>
-                <div class="ci-text">Print Document</div>
-            </button>
-            <button type="button" class="ci-btn" @onclick="@(() => showRegistrationsListPrint = false)">
-                <div class="ci-icon" style="color:#c62828;"><i class="bi bi-x-circle"></i></div>
-                <div class="ci-text">Close</div>
-            </button>
-        </div>
+<!-- ==================== REGISTRATIONS LIST DEVEXPRESS PRINT PREVIEW ==================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showRegistrationsListPrint"
+    Title="Print Dialog"
+    DocumentTitle="Registrations List"
+    PrintElementId="reg-list-print-area">
+    
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">TEST HOTEL</div>
+        <div class="dx-report-doc-title">Registrations List</div>
+    </div>
 
-        <div class="reg-print-sheet" id="reg-list-print-area">
-            <div class="reg-print-header">
-                <div class="reg-print-hotel">TEST HOTEL</div>
-                <div class="reg-print-title">Registrations List</div>
-            </div>
+    <div class="dx-report-meta-row">
+        <span>State = @(string.IsNullOrEmpty(filterState) || filterState == "All" ? "Inhouse" : filterState)</span>
+        <span>Date: @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
 
-            <div class="reg-print-submeta">
-                <div class="reg-print-state">State = @(string.IsNullOrEmpty(filterState) || filterState == "All" ? "Inhouse" : filterState)</div>
-                <div class="reg-print-date">Date : @DateTime.Today.ToString("M/d/yyyy")</div>
-            </div>
-
-            <table class="reg-print-table">
-                <thead>
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th style="width: 110px;">Registration</th>
+                <th style="width: 55px; text-align: center;">Room</th>
+                <th style="width: 95px;">Room Type</th>
+                <th>Guest</th>
+                <th>Company</th>
+                <th style="width: 80px; text-align: center;">Arrival</th>
+                <th style="width: 80px; text-align: center;">Departure</th>
+                <th style="width: 75px; text-align: center;"># of Night</th>
+                <th style="width: 75px;">Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (filteredRegistrations != null && filteredRegistrations.Any())
+            {
+                @foreach (var row in filteredRegistrations)
+                {
                     <tr>
-                        <th style="width: 110px;">Registration</th>
-                        <th style="width: 55px; text-align: center;">Room</th>
-                        <th style="width: 95px;">Room Type</th>
-                        <th>Guest</th>
-                        <th>Company</th>
-                        <th style="width: 80px; text-align: center;">Arrival</th>
-                        <th style="width: 80px; text-align: center;">Departure</th>
-                        <th style="width: 75px; text-align: center;"># of Night</th>
-                        <th style="width: 75px;">Payment</th>
+                        <td>@row.Registration</td>
+                        <td style="text-align: center;">@row.Room</td>
+                        <td>@row.RoomType</td>
+                        <td>@row.Guest</td>
+                        <td>@row.Company</td>
+                        <td style="text-align: center;">@row.Arrival.ToString("M/d/yyyy")</td>
+                        <td style="text-align: center;">@row.Departure.ToString("M/d/yyyy")</td>
+                        <td style="text-align: center;">@row.Nights</td>
+                        <td>@row.Payment</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (filteredRegistrations != null && filteredRegistrations.Any())
-                    {
-                        @foreach (var row in filteredRegistrations)
-                        {
-                            <tr>
-                                <td>@row.Registration</td>
-                                <td style="text-align: center;">@row.Room</td>
-                                <td>@row.RoomType</td>
-                                <td>@row.Guest</td>
-                                <td>@row.Company</td>
-                                <td style="text-align: center;">@row.Arrival.ToString("M/d/yyyy")</td>
-                                <td style="text-align: center;">@row.Departure.ToString("M/d/yyyy")</td>
-                                <td style="text-align: center;">@row.Nights</td>
-                                <td>@row.Payment</td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="9" style="text-align:center; color:#888; padding:16px;">No registrations found</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" style="text-align:center; color:#888; padding:16px;">No registrations found</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-            <div class="reg-print-signatures">
-                <div class="reg-sig-col">
-                    <div class="reg-sig-line"></div>
-                    <div class="reg-sig-text">Prepared By</div>
-                </div>
-                <div class="reg-sig-col">
-                    <div class="reg-sig-line"></div>
-                    <div class="reg-sig-text">Checked By</div>
-                </div>
-                <div class="reg-sig-col">
-                    <div class="reg-sig-line"></div>
-                    <div class="reg-sig-text">Approved By</div>
-                </div>
-                <div class="reg-sig-col">
-                    <div class="reg-sig-line"></div>
-                    <div class="reg-sig-text">Authorized By</div>
-                </div>
-            </div>
-
-            <div class="reg-print-footer">
-                ERP System
-            </div>
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
         </div>
-    </BodyContentTemplate>
-</DxPopup>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
 <DxPopup @bind-Visible="showStateConfirm" HeaderText="State Change Confirmation" Width="420px"
          CloseOnOutsideClick="false" ShowCloseButton="false" CloseOnEscape="false">

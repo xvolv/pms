@@ -2,298 +2,284 @@
 @using ERP.V7.WebPMS.Components.Pages.Registration.CheckIn
 @inject IJSRuntime JSRuntime
 
-<DxPopup @bind-Visible="Visible"
-         HeaderVisible="false"
-         ShowCloseButton="false"
-         Width="950px"
-         CloseOnOutsideClick="true"
-         CloseOnEscape="true"
-         CssClass="guest-ledger-print-popup">
-    <BodyContentTemplate>
-        <div class="print-dialog-container">
-            <!-- Printable Clean Sheet -->
-            <div class="print-sheet @(IsRoomChargeOnly ? "watermark-attachment" : "watermark-non-fiscal")" id="guest-ledger-print-area">
-                
-                <!-- Page Top Actions (Close button on print page, hidden during actual print) -->
-                <div class="print-page-topbar no-print">
-                    <button type="button" class="print-page-close-btn" @onclick="CloseDialog" title="Close">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
+<DevExpressPrintPreview
+    @bind-Visible="Visible"
+    Title="Print Dialog"
+    DocumentTitle="@(IsRoomChargeOnly ? "Guest Ledger (Room Charge Only)" : "Guest Ledger")"
+    PrintElementId="guest-ledger-print-area"
+    WatermarkText="@(IsRoomChargeOnly ? "ATTACHMENT" : "NON FISCAL")"
+    ShowWatermark="true">
 
-                <!-- Document Header (matching Reference Images 2 & 3) -->
-                <div class="ledger-header">
-                    <div class="ledger-hotel-left">
-                        <h2>@HotelName</h2>
-                    </div>
-                    <div class="ledger-hotel-right">
-                        <div class="hotel-line font-bold">@HotelName</div>
-                        <div class="hotel-line">Branch: Head Office</div>
-                        <div class="hotel-line">Tel:</div>
-                        <div class="hotel-line">Fax:</div>
-                        <div class="hotel-line">Web:</div>
-                        <div class="hotel-line">Email:</div>
-                        <div class="hotel-line">POBox</div>
-                        <div class="hotel-line">Addis Ababa ,Ethiopia</div>
-                    </div>
-                </div>
-
-                <!-- TIN / VAT & Title Line with Divider Lines -->
-                <div class="ledger-title-strip">
-                    <div class="tin-vat-info">
-                        <span>TIN: 0000000000-01</span>
-                        <span class="ms-4">VAT:</span>
-                    </div>
-                    <div class="ledger-title-box">
-                        <span class="title-line-left"></span>
-                        <span class="title-text">@(IsRoomChargeOnly ? "Guest Ledger (Room Charge Only)" : "Guest Ledger")</span>
-                        <span class="title-line-right"></span>
-                    </div>
-                </div>
-
-                <!-- Customer Details Grid Table -->
-                <table class="cust-info-table">
-                    <tbody>
-                        <tr>
-                            <td class="lbl-cell" style="width:18%;">Customer Name</td>
-                            <td class="val-cell" style="width:37%;">@GuestName</td>
-                            <td class="lbl-cell" style="width:18%;">TIN No</td>
-                            <td class="val-cell" style="width:27%;">@TinNo</td>
-                        </tr>
-                        <tr>
-                            <td class="lbl-cell">Registration No</td>
-                            <td class="val-cell">@RegNo</td>
-                            <td class="lbl-cell">Arrival Date</td>
-                            <td class="val-cell">@(ArrivalDate?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")</td>
-                        </tr>
-                        <tr>
-                            <td class="lbl-cell">Plan</td>
-                            <td class="val-cell">@Plan</td>
-                            <td class="lbl-cell">Departure Date</td>
-                            <td class="val-cell">@(DepartureDate?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")</td>
-                        </tr>
-                        <tr>
-                            <td class="lbl-cell">FS No.</td>
-                            <td class="val-cell">@FsNo</td>
-                            <td class="lbl-cell"></td>
-                            <td class="val-cell"></td>
-                        </tr>
-                        <tr>
-                            <td class="lbl-cell">Company</td>
-                            <td class="val-cell">@Company</td>
-                            <td class="lbl-cell"></td>
-                            <td class="val-cell"></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- SECTION 1: Room Charge -->
-                <div class="section-title">Room Charge</div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:65px;">Selection</th>
-                            <th style="width:35px;">SN</th>
-                            <th style="width:75px;">Date</th>
-                            <th style="width:65px;">Room No.</th>
-                            <th style="width:90px;">Room Type</th>
-                            <th style="width:85px;">Room Rate</th>
-                            <th style="width:80px;">No. Of Adult</th>
-                            <th style="width:80px;">No. Of Child</th>
-                            <th>Remark</th>
-                            <th style="width:80px; text-align:right;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (RoomCharges != null && RoomCharges.Any())
-                        {
-                            @foreach (var rc in RoomCharges)
-                            {
-                                <tr>
-                                    <td style="text-align:center;">
-                                        <input type="checkbox" checked="@rc.Selected" disabled />
-                                    </td>
-                                    <td style="text-align:center;">@rc.SN</td>
-                                    <td>@rc.Date.ToString("M/d/yyyy")</td>
-                                    <td style="text-align:center;">@rc.RoomNo</td>
-                                    <td>@rc.RoomType</td>
-                                    <td>@rc.RoomRate</td>
-                                    <td style="text-align:center;">@rc.Adults</td>
-                                    <td style="text-align:center;">@rc.Child</td>
-                                    <td>@rc.Remark</td>
-                                    <td style="text-align:right;">@rc.Amount.ToString("N2")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-
-                <!-- Room Charge Totals (Right Aligned Box) -->
-                <div class="totals-wrapper">
-                    <table class="totals-table">
-                        <tr>
-                            <td class="tot-lbl">SubTotal :</td>
-                            <td class="tot-val">@RoomSubtotal.ToString("N1")</td>
-                        </tr>
-                        <tr>
-                            <td class="tot-lbl">Discount:</td>
-                            <td class="tot-val">@Discount.ToString("N2")</td>
-                        </tr>
-                        <tr>
-                            <td class="tot-lbl">ServiceCharge:</td>
-                            <td class="tot-val">@RoomService.ToString("N2")</td>
-                        </tr>
-                        <tr>
-                            <td class="tot-lbl">VAT[15%]:</td>
-                            <td class="tot-val">@RoomVat.ToString("N2")</td>
-                        </tr>
-                        <tr class="grand-tot-row">
-                            <td class="tot-lbl font-bold">Grand Total :</td>
-                            <td class="tot-val font-bold">ETB @RoomGrand.ToString("N1")</td>
-                        </tr>
-                    </table>
-                </div>
-
-                @if (!IsRoomChargeOnly)
-                {
-                    <!-- SECTION 2: Extra Bill History -->
-                    <div class="section-title mt-3">Extra Bill History</div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width:65px;">Selection</th>
-                                <th style="width:35px;">SN</th>
-                                <th style="width:65px;">Room No.</th>
-                                <th style="width:75px;">Date</th>
-                                <th style="width:85px;">Invoice ID</th>
-                                <th style="width:75px; text-align:right;">Ser. Charge</th>
-                                <th style="width:65px; text-align:right;">Discount</th>
-                                <th style="width:65px; text-align:right;">VAT</th>
-                                <th style="width:75px; text-align:right;">Sub Total</th>
-                                <th>Remark</th>
-                                <th style="width:80px; text-align:right;">Grand Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (ExtraBills != null && ExtraBills.Any())
-                            {
-                                @foreach (var eb in ExtraBills)
-                                {
-                                    <tr>
-                                        <td style="text-align:center;">
-                                            <input type="checkbox" checked="@eb.Selected" disabled />
-                                        </td>
-                                        <td style="text-align:center;">@eb.SN</td>
-                                        <td style="text-align:center;">@eb.RoomNo</td>
-                                        <td>@eb.Date.ToString("M/d/yyyy")</td>
-                                        <td>@eb.InvoiceId</td>
-                                        <td style="text-align:right;">@eb.SerCharge.ToString("N2")</td>
-                                        <td style="text-align:right;">@eb.Discount.ToString("N2")</td>
-                                        <td style="text-align:right;">@eb.Vat.ToString("N2")</td>
-                                        <td style="text-align:right;">@eb.SubTotal.ToString("N2")</td>
-                                        <td>@eb.Remark</td>
-                                        <td style="text-align:right;">@eb.GrandTotal.ToString("N2")</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-
-                    <div class="totals-wrapper">
-                        <table class="totals-table">
-                            <tr>
-                                <td class="tot-lbl font-bold" style="width:140px;">Total OtherBill:</td>
-                                <td class="tot-val font-bold">@TotalExtra.ToString("N2")</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- SECTION 3: Payment History -->
-                    <div class="section-title mt-3">Payment History</div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width:65px;">Selection</th>
-                                <th style="width:35px;">SN</th>
-                                <th style="width:75px;">Date</th>
-                                <th style="width:95px;">Receipt No.</th>
-                                <th style="width:95px;">Voucher Type</th>
-                                <th style="width:95px;">Received By</th>
-                                <th>Remark</th>
-                                <th style="width:80px; text-align:right;">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (PaymentHistory != null && PaymentHistory.Any())
-                            {
-                                @foreach (var ph in PaymentHistory)
-                                {
-                                    <tr>
-                                        <td style="text-align:center;">
-                                            <input type="checkbox" checked="@ph.Selected" disabled />
-                                        </td>
-                                        <td style="text-align:center;">@ph.SN</td>
-                                        <td>@ph.Date.ToString("M/d/yyyy")</td>
-                                        <td>@ph.ReceiptNo</td>
-                                        <td>@ph.VoucherType</td>
-                                        <td>@ph.ReceivedBy</td>
-                                        <td>@ph.Remark</td>
-                                        <td style="text-align:right;">@ph.Amount.ToString("N2")</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-
-                    <div class="totals-wrapper">
-                        <table class="totals-table">
-                            <tr>
-                                <td class="tot-lbl">Total Paid:</td>
-                                <td class="tot-val">@TotalPaid.ToString("N2")</td>
-                            </tr>
-                            <tr>
-                                <td class="tot-lbl">Total Credit:</td>
-                                <td class="tot-val">0.00</td>
-                            </tr>
-                            <tr>
-                                <td class="tot-lbl">Refund:</td>
-                                <td class="tot-val">0.00</td>
-                            </tr>
-                            <tr class="grand-tot-row">
-                                <td class="tot-lbl font-bold">Remaining Balance:</td>
-                                <td class="tot-val font-bold">ETB @((RoomGrand + TotalExtra - TotalPaid).ToString("N1"))</td>
-                            </tr>
-                        </table>
-                    </div>
-                }
-
-                <!-- Signatures Row (3 columns) -->
-                <div class="ledger-signatures-container">
-                    <div class="sig-box">
-                        <div class="sig-title">@HotelName @HotelName</div>
-                        <div class="sig-line"></div>
-                        <div class="sig-sub">Prepare By</div>
-                    </div>
-                    <div class="sig-box">
-                        <div class="sig-line"></div>
-                        <div class="sig-sub">GSR'S Signature</div>
-                    </div>
-                    <div class="sig-box">
-                        <div class="sig-line"></div>
-                        <div class="sig-sub">Guest's Signature</div>
-                        <div class="sig-name">@GuestName</div>
-                    </div>
-                </div>
-
-                <!-- Document Footer -->
-                <div class="ledger-footer-line">
-                    <span>ERP System</span>
-                    <span>Page 1</span>
-                </div>
-            </div>
+    <!-- Document Header (matching Reference Images 2 & 3) -->
+    <div class="ledger-header">
+        <div class="ledger-hotel-left">
+            <h2>@HotelName</h2>
         </div>
-    </BodyContentTemplate>
-</DxPopup>
+        <div class="ledger-hotel-right">
+            <div class="hotel-line font-bold">@HotelName</div>
+            <div class="hotel-line">Branch: Head Office</div>
+            <div class="hotel-line">Tel:</div>
+            <div class="hotel-line">Fax:</div>
+            <div class="hotel-line">Web:</div>
+            <div class="hotel-line">Email:</div>
+            <div class="hotel-line">POBox</div>
+            <div class="hotel-line">Addis Ababa ,Ethiopia</div>
+        </div>
+    </div>
+
+    <!-- TIN / VAT & Title Line with Divider Lines -->
+    <div class="ledger-title-strip">
+        <div class="tin-vat-info">
+            <span>TIN: 0000000000-01</span>
+            <span class="ms-4">VAT:</span>
+        </div>
+        <div class="ledger-title-box">
+            <span class="title-line-left"></span>
+            <span class="title-text">@(IsRoomChargeOnly ? "Guest Ledger (Room Charge Only)" : "Guest Ledger")</span>
+            <span class="title-line-right"></span>
+        </div>
+    </div>
+
+    <!-- Customer Details Grid Table -->
+    <table class="cust-info-table">
+        <tbody>
+            <tr>
+                <td class="lbl-cell" style="width:18%;">Customer Name</td>
+                <td class="val-cell" style="width:37%;">@GuestName</td>
+                <td class="lbl-cell" style="width:18%;">TIN No</td>
+                <td class="val-cell" style="width:27%;">@TinNo</td>
+            </tr>
+            <tr>
+                <td class="lbl-cell">Registration No</td>
+                <td class="val-cell">@RegNo</td>
+                <td class="lbl-cell">Arrival Date</td>
+                <td class="val-cell">@(ArrivalDate?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")</td>
+            </tr>
+            <tr>
+                <td class="lbl-cell">Plan</td>
+                <td class="val-cell">@Plan</td>
+                <td class="lbl-cell">Departure Date</td>
+                <td class="val-cell">@(DepartureDate?.ToString("ddd, dd MMMM yyyy hh:mm tt") ?? "")</td>
+            </tr>
+            <tr>
+                <td class="lbl-cell">FS No.</td>
+                <td class="val-cell">@FsNo</td>
+                <td class="lbl-cell"></td>
+                <td class="val-cell"></td>
+            </tr>
+            <tr>
+                <td class="lbl-cell">Company</td>
+                <td class="val-cell">@Company</td>
+                <td class="lbl-cell"></td>
+                <td class="val-cell"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SECTION 1: Room Charge -->
+    <div class="section-title">Room Charge</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width:65px;">Selection</th>
+                <th style="width:35px;">SN</th>
+                <th style="width:75px;">Date</th>
+                <th style="width:65px;">Room No.</th>
+                <th style="width:90px;">Room Type</th>
+                <th style="width:85px;">Room Rate</th>
+                <th style="width:80px;">No. Of Adult</th>
+                <th style="width:80px;">No. Of Child</th>
+                <th>Remark</th>
+                <th style="width:80px; text-align:right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (RoomCharges != null && RoomCharges.Any())
+            {
+                @foreach (var rc in RoomCharges)
+                {
+                    <tr>
+                        <td style="text-align:center;">
+                            <input type="checkbox" checked="@rc.Selected" disabled />
+                        </td>
+                        <td style="text-align:center;">@rc.SN</td>
+                        <td>@rc.Date.ToString("M/d/yyyy")</td>
+                        <td style="text-align:center;">@rc.RoomNo</td>
+                        <td>@rc.RoomType</td>
+                        <td>@rc.RoomRate</td>
+                        <td style="text-align:center;">@rc.Adults</td>
+                        <td style="text-align:center;">@rc.Child</td>
+                        <td>@rc.Remark</td>
+                        <td style="text-align:right;">@rc.Amount.ToString("N2")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <!-- Room Charge Totals (Right Aligned Box) -->
+    <div class="totals-wrapper">
+        <table class="totals-table">
+            <tr>
+                <td class="tot-lbl">SubTotal :</td>
+                <td class="tot-val">@RoomSubtotal.ToString("N1")</td>
+            </tr>
+            <tr>
+                <td class="tot-lbl">Discount:</td>
+                <td class="tot-val">@Discount.ToString("N2")</td>
+            </tr>
+            <tr>
+                <td class="tot-lbl">ServiceCharge:</td>
+                <td class="tot-val">@RoomService.ToString("N2")</td>
+            </tr>
+            <tr>
+                <td class="tot-lbl">VAT[15%]:</td>
+                <td class="tot-val">@RoomVat.ToString("N2")</td>
+            </tr>
+            <tr class="grand-tot-row">
+                <td class="tot-lbl font-bold">Grand Total :</td>
+                <td class="tot-val font-bold">ETB @RoomGrand.ToString("N1")</td>
+            </tr>
+        </table>
+    </div>
+
+    @if (!IsRoomChargeOnly)
+    {
+        <!-- SECTION 2: Extra Bill History -->
+        <div class="section-title mt-3">Extra Bill History</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:65px;">Selection</th>
+                    <th style="width:35px;">SN</th>
+                    <th style="width:65px;">Room No.</th>
+                    <th style="width:75px;">Date</th>
+                    <th style="width:85px;">Invoice ID</th>
+                    <th style="width:75px; text-align:right;">Ser. Charge</th>
+                    <th style="width:65px; text-align:right;">Discount</th>
+                    <th style="width:65px; text-align:right;">VAT</th>
+                    <th style="width:75px; text-align:right;">Sub Total</th>
+                    <th>Remark</th>
+                    <th style="width:80px; text-align:right;">Grand Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ExtraBills != null && ExtraBills.Any())
+                {
+                    @foreach (var eb in ExtraBills)
+                    {
+                        <tr>
+                            <td style="text-align:center;">
+                                <input type="checkbox" checked="@eb.Selected" disabled />
+                            </td>
+                            <td style="text-align:center;">@eb.SN</td>
+                            <td style="text-align:center;">@eb.RoomNo</td>
+                            <td>@eb.Date.ToString("M/d/yyyy")</td>
+                            <td>@eb.InvoiceId</td>
+                            <td style="text-align:right;">@eb.SerCharge.ToString("N2")</td>
+                            <td style="text-align:right;">@eb.Discount.ToString("N2")</td>
+                            <td style="text-align:right;">@eb.Vat.ToString("N2")</td>
+                            <td style="text-align:right;">@eb.SubTotal.ToString("N2")</td>
+                            <td>@eb.Remark</td>
+                            <td style="text-align:right;">@eb.GrandTotal.ToString("N2")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="totals-wrapper">
+            <table class="totals-table">
+                <tr>
+                    <td class="tot-lbl font-bold" style="width:140px;">Total OtherBill:</td>
+                    <td class="tot-val font-bold">@TotalExtra.ToString("N2")</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SECTION 3: Payment History -->
+        <div class="section-title mt-3">Payment History</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:65px;">Selection</th>
+                    <th style="width:35px;">SN</th>
+                    <th style="width:75px;">Date</th>
+                    <th style="width:95px;">Receipt No.</th>
+                    <th style="width:95px;">Voucher Type</th>
+                    <th style="width:95px;">Received By</th>
+                    <th>Remark</th>
+                    <th style="width:80px; text-align:right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (PaymentHistory != null && PaymentHistory.Any())
+                {
+                    @foreach (var ph in PaymentHistory)
+                    {
+                        <tr>
+                            <td style="text-align:center;">
+                                <input type="checkbox" checked="@ph.Selected" disabled />
+                            </td>
+                            <td style="text-align:center;">@ph.SN</td>
+                            <td>@ph.Date.ToString("M/d/yyyy")</td>
+                            <td>@ph.ReceiptNo</td>
+                            <td>@ph.VoucherType</td>
+                            <td>@ph.ReceivedBy</td>
+                            <td>@ph.Remark</td>
+                            <td style="text-align:right;">@ph.Amount.ToString("N2")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="totals-wrapper">
+            <table class="totals-table">
+                <tr>
+                    <td class="tot-lbl">Total Paid:</td>
+                    <td class="tot-val">@TotalPaid.ToString("N2")</td>
+                </tr>
+                <tr>
+                    <td class="tot-lbl">Total Credit:</td>
+                    <td class="tot-val">0.00</td>
+                </tr>
+                <tr>
+                    <td class="tot-lbl">Refund:</td>
+                    <td class="tot-val">0.00</td>
+                </tr>
+                <tr class="grand-tot-row">
+                    <td class="tot-lbl font-bold">Remaining Balance:</td>
+                    <td class="tot-val font-bold">ETB @((RoomGrand + TotalExtra - TotalPaid).ToString("N1"))</td>
+                </tr>
+            </table>
+        </div>
+    }
+
+    <!-- Signatures Row (3 columns) -->
+    <div class="ledger-signatures-container">
+        <div class="sig-box">
+            <div class="sig-title">@HotelName @HotelName</div>
+            <div class="sig-line"></div>
+            <div class="sig-sub">Prepare By</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div class="sig-sub">GSR'S Signature</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div class="sig-sub">Guest's Signature</div>
+            <div class="sig-name">@GuestName</div>
+        </div>
+    </div>
+
+    <!-- Document Footer -->
+    <div class="ledger-footer-line">
+        <span>ERP System</span>
+        <span>Page 1</span>
+    </div>
+</DevExpressPrintPreview>
 
 @code {
     [Parameter] public bool Visible { get; set; }
