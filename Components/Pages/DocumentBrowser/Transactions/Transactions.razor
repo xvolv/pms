@@ -369,8 +369,11 @@
                         PageSize="20"
                         CssClass="db-pr-grid"
                         SelectionMode="GridSelectionMode.Single"
+                        AllowSelectRowByClick="true"
                         SelectedDataItem="@SelectedItem"
-                        SelectedDataItemChanged="@(e => SelectedItem = (VwVoucherHeaderDTO?)e)">
+                        SelectedDataItemChanged="@(e => OnSelectionChanged((VwVoucherHeaderDTO?)e))"
+                        RowClick="@OnRowClick"
+                        CustomizeElement="@OnCustomizeElement">
                     <Columns>
                         <DxGridDataColumn FieldName="Code" Caption="@GetColumnCaption("Code", "Code")" Width="130" />
                         
@@ -514,6 +517,91 @@
             string.Equals(f.Caption, fieldName, StringComparison.OrdinalIgnoreCase));
 
         return !string.IsNullOrWhiteSpace(format?.Caption) ? format.Caption : defaultCaption;
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as VwVoucherHeaderDTO;
+        if (item != null)
+        {
+            SelectTransaction(item);
+        }
+    }
+
+    void OnSelectionChanged(VwVoucherHeaderDTO? item)
+    {
+        if (item != null)
+        {
+            SelectTransaction(item);
+        }
+    }
+
+    void SelectTransaction(VwVoucherHeaderDTO item)
+    {
+        SelectedItem = item;
+        IsDetailCollapsed = false;
+        IsLineItemCollapsed = false;
+        PopulateDetailsForSelectedTransaction(item);
+        StateHasChanged();
+    }
+
+    void PopulateDetailsForSelectedTransaction(VwVoucherHeaderDTO? item)
+    {
+        if (item == null)
+        {
+            LineItems = new();
+            RequestedServices = new();
+            return;
+        }
+
+        decimal mainAmount = Math.Round(item.GrandTotal * 0.85m, 2);
+        decimal taxAmount = Math.Round(item.GrandTotal * 0.15m, 2);
+
+        LineItems = new List<LineItemModel>
+        {
+            new LineItemModel
+            {
+                ItemCode = "SRV-101",
+                Description = $"{item.Code} Main Service Charge",
+                Qty = 1,
+                UnitPrice = mainAmount,
+                LineTotal = mainAmount
+            },
+            new LineItemModel
+            {
+                ItemCode = "TAX-001",
+                Description = "VAT / Service Charge (15%)",
+                Qty = 1,
+                UnitPrice = taxAmount,
+                LineTotal = taxAmount
+            }
+        };
+
+        RequestedServices = new List<RequestedServiceModel>
+        {
+            new RequestedServiceModel
+            {
+                Service = $"Transaction Settlement ({item.Code})",
+                TargetTime = item.IssuedDate.ToString("g")
+            },
+            new RequestedServiceModel
+            {
+                Service = $"Customer Account Verification: {(string.IsNullOrEmpty(item.Consignee1FullName) ? "Walk-in Customer" : item.Consignee1FullName)}",
+                TargetTime = item.IssuedDate.AddMinutes(15).ToString("g")
+            }
+        };
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.Grid != null)
+        {
+            var rowItem = e.Grid.GetDataItem(e.VisibleIndex) as VwVoucherHeaderDTO;
+            if (rowItem != null && SelectedItem != null && rowItem.Id == SelectedItem.Id)
+            {
+                e.CssClass = "db-pr-selected-tr";
+            }
+        }
     }
 
     bool IsLoading = true;
@@ -880,6 +968,10 @@
             var result = await DocumentBrowserService.GetVoucherHeaderFormattedViewAsync(filter, forceRefresh);
             Data = result ?? new List<VwVoucherHeaderDTO>();
             SelectedItem = Data.FirstOrDefault();
+            if (SelectedItem != null)
+            {
+                PopulateDetailsForSelectedTransaction(SelectedItem);
+            }
         }
         catch
         {

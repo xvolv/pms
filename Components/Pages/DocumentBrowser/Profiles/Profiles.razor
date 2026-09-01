@@ -310,8 +310,11 @@
                         PageSize="20"
                         CssClass="db-pr-grid"
                         SelectionMode="GridSelectionMode.Single"
+                        AllowSelectRowByClick="true"
                         SelectedDataItem="@SelectedItem"
-                        SelectedDataItemChanged="@(e => SelectedItem = (VwConsigneeViewDTO?)e)">
+                        SelectedDataItemChanged="@(e => OnSelectionChanged((VwConsigneeViewDTO?)e))"
+                        RowClick="@OnRowClick"
+                        CustomizeElement="@OnCustomizeElement">
                     <Columns>
                         <DxGridDataColumn FieldName="Code" Caption="@GetColumnCaption("Code", "Code")" Width="120" />
                         <DxGridDataColumn FieldName="FullName" Caption="@GetColumnCaption("FullName", "Full Name")" Width="260" />
@@ -343,7 +346,7 @@
             }
         </div>
 
-        <!-- Right detail panel — collapsible, closed by default -->
+        <!-- Right detail panel — collapsible, auto-updated when row selected -->
         <div class="db-pr-detail-panel @(IsDetailCollapsed ? "db-pr-collapsed" : "")">
             <div class="db-pr-detail-header">
                 @if (!IsDetailCollapsed)
@@ -381,8 +384,16 @@
                     
                     <p><strong>Category:</strong> @SelectedItem.ChildPreferenceDescrption</p>
                     <p><strong>State:</strong> @SelectedItem.ObjectStateDescription</p>
-                    <p><strong>Phone:</strong> @SelectedItem.Phone1</p>
-                    <p><strong>City:</strong> @SelectedItem.City</p>
+                    <p><strong>Phone:</strong> @(string.IsNullOrWhiteSpace(SelectedItem.Phone1) ? "-" : SelectedItem.Phone1)</p>
+                    <p><strong>City:</strong> @(SelectedItem.City?.ToString() ?? "-")</p>
+                    @if (!string.IsNullOrWhiteSpace(SelectedItem.HouseNumber))
+                    {
+                        <p><strong>House No / Address:</strong> @SelectedItem.HouseNumber</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(SelectedItem.Email))
+                    {
+                        <p><strong>Email:</strong> @SelectedItem.Email</p>
+                    }
                 }
                 else
                 {
@@ -440,6 +451,59 @@
             string.Equals(f.Caption, fieldName, StringComparison.OrdinalIgnoreCase));
 
         return !string.IsNullOrWhiteSpace(format?.Caption) ? format.Caption : defaultCaption;
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as VwConsigneeViewDTO;
+        if (item != null)
+        {
+            SelectProfile(item);
+        }
+    }
+
+    void OnSelectionChanged(VwConsigneeViewDTO? item)
+    {
+        if (item != null)
+        {
+            SelectProfile(item);
+        }
+    }
+
+    void SelectProfile(VwConsigneeViewDTO item)
+    {
+        SelectedItem = item;
+        IsDetailCollapsed = false;
+        PopulateDetailsForSelectedProfile(item);
+        StateHasChanged();
+    }
+
+    void PopulateDetailsForSelectedProfile(VwConsigneeViewDTO? item)
+    {
+        if (item == null)
+        {
+            RequestedServices = new();
+            return;
+        }
+
+        RequestedServices = new List<RequestedServiceModel>
+        {
+            new RequestedServiceModel { Service = $"Guest Welcome & Amenities ({item.FullName})", TargetTime = DateTime.Today.AddHours(14).ToString("g") },
+            new RequestedServiceModel { Service = "Daily Room Housekeeping Service", TargetTime = DateTime.Today.AddHours(10).ToString("g") },
+            new RequestedServiceModel { Service = "Luggage & Concierge Assistance", TargetTime = DateTime.Today.AddHours(15).ToString("g") }
+        };
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.Grid != null)
+        {
+            var rowItem = e.Grid.GetDataItem(e.VisibleIndex) as VwConsigneeViewDTO;
+            if (rowItem != null && SelectedItem != null && rowItem.Id == SelectedItem.Id)
+            {
+                e.CssClass = "db-pr-selected-tr";
+            }
+        }
     }
 
     bool IsLoading = true;
@@ -810,6 +874,10 @@
             var result = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(filter, forceRefresh);
             Data = result ?? new List<VwConsigneeViewDTO>();
             SelectedItem = Data.FirstOrDefault();
+            if (SelectedItem != null)
+            {
+                PopulateDetailsForSelectedProfile(SelectedItem);
+            }
         }
         catch (Exception)
         {
