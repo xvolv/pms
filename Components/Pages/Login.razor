@@ -217,12 +217,31 @@
 
         isLoading = true;
 
-        var result = await ApiService.AuthenticateAsync(username, password, tin, selectedBranchId);
+        ResponseModel<LoginResponse>? result = await ApiService.AuthenticateAsync(username, password, tin, selectedBranchId);
 
         if (result != null && result.Success)
         {
-            // Successful login
-            Navigation.NavigateTo("/dashboard");
+
+            var consigneeUnitId = int.TryParse(selectedBranchId, out var parsedBranchId)
+                ? parsedBranchId
+                : result.Data?.personConsigneeUnit?.Id ?? 0;
+
+
+            var consigneeUnitName = systemInitData?.branches?
+                .FirstOrDefault(b => b.Id == consigneeUnitId)?.Name
+                ?? result.Data?.personConsigneeUnit?.Name;
+
+            var userId = result.Data?.personInfo?.Id;
+            var role = result.Data?.role;
+            var signInUrl = $"/account/signin?tin={Uri.EscapeDataString(tin)}&username={Uri.EscapeDataString(username)}&consigneeUnitId={consigneeUnitId}";
+            if (!string.IsNullOrEmpty(consigneeUnitName))
+                signInUrl += $"&consigneeUnitName={Uri.EscapeDataString(consigneeUnitName)}";
+            if (userId.HasValue)
+                signInUrl += $"&userId={userId}";
+            if (role.HasValue)
+                signInUrl += $"&role={role}";
+
+            Navigation.NavigateTo(signInUrl, forceLoad: true);
         }
         else
         {

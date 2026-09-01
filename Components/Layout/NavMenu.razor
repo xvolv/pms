@@ -1,3 +1,5 @@
+@inject NavigationManager NavigationManager
+
 <div class="main-menu-container">
     <div class="menu-header">
         <span class="menu-title">Main Menu</span>
@@ -212,10 +214,10 @@
     </div>
 
     <div class="menu-footer">
-        <NavLink class="logout-link" href="">
+        <a class="logout-link" href="javascript:void(0)" @onclick="Logout">
             <i class="bi bi-box-arrow-left logout-icon"></i>
             <span>Log Out</span>
-        </NavLink>
+        </a>
     </div>
 </div>
 
@@ -237,6 +239,8 @@
     private void ToggleNightAudit() => isNightAuditExpanded = !isNightAuditExpanded;
     private void ToggleReports() => isReportsExpanded = !isReportsExpanded;
     private void ToggleSettings() => isSettingsExpanded = !isSettingsExpanded;
+
+    private void Logout() => NavigationManager.NavigateTo("/account/logout", forceLoad: true);
 
     private void ToggleExpandAll()
     {

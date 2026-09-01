@@ -1,37 +1,51 @@
 @inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavigationManager
 @inject RecentPagesService RecentPagesService
+@inject AuthenticationStateProvider AuthStateProvider
 @implements IDisposable
 
-<div class="page @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
-    <div class="sidebar">
-        <AppSidebar OnSectionActivated="ExpandSidebar" />
+@if (isAuthenticated)
+{
+    <div class="page @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
+        <div class="sidebar">
+            <AppSidebar OnSectionActivated="ExpandSidebar" />
+        </div>
+
+        <main>
+            <button class="sidebar-toggle-btn" @onclick="ToggleSidebar" title="@(isSidebarCollapsed ? "Show Menu" : "Hide Menu")">
+                <i class="bi @(isSidebarCollapsed ? "bi-chevron-right" : "bi-chevron-left")"></i>
+            </button>
+
+            <article class="content">
+                @Body
+            </article>
+        </main>
     </div>
 
-    <main>
-        <button class="sidebar-toggle-btn" @onclick="ToggleSidebar" title="@(isSidebarCollapsed ? "Show Menu" : "Hide Menu")">
-            <i class="bi @(isSidebarCollapsed ? "bi-chevron-right" : "bi-chevron-left")"></i>
-        </button>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
 
-        <article class="content">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
-
-<FolioPopup />
+    <FolioPopup />
+}
 
 @code {
     private bool isSidebarCollapsed = true;
-
-    protected override void OnInitialized()
+    private bool isAuthenticated;
+    protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/", forceLoad: true);
+            return;
+        }
+
         NavigationManager.LocationChanged += HandleLocationChanged;
         TrackCurrentLocation();
     }

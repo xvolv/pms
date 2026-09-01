@@ -797,7 +797,7 @@
     .user-card {
         grid-area: user;
         min-width: 0;
-        border:1px solid red;
+
     }
 
     .logo-box {
