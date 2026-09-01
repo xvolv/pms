@@ -313,28 +313,28 @@
                         SelectedDataItem="@SelectedItem"
                         SelectedDataItemChanged="@(e => SelectedItem = (VwConsigneeViewDTO?)e)">
                     <Columns>
-                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="120" />
-                        <DxGridDataColumn FieldName="FullName" Caption="Full Name" Width="260" />
+                        <DxGridDataColumn FieldName="Code" Caption="@GetColumnCaption("Code", "Code")" Width="120" />
+                        <DxGridDataColumn FieldName="FullName" Caption="@GetColumnCaption("FullName", "Full Name")" Width="260" />
                         
                         @if (GslTypeId == 27 || GslTypeId == 30)
                         {
                             <!-- Guest & Contact columns -->
-                            <DxGridDataColumn FieldName="StartDate" Caption="DOB" Width="110" DisplayFormat="d" />
-                            <DxGridDataColumn FieldName="Nationality" Caption="Nationality" Width="130" />
-                            <DxGridDataColumn FieldName="NationalId" Caption="National ID" Width="130" />
-                            <DxGridDataColumn FieldName="GenderDescription" Caption="Gender" Width="90" />
+                            <DxGridDataColumn FieldName="StartDate" Caption="@GetColumnCaption("StartDate", "DOB")" Width="110" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="Nationality" Caption="@GetColumnCaption("Nationality", "Nationality")" Width="130" />
+                            <DxGridDataColumn FieldName="NationalId" Caption="@GetColumnCaption("NationalId", "National ID")" Width="130" />
+                            <DxGridDataColumn FieldName="GenderDescription" Caption="@GetColumnCaption("GenderDescription", "Gender")" Width="90" />
                         }
                         else
                         {
                             <!-- Company, Agent, Group, Source columns -->
-                            <DxGridDataColumn FieldName="Tin" Caption="TIN" Width="120" />
-                            <DxGridDataColumn FieldName="BusinessTypeDesc" Caption="Business Type" Width="160" />
+                            <DxGridDataColumn FieldName="Tin" Caption="@GetColumnCaption("Tin", "TIN")" Width="120" />
+                            <DxGridDataColumn FieldName="BusinessTypeDesc" Caption="@GetColumnCaption("BusinessTypeDesc", "Business Type")" Width="160" />
                         }
                         
-                        <DxGridDataColumn FieldName="ChildPreferenceDescrption" Caption="Category" Width="130" />
-                        <DxGridDataColumn FieldName="ObjectStateDescription" Caption="State" Width="110" />
-                        <DxGridDataColumn FieldName="Phone1" Caption="Phone" Width="130" />
-                        <DxGridDataColumn FieldName="City" Caption="City" Width="130" />
+                        <DxGridDataColumn FieldName="ChildPreferenceDescrption" Caption="@GetColumnCaption("ChildPreferenceDescrption", "Category")" Width="130" />
+                        <DxGridDataColumn FieldName="ObjectStateDescription" Caption="@GetColumnCaption("ObjectStateDescription", "State")" Width="110" />
+                        <DxGridDataColumn FieldName="Phone1" Caption="@GetColumnCaption("Phone1", "Phone")" Width="130" />
+                        <DxGridDataColumn FieldName="City" Caption="@GetColumnCaption("City", "City")" Width="130" />
                     </Columns>
                 </DxGrid>
                 <div class="db-pr-record-info">
@@ -430,6 +430,17 @@
     List<PreferenceDTO> PreferenceList = new();
     List<SystemConstantDTO> ObjectStateList = new();
     List<RequestedServiceModel> RequestedServices = new();
+
+    string GetColumnCaption(string fieldName, string defaultCaption)
+    {
+        if (ColumnFormats == null || ColumnFormats.Count == 0)
+            return defaultCaption;
+
+        var format = ColumnFormats.FirstOrDefault(f =>
+            string.Equals(f.Caption, fieldName, StringComparison.OrdinalIgnoreCase));
+
+        return !string.IsNullOrWhiteSpace(format?.Caption) ? format.Caption : defaultCaption;
+    }
 
     bool IsLoading = true;
     DateTime? ServerTime = DateTime.Today;
