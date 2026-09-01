@@ -109,7 +109,10 @@
 
     void Print()
     {
-
+        if (ActiveTabIndex == 0)
+            header?.Print();
+        else
+            detail?.Print();
     }
 
     
