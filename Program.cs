@@ -1,5 +1,6 @@
 using ERP.V7.WebPMS.Components;
 using ERP.V7.WebPMS.Services;
+using ERP.V7.WebPMS.Services.Common;
 using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services;
 using ERP.V7.WebPMS.Services.Dashboard;
 using ERP.V7.WebPMS.Services.DocumentBrowser;
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddDevExpressBlazor();
 builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDocumentBrowserService, DocumentBrowserService>();

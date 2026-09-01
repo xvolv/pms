@@ -11,7 +11,7 @@
     <!-- ===================== FILTER BAR ===================== -->
     <div class="db-pr-filter-bar">
         <div class="db-pr-toolbar-row">
-            <button class="db-pr-toolbar-btn" type="button" title="Show" @onclick="LoadDataAsync" disabled="@IsLoading">
+            <button class="db-pr-toolbar-btn" type="button" title="Show" @onclick="() => LoadDataAsync(true)" disabled="@IsLoading">
                 <i class="bi bi-eye"></i>
                 <span>Show</span>
             </button>
@@ -820,7 +820,7 @@
     }
 
     // Load Data
-    public async Task LoadDataAsync()
+    public async Task LoadDataAsync(bool forceRefresh = false)
     {
         IsLoading = true;
         StateHasChanged();
@@ -855,7 +855,7 @@
                 filter.ToDate = null;
             }
 
-            var result = await DocumentBrowserService.GetVoucherHeaderFormattedViewAsync(filter);
+            var result = await DocumentBrowserService.GetVoucherHeaderFormattedViewAsync(filter, forceRefresh);
             Data = result ?? new List<VwVoucherHeaderDTO>();
             SelectedItem = Data.FirstOrDefault();
         }
