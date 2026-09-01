@@ -3,8 +3,10 @@
 @rendermode InteractiveServer
 @using ERP.V7.WebPMS.Services
 @using CNET_V7_Domain.Misc
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IApiService ApiService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login - PMS ERP V7</PageTitle>
 
@@ -167,6 +169,15 @@
     private string? errorMessage;
     private string? successMessage;
     private SystemInitDTO? systemInitData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/dashboard", forceLoad: true);
+        }
+    }
 
     private async Task HandleVerify()
     {
