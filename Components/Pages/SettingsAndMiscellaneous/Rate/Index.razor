@@ -1,10 +1,11 @@
-﻿@page "/revenue"
+@page "/revenue"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @rendermode InteractiveServer
 
 @inject NavigationManager Navigation
 @using DevExpress.Blazor
 @using System.ComponentModel.DataAnnotations
+@using ERP.V7.WebPMS.Components.Shared
 
 <PageTitle>Rate</PageTitle>
 <div class="dashboard-wrapper">
@@ -126,6 +127,78 @@
         </div>
     </div>
 </div>
+
+<!-- ===================== DEVEXPRESS PRINT PREVIEW: RATE CATEGORY ===================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showCategoryPrintPreview"
+    Title="Print Dialog"
+    DocumentTitle="Rate Category"
+    PrintElementId="rate-category-print-area"
+    IsMaximized="true">
+
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">TEST HOTEL</div>
+        <div class="dx-report-doc-title">Rate Category</div>
+    </div>
+
+    <div class="dx-report-meta-row" style="justify-content: flex-end;">
+        <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th style="width: 140px;">Start Date</th>
+                <th style="width: 140px;">End Date</th>
+                <th style="width: 140px;">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (AllCategories.Any())
+            {
+                @foreach (var cat in AllCategories)
+                {
+                    <tr>
+                        <td>@cat.Description</td>
+                        <td>@cat.StartDate.ToString("M/d/yyyy")</td>
+                        <td>@cat.EndDate.ToString("M/d/yyyy")</td>
+                        <td>@cat.Type</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #888; padding: 24px;">No Rate Category Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
 @* ===================== RATE CATEGORY EDIT POPUP ===================== *@
 <DxPopup @bind-Visible="@IsPopupVisible" Width="480px" ShowFooter="false" ShowCloseButton="true"
@@ -760,6 +833,7 @@ EndDate = new DateTime(2018,4,7), Type = "Rate Class", Remark = "", RatePolicy =
 
     // ---------- Popup / EditForm (Rate Category add/edit) ----------
     private bool IsPopupVisible = false;
+    private bool showCategoryPrintPreview = false;
     private RateCategoryEditModel EditModel = new();
     private EditContext? EditContext;
     private bool IsEditMode = false;
@@ -923,6 +997,8 @@ c.Description).ToList();
     {
         if (ActiveOuterTabIndex == 0)
             OnPrintClick();
+        else if (ActiveOuterTabIndex == 2)
+            rateDetail?.Print();
     }
 
     // ---------- Rate Category Toolbar Actions ----------
@@ -1004,7 +1080,8 @@ SelectedCategoryRow.ParentId)?.Description : "",
 
     void OnPrintClick()
     {
-        // Hook up print/report logic here.
+        showCategoryPrintPreview = true;
+        StateHasChanged();
     }
 
     void OnSaveClick()

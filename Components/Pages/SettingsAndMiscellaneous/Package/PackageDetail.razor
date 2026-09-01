@@ -4,6 +4,7 @@
 
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
+@using ERP.V7.WebPMS.Components.Shared
 @using DevExpress.Blazor
 
 <div class="page-shell">
@@ -88,6 +89,77 @@
                    OnClose="HandlePopupClose"
                    OnReset="HandleReset" />
 
+<!-- ===================== DEVEXPRESS PRINT PREVIEW MODAL ===================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showPrintPreview"
+    Title="Print Dialog"
+    DocumentTitle="@($"Package Details for {(selectedGroup?.Name ?? "Package")}")"
+    PrintElementId="package-details-print-area"
+    IsMaximized="true">
+
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">@(selectedGroup?.Hotel ?? "TEST HOTEL")</div>
+        <div class="dx-report-doc-title">Package Details for @(selectedGroup?.Name ?? "Test Package Header 1")</div>
+    </div>
+
+    <div class="dx-report-meta-row" style="justify-content: flex-end;">
+        <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Start Date</th>
+                <th style="width: 25%;">End Date</th>
+                <th style="width: 25%; text-align: right;">Price</th>
+                <th style="width: 25%; text-align: right;">Allowance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (selectedGroup?.Details != null && selectedGroup.Details.Any())
+            {
+                @foreach (var row in selectedGroup.Details)
+                {
+                    <tr>
+                        <td>@row.StartDate.ToString("M/d/yyyy")</td>
+                        <td>@row.EndDate.ToString("M/d/yyyy")</td>
+                        <td style="text-align: right;">@row.Price.ToString("0.00")</td>
+                        <td style="text-align: right;">@row.Allowance.ToString("0.00")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #888; padding: 24px;">No Package Details Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
 @code {
     [Inject]
@@ -96,6 +168,8 @@
     private DxGrid? Grid;
     private object? SelectedItemObj;
     private PackageDetailRow? SelectedItem => SelectedItemObj as PackageDetailRow;
+
+    private bool showPrintPreview = false;
 
     private List<PackageGroup> packageGroups = new();
     private PackageGroup? selectedGroup;
@@ -254,7 +328,8 @@
 
     public void Print()
     {
-        // Print implementation
+        showPrintPreview = true;
+        StateHasChanged();
     }
 }
 

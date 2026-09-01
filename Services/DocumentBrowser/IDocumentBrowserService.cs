@@ -28,11 +28,14 @@ namespace ERP.V7.WebPMS.Services.DocumentBrowser
 
     public interface IDocumentBrowserService
     {
-        Task<DateTime?> GetServerTimeAsync();
-        Task<List<FieldFormatDTO>> GetFieldFormatsAsync(int referenceId);
-        Task<List<PreferenceDTO>> GetPreferencesAsync(int systemConstantId);
-        Task<List<SystemConstantDTO>> GetObjectStatesAsync(string type = "ObjectState Definition", string category = "Article");
-        Task<List<VwConsigneeViewDTO>> GetConsigneeHeaderFormattedViewAsync(ConsigneeFilterCriteria filter);
-        Task<List<VwVoucherHeaderDTO>> GetVoucherHeaderFormattedViewAsync(TransactionFilterCriteria filter);
+        Task<DateTime?> GetServerTimeAsync(bool forceRefresh = false);
+        Task<List<FieldFormatDTO>> GetFieldFormatsAsync(int referenceId, bool forceRefresh = false);
+        Task<List<PreferenceDTO>> GetPreferencesAsync(int systemConstantId, bool forceRefresh = false);
+        Task<List<SystemConstantDTO>> GetObjectStatesAsync(string type = "ObjectState Definition", string category = "Article", bool forceRefresh = false);
+        Task<List<VwConsigneeViewDTO>> GetConsigneeHeaderFormattedViewAsync(ConsigneeFilterCriteria filter, bool forceRefresh = false);
+        Task<List<VwVoucherHeaderDTO>> GetVoucherHeaderFormattedViewAsync(TransactionFilterCriteria filter, bool forceRefresh = false);
+        void InvalidateConsigneeCache(int? gslType = null);
+        void InvalidateVoucherCache(int? definitionId = null);
+        void ClearCache();
     }
 }

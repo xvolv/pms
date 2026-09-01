@@ -1,5 +1,6 @@
 
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.Shared
 @rendermode InteractiveServer
 
 <style>
@@ -813,9 +814,91 @@
     </BodyContentTemplate>
 </DxPopup>
 
+<!-- ===================== DEVEXPRESS PRINT PREVIEW: RATE DETAIL ===================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showPrintPreview"
+    Title="Print Dialog"
+    DocumentTitle="@($"Rate Detail list for {(rateCodes.FirstOrDefault(r => r.Code == selectedRateCode)?.Description ?? "Rate 1")}")"
+    PrintElementId="rate-detail-print-area"
+    IsMaximized="true">
+
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">@(rateCodes.FirstOrDefault(r => r.Code == selectedRateCode)?.Hotel ?? "TEST HOTEL")</div>
+        <div class="dx-report-doc-title">Rate Detail list for @(rateCodes.FirstOrDefault(r => r.Code == selectedRateCode)?.Description ?? "Rate 1")</div>
+    </div>
+
+    <div class="dx-report-meta-row" style="justify-content: flex-end;">
+        <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th style="width: 50px; text-align: center;">SN</th>
+                <th>Description</th>
+                <th style="width: 140px;">Start Date</th>
+                <th style="width: 140px;">End Date</th>
+                <th style="width: 160px;">Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (rateDetails.Any())
+            {
+                int index = 1;
+                @foreach (var detail in rateDetails)
+                {
+                    <tr>
+                        <td style="text-align: center;">@(index++)</td>
+                        <td>@(string.IsNullOrWhiteSpace(detail.Description) ? (rateCodes.FirstOrDefault(r => r.Code == selectedRateCode)?.Description ?? "Rate 1") : detail.Description)</td>
+                        <td>@detail.StartDate.ToString("M/d/yyyy")</td>
+                        <td>@detail.EndDate.ToString("M/d/yyyy")</td>
+                        <td>@detail.Remark</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #888; padding: 24px;">No Rate Detail Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
+
 @code {
     int detailTabIndex = 0;
     string selectedRateCode = "ROH000000001";
+    private bool showPrintPreview = false;
+
+    public void Print()
+    {
+        showPrintPreview = true;
+        StateHasChanged();
+    }
 
     // NEW: tracks which "Hotel: X" groups are expanded in the left tree panel
     private HashSet<string> expandedHotels = new();

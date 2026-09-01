@@ -99,42 +99,36 @@
 <!-- ===================== GLOBAL SEARCH POPUPS (FROM SHARED) ===================== -->
 <GuestSearchPopup
     @bind-Visible="showGuestSearch"
-    Guests="@Guests"
     OnSelect="OnGuestSelected"
     OnAddNew="AddNewGuest"
     OnClear="ClearGuest" />
 
 <ContactSearchPopup
     @bind-Visible="showContactSearch"
-    Contacts="@Contacts"
     OnSelect="OnContactSelected"
     OnAddNew="AddNewContact"
     OnClear="ClearContact" />
 
 <CompanySearchPopup
     @bind-Visible="showCompanySearch"
-    Customers="@Customers"
     OnSelect="OnCompanySelected"
     OnAddNew="AddNewCompany"
     OnClear="ClearCompany" />
 
 <AgentSearchPopup
     @bind-Visible="showAgentSearch"
-    Agents="@Agents"
     OnSelect="OnAgentSelected"
     OnAddNew="AddNewAgent"
     OnClear="ClearAgent" />
 
 <GroupSearchPopup
     @bind-Visible="showGroupSearch"
-    Groups="@Groups"
     OnSelect="OnGroupSelected"
     OnAddNew="AddNewGroup"
     OnClear="ClearGroup" />
 
 <SourceSearchPopup
     @bind-Visible="showSourceSearch"
-    Sources="@Sources"
     OnSelect="OnSourceSelected"
     OnAddNew="AddNewSource"
     OnClear="ClearSource" />

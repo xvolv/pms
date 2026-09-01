@@ -16,6 +16,9 @@
 @using ERP.V7.WebPMS.Components.Pages.Profile.Source
 @using ERP.V7.WebPMS.Components.Pages.Profile.Source.Models
 @using ERP.V7.WebPMS.Components.Pages.Profile.Shared
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <PageTitle>Reservation - CNET ERP</PageTitle>
 
@@ -62,21 +65,16 @@
                         <div class="basic-grid">
                             <label>Guest Name</label>
                             <div class="input-with-btn wide">
-                                <DxComboBox CssClass="erp-combobox" Data="@guestList"
-                                            TextFieldName="FullName"
-                                            ValueFieldName="Id"
-                                            @bind-Value="selectedGuestId"
-                                            SearchMode="ListSearchMode.AutoSearch"
-                                            SearchFilterCondition="ListSearchFilterCondition.Contains"
-                                            NullText=""
-                                            Width="100%"
-                                            SizeMode="SizeMode.Small"
-                                            SelectedItemChanged="OnGuestSelected" />
+                                <div class="lookup-field" style="flex:1;">
+                                    <DxTextBox @bind-Text="guestNameText" ReadOnly="true" Width="100%"
+                                               CssClass="erp-combobox lookup-input" Click="OpenGuestSearch" />
+                                    <button type="button" class="lookup-toggle-btn" @onclick="OpenGuestSearch">▾</button>
+                                </div>
                                 <DxButton IconCssClass="bi bi-plus-lg"
                                           CssClass="circle-btn"
                                           RenderStyle="ButtonRenderStyle.Secondary"
                                           SizeMode="SizeMode.Small"
-                                          Click="OpenGuestSearch" />
+                                          Click="AddNewGuest" />
                             </div>
 
                             <label>Nationality</label>
@@ -399,42 +397,36 @@
 
 <!-- ===================== COMPANY / CUSTOMER SEARCH POPUP ===================== -->
 <CompanySearchPopup @bind-Visible="showCompanySearch"
-                    Customers="@Customers"
                     OnSelect="SelectCustomer"
                     OnAddNew="AddNewCompany"
                     OnClear="ClearCustomer" />
 
 <!-- ===================== GROUP SEARCH POPUP ===================== -->
 <GroupSearchPopup @bind-Visible="showGroupSearch"
-                  Groups="@Groups"
                   OnSelect="SelectGroup"
                   OnAddNew="AddNewGroup"
                   OnClear="ClearGroup" />
 
 <!-- ===================== GUEST SEARCH POPUP ===================== -->
 <GuestSearchPopup @bind-Visible="showGuestSearch"
-                  Guests="@Guests"
                   OnSelect="SelectGuest"
                   OnAddNew="AddNewGuest"
                   OnClear="ClearGuest" />
 
 <!-- ===================== CONTACT SEARCH POPUP ===================== -->
 <ContactSearchPopup @bind-Visible="showContactSearch"
-                    Contacts="@Contacts"
                     OnSelect="SelectContact"
                     OnAddNew="AddNewContact"
                     OnClear="ClearContact" />
 
 <!-- ===================== AGENT SEARCH POPUP ===================== -->
 <AgentSearchPopup @bind-Visible="showAgentSearch"
-                  Agents="@Agents"
                   OnSelect="SelectAgent"
                   OnAddNew="AddNewAgent"
                   OnClear="ClearAgent" />
 
 <!-- ===================== SOURCE SEARCH POPUP ===================== -->
 <SourceSearchPopup @bind-Visible="showSourceSearch"
-                   Sources="@Sources"
                    OnSelect="SelectSource"
                    OnAddNew="AddNewSource"
                    OnClear="ClearSource" />
@@ -1046,7 +1038,8 @@
     };
 
     // Basic Info
-    int? selectedGuestId = 7;
+    int? selectedGuestId;
+    string guestNameText = "";
     string nationality = "Ethiopian";
     string passport = "EP155353";
     string title = "Ato";
@@ -1155,58 +1148,12 @@
     bool showAgentModal = false;
     bool showSourceModal = false;
 
-    List<CustomerItem> Customers { get; set; } = new()
-    {
-        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" },
-        new() { Code = "PCU00001", FirstName = "ETHIO TELECOM", MiddleName = "HEAD OFFICE", Tin = "0000012345" },
-        new() { Code = "PCU00002", FirstName = "COMMERCIAL BANK OF ETHIOPIA", MiddleName = "CBE MAIN", Tin = "0000054321" },
-        new() { Code = "PCU00003", FirstName = "ETHIOPIAN AIRLINES", MiddleName = "EAL HEADQUARTERS", Tin = "0000098765" }
-    };
-
-    List<GroupItem> Groups { get; set; } = new()
-    {
-        new() { Code = "GRP-001", Name = "JANE", Description = "Jane Tour Group" },
-        new() { Code = "GRP-002", Name = "ABEBE", Description = "Abebe Corporate Group" },
-        new() { Code = "GRP-003", Name = "KEBEDE", Description = "Kebede Delegation" },
-        new() { Code = "GRP-004", Name = "OTHER GROUP", Description = "General Event Group" }
-    };
-
-    List<GuestItem> Guests { get; set; } = new()
-    {
-        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
-        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
-        new() { FirstName = "JOHN", MiddleName = "SMITH", Tin = "" },
-        new() { FirstName = "TEST", MiddleName = "", Tin = "" },
-        new() { FirstName = "Solomon", MiddleName = "Bereket Tuffa", Tin = "EP155353" },
-        new() { FirstName = "miskir", MiddleName = "engida engida", Tin = "" }
-    };
-
-    List<ContactItem> Contacts { get; set; } = new()
-    {
-        new() { Code = "PCU-00002", FirstName = "KEBEDE", MiddleName = "ZELEKE ABEBE", Phone = "5565556456" },
-        new() { Code = "PCU-00003", FirstName = "BROWN", MiddleName = "CHRIS", Phone = "3423343" },
-        new() { Code = "PCU-00009", FirstName = "NAGUIB", MiddleName = "ALI TAHER", Phone = "D02018" },
-        new() { Code = "PCU-00010", FirstName = "GIRMA", MiddleName = "BIRHANU ASSEFA", Phone = "423432" },
-        new() { Code = "PCU-00011", FirstName = "GIRMA", MiddleName = "SOFOIANA BELIHU", Phone = "43241" },
-        new() { Code = "PCU-00012", FirstName = "GIRMA", MiddleName = "DEFAR BEGENA", Phone = "342342" }
-    };
-
-    List<AgentItem> Agents { get; set; } = new()
-    {
-        new() { Code = "OA-00001", Name = "RIHANN'S AGENT", IataNo = "343422234-34", AgentType = "Corporate" },
-        new() { Code = "OA-00002", Name = "MY AGENT", IataNo = "566632222-22", AgentType = "Retail" },
-        new() { Code = "OA-00003", Name = "GLOBAL TOURS & TRAVEL", IataNo = "789123456-01", AgentType = "Online" },
-        new() { Code = "OA-00004", Name = "ETHIO TRAVEL AGENCY", IataNo = "112233445-55", AgentType = "Wholesale" }
-    };
-
-    List<SourceItem> Sources { get; set; } = new()
-    {
-        new() { Code = "SRC-001", Name = "Company Directory", SourceType = "Corporate" },
-        new() { Code = "SRC-002", Name = "Website", SourceType = "Direct" },
-        new() { Code = "SRC-003", Name = "Travel Agent", SourceType = "Travel Agent" },
-        new() { Code = "SRC-004", Name = "Walk-in", SourceType = "Walk-In" },
-        new() { Code = "SRC-005", Name = "Online OTA", SourceType = "OTA" }
-    };
+    List<CustomerItem> Customers { get; set; } = new();
+    List<GroupItem> Groups { get; set; } = new();
+    List<GuestItem> Guests { get; set; } = new();
+    List<ContactItem> Contacts { get; set; } = new();
+    List<AgentItem> Agents { get; set; } = new();
+    List<SourceItem> Sources { get; set; } = new();
 
     // Guest Search
     string guestSearchText = "";
@@ -1272,24 +1219,49 @@
 
     string SelectedGuestName => guestList.FirstOrDefault(g => g.Id == selectedGuestId)?.FullName ?? "Guest";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        guestList = new List<Guest>
-        {
-            new() { Id = 1,  Title = "Ato",  FirstName = "Taddeses", MiddleName = "ARABA",  LastName = "Mola",     Identification = "EP155353" },
-            new() { Id = 2,  Title = "Ato",  FirstName = "teshome",  MiddleName = "",       LastName = "mola",     Identification = "1234667777" },
-            new() { Id = 7,  Title = "W/ro", FirstName = "solomon",  MiddleName = "Bereket",LastName = "mulugeta", Identification = "3342334" },
-            new() { Id = 12, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Fasil",  LastName = "Girma",    Identification = "575777" },
-            new() { Id = 13, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Fikadu", LastName = "Teshome",  Identification = "4353" },
-            new() { Id = 14, Title = "Ato",  FirstName = "Solman",   MiddleName = "Jack",   LastName = "Jemes",    Identification = "86869007764" },
-            new() { Id = 15, Title = "Ato",  FirstName = "Solomon",  MiddleName = "Bereket",LastName = "Tuffa",    Identification = "EP155353" },
-        };
-        filteredGuests = guestList.ToList();
+        await LoadGuestsFromApiAsync();
+    }
 
-        selectedGuestId = 15;
-        title = "Ato";
-        nationality = "Ethiopian";
-        passport = "EP155353";
+    async Task LoadGuestsFromApiAsync()
+    {
+        try
+        {
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 27,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                guestList = res.Select(dto => new Guest
+                {
+                    Id = dto.Id,
+                    Title = dto.Title.HasValue ? $"Title {dto.Title.Value}" : "Ato",
+                    FirstName = !string.IsNullOrWhiteSpace(dto.FirstName) ? dto.FirstName : (!string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName.Split(' ', 2)[0] : ""),
+                    MiddleName = !string.IsNullOrWhiteSpace(dto.FullName) && dto.FullName.Contains(' ') ? dto.FullName.Split(' ', 2)[1] : "",
+                    LastName = "",
+                    Identification = !string.IsNullOrWhiteSpace(dto.Tin) ? dto.Tin : (dto.NationalId ?? "")
+                }).ToList();
+
+                filteredGuests = guestList.ToList();
+
+                if (guestList.Any() && selectedGuestId == null)
+                {
+                    var first = guestList.First();
+                    selectedGuestId = first.Id;
+                    guestNameText = first.FullName;
+                    title = first.Title;
+                    passport = first.Identification;
+                }
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
     }
 
     // ---------- Actions ----------
@@ -1313,34 +1285,18 @@
 
     void SelectGuest(GuestItem g)
     {
-        var existing = guestList.FirstOrDefault(x => x.FirstName.Equals(g.FirstName, StringComparison.OrdinalIgnoreCase));
-        if (existing != null)
-        {
-            selectedGuestId = existing.Id;
-            title = existing.Title;
-            passport = existing.Identification;
-        }
-        else
-        {
-            var newId = guestList.Any() ? guestList.Max(x => x.Id) + 1 : 1;
-            var newG = new Guest
-            {
-                Id = newId,
-                FirstName = g.FirstName,
-                MiddleName = g.MiddleName ?? "",
-                LastName = "",
-                Identification = g.Tin
-            };
-            guestList.Add(newG);
-            selectedGuestId = newId;
-            passport = g.Tin;
-        }
+        selectedGuestId = g.Id;
+        guestNameText = !string.IsNullOrWhiteSpace(g.FullName) ? g.FullName : g.FirstName;
+        title = !string.IsNullOrWhiteSpace(g.Title) ? g.Title : "Ato";
+        passport = !string.IsNullOrWhiteSpace(g.IdNumber) ? g.IdNumber : g.Tin;
+        nationality = !string.IsNullOrWhiteSpace(g.Nationality) ? g.Nationality : "Ethiopian";
         showGuestSearch = false;
     }
 
     void ClearGuest()
     {
         selectedGuestId = null;
+        guestNameText = "";
         nationality = "";
         passport = "";
         title = "";

@@ -1,4 +1,7 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
@@ -15,21 +18,30 @@
                 <button type="button" class="lookup-modal-find-btn">Find</button>
             </div>
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredAgents"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(AgentItem.Code)" Caption="Code" Width="110px" />
-                        <DxGridDataColumn FieldName="@nameof(AgentItem.Name)" Caption="Agent Name" Width="180px" />
-                        <DxGridDataColumn FieldName="@nameof(AgentItem.IataNo)" Caption="IATA / ID" Width="120px" />
-                        <DxGridDataColumn FieldName="@nameof(AgentItem.AgentType)" Caption="Type" Width="90px" />
-                    </Columns>
-                </DxGrid>
+                @if (IsLoading && DataList.Count == 0)
+                {
+                    <div style="padding: 24px; text-align: center; color: #666; font-size: 13px;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading travel agents...
+                    </div>
+                }
+                else
+                {
+                    <DxGrid @ref="gridRef"
+                            Data="@FilteredAgents"
+                            CssClass="lookup-modal-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            CustomizeElement="OnCustomizeElement"
+                            RowClick="OnRowClick"
+                            RowDoubleClick="OnRowDoubleClick">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(AgentItem.Code)" Caption="Code" Width="110px" />
+                            <DxGridDataColumn FieldName="@nameof(AgentItem.Name)" Caption="Agent Name" Width="180px" />
+                            <DxGridDataColumn FieldName="@nameof(AgentItem.IataNo)" Caption="IATA / ID" Width="120px" />
+                            <DxGridDataColumn FieldName="@nameof(AgentItem.AgentType)" Caption="Type" Width="90px" />
+                        </Columns>
+                    </DxGrid>
+                }
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
@@ -55,16 +67,11 @@
     string SearchText { get; set; } = "";
     AgentItem? selectedRow;
     IGrid? gridRef;
+    List<AgentItem> ApiAgents = new();
+    bool IsLoading = false;
+    bool hasLoaded = false;
 
-    List<AgentItem> DefaultAgents { get; } = new()
-    {
-        new() { Code = "OA-00001", Name = "RIHANN'S AGENT", IataNo = "343422234-34", AgentType = "Corporate" },
-        new() { Code = "OA-00002", Name = "MY AGENT", IataNo = "566632222-22", AgentType = "Retail" },
-        new() { Code = "OA-00003", Name = "GLOBAL TOURS & TRAVEL", IataNo = "789123456-01", AgentType = "Online" },
-        new() { Code = "OA-00004", Name = "ETHIO TRAVEL AGENCY", IataNo = "112233445-55", AgentType = "Wholesale" }
-    };
-
-    List<AgentItem> DataList => (Agents != null && Agents.Count > 0) ? Agents : DefaultAgents;
+    List<AgentItem> DataList => (ApiAgents.Count > 0) ? ApiAgents : (Agents ?? new());
 
     IEnumerable<AgentItem> FilteredAgents =>
         string.IsNullOrWhiteSpace(SearchText)
@@ -74,11 +81,57 @@
                                   (a.IataNo?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (a.AgentType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApiDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         if (SelectedAgent != null)
         {
             selectedRow = SelectedAgent;
+        }
+
+        if (Visible && !hasLoaded)
+        {
+            await LoadApiDataAsync();
+        }
+    }
+
+    async Task LoadApiDataAsync()
+    {
+        if (hasLoaded && ApiAgents.Count > 0) return;
+
+        try
+        {
+            IsLoading = true;
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 31,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                ApiAgents = res.Select(dto => new AgentItem
+                {
+                    Code = dto.Code ?? "",
+                    Name = !string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName : (dto.FirstName ?? ""),
+                    IataNo = !string.IsNullOrWhiteSpace(dto.Tin) ? dto.Tin : (dto.NationalId ?? ""),
+                    AgentType = !string.IsNullOrWhiteSpace(dto.BusinessTypeDesc) ? dto.BusinessTypeDesc : "Travel Agent"
+                }).ToList();
+                hasLoaded = true;
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

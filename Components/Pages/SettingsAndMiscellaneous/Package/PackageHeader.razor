@@ -1,6 +1,7 @@
 @* PackageHeader.razor - child component rendered inside Package.razor's content tab *@
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Models
 @using ERP.Components.Pages.SettingsAndMiscellaneous.Package.Services
+@using ERP.V7.WebPMS.Components.Shared
 
 <div class="ph-master-detail">
     <!-- Left Panel with ParentId and Hotel columns using DxGrid -->
@@ -170,7 +171,84 @@
 
 </DxPopup>
 
+<!-- ===================== DEVEXPRESS PRINT PREVIEW MODAL ===================== -->
+<DevExpressPrintPreview
+    @bind-Visible="showPrintPreview"
+    Title="Print Dialog"
+    DocumentTitle="Package Headers"
+    PrintElementId="package-headers-print-area"
+    IsMaximized="true">
 
+    <div class="dx-report-header">
+        <div class="dx-report-hotel-title">@(SelectedLeftItem?.Hotel ?? "TEST HOTEL")</div>
+        <div class="dx-report-doc-title">Package Headers</div>
+    </div>
+
+    <div class="dx-report-meta-row" style="justify-content: flex-end;">
+        <span>Date : @DateTime.Today.ToString("M/d/yyyy")</span>
+    </div>
+
+    <table class="dx-report-table">
+        <thead>
+            <tr>
+                <th style="width: 50px; text-align: center;">Id</th>
+                <th>Description</th>
+                <th style="width: 140px;">Group</th>
+                <th style="width: 140px;">Type</th>
+                <th style="width: 100px;">Currency</th>
+                <th style="width: 150px;">Article</th>
+                <th style="width: 150px;">Posting Rhythm</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Packages.Any())
+            {
+                int index = 1;
+                @foreach (var pkg in Packages)
+                {
+                    <tr>
+                        <td style="text-align: center;">@(index++)</td>
+                        <td>@pkg.Description</td>
+                        <td>@pkg.Group</td>
+                        <td>@pkg.Type</td>
+                        <td>@pkg.Currency</td>
+                        <td>@pkg.Article</td>
+                        <td>@pkg.PostingRhythm</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #888; padding: 24px;">No Package Headers Data</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="dx-report-signatures">
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Prepared By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Checked By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Approved By</div>
+        </div>
+        <div class="dx-report-sig-col">
+            <div class="dx-report-sig-line"></div>
+            <div class="dx-report-sig-text">Authorized By</div>
+        </div>
+    </div>
+
+    <div class="dx-report-footer">
+        <span>ERP System</span>
+    </div>
+</DevExpressPrintPreview>
 
 @code {
     [Inject]
@@ -181,6 +259,8 @@
     private DxGrid? LeftGrid;
     private object? SelectedItemObj;
     private PackageHeaderModel? SelectedItem => SelectedItemObj as PackageHeaderModel;
+
+    private bool showPrintPreview = false;
 
     // Left panel data
     private List<PackageHeaderListItem> packageHeaderListItems = new()
@@ -336,6 +416,7 @@
 
     public void Print()
     {
-        // Print implementation
+        showPrintPreview = true;
+        StateHasChanged();
     }
 }

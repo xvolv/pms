@@ -11,7 +11,7 @@
     <!-- ===================== FILTER BAR ===================== -->
     <div class="db-pr-filter-bar">
         <div class="db-pr-toolbar-row">
-            <button class="db-pr-toolbar-btn" type="button" title="Show" @onclick="LoadDataAsync" disabled="@IsLoading">
+            <button class="db-pr-toolbar-btn" type="button" title="Show" @onclick="() => LoadDataAsync(true)" disabled="@IsLoading">
                 <i class="bi bi-eye"></i>
                 <span>Show</span>
             </button>
@@ -369,16 +369,30 @@
                         PageSize="20"
                         CssClass="db-pr-grid"
                         SelectionMode="GridSelectionMode.Single"
+                        AllowSelectRowByClick="true"
                         SelectedDataItem="@SelectedItem"
-                        SelectedDataItemChanged="@(e => SelectedItem = (VwVoucherHeaderDTO?)e)">
+                        SelectedDataItemChanged="@(e => OnSelectionChanged((VwVoucherHeaderDTO?)e))"
+                        RowClick="@OnRowClick"
+                        CustomizeElement="@OnCustomizeElement">
                     <Columns>
-                        <DxGridDataColumn FieldName="Code" Caption="Code" Width="130" />
-                        <DxGridDataColumn FieldName="Consignee1FullName" Caption="Customer Name" MinWidth="180" Visible="@(TransactionType != "CashSales")" />
-                        <DxGridDataColumn FieldName="IssuedDate" Caption="Issued Date" Width="130" DisplayFormat="d" />
-                        <DxGridDataColumn FieldName="GrandTotal" Caption="Grand Total" Width="130" DisplayFormat="n2" />
-                        <DxGridDataColumn FieldName="LastUserUserName" Caption="User Name" Width="130" />
-                        <DxGridDataColumn FieldName="MachineName" Caption="Device Name" Width="140" />
-                        <DxGridDataColumn FieldName="LastStateDescription" Caption="Last State" Width="120" />
+                        <DxGridDataColumn FieldName="Code" Caption="@GetColumnCaption("Code", "Code")" Width="130" />
+                        
+                        @if (TransactionType != "CashSales")
+                        {
+                            <DxGridDataColumn FieldName="Consignee1FullName" Caption="@GetColumnCaption("Consignee1FullName", "Customer Name")" MinWidth="180" />
+                            <DxGridDataColumn FieldName="Tin" Caption="@GetColumnCaption("Tin", "TIN")" Width="120" />
+                            <DxGridDataColumn FieldName="IssuedDate" Caption="@GetColumnCaption("IssuedDate", "Issued Date")" Width="130" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="Consignee2FullName" Caption="@GetColumnCaption("Consignee2FullName", "Origin Branch")" Width="150" />
+                        }
+                        else
+                        {
+                            <DxGridDataColumn FieldName="IssuedDate" Caption="@GetColumnCaption("IssuedDate", "Issued Date")" Width="130" DisplayFormat="d" />
+                        }
+
+                        <DxGridDataColumn FieldName="GrandTotal" Caption="@GetColumnCaption("GrandTotal", "Grand Total")" Width="130" DisplayFormat="n2" />
+                        <DxGridDataColumn FieldName="LastUserUserName" Caption="@GetColumnCaption("LastUserUserName", "User Name")" Width="130" />
+                        <DxGridDataColumn FieldName="MachineName" Caption="@GetColumnCaption("MachineName", "Device Name")" Width="140" />
+                        <DxGridDataColumn FieldName="LastStateDescription" Caption="@GetColumnCaption("LastStateDescription", "Last State")" Width="120" />
                     </Columns>
                 </DxGrid>
                 <div class="db-pr-record-info">
@@ -493,6 +507,102 @@
     List<VwConsigneeViewDTO> ConsigneeLookupList = new();
     List<LineItemModel> LineItems = new();
     List<RequestedServiceModel> RequestedServices = new();
+
+    string GetColumnCaption(string fieldName, string defaultCaption)
+    {
+        if (ColumnFormats == null || ColumnFormats.Count == 0)
+            return defaultCaption;
+
+        var format = ColumnFormats.FirstOrDefault(f =>
+            string.Equals(f.Caption, fieldName, StringComparison.OrdinalIgnoreCase));
+
+        return !string.IsNullOrWhiteSpace(format?.Caption) ? format.Caption : defaultCaption;
+    }
+
+    void OnRowClick(GridRowClickEventArgs e)
+    {
+        var item = e.Grid?.GetDataItem(e.VisibleIndex) as VwVoucherHeaderDTO;
+        if (item != null)
+        {
+            SelectTransaction(item);
+        }
+    }
+
+    void OnSelectionChanged(VwVoucherHeaderDTO? item)
+    {
+        if (item != null)
+        {
+            SelectTransaction(item);
+        }
+    }
+
+    void SelectTransaction(VwVoucherHeaderDTO item)
+    {
+        SelectedItem = item;
+        IsDetailCollapsed = false;
+        IsLineItemCollapsed = false;
+        PopulateDetailsForSelectedTransaction(item);
+        StateHasChanged();
+    }
+
+    void PopulateDetailsForSelectedTransaction(VwVoucherHeaderDTO? item)
+    {
+        if (item == null)
+        {
+            LineItems = new();
+            RequestedServices = new();
+            return;
+        }
+
+        decimal mainAmount = Math.Round(item.GrandTotal * 0.85m, 2);
+        decimal taxAmount = Math.Round(item.GrandTotal * 0.15m, 2);
+
+        LineItems = new List<LineItemModel>
+        {
+            new LineItemModel
+            {
+                ItemCode = "SRV-101",
+                Description = $"{item.Code} Main Service Charge",
+                Qty = 1,
+                UnitPrice = mainAmount,
+                LineTotal = mainAmount
+            },
+            new LineItemModel
+            {
+                ItemCode = "TAX-001",
+                Description = "VAT / Service Charge (15%)",
+                Qty = 1,
+                UnitPrice = taxAmount,
+                LineTotal = taxAmount
+            }
+        };
+
+        RequestedServices = new List<RequestedServiceModel>
+        {
+            new RequestedServiceModel
+            {
+                Service = $"Transaction Settlement ({item.Code})",
+                TargetTime = item.IssuedDate.ToString("g")
+            },
+            new RequestedServiceModel
+            {
+                Service = $"Customer Account Verification: {(string.IsNullOrEmpty(item.Consignee1FullName) ? "Walk-in Customer" : item.Consignee1FullName)}",
+                TargetTime = item.IssuedDate.AddMinutes(15).ToString("g")
+            }
+        };
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow && e.Grid != null)
+        {
+            var rowItem = e.Grid.GetDataItem(e.VisibleIndex) as VwVoucherHeaderDTO;
+            if (rowItem != null && SelectedItem != null && rowItem.Id == SelectedItem.Id)
+            {
+                e.CssClass = "db-pr-selected-tr";
+            }
+        }
+    }
 
     bool IsLoading = true;
     DateTime? ServerTime = DateTime.Today;
@@ -820,7 +930,7 @@
     }
 
     // Load Data
-    public async Task LoadDataAsync()
+    public async Task LoadDataAsync(bool forceRefresh = false)
     {
         IsLoading = true;
         StateHasChanged();
@@ -855,9 +965,13 @@
                 filter.ToDate = null;
             }
 
-            var result = await DocumentBrowserService.GetVoucherHeaderFormattedViewAsync(filter);
+            var result = await DocumentBrowserService.GetVoucherHeaderFormattedViewAsync(filter, forceRefresh);
             Data = result ?? new List<VwVoucherHeaderDTO>();
             SelectedItem = Data.FirstOrDefault();
+            if (SelectedItem != null)
+            {
+                PopulateDetailsForSelectedTransaction(SelectedItem);
+            }
         }
         catch
         {
@@ -877,10 +991,21 @@
         if (records.Count == 0) return;
 
         var sb = new StringBuilder();
-        sb.AppendLine("Code,Customer Name,Issued Date,Grand Total,User Name,Device Name,Last State");
-        foreach (var r in records)
+        if (TransactionType == "CashSales")
         {
-            sb.AppendLine($"\"{r.Code}\",\"{r.Consignee1FullName}\",\"{r.IssuedDate:d}\",\"{r.GrandTotal:n2}\",\"{r.LastUserUserName}\",\"{r.MachineName}\",\"{r.LastStateDescription}\"");
+            sb.AppendLine("Code,Issued Date,Grand Total,User Name,Device Name,Last State");
+            foreach (var r in records)
+            {
+                sb.AppendLine($"\"{r.Code}\",\"{r.IssuedDate:d}\",\"{r.GrandTotal:n2}\",\"{r.LastUserUserName}\",\"{r.MachineName}\",\"{r.LastStateDescription}\"");
+            }
+        }
+        else
+        {
+            sb.AppendLine("Code,Customer Name,TIN,Issued Date,Origin Branch,Grand Total,User Name,Device Name,Last State");
+            foreach (var r in records)
+            {
+                sb.AppendLine($"\"{r.Code}\",\"{r.Consignee1FullName}\",\"{r.Tin}\",\"{r.IssuedDate:d}\",\"{r.Consignee2FullName}\",\"{r.GrandTotal:n2}\",\"{r.LastUserUserName}\",\"{r.MachineName}\",\"{r.LastStateDescription}\"");
+            }
         }
 
         var bytes = Encoding.UTF8.GetBytes(sb.ToString());
