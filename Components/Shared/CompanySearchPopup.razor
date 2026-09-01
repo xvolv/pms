@@ -1,4 +1,7 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
@@ -15,21 +18,30 @@
                 <button type="button" class="lookup-modal-find-btn">Find</button>
             </div>
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredCustomers"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(CustomerItem.Code)" Caption="Code" Width="110px" />
-                        <DxGridDataColumn FieldName="@nameof(CustomerItem.FirstName)" Caption="First Name" Width="160px" />
-                        <DxGridDataColumn FieldName="@nameof(CustomerItem.MiddleName)" Caption="Middle Name" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(CustomerItem.Tin)" Caption="Tin" Width="100px" />
-                    </Columns>
-                </DxGrid>
+                @if (IsLoading && DataList.Count == 0)
+                {
+                    <div style="padding: 24px; text-align: center; color: #666; font-size: 13px;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading companies...
+                    </div>
+                }
+                else
+                {
+                    <DxGrid @ref="gridRef"
+                            Data="@FilteredCustomers"
+                            CssClass="lookup-modal-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            CustomizeElement="OnCustomizeElement"
+                            RowClick="OnRowClick"
+                            RowDoubleClick="OnRowDoubleClick">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Code)" Caption="Code" Width="110px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.FirstName)" Caption="First Name" Width="160px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                            <DxGridDataColumn FieldName="@nameof(CustomerItem.Tin)" Caption="Tin" Width="100px" />
+                        </Columns>
+                    </DxGrid>
+                }
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
@@ -55,16 +67,11 @@
     string SearchText { get; set; } = "";
     CustomerItem? selectedRow;
     IGrid? gridRef;
+    List<CustomerItem> ApiCustomers = new();
+    bool IsLoading = false;
+    bool hasLoaded = false;
 
-    List<CustomerItem> DefaultCustomers { get; } = new()
-    {
-        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" },
-        new() { Code = "PCU00001", FirstName = "ETHIO TELECOM", MiddleName = "HEAD OFFICE", Tin = "0000012345" },
-        new() { Code = "PCU00002", FirstName = "COMMERCIAL BANK OF ETHIOPIA", MiddleName = "CBE MAIN", Tin = "0000054321" },
-        new() { Code = "PCU00003", FirstName = "ETHIOPIAN AIRLINES", MiddleName = "EAL HEADQUARTERS", Tin = "0000098765" }
-    };
-
-    List<CustomerItem> DataList => (Customers != null && Customers.Count > 0) ? Customers : DefaultCustomers;
+    List<CustomerItem> DataList => (ApiCustomers.Count > 0) ? ApiCustomers : (Customers ?? new());
 
     IEnumerable<CustomerItem> FilteredCustomers =>
         string.IsNullOrWhiteSpace(SearchText)
@@ -74,11 +81,61 @@
                                   (c.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (c.Tin?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApiDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         if (SelectedCustomer != null)
         {
             selectedRow = SelectedCustomer;
+        }
+
+        if (Visible && !hasLoaded)
+        {
+            await LoadApiDataAsync();
+        }
+    }
+
+    async Task LoadApiDataAsync()
+    {
+        if (hasLoaded && ApiCustomers.Count > 0) return;
+
+        try
+        {
+            IsLoading = true;
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 28,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                ApiCustomers = res.Select(dto => new CustomerItem
+                {
+                    Code = dto.Code ?? "",
+                    FirstName = !string.IsNullOrWhiteSpace(dto.FirstName) 
+                        ? dto.FirstName 
+                        : (!string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName : ""),
+                    MiddleName = !string.IsNullOrWhiteSpace(dto.FullName) && dto.FullName.Contains(' ') 
+                        ? dto.FullName.Split(' ', 2)[1] 
+                        : "",
+                    Tin = dto.Tin ?? ""
+                }).ToList();
+                hasLoaded = true;
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

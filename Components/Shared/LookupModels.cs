@@ -10,11 +10,17 @@ namespace ERP.V7.WebPMS.Components.Shared
 
     public class GuestItem
     {
+        public int Id { get; set; }
+        public string Code { get; set; } = "";
         public string FirstName { get; set; } = "";
         public string? MiddleName { get; set; }
+        public string? LastName { get; set; }
         public string Tin { get; set; } = "";
+        public string IdNumber { get; set; } = "";
+        public string? Title { get; set; }
+        public string? Nationality { get; set; }
 
-        public string FullName => string.IsNullOrWhiteSpace(MiddleName) ? FirstName : $"{FirstName} {MiddleName}".Trim();
+        public string FullName => $"{FirstName} {MiddleName} {LastName}".Replace("  ", " ").Trim();
     }
 
     public class GroupItem

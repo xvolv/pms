@@ -1,4 +1,7 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
@@ -15,21 +18,30 @@
                 <button type="button" class="lookup-modal-find-btn">Find</button>
             </div>
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredContacts"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(ContactItem.Code)" Caption="Code" Width="100px" />
-                        <DxGridDataColumn FieldName="@nameof(ContactItem.FirstName)" Caption="First Name" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(ContactItem.MiddleName)" Caption="Middle Name" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(ContactItem.Phone)" Caption="Phone / ID" Width="120px" />
-                    </Columns>
-                </DxGrid>
+                @if (IsLoading && DataList.Count == 0)
+                {
+                    <div style="padding: 24px; text-align: center; color: #666; font-size: 13px;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading contacts...
+                    </div>
+                }
+                else
+                {
+                    <DxGrid @ref="gridRef"
+                            Data="@FilteredContacts"
+                            CssClass="lookup-modal-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            CustomizeElement="OnCustomizeElement"
+                            RowClick="OnRowClick"
+                            RowDoubleClick="OnRowDoubleClick">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(ContactItem.Code)" Caption="Code" Width="100px" />
+                            <DxGridDataColumn FieldName="@nameof(ContactItem.FirstName)" Caption="First Name" Width="140px" />
+                            <DxGridDataColumn FieldName="@nameof(ContactItem.MiddleName)" Caption="Middle Name" Width="140px" />
+                            <DxGridDataColumn FieldName="@nameof(ContactItem.Phone)" Caption="Phone / ID" Width="120px" />
+                        </Columns>
+                    </DxGrid>
+                }
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
@@ -55,18 +67,11 @@
     string SearchText { get; set; } = "";
     ContactItem? selectedRow;
     IGrid? gridRef;
+    List<ContactItem> ApiContacts = new();
+    bool IsLoading = false;
+    bool hasLoaded = false;
 
-    List<ContactItem> DefaultContacts { get; } = new()
-    {
-        new() { Code = "PCU-00002", FirstName = "KEBEDE", MiddleName = "ZELEKE ABEBE", Phone = "5565556456" },
-        new() { Code = "PCU-00003", FirstName = "BROWN", MiddleName = "CHRIS", Phone = "3423343" },
-        new() { Code = "PCU-00009", FirstName = "NAGUIB", MiddleName = "ALI TAHER", Phone = "D02018" },
-        new() { Code = "PCU-00010", FirstName = "GIRMA", MiddleName = "BIRHANU ASSEFA", Phone = "423432" },
-        new() { Code = "PCU-00011", FirstName = "GIRMA", MiddleName = "SOFOIANA BELIHU", Phone = "43241" },
-        new() { Code = "PCU-00012", FirstName = "GIRMA", MiddleName = "DEFAR BEGENA", Phone = "342342" }
-    };
-
-    List<ContactItem> DataList => (Contacts != null && Contacts.Count > 0) ? Contacts : DefaultContacts;
+    List<ContactItem> DataList => (ApiContacts.Count > 0) ? ApiContacts : (Contacts ?? new());
 
     IEnumerable<ContactItem> FilteredContacts =>
         string.IsNullOrWhiteSpace(SearchText)
@@ -76,11 +81,61 @@
                                   (c.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (c.Phone?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApiDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         if (SelectedContact != null)
         {
             selectedRow = SelectedContact;
+        }
+
+        if (Visible && !hasLoaded)
+        {
+            await LoadApiDataAsync();
+        }
+    }
+
+    async Task LoadApiDataAsync()
+    {
+        if (hasLoaded && ApiContacts.Count > 0) return;
+
+        try
+        {
+            IsLoading = true;
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 30,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                ApiContacts = res.Select(dto => new ContactItem
+                {
+                    Code = dto.Code ?? "",
+                    FirstName = !string.IsNullOrWhiteSpace(dto.FirstName) 
+                        ? dto.FirstName 
+                        : (!string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName.Split(' ', 2)[0] : ""),
+                    MiddleName = !string.IsNullOrWhiteSpace(dto.FullName) && dto.FullName.Contains(' ') 
+                        ? dto.FullName.Split(' ', 2)[1] 
+                        : "",
+                    Phone = !string.IsNullOrWhiteSpace(dto.Phone1) ? dto.Phone1 : (dto.NationalId ?? "")
+                }).ToList();
+                hasLoaded = true;
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

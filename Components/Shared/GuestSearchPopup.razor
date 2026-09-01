@@ -1,9 +1,12 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
          HeaderText="Guest Search"
-         Width="520px"
+         Width="660px"
          CloseOnOutsideClick="true"
          ShowCloseButton="true"
          CloseOnEscape="true"
@@ -11,24 +14,35 @@
     <BodyContentTemplate>
         <div class="lookup-modal-container">
             <div class="lookup-modal-searchrow">
-                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search guest name..." />
+                <input class="lookup-modal-search-input" @bind="SearchText" @bind:event="oninput" placeholder="Search guest..." />
                 <button type="button" class="lookup-modal-find-btn">Find</button>
             </div>
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredGuests"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(GuestItem.FirstName)" Caption="First Name" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(GuestItem.MiddleName)" Caption="Middle Name" Width="140px" />
-                        <DxGridDataColumn FieldName="@nameof(GuestItem.Tin)" Caption="Tin" Width="100px" />
-                    </Columns>
-                </DxGrid>
+                @if (IsLoading && DataList.Count == 0)
+                {
+                    <div style="padding: 24px; text-align: center; color: #666; font-size: 13px;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading guests...
+                    </div>
+                }
+                else
+                {
+                    <DxGrid @ref="gridRef"
+                            Data="@FilteredGuests"
+                            CssClass="lookup-modal-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            CustomizeElement="OnCustomizeElement"
+                            RowClick="OnRowClick"
+                            RowDoubleClick="OnRowDoubleClick">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.Code)" Caption="Code" Width="105px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.FirstName)" Caption="First Name" Width="125px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.MiddleName)" Caption="Middle Name" Width="125px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.LastName)" Caption="Last Name" Width="135px" />
+                            <DxGridDataColumn FieldName="@nameof(GuestItem.IdNumber)" Caption="Id Number" Width="120px" />
+                        </Columns>
+                    </DxGrid>
+                }
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
@@ -54,31 +68,86 @@
     string SearchText { get; set; } = "";
     GuestItem? selectedRow;
     IGrid? gridRef;
+    List<GuestItem> ApiGuests = new();
+    bool IsLoading = false;
+    bool hasLoaded = false;
 
-    List<GuestItem> DefaultGuests { get; } = new()
-    {
-        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
-        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
-        new() { FirstName = "JOHN", MiddleName = "SMITH", Tin = "" },
-        new() { FirstName = "TEST", MiddleName = "", Tin = "" },
-        new() { FirstName = "Solomon", MiddleName = "Tuffa Bereket", Tin = "" },
-        new() { FirstName = "miskir", MiddleName = "engida engida", Tin = "" }
-    };
-
-    List<GuestItem> DataList => (Guests != null && Guests.Count > 0) ? Guests : DefaultGuests;
+    List<GuestItem> DataList => (ApiGuests.Count > 0) ? ApiGuests : (Guests ?? new());
 
     IEnumerable<GuestItem> FilteredGuests =>
         string.IsNullOrWhiteSpace(SearchText)
             ? DataList
-            : DataList.Where(g => (g.FirstName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            : DataList.Where(g => (g.Code?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (g.FirstName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (g.MiddleName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (g.LastName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                  (g.IdNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (g.Tin?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApiDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         if (SelectedGuest != null)
         {
             selectedRow = SelectedGuest;
+        }
+
+        if (Visible && !hasLoaded)
+        {
+            await LoadApiDataAsync();
+        }
+    }
+
+    async Task LoadApiDataAsync()
+    {
+        if (hasLoaded && ApiGuests.Count > 0) return;
+
+        try
+        {
+            IsLoading = true;
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 27,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                ApiGuests = res.Select(dto =>
+                {
+                    var names = (dto.FullName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var fName = !string.IsNullOrWhiteSpace(dto.FirstName) ? dto.FirstName : (names.Length > 0 ? names[0] : "");
+                    var mName = names.Length > 2 ? names[1] : (names.Length == 2 ? names[1] : "");
+                    var lName = names.Length > 2 ? string.Join(" ", names.Skip(2)) : "";
+
+                    return new GuestItem
+                    {
+                        Id = dto.Id,
+                        Code = dto.Code ?? "",
+                        FirstName = fName,
+                        MiddleName = mName,
+                        LastName = lName,
+                        Tin = dto.Tin ?? "",
+                        IdNumber = !string.IsNullOrWhiteSpace(dto.Tin) ? dto.Tin : (dto.NationalId ?? ""),
+                        Title = dto.Title.HasValue ? $"Title {dto.Title.Value}" : "Ato",
+                        Nationality = !string.IsNullOrWhiteSpace(dto.Nationality) ? dto.Nationality : "Ethiopian"
+                    };
+                }).ToList();
+                hasLoaded = true;
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

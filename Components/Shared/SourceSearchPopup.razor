@@ -1,4 +1,7 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Services.DocumentBrowser
+@using CNET_V7_Domain.Misc
+@inject IDocumentBrowserService DocumentBrowserService
 
 <DxPopup Visible="@Visible"
          VisibleChanged="@HandleVisibleChanged"
@@ -15,20 +18,29 @@
                 <button type="button" class="lookup-modal-find-btn">Find</button>
             </div>
             <div class="lookup-modal-gridwrap">
-                <DxGrid @ref="gridRef"
-                        Data="@FilteredSources"
-                        CssClass="lookup-modal-grid"
-                        ShowFilterRow="false"
-                        ShowGroupPanel="false"
-                        CustomizeElement="OnCustomizeElement"
-                        RowClick="OnRowClick"
-                        RowDoubleClick="OnRowDoubleClick">
-                    <Columns>
-                        <DxGridDataColumn FieldName="@nameof(SourceItem.Code)" Caption="Code" Width="110px" />
-                        <DxGridDataColumn FieldName="@nameof(SourceItem.Name)" Caption="Source Name" Width="200px" />
-                        <DxGridDataColumn FieldName="@nameof(SourceItem.SourceType)" Caption="Source Type" Width="120px" />
-                    </Columns>
-                </DxGrid>
+                @if (IsLoading && DataList.Count == 0)
+                {
+                    <div style="padding: 24px; text-align: center; color: #666; font-size: 13px;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading sources...
+                    </div>
+                }
+                else
+                {
+                    <DxGrid @ref="gridRef"
+                            Data="@FilteredSources"
+                            CssClass="lookup-modal-grid"
+                            ShowFilterRow="false"
+                            ShowGroupPanel="false"
+                            CustomizeElement="OnCustomizeElement"
+                            RowClick="OnRowClick"
+                            RowDoubleClick="OnRowDoubleClick">
+                        <Columns>
+                            <DxGridDataColumn FieldName="@nameof(SourceItem.Code)" Caption="Code" Width="110px" />
+                            <DxGridDataColumn FieldName="@nameof(SourceItem.Name)" Caption="Source Name" Width="200px" />
+                            <DxGridDataColumn FieldName="@nameof(SourceItem.SourceType)" Caption="Source Type" Width="120px" />
+                        </Columns>
+                    </DxGrid>
+                }
             </div>
             <div class="lookup-modal-footer">
                 <button type="button" class="lookup-modal-btn lookup-modal-btn-select" @onclick="HandleSelect">Select</button>
@@ -54,17 +66,11 @@
     string SearchText { get; set; } = "";
     SourceItem? selectedRow;
     IGrid? gridRef;
+    List<SourceItem> ApiSources = new();
+    bool IsLoading = false;
+    bool hasLoaded = false;
 
-    List<SourceItem> DefaultSources { get; } = new()
-    {
-        new() { Code = "SRC-001", Name = "Company Directory", SourceType = "Corporate" },
-        new() { Code = "SRC-002", Name = "Website", SourceType = "Direct" },
-        new() { Code = "SRC-003", Name = "Travel Agent", SourceType = "Travel Agent" },
-        new() { Code = "SRC-004", Name = "Walk-in", SourceType = "Walk-In" },
-        new() { Code = "SRC-005", Name = "Online OTA", SourceType = "OTA" }
-    };
-
-    List<SourceItem> DataList => (Sources != null && Sources.Count > 0) ? Sources : DefaultSources;
+    List<SourceItem> DataList => (ApiSources.Count > 0) ? ApiSources : (Sources ?? new());
 
     IEnumerable<SourceItem> FilteredSources =>
         string.IsNullOrWhiteSpace(SearchText)
@@ -73,11 +79,58 @@
                                   (s.Name?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                                   (s.SourceType?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApiDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         if (SelectedSource != null)
         {
             selectedRow = SelectedSource;
+        }
+
+        if (Visible && !hasLoaded)
+        {
+            await LoadApiDataAsync();
+        }
+    }
+
+    async Task LoadApiDataAsync()
+    {
+        if (hasLoaded && ApiSources.Count > 0) return;
+
+        try
+        {
+            IsLoading = true;
+            var res = await DocumentBrowserService.GetConsigneeHeaderFormattedViewAsync(new ConsigneeFilterCriteria
+            {
+                GslType = 42,
+                FieldFormatType = 1617
+            });
+
+            if (res != null && res.Count > 0)
+            {
+                ApiSources = res.Select(dto => new SourceItem
+                {
+                    Code = dto.Code ?? "",
+                    Name = !string.IsNullOrWhiteSpace(dto.FullName) ? dto.FullName : (dto.FirstName ?? ""),
+                    SourceType = !string.IsNullOrWhiteSpace(dto.BusinessTypeDesc) 
+                        ? dto.BusinessTypeDesc 
+                        : (!string.IsNullOrWhiteSpace(dto.ChildPreferenceDescrption) ? dto.ChildPreferenceDescrption : "Direct")
+                }).ToList();
+                hasLoaded = true;
+            }
+        }
+        catch
+        {
+            // fallback gracefully
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

@@ -296,19 +296,16 @@
     @* ============== LOOKUP PANELS ============== *@
     <!-- ===================== LOOKUP POPUP MODALS ===================== -->
     <CompanySearchPopup @bind-Visible="ShowCustomerLookup"
-                        Customers="@Customers"
                         OnSelect="SelectCustomer"
                         OnAddNew="AddNewCompany"
                         OnClear="ClearCustomer" />
 
     <GuestSearchPopup @bind-Visible="ShowGuestLookup"
-                       Guests="@Guests"
                        OnSelect="SelectGuest"
                        OnAddNew="AddNewGuest"
                        OnClear="ClearGuest" />
 
     <GroupSearchPopup @bind-Visible="ShowGroupLookup"
-                      Groups="@Groups"
                       OnSelect="SelectGroup"
                       OnAddNew="AddNewGroup"
                       OnClear="ClearGroup" />
@@ -507,10 +504,7 @@
     }
 
     // ---- Mock data (MVP) ----
-    List<CustomerItem> Customers { get; set; } = new List<CustomerItem>()
-    {
-        new() { Code = "PCU00000", FirstName = "RED CLOUD ICT SOLUTIONS PLC", MiddleName = "RED CLOUD ICT SOL...", Tin = "0076217301" }
-    };
+    List<CustomerItem> Customers { get; set; } = new List<CustomerItem>();
 
     List<string> PurposeOptions { get; set; } = new List<string>()
     {
@@ -518,18 +512,9 @@
         "Transit", "Vacation", "Wedding", "Holiday", "Shopping"
     };
 
-    List<GuestItem> Guests { get; set; } = new List<GuestItem>()
-    {
-        new() { FirstName = "JANE", MiddleName = "DOE", Tin = "" },
-        new() { FirstName = "ABEBE", MiddleName = "KEBEDE", Tin = "" },
-        new() { FirstName = "TEST", MiddleName = "", Tin = "" }
-    };
+    List<GuestItem> Guests { get; set; } = new List<GuestItem>();
 
-    List<GroupItem> Groups { get; set; } = new List<GroupItem>()
-    {
-        new() { Code = "GRP-001", Name = "JANE", Description = "Jane Tour Group" },
-        new() { Code = "GRP-002", Name = "ABEBE", Description = "Abebe Corporate Group" }
-    };
+    List<GroupItem> Groups { get; set; } = new List<GroupItem>();
 
     List<RegistrationLookupItem> LookupItems { get; set; } = new List<RegistrationLookupItem>()
     {

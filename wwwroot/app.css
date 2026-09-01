@@ -1218,3 +1218,140 @@ a.menu-item.active .item-icon {
 .dx-input-num .dxbs-form-control {
     padding-right: 30px !important;
 }
+
+/* ==========================================================================
+   GLOBAL LOOKUP SEARCH POPUP STYLES (Shared across all pages)
+   ========================================================================== */
+.global-lookup-popup .dxbl-popup-content {
+    padding: 0 !important;
+}
+
+.global-lookup-popup .dxbl-popup-header {
+    background: #f0f4f8 !important;
+    border-bottom: 1px solid #c9d2d9 !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+}
+
+.lookup-modal-container {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.lookup-modal-searchrow {
+    display: flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #c9d2d9;
+    background: #f8f9fa;
+}
+
+.lookup-modal-search-input {
+    flex: 1;
+    height: 28px;
+    border: 1px solid #b8c4ce;
+    border-radius: 2px;
+    padding: 0 8px;
+    font-size: 12px !important;
+    outline: none;
+    background: #ffffff;
+}
+
+.lookup-modal-search-input:focus {
+    border-color: #4a90d9;
+}
+
+.lookup-modal-find-btn {
+    border: 1px solid #b8c4ce;
+    background: #ffffff;
+    border-radius: 2px;
+    padding: 0 14px;
+    height: 28px;
+    font-size: 12px !important;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.lookup-modal-find-btn:hover {
+    background: #e3f2fd;
+}
+
+.lookup-modal-gridwrap {
+    max-height: 320px;
+    min-height: 180px;
+    overflow-y: auto;
+}
+
+.lookup-modal-grid {
+    font-size: 12px !important;
+}
+
+.lookup-modal-grid .dxbl-grid-header-cell {
+    background: #eef0f2 !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    color: #333 !important;
+    border-bottom: 1px solid #c9d2d9 !important;
+    padding: 6px 8px !important;
+    line-height: 1.2 !important;
+}
+
+.lookup-modal-grid .dxbl-grid-data-cell {
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    color: #222 !important;
+}
+
+.lookup-modal-grid .dxbl-grid-data-row:hover {
+    background: #f0f7ff !important;
+    cursor: pointer;
+}
+
+.lookup-modal-grid .lookup-modal-row-selected td,
+.lookup-modal-grid .dxbl-grid-data-row.lookup-modal-row-selected td {
+    background: #bbdefb !important;
+    color: #000 !important;
+    font-weight: 500 !important;
+}
+
+.lookup-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid #c9d2d9;
+    background: #f8f9fa;
+}
+
+.lookup-modal-btn {
+    min-width: 65px;
+    height: 26px;
+    border: 1px solid #b8c4ce;
+    background: #ffffff;
+    border-radius: 2px;
+    font-size: 12px !important;
+    cursor: pointer;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lookup-modal-btn:hover {
+    background: #e3f2fd;
+}
+
+.lookup-modal-btn-select {
+    background: #0078d4 !important;
+    color: #fff !important;
+    border-color: #006abc !important;
+}
+
+.lookup-modal-btn-select:hover {
+    background: #106ebe !important;
+}
