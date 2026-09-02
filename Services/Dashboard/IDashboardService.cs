@@ -4,6 +4,7 @@ namespace ERP.V7.WebPMS.Services.Dashboard
 {
     public interface IDashboardService
     {
-        Task<ResponseModel<PMSDashBoardReport>?> GetPmsDashboardReportAsync();
+        Task<ResponseModel<PMSDashBoardReport>?> GetPmsDashboardReportAsync(bool forceRefresh = false);
+        void InvalidateDashboardCache(int? consigneeUnitId = null);
     }
 }

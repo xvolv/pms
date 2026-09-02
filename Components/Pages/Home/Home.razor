@@ -6,6 +6,7 @@
 @using ERP.V7.WebPMS.Services.Dashboard
 @using CNET_V7_Domain.Misc.PmsDTO
 @inject IDashboardService DashboardService
+@inject IJSRuntime JSRuntime
 
 
 <PageTitle>Dashboard - CNET ERP</PageTitle>
@@ -100,13 +101,13 @@
                     <!-- Left: Task Statistics Grid -->
                     <div class="left-panel">
                         <div class="panel-toolbar">
-                            <button type="button" class="icon-toolbar-btn" title="Refresh" @onclick="RefreshTasks">
-                                <i class="bi bi-arrow-clockwise" style="color:#4caf50;"></i>
+                            <button type="button" class="icon-toolbar-btn" title="Refresh" @onclick="RefreshTasksAsync" disabled="@isLoading">
+                                <i class="bi bi-arrow-clockwise @(isLoading ? "spin" : "")" style="color:#4caf50;"></i>
                             </button>
                             <button type="button" class="icon-toolbar-btn" title="Print" @onclick="OnPrintTasks">
                                 <i class="bi bi-file-earmark-pdf" style="color:#d32f2f;"></i>
                             </button>
-                            <button type="button" class="icon-toolbar-btn" title="Export to Excel" @onclick="OnExportTasks">
+                            <button type="button" class="icon-toolbar-btn" title="Export to Excel" @onclick="@(() => showExportConfirm = true)">
                                 <i class="bi bi-file-earmark-excel" style="color:#2e7d32;"></i>
                             </button>
 
@@ -330,8 +331,62 @@
         </DxTabs>
     </div>
 
-    <DevExpressPrintPreview @bind-Visible="showPrintPreview" Title="Print Dialog" DocumentTitle="Dashboard"
-                            PrintElementId="dashboard-print-area" IsMaximized="true">
+    <div id="dashboard-excel-area" style="display:none;">
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Task</th>
+                    <th>Statistics</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in taskItems)
+                {
+                    <tr>
+                        <td>@row.sn</td>
+                        <td>@row.Task</td>
+                        <td>@row.Statistics</td>
+                        <td>@row.Remark</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <table class="dx-report-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Description</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in roomStatsItems)
+                {
+                    <tr>
+                        <td>@row.SN</td>
+                        <td>@row.Description</td>
+                        <td>@row.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <DxConfirmDialog Visible="@showExportConfirm"
+                      VisibleChanged="@((bool v) => showExportConfirm = v)"
+                      Title="Export to Excel"
+                      Message="Export the Task Statistics and Room Statistics tables to Excel?"
+                      OnConfirm="OnExportTasks" />
+
+    <DevExpressPrintPreview
+        @bind-Visible="showPrintPreview"
+        Title="Print Dialog"
+        DocumentTitle="Dashboard"
+        PrintElementId="dashboard-print-area"
+        IsMaximized="true">
 
         <div class="dx-report-header">
             <div class="dx-report-hotel-title">@(selectedDashboardHotel ?? "MAIN TEST HOTEL")</div>
@@ -480,22 +535,33 @@
         }
     }
 
-    void RefreshTasks()
+    async Task RefreshTasksAsync()
     {
         selectedTask = null;
+        isLoading = true;
         StateHasChanged();
+        try
+        {
+            await LoadDashboardAsync(forceRefresh: true);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     bool showPrintPreview;
+    bool showExportConfirm;
 
     void OnPrintTasks()
     {
         showPrintPreview = true;
     }
 
-    void OnExportTasks()
+    async Task OnExportTasks()
     {
-        // TODO: export to Excel logic
+        await JSRuntime.InvokeVoidAsync("DxDocViewer.exportToExcel", "dashboard-excel-area", "Dashboard");
     }
 
 
@@ -564,9 +630,9 @@
         }
     }
 
-    private async Task LoadDashboardAsync()
+    private async Task LoadDashboardAsync(bool forceRefresh = false)
     {
-        CNET_V7_Domain.Misc.ResponseModel<PMSDashBoardReport>? response = await DashboardService.GetPmsDashboardReportAsync();
+        CNET_V7_Domain.Misc.ResponseModel<PMSDashBoardReport>? response = await DashboardService.GetPmsDashboardReportAsync(forceRefresh);
 
         if (response?.Data == null)
             return;

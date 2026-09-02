@@ -1,8 +1,4 @@
-/**
- * DevExpress Print Preview & Document Viewer Client-Side Functions
- * Provides high-fidelity isolated iframe printing, full export (XLSX, CSV, DOC, HTML, TXT, PDF),
- * text search, canvas pan, watermark, file import and page setup capabilities.
- */
+
 window.DxDocViewer = {
 
     /**
@@ -86,12 +82,7 @@ window.DxDocViewer = {
         doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Document</title>' + styles + printStyles + '</head><body>' + clone.outerHTML + '</body></html>');
         doc.close();
 
-        // Wait for the injected stylesheets to actually finish loading before
-        // printing, instead of a fixed delay. One of them (bootstrap-icons) is
-        // fetched from a CDN, so a fixed timeout races the network and can
-        // fire print() against an unstyled/unpainted document - producing a
-        // blank page intermittently depending on cache/network timing rather
-        // than which page triggered it.
+        
         var linkEls = Array.prototype.slice.call(doc.querySelectorAll('link[rel="stylesheet"]'));
         var pending = linkEls.length;
         var printed = false;
@@ -337,7 +328,32 @@ window.DxDocViewer = {
     /**
      * Helper to download any created Blob
      */
-    downloadBlob: function (blob, fileName) {
+    downloadBlob: async function (blob, fileName) {
+        if (window.showSaveFilePicker) {
+            var ext = (fileName.split('.').pop() || '').toLowerCase();
+            try {
+                // showSaveFilePicker's accept option requires a bare "type/subtype"
+                // MIME string - no ";charset=..." parameters - or it throws a TypeError.
+                var mime = (blob.type || 'application/octet-stream').split(';')[0].trim();
+                var accept = {};
+                accept[mime] = ['.' + ext];
+                var handle = await window.showSaveFilePicker({
+                    suggestedName: fileName,
+                    types: [{ description: ext.toUpperCase() + ' File', accept: accept }]
+                });
+                var writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                return;
+            } catch (err) {
+                if (err && err.name === 'AbortError') {
+                    // User cancelled the save dialog - do not fall back to a silent download.
+                    return;
+                }
+                console.warn('showSaveFilePicker failed, falling back to direct download:', err);
+            }
+        }
+
         var link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = fileName;
