@@ -89,7 +89,7 @@
             </div>
 
             <div class="logo-box">
-                <img src="cnet logo.png" alt="CNET Logo" class="cnet-logo-img" />
+                <img src="cnet logo.jpg" alt="CNET Logo" class="cnet-logo-img" />
             </div>
         </div>
 
@@ -444,8 +444,8 @@
                 <div class="chart-title">Today's Room Status</div>
                 <DxPieChart Data="@roomStatusData" Height="260px" Width="100%">
                     <DxChartLegend Visible="false" />
-                    <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal"
-                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Room Status">
+                    <DxPieChartSeries T="RoomStatusSlice" TArgument="string" TValue="decimal" ArgumentField="@(x => x.Name)"
+                                      ValueField="@(x => x.Value)" Name="Room Status">
                         <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
                             <DxChartSeriesLabelConnector Visible="true" />
                         </DxChartSeriesLabel>
@@ -465,8 +465,8 @@
                 <div class="chart-title">Room Occupancy (Today)</div>
                 <DxPieChart Data="@occupancyData" Height="260px" Width="100%">
                     <DxChartLegend Visible="false" />
-                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal"
-                                      ArgumentField="@(x => x.Name)" ValueField="@(x => x.Value)" Name="Occupancy">
+                    <DxPieChartSeries T="OccupancySlice" TArgument="string" TValue="decimal" ArgumentField="@(x => x.Name)"
+                                      ValueField="@(x => x.Value)" Name="Occupancy">
                         <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside">
                             <DxChartSeriesLabelConnector Visible="true" />
                         </DxChartSeriesLabel>

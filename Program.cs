@@ -81,6 +81,12 @@ app.MapGet("/account/logout", async (HttpContext ctx) =>
     return Results.Redirect("/");
 });
 
+app.MapGet("/account/validate", (HttpContext ctx) =>
+{
+    var isAuthenticated = ctx.User.Identity?.IsAuthenticated == true;
+    return Results.Ok(new { authenticated = isAuthenticated });
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

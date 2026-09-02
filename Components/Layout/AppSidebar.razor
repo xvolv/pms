@@ -1,4 +1,5 @@
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <div class="sidebar-shell">
     <div class="sidebar-rail">
@@ -76,10 +77,18 @@
 
     private void GoHome() => NavigationManager.NavigateTo("/dashboard");
 
-    // Same reasoning as the sign-in redirect: clearing the auth cookie needs
-    // a real HTTP response, so this is a forced full navigation to a plain
-    // endpoint (Program.cs), not an in-circuit route change.
-    private void Logout() => NavigationManager.NavigateTo("/account/logout", forceLoad: true);
+    private async Task Logout()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("authSync.notifyLogout");
+        }
+        catch
+        {
+            // Ignore if JS interop fails during shutdown
+        }
+        NavigationManager.NavigateTo("/account/logout", forceLoad: true);
+    }
 
     private async Task Select(SidebarSection section)
     {

@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject RecentPagesService RecentPagesService
+@inject IJSRuntime JS
 @implements IDisposable
 
 <div class="page @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
@@ -36,9 +37,42 @@
         TrackCurrentLocation();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("authSync.init");
+                await JS.InvokeAsync<bool>("authSync.validate");
+            }
+            catch
+            {
+                // Ignored if JS runtime is unavailable or disconnected
+            }
+        }
+    }
+
     private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         TrackCurrentLocation();
+        _ = ValidateAuthAsync();
+    }
+
+    private async Task ValidateAuthAsync()
+    {
+        try
+        {
+            var isValid = await JS.InvokeAsync<bool>("authSync.validate");
+            if (!isValid)
+            {
+                NavigationManager.NavigateTo("/", forceLoad: true);
+            }
+        }
+        catch
+        {
+            // Ignored during disconnection or circuit teardown
+        }
     }
 
     private void TrackCurrentLocation()
