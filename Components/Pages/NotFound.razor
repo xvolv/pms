@@ -6,31 +6,43 @@
 
 <div class="nf-stage">
     <div class="nf-content">
-        <!-- Minimalist Branded Geometric Illustration -->
+        <!-- 3 Overlapping Sky Clouds Illustration (Matching Exact Reference Cloud Shape) -->
         <div class="nf-icon-wrap">
-            <svg class="nf-graphic" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="60" cy="60" r="54" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4 4" />
-                <circle cx="60" cy="60" r="38" fill="#fef2f2" />
+            <svg class="nf-graphic" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- SVG Definition for the Exact Cloud Silhouette -->
+                <defs>
+                    <path id="cloud-shape" d="M 16,48 
+                    C 8,48 1,42 2,34 
+                    C 2,27 7,21 14,20 
+                    C 16,9 27,2 40,2 
+                    C 51,2 61,8 64,18 
+                    C 68,14 74,11 80,11 
+                    C 89,11 96,17 96,25 
+                    C 103,26 108,32 108,39 
+                    C 108,46 102,52 94,52 
+                    L 16,52 
+                    C 8,52 2,46 2,38 Z" />
+                </defs>
 
-                <!-- Cloud Silhouette Contour -->
-                <path
-                d="M42 66 C42 58 48 52 56 52 C58 46 64 42 71 44 C77 46 81 51 81 57 C85 57 88 61 88 65 C88 69 85 72 80 72 L44 72 C43 72 42 70 42 66 Z"
-                stroke="#e52427" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                <!-- Cloud 1: Back Left (Soft Light Pink/Red) -->
+                <use href="#cloud-shape" x="12" y="14" transform="scale(0.85)" fill="#fee2e2" />
 
-                <!-- Subtle Compass Pin / Radar Pulse -->
-                <circle cx="60" cy="60" r="2.5" fill="#e52427" />
-                <line x1="60" y1="36" x2="60" y2="40" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
-                <line x1="60" y1="80" x2="60" y2="84" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
-                <line x1="36" y1="60" x2="40" y2="60" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
-                <line x1="80" y1="60" x2="84" y2="60" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                <!-- Cloud 2: Back Right (Soft Warm Coral Red) -->
+                <use href="#cloud-shape" x="96" y="10" transform="scale(0.82)" fill="#fca5a5" />
+
+                <!-- Cloud 3: Foreground Main (Bold Red with White Dot) -->
+                <g transform="translate(34, 40) scale(1.18)">
+                    <use href="#cloud-shape" fill="#e52427" />
+                    <!-- White Center Circle Dot -->
+                    <circle cx="38" cy="34" r="5" fill="#ffffff" />
+                </g>
             </svg>
         </div>
 
         <div class="nf-badge">Lost in the Cloud</div>
 
-        <h1 class="nf-headline"> 404 Page Not Found</h1>
+        <h1 class="nf-headline">404 Page Not Found</h1>
 
-        
         <div class="nf-buttons">
             <button type="button" class="nf-btn-primary" @onclick="GoHome">
                 <i class="bi bi-grid-fill text-white me-2"></i> Back to Dashboard
@@ -39,7 +51,7 @@
                 <i class="bi bi-arrow-left me-2"></i> Previous
             </button>
         </div>
-    </div>`
+    </div>
 </div>
 
 <style>
@@ -53,7 +65,7 @@
     }
 
     .nf-content {
-        max-width: 460px;
+        max-width: 480px;
         width: 100%;
         text-align: center;
         display: flex;
@@ -62,9 +74,9 @@
     }
 
     .nf-icon-wrap {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 20px;
+        width: 200px;
+        height: 130px;
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -73,6 +85,7 @@
     .nf-graphic {
         width: 100%;
         height: 100%;
+        overflow: visible;
     }
 
     .nf-badge {
@@ -90,16 +103,8 @@
         font-size: 1.95rem;
         font-weight: 800;
         color: #0f172a;
-        margin: 0 0 42px 0;
+        margin: 0 0 36px 0;
         letter-spacing: -0.5px;
-    }
-
-    .nf-description {
-        font-size: 0.94rem;
-        color: #64748b;
-        line-height: 1.55;
-        margin: 0 0 32px 0;
-        max-width: 400px;
     }
 
     .nf-buttons {
