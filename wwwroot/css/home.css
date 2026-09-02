@@ -72,7 +72,7 @@
 
     min-width: 420px;
 
-    padding: 4px 0;
+    padding: 0px 0px 8px 0px;
 }
 
 .avatar {
@@ -362,6 +362,20 @@
 
 .icon-toolbar-btn:hover {
     background: #f0f4fa;
+}
+
+.icon-toolbar-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.icon-toolbar-btn i.spin {
+    animation: icon-toolbar-spin 0.8s linear infinite;
+}
+
+@keyframes icon-toolbar-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .panel-toolbar-hotel {
@@ -725,14 +739,32 @@
         height: auto;
     }
 
+    .dashboard-page {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    .main-tabs + .dx-tabs-content-panel,
+    .main-tabs + .dx-tabs-content-panel .dx-tabs-content {
+        min-height: 0;
+        overflow: visible;
+    }
+
     .dashboard-body {
         flex-direction: column;
+        height: auto;
+        overflow: visible;
     }
 
     .left-panel,
     .right-panel {
         min-width: 0;
-        flex: 1 1 auto;
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        flex: 0 0 auto;
+        overflow: visible;
     }
 }
 
