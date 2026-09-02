@@ -1,5 +1,218 @@
 <div class="cnet-loading @CssClass" style="@(string.IsNullOrWhiteSpace(Height) ? null : $"height:{Height};")">
-    <div class="cnet-loading-spinner"></div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" width="100%" height="100%"
+         aria-label="Red Cloud ICT Solutions Animated Loader" class="redcloud-loader">
+        <style>
+                    :root {
+                        --rc-red: #e52427;
+                        --rc-dark: #191919;
+                    }
+
+                    .redcloud-loader {
+                        display: block;
+                        max-width: 440px;
+                        max-height: 220px;
+                        margin: auto;
+                        font-family: 'Century Gothic', 'Montserrat', 'Segoe UI', -apple-system, sans-serif;
+                    }
+
+                    /* Common line-draw base */
+                    .draw-stroke {
+                        fill-opacity: 0;
+                        stroke-dasharray: 1000;
+                        stroke-dashoffset: 1000;
+                    }
+
+                    /* 1. Cloud Outline - Segments for custom edge and body thicknesses */
+                    .cloud-contour-start {
+                        stroke: var(--rc-red);
+                        stroke-width: 6.5;
+                        stroke-linecap: round;
+                        stroke-linejoin: round;
+                        fill: none;
+                        stroke-dasharray: 400;
+                        stroke-dashoffset: 400;
+                        animation: drawCloudStart 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                    }
+
+                    .cloud-contour-end {
+                        stroke: var(--rc-red);
+                        stroke-width: 4.7;
+                        stroke-linecap: round;
+                        stroke-linejoin: round;
+                        fill: none;
+                        stroke-dasharray: 400;
+                        stroke-dashoffset: 400;
+                        animation: drawCloudEnd 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                    }
+
+                    /* 2. RED Typography - Medium weight */
+                    .text-red-brand {
+                        font-size: 52px;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        stroke: var(--rc-red);
+                        stroke-width: 1;
+                        fill: var(--rc-red);
+                        animation: fillRedText 3.5s ease-in-out infinite;
+                    }
+
+                    /* 3. Cloud Typography - Light / Normal weight (not bold) */
+                    .text-cloud-brand {
+                        font-size: 52px;
+                        font-weight: 300;
+                        letter-spacing: 0.5px;
+                        stroke: var(--rc-red);
+                        stroke-width: 0.8;
+                        fill: var(--rc-red);
+                        animation: fillRedText 3.5s ease-in-out infinite;
+                    }
+
+                    /* 4. Subtitle Typography */
+                    .sub-text {
+                        font-size: 30px;
+                        font-weight: 300;
+                        letter-spacing: 0.5px;
+                        stroke: var(--rc-dark);
+                        stroke-width: 0.8;
+                        fill: var(--rc-dark);
+                        animation: fillSubText 3.5s ease-in-out infinite;
+                    }
+
+                    /* 5. Underline Accent */
+                    .accent-bar {
+                        stroke: var(--rc-dark);
+                        stroke-width: 2;
+                        stroke-linecap: round;
+                        stroke-dasharray: 200;
+                        stroke-dashoffset: 200;
+                        animation: drawBar 3.5s ease-in-out infinite;
+                    }
+
+                    /* Keyframes */
+                    @@keyframes drawCloudStart {
+                        0% {
+                            stroke-dashoffset: 400;
+                        }
+
+                        30%,
+                        85% {
+                            stroke-dashoffset: 0;
+                        }
+
+                        96%,
+                        100% {
+                            stroke-dashoffset: 400;
+                        }
+                    }
+
+                    @@keyframes drawCloudEnd {
+
+                        0%,
+                        12% {
+                            stroke-dashoffset: 400;
+                        }
+
+                        40%,
+                        85% {
+                            stroke-dashoffset: 0;
+                        }
+
+                        96%,
+                        100% {
+                            stroke-dashoffset: 400;
+                        }
+                    }
+
+                    @@keyframes fillRedText {
+                        0% {
+                            stroke-dashoffset: 1000;
+                            fill-opacity: 0;
+                        }
+
+                        35% {
+                            stroke-dashoffset: 0;
+                            fill-opacity: 0;
+                        }
+
+                        48%,
+                        85% {
+                            stroke-dashoffset: 0;
+                            fill-opacity: 1;
+                        }
+
+                        95%,
+                        100% {
+                            stroke-dashoffset: 1000;
+                            fill-opacity: 0;
+                        }
+                    }
+
+                    @@keyframes drawBar {
+
+                        0%,
+                        25% {
+                            stroke-dashoffset: 200;
+                        }
+
+                        50%,
+                        85% {
+                            stroke-dashoffset: 0;
+                        }
+
+                        95%,
+                        100% {
+                            stroke-dashoffset: 200;
+                        }
+                    }
+
+                    @@keyframes fillSubText {
+
+                        0%,
+                        20% {
+                            stroke-dashoffset: 1000;
+                            fill-opacity: 0;
+                        }
+
+                        45% {
+                            stroke-dashoffset: 0;
+                            fill-opacity: 0;
+                        }
+
+                        58%,
+                        85% {
+                            stroke-dashoffset: 0;
+                            fill-opacity: 1;
+                        }
+
+                        95%,
+                        100% {
+                            stroke-dashoffset: 1000;
+                            fill-opacity: 0;
+                        }
+                    }
+        </style>
+
+        <!-- Cloud path - Segment 1: Starting arch from 'C' (Adjust thickness with stroke-width) -->
+        <path class="cloud-contour-start" d="M 178,116 C 166,60 246,48 250,92" />
+
+        <!-- Cloud path - Segment 2: Ending arch to 'd' (Adjust thickness with stroke-width) -->
+        <path class="cloud-contour-end" d="M 250,92 C 258,73 285,83 274,114" />
+
+        <!-- "RED" (Medium weight) and "Cloud" (Light weight) -->
+        <text x="35" y="150">
+            <tspan class="draw-stroke text-red-brand">RED </tspan>
+            <tspan class="draw-stroke text-cloud-brand">Cloud</tspan>
+        </text>
+
+        <!-- Divider Rule aligned underneath "RED" -->
+        <line x1="36" y1="178" x2="168" y2="178" class="accent-bar" />
+
+        <!-- "ICT Solutions" Subtitle aligned under "Cloud" -->
+        <text x="185" y="188" class="draw-stroke sub-text">
+            ICT Solutions
+        </text>
+    </svg>
+
     @if (!string.IsNullOrWhiteSpace(Text))
     {
         <div class="cnet-loading-text">@Text</div>
@@ -7,7 +220,7 @@
 </div>
 
 @code {
-    [Parameter] public string? Text { get; set; } = "Loading...";
+    [Parameter] public string? Text { get; set; }
     [Parameter] public string? Height { get; set; }
     [Parameter] public string? CssClass { get; set; }
 }

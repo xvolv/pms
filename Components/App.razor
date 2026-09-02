@@ -25,13 +25,18 @@
     <link href="css/density-chart.css" rel="stylesheet" />
     <link href="css/home.css" rel="stylesheet" />
     <link href="css/loading-spinner.css" rel="stylesheet" />
+    <link href="css/network-overlay.css" rel="stylesheet" />
     <link href="css/devexpress-print-preview.css" rel="stylesheet" />
     <HeadOutlet />
 </head>
 
 <body>
     <Routes @rendermode="InteractiveServer" />
+
+    <NetworkOverlay />
+
     <script src="js/auth-sync.js"></script>
+    <script src="js/network-monitor.js"></script>
     <script src="_framework/blazor.web.js"></script>
     <script src="js/devexpress-print-preview.js"></script>
 </body>

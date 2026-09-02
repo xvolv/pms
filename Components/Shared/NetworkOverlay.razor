@@ -1,0 +1,55 @@
+<!-- No Internet / Offline Overlay Modal -->
+<div id="network-offline-overlay">
+    <div class="network-modal-card">
+        <button type="button" class="network-modal-close" onclick="window.dismissOfflineOverlay()" title="Close">&times;</button>
+        
+        <div class="network-modal-loader-centered">
+            <LoadingSpinner Height="240px" />
+        </div>
+
+        <h4 class="network-modal-title">
+            <i class="bi bi-wifi-off text-danger"></i> No Internet Connection
+        </h4>
+        <p class="network-modal-subtitle">
+            Please check your network. Waiting for connection to be restored...
+        </p>
+
+        <button type="button" class="btn-network-close" onclick="window.location.reload()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Reload Page
+        </button>
+    </div>
+</div>
+
+<!-- Blazor Circuit Reconnection Modal -->
+<div id="components-reconnect-modal">
+    <div class="network-modal-card">
+        <button type="button" class="network-modal-close" onclick="window.dismissReconnectModal()" title="Close">&times;</button>
+
+        <div class="network-modal-loader-centered">
+            <LoadingSpinner Height="240px" />
+        </div>
+
+        <h4 class="network-modal-title">
+            <i class="bi bi-arrow-repeat text-danger"></i> Reconnecting to Server
+        </h4>
+        <p class="network-modal-subtitle">
+            Restoring your session...
+        </p>
+
+        <button type="button" class="btn-network-close" onclick="window.location.reload()">
+            Reload Page
+        </button>
+    </div>
+</div>
+
+<!-- Connection Restored Toast Notification -->
+<div id="network-restored-toast" class="network-restored-toast" role="alert">
+    <div class="network-toast-content">
+        <i class="bi bi-check-circle-fill network-toast-icon"></i>
+        <div class="network-toast-text">
+            <strong>Connection Restored</strong>
+            <span>You are back online.</span>
+        </div>
+    </div>
+    <button type="button" class="network-toast-close" onclick="window.hideRestoredToast()" title="Dismiss">&times;</button>
+</div>
