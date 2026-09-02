@@ -13,7 +13,7 @@
 
 <div class="login-container">
     <div class="login-header">
-       @*  <span class="brand-cnet">RED Cloud</span> *@ <span class="brand-erp">PMS ERP V7</span>
+        @*  <span class="brand-cnet">RED Cloud</span> *@ <span class="brand-erp">PMS ERP V7</span>
     </div>
 
     <div class="login-card">
@@ -32,11 +32,7 @@
 
             <form @onsubmit="HandleVerify">
                 <div class="input-group-custom">
-                    <input type="text" 
-                           class="form-control-custom" 
-                           placeholder="Identification No." 
-                           @bind="tin" 
-                           required 
+                    <input type="text" class="form-control-custom" placeholder="Identification No." @bind="tin" required
                            disabled="@isLoading" />
                     <span class="input-icon">
                         <i class="bi bi-cloud-fill"></i>
@@ -75,7 +71,7 @@
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
                 </div>
             }
-            
+
             @if (!string.IsNullOrEmpty(successMessage))
             {
                 <div class="alert alert-info" role="alert">
@@ -85,11 +81,7 @@
 
             <form @onsubmit="HandleLogin">
                 <div class="input-group-custom">
-                    <input type="text" 
-                           class="form-control-custom" 
-                           placeholder="Username" 
-                           @bind="username" 
-                           required 
+                    <input type="text" class="form-control-custom" placeholder="Username" @bind="username" required
                            disabled="@isLoading" />
                     <span class="input-icon">
                         <i class="bi bi-person-fill"></i>
@@ -97,11 +89,7 @@
                 </div>
 
                 <div class="input-group-custom">
-                    <input type="password" 
-                           class="form-control-custom" 
-                           placeholder="Password" 
-                           @bind="password" 
-                           required 
+                    <input type="password" class="form-control-custom" placeholder="Password" @bind="password" required
                            disabled="@isLoading" />
                     <span class="input-icon">
                         <i class="bi bi-lock-fill"></i>
@@ -109,7 +97,8 @@
                 </div>
 
                 <div class="input-group-custom">
-                    <select class="form-control-custom select-custom" @bind="selectedBranchId" required disabled="@isLoading">
+                    <select class="form-control-custom select-custom" @bind="selectedBranchId" required
+                            disabled="@isLoading">
                         <option value="" disabled selected>Select Branch ...</option>
                         @if (systemInitData?.branches != null)
                         {
@@ -154,7 +143,7 @@
             @systemInitData.company.FirstName
         </div>
     }
-    
+
 </div>
 
 @code {
@@ -163,7 +152,7 @@
     private string username = "";
     private string password = "";
     private string selectedBranchId = "";
-    private bool isRememberMe = false;
+    @* private bool isRememberMe = false; *@
 
     private int currentStep = 1;
     private bool isLoading = false;
@@ -272,7 +261,8 @@
 
             var userId = result.Data?.personInfo?.Id;
             var role = result.Data?.role;
-            var signInUrl = $"/account/signin?tin={Uri.EscapeDataString(tin)}&username={Uri.EscapeDataString(username)}&consigneeUnitId={consigneeUnitId}";
+            var signInUrl =
+$"/account/signin?tin={Uri.EscapeDataString(tin)}&username={Uri.EscapeDataString(username)}&consigneeUnitId={consigneeUnitId}";
             if (!string.IsNullOrEmpty(consigneeUnitName))
                 signInUrl += $"&consigneeUnitName={Uri.EscapeDataString(consigneeUnitName)}";
             if (userId.HasValue)

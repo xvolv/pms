@@ -2,11 +2,6 @@
 @inject NavigationManager Navigation
 
 <Router AppAssembly="typeof(Program).Assembly">
-    <Navigating>
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh; width: 100%;">
-            <LoadingSpinner Text="Loading page data..." Height="300px" />
-        </div>
-    </Navigating>
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
             <Authorizing>
