@@ -20,4 +20,9 @@
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <ERP.V7.WebPMS.Components.Pages.NotFound />
+        </LayoutView>
+    </NotFound>
 </Router>
