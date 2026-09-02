@@ -1,4 +1,5 @@
 @using DevExpress.Blazor
+@using ERP.V7.WebPMS.Components.DocumentBrowser.Models
 
 <div class="rst-toolbar">
     <button type="button" class="rt-toolbar-btn" @onclick="OnShow">
@@ -84,6 +85,29 @@
     </div>
 </div>
 
+<!-- Bottom Requested Services — collapsible, closed by default -->
+<div class="db-pr-requested-services @(IsServicesCollapsed ? "db-pr-collapsed" : "")">
+    <div class="db-pr-rs-header" @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+        <span>Requested Services</span>
+        <div class="db-pr-panel-actions" @onclick:stopPropagation="true">
+            <button type="button" title="Pin"><i class="bi bi-pin-angle"></i></button>
+            <button type="button" title="@(IsServicesCollapsed ? "Expand" : "Collapse")"
+                    @onclick="() => IsServicesCollapsed = !IsServicesCollapsed">
+                <i class="bi @(IsServicesCollapsed ? "bi-chevron-up" : "bi-chevron-down")"></i>
+            </button>
+        </div>
+    </div>
+    @if (!IsServicesCollapsed)
+    {
+        <DxGrid Data="@RequestedServices" PageSize="5" CssClass="db-pr-grid-small">
+            <Columns>
+                <DxGridDataColumn FieldName="Service" Caption="Service" />
+                <DxGridDataColumn FieldName="TargetTime" Caption="Target Time" Width="140" />
+            </Columns>
+        </DxGrid>
+    }
+</div>
+
 @code {
     DateTime SelectedDate = DateTime.Today;
     List<string> Packages = new();
@@ -94,6 +118,17 @@
     PackageAuditRowModel? SelectedItem;
 
     decimal Sum => Data.Sum( d => d.Amount);
+
+    bool IsServicesCollapsed = true;
+
+    List<RequestedServiceModel> RequestedServices =>
+        SelectedItem == null
+            ? new()
+            : new List<RequestedServiceModel>
+            {
+                new() { Service = $"Package Activity Confirmation ({SelectedItem.Guest})", TargetTime = DateTime.Today.AddHours(9).ToString("g") },
+                new() { Service = $"{SelectedItem.Package} Amenities Setup", TargetTime = DateTime.Today.AddHours(11).ToString("g") }
+            };
 
 
     protected override void OnInitialized()
