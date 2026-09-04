@@ -28,16 +28,24 @@
         @switch (activeTabIndex)
         {
             case 0:
-                <TaskAssignmentPanel State="@state" OnChanged="Refresh" />
+                <PermissionGate Category="House Keeping" Permission="Task Assignment">
+                    <TaskAssignmentPanel State="@state" OnChanged="Refresh" />
+                </PermissionGate>
                 break;
             case 1:
-                <RoomManagementPanel State="@state" OnChanged="Refresh" />
+                <PermissionGate Category="House Keeping" Permission="Room Management">
+                    <RoomManagementPanel State="@state" OnChanged="Refresh" />
+                </PermissionGate>
                 break;
             case 2:
-                <DiscrepancyPanel State="@state" OnChanged="Refresh" />
+                <PermissionGate Category="House Keeping" Permission="Discrepancy">
+                    <DiscrepancyPanel State="@state" OnChanged="Refresh" />
+                </PermissionGate>
                 break;
             case 3:
-                <TurndownPanel State="@state" OnChanged="Refresh" />
+                <PermissionGate Category="House Keeping" Permission="Turndown Management">
+                    <TurndownPanel State="@state" OnChanged="Refresh" />
+                </PermissionGate>
                 break;
         }
     </div>

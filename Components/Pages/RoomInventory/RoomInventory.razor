@@ -6,6 +6,7 @@
 
 <PageTitle>Room Inventory</PageTitle>
 
+<PermissionGate Category="Document Browser" Permission="Room Inventory">
 <div class="dashboard-wrapper">
     <div class="top-tab-header">
         <div class="tab-item active" style="position: relative; padding-right: 2.5rem;">
@@ -226,6 +227,7 @@
         }
     </div>
 </div>
+</PermissionGate>
 
 <DevExpressPrintPreview
     @bind-Visible="showPrintPreview"

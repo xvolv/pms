@@ -1,0 +1,28 @@
+@inject UserSessionService UserSession
+
+@if (_allowed)
+{
+    @ChildContent
+}
+else if (_evaluated)
+{
+    <div class="permission-gate-denied">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>You are not allowed to access this.</p>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Category { get; set; } = "";
+    [Parameter, EditorRequired] public string Permission { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _allowed;
+    private bool _evaluated;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _allowed = await UserSession.HasAccessAsync(Category, Permission);
+        _evaluated = true;
+    }
+}

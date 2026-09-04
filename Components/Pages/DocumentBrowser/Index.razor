@@ -19,13 +19,19 @@
     <div class="db-pr-tabs-wrapper">
         <DxTabs @bind-ActiveTabIndex="ActiveMainTabIndex" CssClass="db-pr-sub-tabs">
             <DxTabPage Text="Profiles">
-                <ProfilesTab />
+                <PermissionGate Category="Document Browser" Permission="Profiles Document">
+                    <ProfilesTab />
+                </PermissionGate>
             </DxTabPage>
             <DxTabPage Text="Transactions">
-                <TransactionsTab />
+                <PermissionGate Category="Document Browser" Permission="Transactions Document">
+                    <TransactionsTab />
+                </PermissionGate>
             </DxTabPage>
             <DxTabPage Text="Others">
-                <OthersTab />
+                <PermissionGate Category="Document Browser" Permission="Others">
+                    <OthersTab />
+                </PermissionGate>
             </DxTabPage>
         </DxTabs>
     </div>

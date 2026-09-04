@@ -3,22 +3,34 @@
 <div class="db-pr-tabs-wrapper">
     <DxTabs @bind-ActiveTabIndex="ActiveProfileTab" CssClass="db-pr-sub-tabs">
         <DxTabPage Text="Guest">
-            <Profiles IsGuest="true" ProfileType="Guest" GslTypeId="27" />
+            <PermissionGate Category="Document Browser" Permission="Guest">
+                <Profiles IsGuest="true" ProfileType="Guest" GslTypeId="27" />
+            </PermissionGate>
         </DxTabPage>
         <DxTabPage Text="Contact">
-            <Profiles IsGuest="false" ProfileType="Contact" GslTypeId="30" />
+            <PermissionGate Category="Document Browser" Permission="Contact">
+                <Profiles IsGuest="false" ProfileType="Contact" GslTypeId="30" />
+            </PermissionGate>
         </DxTabPage>
         <DxTabPage Text="Company">
-            <Profiles IsGuest="false" ProfileType="Company" GslTypeId="28" />
+            <PermissionGate Category="Document Browser" Permission="Company">
+                <Profiles IsGuest="false" ProfileType="Company" GslTypeId="28" />
+            </PermissionGate>
         </DxTabPage>
         <DxTabPage Text="Travel Agent">
-            <Profiles IsGuest="false" ProfileType="TravelAgent" GslTypeId="31" />
+            <PermissionGate Category="Document Browser" Permission="Travel Agent">
+                <Profiles IsGuest="false" ProfileType="TravelAgent" GslTypeId="31" />
+            </PermissionGate>
         </DxTabPage>
         <DxTabPage Text="Group">
-            <Profiles IsGuest="false" ProfileType="Group" GslTypeId="41" />
+            <PermissionGate Category="Document Browser" Permission="Group">
+                <Profiles IsGuest="false" ProfileType="Group" GslTypeId="41" />
+            </PermissionGate>
         </DxTabPage>
         <DxTabPage Text="Source">
-            <Profiles IsGuest="false" ProfileType="Source" GslTypeId="42" />
+            <PermissionGate Category="Document Browser" Permission="Source">
+                <Profiles IsGuest="false" ProfileType="Source" GslTypeId="42" />
+            </PermissionGate>
         </DxTabPage>
     </DxTabs>
 </div>

@@ -7,5 +7,6 @@ namespace ERP.V7.WebPMS.Services
     {
         Task<CNET_V7_Domain.Misc.ResponseModel<SystemInitDTO>?> InitializeSystemAsync(string tin);
         Task<CNET_V7_Domain.Misc.ResponseModel<LoginResponse>?> AuthenticateAsync(string username, string password, string tin, string branchId);
+        Task<CNET_V7_Domain.Misc.ResponseModel<PmsAccessDTO>?> GetPmsAccessAsync(int consigneeUnitId, int userId);
     }
 }

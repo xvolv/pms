@@ -1,0 +1,22 @@
+.permission-gate-denied {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 200px;
+    padding: 40px 20px;
+    color: #888;
+    text-align: center;
+}
+
+.permission-gate-denied i {
+    font-size: 32px;
+    color: #dc3545;
+}
+
+.permission-gate-denied p {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+}

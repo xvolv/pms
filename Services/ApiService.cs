@@ -88,5 +88,48 @@ namespace ERP.V7.WebPMS.Services
                 };
             }
         }
+
+        public async Task<CNET_V7_Domain.Misc.ResponseModel<PmsAccessDTO>?> GetPmsAccessAsync(int consigneeUnitId, int userId)
+        {
+            var baseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5181/";
+            if (!baseUrl.EndsWith("/"))
+            {
+                baseUrl += "/";
+            }
+
+            var requestUrl = $"{baseUrl}api/PMSLibrary/PMSInitialize?consigneeunit={consigneeUnitId}&userid={userId}";
+
+            try
+            {
+                _logger.LogInformation("Calling PMSInitialize API at: {RequestUrl}", requestUrl);
+                var httpResponse = await _httpClient.GetAsync(requestUrl);
+                var body = await httpResponse.Content.ReadAsStringAsync();
+
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("PMSInitialize API returned {StatusCode} for {RequestUrl}. Response body: {Body}",
+                        (int)httpResponse.StatusCode, requestUrl, body);
+                    return new ResponseModel<PmsAccessDTO>
+                    {
+                        Success = false,
+                        Message = $"PMSInitialize returned {(int)httpResponse.StatusCode}: {body}"
+                    };
+                }
+
+                return JsonSerializer.Deserialize<ResponseModel<PmsAccessDTO>>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "PMSInitialize API call failed to {RequestUrl}.", requestUrl);
+                return new ResponseModel<PmsAccessDTO>
+                {
+                    Success = false,
+                    Message = "Connection failed: " + ex.Message
+                };
+            }
+        }
     }
 }

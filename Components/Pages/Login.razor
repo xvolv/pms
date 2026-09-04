@@ -259,13 +259,13 @@
                 .FirstOrDefault(b => b.Id == consigneeUnitId)?.Name
                 ?? result.Data?.personConsigneeUnit?.Name;
 
-            var userId = result.Data?.personInfo?.Id;
+            var userId = 1; //result.Data?.personInfo?.Id;
             var role = result.Data?.role;
             var signInUrl =
 $"/account/signin?tin={Uri.EscapeDataString(tin)}&username={Uri.EscapeDataString(username)}&consigneeUnitId={consigneeUnitId}";
             if (!string.IsNullOrEmpty(consigneeUnitName))
                 signInUrl += $"&consigneeUnitName={Uri.EscapeDataString(consigneeUnitName)}";
-            if (userId.HasValue)
+            if (userId==1)
                 signInUrl += $"&userId={userId}";
             if (role.HasValue)
                 signInUrl += $"&role={role}";
